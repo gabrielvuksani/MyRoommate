@@ -250,8 +250,9 @@ export default function Home() {
         {/* 1. Chore Card */}
         {nextChore ? (
           <div 
-            className="smart-card interactive cursor-pointer"
+            className="smart-card interactive cursor-pointer animate-slide-up hover:scale-102"
             onClick={() => setLocation('/chores')}
+            style={{ animationDelay: '100ms' }}
           >
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
@@ -297,8 +298,9 @@ export default function Home() {
           </div>
         ) : (
           <div 
-            className="empty-state-card cursor-pointer"
+            className="empty-state-card cursor-pointer animate-fade-in hover:scale-102"
             onClick={() => setLocation('/chores')}
+            style={{ animationDelay: '100ms' }}
           >
             <div className="p-6 text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -316,8 +318,9 @@ export default function Home() {
         {/* 2. Bills Card */}
         {balance && (netBalance !== 0 || balance.totalOwed > 0 || balance.totalOwing > 0) ? (
           <div 
-            className="smart-card interactive cursor-pointer"
+            className="smart-card interactive cursor-pointer animate-slide-up hover:scale-102"
             onClick={() => setLocation('/expenses')}
+            style={{ animationDelay: '200ms' }}
           >
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
@@ -351,8 +354,9 @@ export default function Home() {
           </div>
         ) : (
           <div 
-            className="empty-state-card cursor-pointer"
+            className="empty-state-card cursor-pointer animate-fade-in hover:scale-102"
             onClick={() => setLocation('/expenses')}
+            style={{ animationDelay: '200ms' }}
           >
             <div className="p-6 text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -370,8 +374,9 @@ export default function Home() {
         {/* 3. Calendar Card */}
         {todayEvents.length > 0 ? (
           <div 
-            className="smart-card interactive cursor-pointer"
+            className="smart-card interactive cursor-pointer animate-slide-up hover:scale-102"
             onClick={() => setLocation('/calendar')}
+            style={{ animationDelay: '300ms' }}
           >
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
@@ -404,8 +409,9 @@ export default function Home() {
           </div>
         ) : (
           <div 
-            className="empty-state-card cursor-pointer"
+            className="empty-state-card cursor-pointer animate-fade-in hover:scale-102"
             onClick={() => setLocation('/calendar')}
+            style={{ animationDelay: '300ms' }}
           >
             <div className="p-6 text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -471,8 +477,9 @@ export default function Home() {
           </div>
         ) : (
           <div 
-            className="empty-state-card cursor-pointer"
+            className="empty-state-card cursor-pointer animate-fade-in hover:scale-102"
             onClick={() => setLocation('/messages')}
+            style={{ animationDelay: '400ms' }}
           >
             <div className="p-6 text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">

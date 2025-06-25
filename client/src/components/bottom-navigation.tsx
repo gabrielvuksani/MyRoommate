@@ -22,8 +22,8 @@ export default function BottomNavigation() {
             <button
               key={id}
               onClick={() => setLocation(path)}
-              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 ${
-                isActive ? 'active' : 'inactive'
+              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 transition-all hover:scale-110 ${
+                isActive ? 'active animate-bounce-in' : 'inactive'
               }`}
             >
               <Icon size={20} className="flex-shrink-0" />
