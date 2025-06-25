@@ -107,7 +107,7 @@ export default function Chores() {
   }
 
   return (
-    <div className="page-container">
+    <div className="page-container animate-page-enter">
       {/* visionOS Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
