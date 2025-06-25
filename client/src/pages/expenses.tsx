@@ -94,22 +94,20 @@ export default function Expenses() {
 
   return (
     <div className="page-container">
-      {/* visionOS Header */}
-      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
-        <div className="page-header">
+      <div className="floating-header">
+        <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="page-title">Expenses</h1>
-              <p className="page-subtitle">Split bills and track balances</p>
+              <h1 className="text-large-title font-bold text-primary">Expenses</h1>
+              <p className="text-subhead text-secondary mt-1">Track and split costs easily</p>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogTrigger asChild>
-                  <button className="w-12 h-12 bg-gradient-to-br from-accent to-accent-hover rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    <Plus size={20} className="text-white" />
-                  </button>
-                </DialogTrigger>
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <button className="btn-floating">
+                  <span className="text-xl">+</span>
+                </button>
+              </DialogTrigger>
             <DialogContent className="modal-content">
               <DialogHeader className="px-6 pt-6 pb-2">
                 <DialogTitle className="text-title-2 font-bold text-primary">Add New Expense</DialogTitle>
@@ -153,72 +151,61 @@ export default function Expenses() {
                   {createExpenseMutation.isPending ? "Adding..." : "Add Expense"}
                 </button>
               </div>
-              </DialogContent>
-              </Dialog>
-            </div>
+            </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>
       
-      {/* Enhanced Expenses Layout */}
-      <div className="flex-1 page-content-with-header">
+      <div className="page-content space-y-6">
         {/* Balance Overview */}
-        <div className="px-6 mb-6">
-          <div className="smart-card bg-gradient-to-br from-accent to-accent-hover text-white p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">Your Money</h2>
-              <DollarSign size={24} />
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <h2 className="text-headline font-semibold text-primary mb-4">Balance Overview</h2>
+            <div className="text-center py-4">
+              <p className={`text-title-1 font-bold ${netBalance >= 0 ? 'text-success' : 'text-destructive'}`}>
+                {netBalance >= 0 ? '+' : ''}${netBalance.toFixed(2)}
+              </p>
+              <p className="text-footnote text-secondary">Overall balance</p>
             </div>
-            
-            <div className="grid grid-cols-2 gap-6 mb-4">
-              <div>
-                <div className="text-3xl font-bold mb-1">
-                  ${balance?.totalOwed.toFixed(2) || '0.00'}
-                </div>
-                <div className="text-white/80">You're owed</div>
+            {balance && (
+              <div className="space-y-2">
+                {balance.totalOwed > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-ios-body text-black">Total owed to you</span>
+                    <span className="text-ios-body font-medium text-ios-green">
+                      ${balance.totalOwed.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+                {balance.totalOwing > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-ios-body text-black">Total you owe</span>
+                    <span className="text-ios-body font-medium text-ios-red">
+                      ${balance.totalOwing.toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
-              
-              <div>
-                <div className="text-3xl font-bold mb-1">
-                  ${balance?.totalOwing.toFixed(2) || '0.00'}
-                </div>
-                <div className="text-white/80">You owe</div>
-              </div>
-            </div>
-            
-            <div className="bg-white/20 rounded-xl p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-white/90 font-medium">Net Balance</span>
-                <span className="text-2xl font-bold text-white">
-                  {netBalance >= 0 ? '+' : ''}${netBalance.toFixed(2)}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Recent Expenses */}
-        <div className="px-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Expenses</h2>
-          <div className="space-y-3">
-            {expenses.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <DollarSign size={24} className="text-gray-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No expenses yet</h3>
-                <p className="text-gray-600 mb-6">Start tracking shared costs</p>
-                <button className="bg-accent text-white px-6 py-3 rounded-full font-semibold">
-                  Add First Expense
-                </button>
-              </div>
-            ) : (
-              expenses.map((expense: any) => (
-                <ExpenseCard key={expense.id} expense={expense} />
-              ))
-            )}
-          </div>
-        </div>
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <h2 className="text-headline font-semibold text-primary mb-4">Recent Expenses</h2>
+            <div className="space-y-3">
+              {expenses.length === 0 ? (
+                <p className="text-body text-secondary">No expenses yet</p>
+              ) : (
+                expenses.map((expense: any) => (
+                  <ExpenseCard key={expense.id} expense={expense} />
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

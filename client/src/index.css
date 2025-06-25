@@ -462,11 +462,6 @@
   overflow-x: hidden;
 }
 
-/* Content spacing for sticky headers */
-.page-content-with-header {
-  padding-top: var(--space-4);
-}
-
 .page-content {
   padding: 0 var(--space-6);
 }

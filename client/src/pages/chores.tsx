@@ -98,22 +98,20 @@ export default function Chores() {
 
   return (
     <div className="page-container">
-      {/* visionOS Header */}
-      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
-        <div className="page-header">
+      <div className="floating-header">
+        <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="page-title">Chores</h1>
-              <p className="page-subtitle">Manage household tasks</p>
+              <h1 className="text-large-title font-bold text-primary">Chores</h1>
+              <p className="text-subhead text-secondary mt-1">Keep the house running smoothly</p>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogTrigger asChild>
-                  <button className="w-12 h-12 bg-gradient-to-br from-green to-green-light rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    <Plus size={20} className="text-white" />
-                  </button>
-                </DialogTrigger>
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <button className="btn-floating">
+                  <span className="text-xl">+</span>
+                </button>
+              </DialogTrigger>
               <DialogContent className="modal-content">
                 <DialogHeader className="px-6 pt-6 pb-2">
                   <DialogTitle className="text-title-2 font-bold text-primary">Create New Chore</DialogTitle>
@@ -168,37 +166,13 @@ export default function Chores() {
                   </button>
                 </div>
               </DialogContent>
-              </Dialog>
-            </div>
+            </Dialog>
           </div>
         </div>
       </div>
       
-      {/* Enhanced Chores Layout */}
-      <div className="flex-1 page-content-with-header">
-        {/* Today's Focus */}
-        <div className="px-6 mb-6">
-          <div className="smart-card bg-gradient-to-br from-green to-green-light text-white p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">Today's Focus</h2>
-              <CheckSquare size={24} />
-            </div>
-            {chores.filter((c: any) => c.dueDate && new Date(c.dueDate).toDateString() === new Date().toDateString()).length > 0 ? (
-              <div>
-                <p className="text-white/90 mb-3">
-                  {chores.filter((c: any) => c.dueDate && new Date(c.dueDate).toDateString() === new Date().toDateString()).length} task{chores.filter((c: any) => c.dueDate && new Date(c.dueDate).toDateString() === new Date().toDateString()).length > 1 ? 's' : ''} due today
-                </p>
-              </div>
-            ) : (
-              <p className="text-white/90">All tasks completed! 🎉</p>
-            )}
-          </div>
-        </div>
-
-        {/* Chore Board */}
-        <div className="px-6">
-          <ChoreBoard chores={chores} onUpdateChore={handleUpdateChore} />
-        </div>
+      <div className="page-content">
+        <ChoreBoard chores={chores} onUpdateChore={handleUpdateChore} />
       </div>
     </div>
   );
