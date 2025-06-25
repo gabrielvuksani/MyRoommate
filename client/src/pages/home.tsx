@@ -109,49 +109,72 @@ export default function Home() {
 
       <div className="page-content space-y-6">
         {/* Hero Stats */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="glass-card">
-            <CardContent className="p-6 text-center animate-fade-in">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <CheckSquare className="text-white" size={20} />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{activeChores.length}</p>
-              <p className="text-sm text-gray-600">Active chores</p>
+            <CardContent className="p-6">
+              <button 
+                onClick={() => setLocation('/chores')}
+                className="w-full text-center transition-all btn-animated animate-fade-in"
+              >
+                <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <CheckSquare className="text-white" size={20} />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{activeChores.length}</p>
+                <p className="text-sm text-gray-600">Active chores</p>
+              </button>
             </CardContent>
           </Card>
           
           <Card className="glass-card">
-            <CardContent className="p-6 text-center animate-fade-in" style={{ animationDelay: '100ms' }}>
-              <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <DollarSign className="text-white" size={20} />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">
-                ${Math.abs(netBalance).toFixed(0)}
-              </p>
-              <p className="text-sm text-gray-600">
-                {netBalance > 0 ? 'Owed to you' : netBalance < 0 ? 'You owe' : 'All settled'}
-              </p>
+            <CardContent className="p-6">
+              <button 
+                onClick={() => setLocation('/expenses')}
+                className="w-full text-center transition-all btn-animated animate-fade-in"
+                style={{ animationDelay: '100ms' }}
+              >
+                <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <DollarSign className="text-white" size={20} />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${Math.abs(netBalance).toFixed(0)}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {netBalance > 0 ? 'Owed to you' : netBalance < 0 ? 'You owe' : 'All settled'}
+                </p>
+              </button>
             </CardContent>
           </Card>
 
           {/* Additional stats for larger screens */}
           <Card className="glass-card hidden md:block">
-            <CardContent className="p-6 text-center animate-fade-in" style={{ animationDelay: '200ms' }}>
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Calendar className="text-white" size={20} />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{todayEvents.length}</p>
-              <p className="text-sm text-gray-600">Today's events</p>
+            <CardContent className="p-6">
+              <button 
+                onClick={() => setLocation('/calendar')}
+                className="w-full text-center transition-all btn-animated animate-fade-in"
+                style={{ animationDelay: '200ms' }}
+              >
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="text-white" size={20} />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{todayEvents.length}</p>
+                <p className="text-sm text-gray-600">Today's events</p>
+              </button>
             </CardContent>
           </Card>
 
           <Card className="glass-card hidden md:block">
-            <CardContent className="p-6 text-center animate-fade-in" style={{ animationDelay: '300ms' }}>
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="text-white" size={20} />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{recentMessages.length}</p>
-              <p className="text-sm text-gray-600">New messages</p>
+            <CardContent className="p-6">
+              <button 
+                onClick={() => setLocation('/messages')}
+                className="w-full text-center transition-all btn-animated animate-fade-in"
+                style={{ animationDelay: '300ms' }}
+              >
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <MessageCircle className="text-white" size={20} />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{recentMessages.length}</p>
+                <p className="text-sm text-gray-600">New messages</p>
+              </button>
             </CardContent>
           </Card>
         </div>
