@@ -18,9 +18,28 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
   }
 
   if (isOwnMessage) {
+    const userName = message.user?.firstName || message.user?.email?.split('@')[0] || 'You';
+    
     return (
       <div className="flex justify-end">
-        <div className="flex-1 flex justify-end">
+        <div className="flex flex-col items-end">
+          <div className="flex items-center space-x-2 mb-1 px-1">
+            <span className="text-xs text-gray-400">
+              {new Date(message.createdAt).toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+              })}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">
+              {userName}
+            </span>
+            <div className="w-6 h-6 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-medium">
+                {message.user?.firstName?.[0] || message.user?.email?.[0] || 'Y'}
+              </span>
+            </div>
+          </div>
           <div className="bg-ios-blue rounded-2xl rounded-tr-md px-4 py-3 max-w-xs">
             <p className="text-ios-body text-white">{message.content}</p>
           </div>
