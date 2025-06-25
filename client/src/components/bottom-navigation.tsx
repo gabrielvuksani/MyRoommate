@@ -14,9 +14,10 @@ export default function BottomNavigation() {
 
   return (
     <nav className="tab-navigation" style={{
-      background: 'rgba(255, 255, 255, 0.25)',
-      backdropFilter: 'blur(40px) saturate(1.8) brightness(1.1)',
-      WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.1)',
+      background: 'rgba(255, 255, 255, 0.85)',
+      backdropFilter: 'blur(20px) saturate(1.8)',
+      WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+      border: '1px solid rgba(255, 255, 255, 0.3)',
     }}>
       <div className="flex items-center justify-center w-full">
         {tabs.map(({ id, path, label, Icon }) => {
