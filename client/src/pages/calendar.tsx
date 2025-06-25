@@ -16,7 +16,7 @@ export default function Calendar() {
     title: '',
     description: '',
     startDate: '',
-    color: 'blue',
+    color: '#3B82F6',
     type: 'social',
   });
   
@@ -43,7 +43,7 @@ export default function Calendar() {
         title: '',
         description: '',
         startDate: '',
-        color: 'blue',
+        color: '#3B82F6',
         type: 'social',
       });
       toast({
@@ -71,7 +71,7 @@ export default function Calendar() {
       description: newEvent.description || '',
       startDate: startDateTime.toISOString(),
       endDate: endDateTime.toISOString(),
-      color: newEvent.color || 'blue',
+      color: newEvent.color || '#3B82F6',
       type: 'personal'
     };
     
