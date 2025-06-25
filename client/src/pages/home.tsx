@@ -70,7 +70,7 @@ export default function Home() {
   }
 
   const activeChores = chores.filter((chore: any) => chore.status !== 'done');
-  const recentMessages = messages.slice(-3);
+  const recentMessages = messages.slice().reverse().slice(0, 3);
   const netBalance = (balance?.totalOwed || 0) - (balance?.totalOwing || 0);
   const firstName = user.firstName || user.email?.split('@')[0] || 'there';
 
@@ -269,7 +269,7 @@ export default function Home() {
                               {message.user.firstName || message.user.email?.split('@')[0]}
                             </p>
                             <span className="text-xs text-gray-500">
-                              {new Date(message.createdAt).toLocaleTimeString()}
+                              {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
                           <p className="text-sm text-gray-600">{message.content}</p>
