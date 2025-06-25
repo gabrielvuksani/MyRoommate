@@ -243,29 +243,25 @@ export default function Messages() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Fixed Header */}
-      <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        headerScrolled 
-          ? "bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm" 
-          : "bg-transparent"
-      }`}>
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between max-w-md mx-auto">
+    <div className="page-container page-transition">
+      {/* visionOS Header */}
+      <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
+        <div className="page-header">
+          <div className="flex items-center justify-between">
             <div>
               <h1 className="font-semibold text-[#1a1a1a] text-[22px]">Messages</h1>
-              <p className="text-sm text-gray-600">Chat with your household</p>
+              <p className="page-subtitle">Chat with your household</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Messages Container - Fixed height with scroll */}
-      <div className="flex-1 flex flex-col pt-20 pb-20">
-        <div className="flex-1 overflow-y-auto max-w-md mx-auto w-full">
-          <div className="px-6 py-4 space-y-2 min-h-full">
+      {/* Messages Container - Positioned between header and input */}
+      <div className="fixed top-[100px] bottom-[100px] left-0 right-0 overflow-y-auto">
+        <div className="max-w-md mx-auto h-full">
+          <div className="px-6 py-4 space-y-2 h-full flex flex-col">
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-96 space-y-6">
+              <div className="flex flex-col items-center justify-center flex-1 space-y-6">
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mb-4 mx-auto">
                     <MessageCircle size={24} className="text-white" />
@@ -303,73 +299,69 @@ export default function Messages() {
                 </div>
               </div>
             ) : (
-              <>
-                {messages.map((message: any) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                    currentUserId={user?.id}
-                  />
-                ))}
-                
-                {/* Typing Indicator */}
-                {typingUsers.length > 0 && (
-                  <div className="flex justify-start">
-                    <div className="flex flex-col items-start">
-                      <div className="bg-gray-100 rounded-2xl rounded-tl-md px-4 py-3">
-                        <div className="flex items-center space-x-1">
-                          <span className="text-sm text-gray-600">
-                            {typingUsers.length === 1 
-                              ? `${typingUsers[0]} is typing`
-                              : `${typingUsers.slice(0, -1).join(', ')} and ${typingUsers[typingUsers.length - 1]} are typing`
-                            }
-                          </span>
-                          <div className="flex space-x-1 ml-2">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="flex-1 flex flex-col">
+                <div className="flex-1">
+                  {messages.map((message: any) => (
+                    <MessageBubble
+                      key={message.id}
+                      message={message}
+                      currentUserId={user?.id}
+                    />
+                  ))}
+                  
+                  {/* Typing Indicator */}
+                  {typingUsers.length > 0 && (
+                    <div className="flex justify-start">
+                      <div className="flex flex-col items-start">
+                        <div className="bg-gray-100 rounded-2xl rounded-tl-md px-4 py-3">
+                          <div className="flex items-center space-x-1">
+                            <span className="text-sm text-gray-600">
+                              {typingUsers.length === 1 
+                                ? `${typingUsers[0]} is typing`
+                                : `${typingUsers.slice(0, -1).join(', ')} and ${typingUsers[typingUsers.length - 1]} are typing`
+                              }
+                            </span>
+                            <div className="flex space-x-1 ml-2">
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                
-                {/* Spacer to ensure last message is above input */}
-                <div className="h-4" />
-              </>
+                  )}
+                </div>
+                <div ref={messagesEndRef} />
+              </div>
             )}
-            
-            <div ref={messagesEndRef} />
           </div>
         </div>
       </div>
 
-      {/* Fixed Message Input at Bottom */}
-      <div className="fixed bottom-20 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4 z-40">
-        <div className="max-w-md mx-auto">
-          <form
-            onSubmit={handleSendMessage}
-            className="flex items-center space-x-3"
+      {/* Message Input - Fixed at bottom */}
+      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 px-4 py-3 z-40">
+        <form
+          onSubmit={handleSendMessage}
+          className="flex items-center space-x-3"
+        >
+          <div className="flex-1 bg-gray-100 rounded-full px-4 py-2">
+            <Input
+              type="text"
+              placeholder="Type a message..."
+              value={newMessage}
+              onChange={(e) => handleTyping(e.target.value)}
+              className="w-full bg-transparent border-none text-sm text-black placeholder-gray-500 focus:outline-none focus:ring-0"
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={!newMessage.trim()}
+            className="w-10 h-10 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center p-0"
           >
-            <div className="flex-1 bg-gray-100 rounded-full px-4 py-2">
-              <Input
-                type="text"
-                placeholder="Type a message..."
-                value={newMessage}
-                onChange={(e) => handleTyping(e.target.value)}
-                className="w-full bg-transparent border-none text-sm text-black placeholder-gray-500 focus:outline-none focus:ring-0"
-              />
-            </div>
-            <Button
-              type="submit"
-              disabled={!newMessage.trim()}
-              className="w-10 h-10 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center p-0"
-            >
-              <span className="text-white text-lg">→</span>
-            </Button>
-          </form>
-        </div>
+            <span className="text-white text-lg">→</span>
+          </Button>
+        </form>
       </div>
     </div>
   );
