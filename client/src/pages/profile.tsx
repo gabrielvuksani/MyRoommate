@@ -210,78 +210,7 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* App Settings */}
-        <Card className="smart-card">
-          <CardContent className="p-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">App Settings</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                <div>
-                  <span className="text-gray-900 font-medium">Notifications</span>
-                  <p className="text-sm text-gray-600">Get notified about chores, bills, and messages</p>
-                </div>
-                <button
-                  onClick={toggleNotifications}
-                  className={`w-12 h-6 rounded-full relative transition-colors ${
-                    settings.notifications ? 'bg-primary' : 'bg-gray-300'
-                  }`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${
-                    settings.notifications ? 'translate-x-6' : 'translate-x-0.5'
-                  }`}></div>
-                </button>
-              </div>
-              <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                <div>
-                  <span className="text-gray-900 font-medium">Dark Mode</span>
-                  <p className="text-sm text-gray-600">Switch between light and dark themes</p>
-                </div>
-                <button
-                  onClick={toggleDarkMode}
-                  className={`w-12 h-6 rounded-full relative transition-colors ${
-                    settings.darkMode ? 'bg-primary' : 'bg-gray-300'
-                  }`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${
-                    settings.darkMode ? 'translate-x-6' : 'translate-x-0.5'
-                  }`}></div>
-                </button>
-              </div>
-              <div className="flex justify-between items-center py-3">
-                <div>
-                  <span className="text-gray-900 font-medium">Accent Color</span>
-                  <p className="text-sm text-gray-600">Customize your app theme</p>
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => changeAccentColor('blue')}
-                    className={`w-6 h-6 bg-blue-500 rounded-full transition-all ${
-                      settings.accentColor === 'blue' ? 'ring-2 ring-blue-200 scale-110' : 'hover:scale-105'
-                    }`}
-                  />
-                  <button
-                    onClick={() => changeAccentColor('green')}
-                    className={`w-6 h-6 bg-green-500 rounded-full transition-all ${
-                      settings.accentColor === 'green' ? 'ring-2 ring-green-200 scale-110' : 'hover:scale-105'
-                    }`}
-                  />
-                  <button
-                    onClick={() => changeAccentColor('purple')}
-                    className={`w-6 h-6 bg-purple-500 rounded-full transition-all ${
-                      settings.accentColor === 'purple' ? 'ring-2 ring-purple-200 scale-110' : 'hover:scale-105'
-                    }`}
-                  />
-                  <button
-                    onClick={() => changeAccentColor('orange')}
-                    className={`w-6 h-6 bg-orange-500 rounded-full transition-all ${
-                      settings.accentColor === 'orange' ? 'ring-2 ring-orange-200 scale-110' : 'hover:scale-105'
-                    }`}
-                  />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* Household Information */}
         {household && (
@@ -297,12 +226,12 @@ export default function Profile() {
                   <span className="text-gray-600">Invite Code</span>
                   <div className="flex items-center space-x-3">
                     <span className="text-gray-900 font-mono text-sm bg-gray-100 px-2 py-1 rounded">{household.inviteCode}</span>
-                    <Button
+                    <button
                       onClick={copyInviteCode}
-                      className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-lg"
+                      className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg btn-animated"
                     >
-                      Copy
-                    </Button>
+                      <Copy size={14} />
+                    </button>
                   </div>
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
@@ -347,7 +276,9 @@ export default function Profile() {
                             : member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'
                           }
                         </p>
-                        <p className="text-sm text-gray-600">{member.user.email}</p>
+                        <p className="text-sm text-gray-600">
+                          {member.role === 'admin' ? 'Administrator' : 'Member'}
+                        </p>
                       </div>
                     </div>
                     {member.role && (

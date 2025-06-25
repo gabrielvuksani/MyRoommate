@@ -1,14 +1,14 @@
 import { useLocation } from "wouter";
-import { Home, CheckSquare, DollarSign, Calendar, MessageCircle, User } from "lucide-react";
+import { Home, DollarSign, Calendar, MessageCircle, User } from "lucide-react";
 
 export default function BottomNavigation() {
   const [location, setLocation] = useLocation();
 
   const tabs = [
     { id: 'home', path: '/', label: 'Home', Icon: Home },
-    { id: 'chores', path: '/chores', label: 'Chores', Icon: CheckSquare },
     { id: 'expenses', path: '/expenses', label: 'Expenses', Icon: DollarSign },
     { id: 'calendar', path: '/calendar', label: 'Calendar', Icon: Calendar },
+    { id: 'messages', path: '/messages', label: 'Chat', Icon: MessageCircle },
     { id: 'profile', path: '/profile', label: 'Profile', Icon: User },
   ];
 

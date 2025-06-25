@@ -106,25 +106,25 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="page-content space-y-6">
+      <div className="page-content space-y-4">
         {/* Hero Stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="smart-card p-6 text-center animate-fade-in">
-            <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <CheckSquare className="text-white" size={22} />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="smart-card p-4 text-center animate-fade-in">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <CheckSquare className="text-white" size={18} />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{activeChores.length}</p>
-            <p className="text-sm text-gray-600">Active chores</p>
+            <p className="text-xl font-bold text-gray-900">{activeChores.length}</p>
+            <p className="text-xs text-gray-600">Active chores</p>
           </div>
           
-          <div className="smart-card p-6 text-center animate-fade-in" style={{ animationDelay: '100ms' }}>
-            <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <DollarSign className="text-white" size={22} />
+          <div className="smart-card p-4 text-center animate-fade-in" style={{ animationDelay: '100ms' }}>
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <DollarSign className="text-white" size={18} />
             </div>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-xl font-bold text-gray-900">
               ${Math.abs(netBalance).toFixed(0)}
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-xs text-gray-600">
               {netBalance > 0 ? 'Owed to you' : netBalance < 0 ? 'You owe' : 'All settled'}
             </p>
           </div>
@@ -137,7 +137,6 @@ export default function Home() {
           {nextChore ? (
             <div 
               className="smart-card p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-primary cursor-pointer animate-slide-up btn-animated"
-              onClick={() => setLocation('/chores')}
               style={{ animationDelay: '200ms' }}
             >
               <div className="flex items-center justify-between">
@@ -166,7 +165,6 @@ export default function Home() {
           ) : (
             <div 
               className="smart-card p-8 text-center bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-dashed border-green-200 cursor-pointer animate-scale-in btn-animated"
-              onClick={() => setLocation('/chores')}
               style={{ animationDelay: '200ms' }}
             >
               <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
@@ -175,7 +173,7 @@ export default function Home() {
               <h3 className="text-xl font-bold text-gray-900 mb-2">All caught up!</h3>
               <p className="text-gray-600 mb-6">No chores need your attention today</p>
               <div className="flex items-center justify-center space-x-2 text-primary font-medium">
-                <span>Add New Chore</span>
+                <span>View Dashboard</span>
                 <ArrowRight size={16} />
               </div>
             </div>
@@ -239,29 +237,29 @@ export default function Home() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <button 
             onClick={() => setLocation('/expenses')}
-            className="smart-card p-6 text-left hover:shadow-lg transition-all btn-animated animate-slide-in-left"
+            className="smart-card p-4 text-left hover:shadow-lg transition-all btn-animated animate-slide-in-left"
             style={{ animationDelay: '300ms' }}
           >
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mb-4">
-              <DollarSign className="text-white" size={20} />
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center mb-3">
+              <DollarSign className="text-white" size={18} />
             </div>
-            <h4 className="font-semibold text-gray-900 mb-1">Split Bill</h4>
-            <p className="text-sm text-gray-600">Add new expense</p>
+            <h4 className="text-sm font-semibold text-gray-900 mb-1">Split Bill</h4>
+            <p className="text-xs text-gray-600">Add new expense</p>
           </button>
           
           <button 
             onClick={() => setLocation('/calendar')}
-            className="smart-card p-6 text-left hover:shadow-lg transition-all btn-animated animate-slide-in-right"
+            className="smart-card p-4 text-left hover:shadow-lg transition-all btn-animated animate-slide-in-right"
             style={{ animationDelay: '350ms' }}
           >
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
-              <Calendar className="text-white" size={20} />
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center mb-3">
+              <Calendar className="text-white" size={18} />
             </div>
-            <h4 className="font-semibold text-gray-900 mb-1">Add Event</h4>
-            <p className="text-sm text-gray-600">Schedule something</p>
+            <h4 className="text-sm font-semibold text-gray-900 mb-1">Add Event</h4>
+            <p className="text-xs text-gray-600">Schedule something</p>
           </button>
         </div>
       </div>
