@@ -184,44 +184,52 @@ export default function Home() {
             {nextChore ? (
               <Card className="glass-card">
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
-                        <p className="text-sm font-medium text-primary">Next up</p>
-                      </div>
-                      <h4 className="text-lg font-semibold text-gray-900 mb-1">{nextChore.title}</h4>
-                      {nextChore.description && (
-                        <p className="text-sm text-gray-600 mb-3">{nextChore.description}</p>
-                      )}
-                      <div className="flex items-center space-x-3 text-xs text-gray-500">
-                        <span>{nextChore.assignedUser?.firstName || 'Unassigned'}</span>
-                        {nextChore.dueDate && (
-                          <>
-                            <span>•</span>
-                            <span>Due {new Date(nextChore.dueDate).toLocaleDateString()}</span>
-                          </>
+                  <button 
+                    onClick={() => setLocation('/chores')}
+                    className="w-full text-left transition-all hover:scale-[1.02]"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          <p className="text-sm font-medium text-primary">Next up</p>
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-900 mb-1">{nextChore.title}</h4>
+                        {nextChore.description && (
+                          <p className="text-sm text-gray-600 mb-3">{nextChore.description}</p>
                         )}
+                        <div className="flex items-center space-x-3 text-xs text-gray-500">
+                          <span>{nextChore.assignedUser?.firstName || 'Unassigned'}</span>
+                          {nextChore.dueDate && (
+                            <>
+                              <span>•</span>
+                              <span>Due {new Date(nextChore.dueDate).toLocaleDateString()}</span>
+                            </>
+                          )}
+                        </div>
                       </div>
+                      <ArrowRight size={20} className="text-gray-400 ml-4" />
                     </div>
-                    <ArrowRight size={20} className="text-gray-400 ml-4" />
-                  </div>
+                  </button>
                 </CardContent>
               </Card>
             ) : (
               <Card className="glass-card">
                 <CardContent className="p-6">
-                  <div className="text-center border-2 border-dashed border-gray-200 py-8">
+                  <button 
+                    onClick={() => setLocation('/chores')}
+                    className="w-full text-center border-2 border-dashed border-gray-200 py-8 transition-all hover:border-gray-300"
+                  >
                     <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
                       <CheckSquare size={24} className="text-white" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">All caught up!</h3>
                     <p className="text-gray-600 mb-6">No chores need your attention today</p>
-                    <div className="flex items-center justify-center space-x-2 text-primary font-medium">
+                    <div className="flex items-center justify-center space-x-2 text-blue-600 font-medium">
                       <span>View Dashboard</span>
                       <ArrowRight size={16} />
                     </div>
-                  </div>
+                  </button>
                 </CardContent>
               </Card>
             )}
