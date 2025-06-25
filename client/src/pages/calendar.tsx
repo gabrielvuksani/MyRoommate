@@ -171,13 +171,14 @@ export default function Calendar() {
                 
                 <div className="p-6 space-y-5">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Event Title</label>
+                    <label className="text-sm font-semibold text-gray-700">Event Title *</label>
                     <input
                       type="text"
                       placeholder="What's happening?"
                       value={newEvent.title}
                       onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      required
                     />
                   </div>
                   
