@@ -9,7 +9,7 @@ import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucid
 
 export default function Calendar() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [currentDate, setCurrentDate] = useState(new Date());
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [newEvent, setNewEvent] = useState({

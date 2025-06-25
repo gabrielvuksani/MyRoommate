@@ -9,6 +9,7 @@ export default function BottomNavigation() {
     { id: 'chores', path: '/chores', label: 'Chores', Icon: CheckSquare },
     { id: 'expenses', path: '/expenses', label: 'Expenses', Icon: DollarSign },
     { id: 'calendar', path: '/calendar', label: 'Calendar', Icon: Calendar },
+    { id: 'dashboard', path: '/dashboard', label: 'Analytics', Icon: BarChart3 },
     { id: 'messages', path: '/messages', label: 'Chat', Icon: MessageCircle },
   ];
 
