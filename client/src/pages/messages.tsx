@@ -97,9 +97,9 @@ export default function Messages() {
       </div>
 
       {/* Content with top padding for fixed header */}
-      <div className="pt-24 pb-32">
+      <div className="pt-24 pb-20">
         {/* Messages Area */}
-        <div className="px-6 py-4 space-y-2 min-h-screen">
+        <div className="px-6 py-4 space-y-2">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mb-4">
