@@ -232,19 +232,19 @@ export default function Calendar() {
             </div>
 
             {/* Days of Week Header */}
-            <div className="grid grid-cols-7 gap-2 mb-4">
+            <div className="grid grid-cols-7 gap-3 mb-5">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                <div key={day} className="text-center text-caption text-secondary font-semibold py-2">
+                <div key={day} className="text-center text-sm text-gray-500 font-medium py-2">
                   {day}
                 </div>
               ))}
             </div>
 
             {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-3">
               {calendarDays.map((day, index) => {
                 if (!day) {
-                  return <div key={`empty-${index}`} className="calendar-day opacity-0"></div>;
+                  return <div key={`empty-${index}`} className="h-14"></div>;
                 }
                 
                 const isToday = day === today.getDate() && 
@@ -261,18 +261,31 @@ export default function Calendar() {
                   <button
                     key={`day-${day}`}
                     onClick={() => handleDayClick(day)}
-                    className={`calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasEvents ? 'has-events' : ''}`}
+                    className={`h-14 rounded-xl text-center font-medium transition-all duration-150 relative ${
+                      isSelected 
+                        ? 'bg-primary text-white shadow-sm' 
+                        : isToday
+                        ? 'bg-primary/10 text-primary font-semibold'
+                        : hasEvents
+                        ? 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
                   >
                     <span className="relative z-10">{day}</span>
+                    {hasEvents && (
+                      <div className={`w-1.5 h-1.5 rounded-full absolute bottom-2 left-1/2 transform -translate-x-1/2 ${
+                        isSelected ? 'bg-white' : 'bg-primary'
+                      }`}></div>
+                    )}
                   </button>
                 );
               })}
             </div>
             
-            {/* Today's Events - Integrated */}
-            {selectedDate && getDayEvents(selectedDate.getDate()).length > 0 && (
-              <div className="mt-4 space-y-2">
-                <div className="flex items-center justify-between px-2">
+            {/* Selected Date Events */}
+            {selectedDate && (
+              <div className="mt-6">
+                <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">
                     {selectedDate.toDateString() === new Date().toDateString() ? 'Today' : 
                      selectedDate.toLocaleDateString('en-US', { 
@@ -281,61 +294,57 @@ export default function Calendar() {
                        day: 'numeric'
                      })}
                   </h3>
-                  <span className="text-sm text-gray-500">
-                    {getDayEvents(selectedDate.getDate()).length} event{getDayEvents(selectedDate.getDate()).length !== 1 ? 's' : ''}
-                  </span>
+                  <button
+                    onClick={() => {
+                      const dateString = selectedDate.toISOString().split('T')[0];
+                      setNewEvent(prev => ({ ...prev, startDate: dateString }));
+                      setIsCreateOpen(true);
+                    }}
+                    className="bg-primary text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    Add event
+                  </button>
                 </div>
                 
-                {getDayEvents(selectedDate.getDate()).map((event: any) => (
-                  <div key={event.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-3">
-                        <div className="w-3 h-12 bg-primary rounded-full flex-shrink-0"></div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-gray-900">{event.title}</h4>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <span className="text-sm text-gray-600">
-                              {new Date(event.startDate).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit'
-                              })}
-                            </span>
-                            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                            <span className="text-sm text-gray-600">
-                              {event.creator?.firstName || 'Unknown'}
-                            </span>
+                {getDayEvents(selectedDate.getDate()).length === 0 ? (
+                  <div className="text-center py-8">
+                    <Calendar size={32} className="text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500">No events scheduled</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {getDayEvents(selectedDate.getDate()).map((event: any) => (
+                      <div key={event.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-3 h-12 bg-primary rounded-full flex-shrink-0"></div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900">{event.title}</h4>
+                              <div className="flex items-center space-x-2 mt-1">
+                                <span className="text-sm text-gray-600">
+                                  {new Date(event.startDate).toLocaleTimeString('en-US', {
+                                    hour: 'numeric',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                                <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                                <span className="text-sm text-gray-600">
+                                  {event.creator?.firstName || 'Unknown'}
+                                </span>
+                              </div>
+                              {event.description && (
+                                <p className="text-sm text-gray-600 mt-2">{event.description}</p>
+                              )}
+                            </div>
                           </div>
-                          {event.description && (
-                            <p className="text-sm text-gray-600 mt-2">{event.description}</p>
-                          )}
+                          <span className="text-xs text-gray-500 capitalize px-2 py-1 bg-gray-100 rounded-md">
+                            {event.type}
+                          </span>
                         </div>
                       </div>
-                      <span className="text-xs text-gray-500 capitalize px-2 py-1 bg-gray-100 rounded-md">
-                        {event.type}
-                      </span>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
-            
-            {/* Quick Add for Selected Date */}
-            {selectedDate && getDayEvents(selectedDate.getDate()).length === 0 && (
-              <div className="mt-4 p-4 border-2 border-dashed border-gray-200 rounded-xl text-center">
-                <p className="text-gray-500 mb-3">
-                  No events on {selectedDate.toDateString() === new Date().toDateString() ? 'today' : 
-                  selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                </p>
-                <button
-                  onClick={() => {
-                    const dateString = selectedDate.toISOString().split('T')[0];
-                    setNewEvent(prev => ({ ...prev, startDate: dateString }));
-                    setIsCreateOpen(true);
-                  }}
-                  className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
-                >
-                  Add event
-                </button>
+                )}
               </div>
             )}
           </CardContent>
