@@ -31,7 +31,7 @@ export default function Profile() {
   useEffect(() => {
     // Scroll to top when page loads
     window.scrollTo(0, 0);
-    
+
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 20);
     };
@@ -119,7 +119,7 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="pt-36 px-6 space-y-6">
+      <div className="pt-40 px-6 space-y-6">
         {/* Profile Header */}
         <Card className="smart-card">
           <CardContent className="p-6">
@@ -138,7 +138,9 @@ export default function Profile() {
                         user.email?.split("@")[0] ||
                         "Unknown User"}
                   </h2>
-                  <p className="text-gray-600 truncate" title={user.email}>{user.email}</p>
+                  <p className="text-gray-600 truncate" title={user.email}>
+                    {user.email}
+                  </p>
                 </div>
               </div>
 
@@ -207,7 +209,10 @@ export default function Profile() {
             <div className="space-y-4">
               <div className="flex justify-between items-center py-3 border-b border-gray-200">
                 <span className="text-gray-600 flex-shrink-0">User ID</span>
-                <span className="text-gray-900 font-mono text-sm truncate ml-4" title={user.id}>
+                <span
+                  className="text-gray-900 font-mono text-sm truncate ml-4"
+                  title={user.id}
+                >
                   {user.id}
                 </span>
               </div>
@@ -231,7 +236,10 @@ export default function Profile() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
                   <span className="text-gray-600 flex-shrink-0">Name</span>
-                  <span className="text-gray-900 font-semibold truncate ml-4" title={household.name}>
+                  <span
+                    className="text-gray-900 font-semibold truncate ml-4"
+                    title={household.name}
+                  >
                     {household.name}
                   </span>
                 </div>
@@ -333,7 +341,11 @@ export default function Profile() {
                   className="w-full bg-orange-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-orange-700 disabled:opacity-50"
                 >
                   <UserMinus size={20} />
-                  <span>{leaveHouseholdMutation.isPending ? "Leaving..." : "Leave Household"}</span>
+                  <span>
+                    {leaveHouseholdMutation.isPending
+                      ? "Leaving..."
+                      : "Leave Household"}
+                  </span>
                 </Button>
               )}
               <Button
