@@ -152,7 +152,7 @@ export default function Calendar() {
             
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
-                <button className="w-12 h-12 bg-gradient-to-br from-accent to-accent-hover rounded-2xl flex items-center justify-center shadow-lg btn-animated">
+                <button className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg btn-animated">
                   <Plus size={24} className="text-white" />
                 </button>
               </DialogTrigger>
@@ -236,7 +236,7 @@ export default function Calendar() {
                   <button 
                     onClick={handleCreateEvent} 
                     disabled={!canCreateEvent || createEventMutation.isPending}
-                    className="bg-accent text-white px-6 py-3 rounded-xl font-bold shadow-lg btn-animated disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-primary text-white px-6 py-3 rounded-xl font-bold shadow-lg btn-animated disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {createEventMutation.isPending ? "Creating..." : "Create Event"}
                   </button>
@@ -247,52 +247,46 @@ export default function Calendar() {
         </div>
       </div>
       
-      {/* Premium Calendar Section */}
-      <div className="px-6 space-y-6">
-        {/* Calendar Card */}
-        <div className="smart-card p-8 animate-fade-in">
+      {/* Calendar Section */}
+      <div className="px-6 mb-6">
+        <div className="smart-card p-6 animate-fade-in">
           {/* Month Navigation */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => navigateMonth('prev')}
-              className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center btn-animated shadow-sm hover:shadow-md transition-all"
+              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-animated"
             >
-              <ChevronLeft size={22} className="text-gray-700" />
+              <ChevronLeft size={20} className="text-gray-600" />
             </button>
             
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-1">
-                {monthNames[currentMonth]} {currentYear}
-              </h2>
-              <p className="text-gray-500 text-sm font-medium">Tap a day to view events</p>
-            </div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {monthNames[currentMonth]} {currentYear}
+            </h2>
             
             <button
               onClick={() => navigateMonth('next')}
-              className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center btn-animated shadow-sm hover:shadow-md transition-all"
+              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-animated"
             >
-              <ChevronRight size={22} className="text-gray-700" />
+              <ChevronRight size={20} className="text-gray-600" />
             </button>
           </div>
 
           {/* Calendar Grid */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Day Headers */}
-            <div className="grid grid-cols-7 gap-3">
+            <div className="grid grid-cols-7 gap-2">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="text-center py-4">
-                  <span className="text-sm font-bold text-gray-400 uppercase tracking-wider">
-                    {day}
-                  </span>
+                <div key={day} className="text-center text-sm font-bold text-gray-500 py-3">
+                  {day}
                 </div>
               ))}
             </div>
             
             {/* Calendar Days */}
-            <div className="grid grid-cols-7 gap-3">
+            <div className="grid grid-cols-7 gap-2">
               {calendarDays.map((day, index) => {
                 if (!day) {
-                  return <div key={`empty-${index}`} className="h-16"></div>;
+                  return <div key={`empty-${index}`} className="h-12"></div>;
                 }
                 
                 const isToday = day === today.getDate() && 
@@ -309,26 +303,19 @@ export default function Calendar() {
                   <button
                     key={`day-${day}`}
                     onClick={() => handleDayClick(day)}
-                    className={`h-16 rounded-2xl text-center font-semibold transition-all duration-300 relative btn-animated shadow-sm hover:shadow-lg transform hover:scale-105 ${
+                    className={`h-12 rounded-xl text-center font-medium transition-all duration-200 relative btn-animated ${
                       isSelected 
-                        ? 'bg-gradient-to-br from-accent to-accent-hover text-white shadow-lg scale-105' 
+                        ? 'bg-primary text-white shadow-lg' 
                         : isToday
-                        ? 'bg-gradient-to-br from-accent-light to-accent/20 text-accent border-2 border-accent/30'
+                        ? 'bg-blue-50 text-primary font-semibold border border-primary'
                         : hasEvents
-                        ? 'bg-gradient-to-br from-orange-light to-orange/20 text-orange border border-orange/30'
-                        : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
+                        ? 'bg-gray-100 text-gray-900'
+                        : 'text-gray-600 hover:bg-gray-100'
                     }`}
-                    style={{ 
-                      animationDelay: `${index * 20}ms`,
-                      animationFillMode: 'both'
-                    }}
                   >
-                    <span className="relative z-10 text-lg">{day}</span>
+                    <span className="text-sm">{day}</span>
                     {hasEvents && !isSelected && (
-                      <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-orange rounded-full shadow-sm animate-pulse"></div>
-                    )}
-                    {isToday && !isSelected && (
-                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-accent rounded-full"></div>
+                      <div className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></div>
                     )}
                   </button>
                 );
@@ -338,79 +325,66 @@ export default function Calendar() {
         </div>
       </div>
 
-      {/* Selected Day Events - Animated Slide In */}
+      {/* Selected Day Events */}
       {selectedDate && (
-        <div className="px-6 pb-12 animate-slide-up" key={selectedDate.toDateString()}>
-          <div className="smart-card p-8 shadow-2xl animate-scale-in" style={{ animationDelay: '300ms' }}>
-            {/* Event Section Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  {selectedDate.toDateString() === new Date().toDateString() ? 'Today\'s Events' : 
-                   selectedDate.toLocaleDateString('en-US', { 
-                     weekday: 'long',
-                     month: 'long', 
-                     day: 'numeric',
-                     year: 'numeric'
-                   })}
-                </h3>
-                <p className="text-gray-500 font-medium">
-                  {getDayEvents(selectedDate.getDate()).length} event{getDayEvents(selectedDate.getDate()).length !== 1 ? 's' : ''} scheduled
-                </p>
-              </div>
+        <div className="px-6 pb-8 animate-slide-up" key={selectedDate.toDateString()}>
+          <div className="smart-card p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">
+                {selectedDate.toDateString() === new Date().toDateString() ? 'Today' : 
+                 selectedDate.toLocaleDateString('en-US', { 
+                   weekday: 'long',
+                   month: 'short', 
+                   day: 'numeric'
+                 })}
+              </h3>
               <button
                 onClick={() => {
                   const dateString = selectedDate.toISOString().split('T')[0];
                   setNewEvent(prev => ({ ...prev, startDate: dateString }));
                   setIsCreateOpen(true);
                 }}
-                className="bg-gradient-to-br from-accent to-accent-hover text-white px-6 py-3 rounded-2xl font-bold shadow-lg btn-animated hover:shadow-xl transform hover:scale-105 transition-all"
+                className="bg-primary text-white px-4 py-2 rounded-xl font-semibold btn-animated"
               >
                 Add Event
               </button>
             </div>
             
             {getDayEvents(selectedDate.getDate()).length === 0 ? (
-              <div className="text-center py-16 animate-fade-in">
-                <div className="w-20 h-20 bg-gradient-to-br from-orange to-orange-light rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl animate-bounce">
-                  <CalendarIcon size={32} className="text-white" />
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                  <CalendarIcon size={28} className="text-gray-400" />
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-3">No events scheduled</h4>
-                <p className="text-gray-600 text-lg mb-8 leading-relaxed">This day is completely free for new activities</p>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">No events scheduled</h4>
+                <p className="text-gray-600 mb-6">This day is completely free</p>
                 <button 
                   onClick={() => setIsCreateOpen(true)}
-                  className="bg-gradient-to-br from-accent to-accent-hover text-white px-8 py-4 rounded-2xl font-bold shadow-xl btn-animated hover:shadow-2xl transform hover:scale-105 transition-all"
+                  className="bg-primary text-white px-6 py-3 rounded-xl font-semibold btn-animated"
                 >
-                  Create Your First Event
+                  Add Event
                 </button>
               </div>
             ) : (
-              <div className="space-y-5">
+              <div className="space-y-4">
                 {getDayEvents(selectedDate.getDate()).map((event: any, index: number) => (
                   <div 
                     key={event.id} 
-                    className="bg-gradient-to-r from-white via-gray-50 to-white rounded-3xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-102 animate-slide-up"
-                    style={{ 
-                      animationDelay: `${400 + (index * 150)}ms`,
-                      animationFillMode: 'both'
-                    }}
+                    className="bg-gray-50 rounded-2xl p-5 border border-gray-200 animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <div className="flex items-start space-x-6">
+                    <div className="flex items-start space-x-4">
                       <div 
-                        className="w-1 h-20 rounded-full flex-shrink-0 shadow-lg"
+                        className="w-4 h-16 rounded-full flex-shrink-0"
                         style={{ backgroundColor: event.color || '#007AFF' }}
                       ></div>
-                      <div className="flex-1 space-y-4">
-                        <div>
-                          <h4 className="font-bold text-gray-900 text-xl mb-2 leading-tight">{event.title}</h4>
-                          {event.description && (
-                            <p className="text-gray-700 font-medium text-lg leading-relaxed">{event.description}</p>
-                          )}
-                        </div>
-                        
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900 text-lg mb-2">{event.title}</h4>
+                        {event.description && (
+                          <p className="text-gray-700 mb-3">{event.description}</p>
+                        )}
                         <div className="flex items-center space-x-4">
-                          <div className="bg-gradient-to-br from-white to-gray-100 px-4 py-2.5 rounded-2xl shadow-md border border-gray-200">
-                            <span className="text-gray-800 font-bold text-sm">
+                          <div className="bg-white px-3 py-2 rounded-xl shadow-sm">
+                            <span className="text-gray-800 font-semibold text-sm">
                               {new Date(event.startDate).toLocaleTimeString('en-US', {
                                 hour: 'numeric',
                                 minute: '2-digit'
@@ -418,17 +392,12 @@ export default function Calendar() {
                             </span>
                           </div>
                           {event.type && (
-                            <div className="bg-gradient-to-br from-accent-light to-accent/30 text-accent px-4 py-2.5 rounded-2xl border border-accent/20">
-                              <span className="capitalize font-bold text-sm">
+                            <div className="bg-blue-50 text-primary px-3 py-2 rounded-xl">
+                              <span className="capitalize font-semibold text-sm">
                                 {event.type}
                               </span>
                             </div>
                           )}
-                          <div className="bg-gradient-to-br from-gray-100 to-gray-200 px-4 py-2.5 rounded-2xl">
-                            <span className="text-gray-700 font-semibold text-sm">
-                              {event.creator?.firstName || 'Unknown'}
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </div>
