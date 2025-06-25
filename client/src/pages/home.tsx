@@ -115,7 +115,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="page-content space-y-6 pt-32">
+      <div className="page-content space-y-6 pt-40">
         {/* Hero Stats */}
         <div className="grid grid-cols-2 gap-4">
           <Card className="glass-card">
