@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { Home, CheckSquare, DollarSign, Calendar, MessageCircle } from "lucide-react";
+import { Home, CheckSquare, DollarSign, Calendar, MessageCircle, User } from "lucide-react";
 
 export default function BottomNavigation() {
   const [location, setLocation] = useLocation();
@@ -9,7 +9,7 @@ export default function BottomNavigation() {
     { id: 'chores', path: '/chores', label: 'Chores', Icon: CheckSquare },
     { id: 'expenses', path: '/expenses', label: 'Expenses', Icon: DollarSign },
     { id: 'calendar', path: '/calendar', label: 'Calendar', Icon: Calendar },
-    { id: 'messages', path: '/messages', label: 'Chat', Icon: MessageCircle },
+    { id: 'profile', path: '/profile', label: 'Profile', Icon: User },
   ];
 
   return (

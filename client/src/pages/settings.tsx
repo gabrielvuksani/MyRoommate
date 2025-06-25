@@ -62,90 +62,81 @@ export default function Settings() {
       
       <div className="page-content space-y-6">
         {/* Household Info */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
+        <div className="smart-card p-6 animate-fade-in">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-ios-blue rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                 <Home size={20} className="text-white" />
               </div>
               <div>
-                <h2 className="text-ios-headline font-semibold text-black">{household.name}</h2>
-                <p className="text-ios-footnote text-ios-gray-5">
+                <h2 className="text-lg font-semibold text-gray-900">{household.name}</h2>
+                <p className="text-sm text-gray-600">
                   {household.members?.length || 0} member{household.members?.length !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
             
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-ios-gray rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
-                  <p className="text-ios-body font-medium text-black">Invite Code</p>
-                  <p className="text-ios-footnote text-ios-gray-5">Share with new roommates</p>
+                  <p className="text-sm font-medium text-gray-900">Invite Code</p>
+                  <p className="text-xs text-gray-600">Share with new roommates</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-ios-body font-mono text-black">{household.inviteCode}</span>
-                  <Button
+                  <span className="text-sm font-mono text-gray-900">{household.inviteCode}</span>
+                  <button
                     onClick={handleCopyInviteCode}
-                    variant="ghost"
-                    size="sm"
-                    className="p-2"
+                    className="p-2 rounded-lg hover:bg-gray-200 transition-colors btn-animated"
                   >
-                    <Copy size={16} className="text-ios-blue" />
-                  </Button>
+                    <Copy size={16} className="text-primary" />
+                  </button>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+        </div>
 
         {/* Members */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
+        <div className="smart-card p-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-ios-green rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
                 <Users size={20} className="text-white" />
               </div>
-              <h2 className="text-ios-headline font-semibold text-black">Members</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Members</h2>
             </div>
             
             <div className="space-y-3">
               {household.members?.map((member: any) => (
                 <div key={member.id} className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-ios-blue rounded-full flex items-center justify-center">
-                    <span className="text-white text-ios-footnote font-medium">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-medium">
                       {member.user.firstName?.[0] || member.user.email?.[0] || '?'}
                     </span>
                   </div>
                   <div className="flex-1">
-                    <p className="text-ios-body text-black">
+                    <p className="text-sm text-gray-900">
                       {member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'}
                     </p>
-                    <p className="text-ios-footnote text-ios-gray-5">
+                    <p className="text-xs text-gray-600">
                       {member.role === 'admin' ? 'Admin' : 'Member'} • Joined {new Date(member.joinedAt).toLocaleDateString()}
                     </p>
                   </div>
                   {member.userId === user?.id && (
-                    <span className="text-ios-caption text-ios-blue font-medium">You</span>
+                    <span className="text-xs text-primary font-medium">You</span>
                   )}
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+        </div>
 
         {/* Account Actions */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
-            <Button
+        <div className="smart-card p-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
+            <button
               onClick={handleLogout}
-              variant="destructive"
-              className="w-full bg-ios-red hover:bg-ios-red/90 text-white"
+              className="w-full bg-red-500 hover:bg-red-600 text-white p-4 rounded-xl font-semibold btn-animated flex items-center justify-center space-x-2"
             >
-              <LogOut size={16} className="mr-2" />
-              Sign Out
-            </Button>
-          </CardContent>
-        </Card>
+              <LogOut size={16} />
+              <span>Sign Out</span>
+            </button>
+        </div>
       </div>
     </div>
   );
