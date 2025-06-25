@@ -76,10 +76,28 @@ export default function Chores() {
 
   const updateChoreMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
-      await apiRequest("PATCH", `/api/chores/${id}`, updates);
+      // Handle date formatting for completedAt
+      const formattedUpdates = { ...updates };
+      if (formattedUpdates.completedAt) {
+        formattedUpdates.completedAt = new Date(formattedUpdates.completedAt);
+      }
+      
+      await apiRequest("PATCH", `/api/chores/${id}`, formattedUpdates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
+      toast({
+        title: "Success",
+        description: "Chore updated successfully",
+      });
+    },
+    onError: (error) => {
+      console.error('Error updating chore:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update chore",
+        variant: "destructive",
+      });
     },
   });
 

@@ -97,7 +97,7 @@ export default function Messages() {
       </div>
 
       {/* Content with top padding for fixed header */}
-      <div className="pt-24 pb-20">
+      <div className="">
         {/* Messages Area */}
         <div className="px-6 py-4 space-y-2">
           {messages.length === 0 ? (
