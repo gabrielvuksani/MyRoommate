@@ -1,91 +1,156 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { useLocation } from "wouter";
+import { CheckCircle, DollarSign, MessageCircle, Home, Users, Calendar, Sparkles } from "lucide-react";
+import { useEffect } from "react";
 
 export default function Landing() {
-  const [, setLocation] = useLocation();
-  
   const handleLogin = () => {
     window.location.href = "/api/login";
   };
 
-  return (
-    <div className="min-h-screen bg-ios-gray flex flex-col">
-      <div className="h-6 bg-white"></div>
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
+  const features = [
+    {
+      icon: CheckCircle,
+      title: "Smart Chores",
+      description: "Automated task rotation with streak tracking and gamification",
+      gradient: "from-emerald-400 to-cyan-400"
+    },
+    {
+      icon: DollarSign,
+      title: "Split Expenses",
+      description: "Instant bill splitting with real-time balance tracking",
+      gradient: "from-blue-400 to-purple-400"
+    },
+    {
+      icon: MessageCircle,
+      title: "Group Chat",
+      description: "Real-time messaging with typing indicators and quick reactions",
+      gradient: "from-pink-400 to-rose-400"
+    },
+    {
+      icon: Calendar,
+      title: "Shared Calendar",
+      description: "Coordinate events, movie nights, and household activities",
+      gradient: "from-orange-400 to-amber-400"
+    },
+    {
+      icon: Users,
+      title: "Household Management",
+      description: "Invite codes, member roles, and performance analytics",
+      gradient: "from-violet-400 to-indigo-400"
+    },
+    {
+      icon: Home,
+      title: "One Platform",
+      description: "Everything you need for seamless shared living in one app",
+      gradient: "from-teal-400 to-green-400"
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5"></div>
+        
+        <div className="relative max-w-3xl mx-auto px-6 pt-20 pb-16 text-center">
+          {/* Logo/Brand */}
+          <div className="mb-8">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center shadow-2xl shadow-emerald-500/25">
+              <Home size={32} className="text-white" />
+            </div>
+            <h1 className="font-bold text-[#1a1a1a] text-[32px] leading-tight mb-4">
+              MyRoommate
+            </h1>
+            <p className="text-lg text-gray-600 max-w-md mx-auto leading-relaxed">
+              Transform shared living into a seamless, intelligent experience. One app that removes every roommate headache.
+            </p>
+          </div>
+
+          {/* Main CTA */}
+          <Button
+            onClick={handleLogin}
+            className="w-full max-w-sm mx-auto h-14 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02] mb-12"
+          >
+            <Sparkles size={20} className="mr-2" />
+            Get Started Free
+          </Button>
+
+          {/* Trust Indicators */}
+          <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+              <span>Free to use</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+              <span>No credit card</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span>Setup in 2 mins</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Grid */}
+      <div className="max-w-4xl mx-auto px-6 pb-20">
         <div className="text-center mb-12">
-          <h1 className="text-ios-large-title font-bold text-black mb-4">
-            MyRoommate
-          </h1>
-          <p className="text-ios-body text-ios-gray-5 max-w-sm">
-            Simplify shared living with your roommates. Manage chores, split
-            expenses, and stay connected.
+          <h2 className="font-semibold text-[#1a1a1a] text-[24px] mb-4">
+            Everything you need for perfect roommate harmony
+          </h2>
+          <p className="text-gray-600 text-lg">
+            Inspired by the best productivity and lifestyle apps
           </p>
         </div>
 
-        <div className="w-full max-w-sm space-y-4 mb-8">
-          <Card className="card-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-ios-blue rounded-full flex items-center justify-center">
-                  <span className="text-white text-ios-body">✓</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {features.map((feature, index) => {
+            const IconComponent = feature.icon;
+            return (
+              <div
+                key={index}
+                className="glass-card p-6 rounded-3xl hover:scale-[1.02] transition-all duration-200 group"
+                style={{
+                  animationDelay: `${index * 0.1}s`
+                }}
+              >
+                <div className={`w-12 h-12 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200 shadow-lg`}>
+                  <IconComponent size={20} className="text-white" />
                 </div>
-                <div>
-                  <h3 className="text-ios-headline font-semibold text-black">
-                    Smart Chores
-                  </h3>
-                  <p className="text-ios-footnote text-ios-gray-5">
-                    Auto-rotating assignments
-                  </p>
-                </div>
+                <h3 className="font-semibold text-[#1a1a1a] text-[18px] mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {feature.description}
+                </p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="card-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-ios-green rounded-full flex items-center justify-center">
-                  <span className="text-white text-ios-body">$</span>
-                </div>
-                <div>
-                  <h3 className="text-ios-headline font-semibold text-black">
-                    Easy Expenses
-                  </h3>
-                  <p className="text-ios-footnote text-ios-gray-5">
-                    Split bills instantly
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="card-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-ios-orange rounded-full flex items-center justify-center">
-                  <span className="text-white text-ios-body">💬</span>
-                </div>
-                <div>
-                  <h3 className="text-ios-headline font-semibold text-black">
-                    Stay Connected
-                  </h3>
-                  <p className="text-ios-footnote text-ios-gray-5">
-                    Real-time group chat
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            );
+          })}
         </div>
+      </div>
 
-        <Button
-          onClick={handleLogin}
-          className="w-full max-w-sm bg-ios-blue hover:bg-ios-blue/90 text-white py-4 rounded-lg font-medium"
-        >
-          Get Started
-        </Button>
+      {/* Bottom CTA */}
+      <div className="bg-white/60 backdrop-blur-lg border-t border-white/20">
+        <div className="max-w-3xl mx-auto px-6 py-12 text-center">
+          <h3 className="font-semibold text-[#1a1a1a] text-[20px] mb-3">
+            Ready to transform your living experience?
+          </h3>
+          <p className="text-gray-600 mb-8">
+            Join thousands of happy roommates who've simplified their shared living
+          </p>
+          <Button
+            onClick={handleLogin}
+            className="h-12 px-8 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
+          >
+            Start Your Journey
+          </Button>
+        </div>
       </div>
     </div>
   );
