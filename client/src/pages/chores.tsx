@@ -249,31 +249,62 @@ export default function Chores() {
                 }
                 
                 return (
-                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/40">
-                    <h3 className="font-semibold text-[#1a1a1a] mb-2">{priorityChore.title}</h3>
-                    <div className="flex items-center gap-4 text-sm text-secondary mb-3">
-                      <span>{priorityChore.assignedUser?.firstName || 'Unassigned'}</span>
-                      {priorityChore.dueDate && (
-                        <span className={new Date(priorityChore.dueDate) < new Date() ? 'text-red-600 font-medium' : ''}>
-                          Due {new Date(priorityChore.dueDate).toLocaleDateString()}
-                        </span>
-                      )}
-                      {priorityChore.priority && (
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          priorityChore.priority === 'urgent' ? 'bg-red-100 text-red-700' :
-                          priorityChore.priority === 'high' ? 'bg-orange-100 text-orange-700' :
-                          'bg-blue-100 text-blue-700'
-                        }`}>
-                          {priorityChore.priority.charAt(0).toUpperCase() + priorityChore.priority.slice(1)}
-                        </span>
-                      )}
+                  <div className="border border-gray-200 rounded-xl p-4 bg-white hover:shadow-sm transition-shadow">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="text-body font-semibold text-primary mb-1">{priorityChore.title}</h3>
+                        {priorityChore.description && (
+                          <p className="text-footnote text-secondary mb-2">{priorityChore.description}</p>
+                        )}
+                        <div className="flex items-center gap-2 text-footnote text-secondary">
+                          <span>{priorityChore.assignedUser?.firstName || priorityChore.assignedUser?.email?.split('@')[0] || 'Unassigned'}</span>
+                          {priorityChore.dueDate && (
+                            <>
+                              <span>•</span>
+                              <span className={new Date(priorityChore.dueDate) < new Date() ? 'text-red-600 font-medium' : ''}>
+                                Due {new Date(priorityChore.dueDate).toLocaleDateString()}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col items-end space-y-2">
+                        {priorityChore.priority && (
+                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                            priorityChore.priority === 'urgent' ? 'bg-red-100 text-red-700' :
+                            priorityChore.priority === 'high' ? 'bg-orange-100 text-orange-700' :
+                            priorityChore.priority === 'medium' ? 'bg-blue-100 text-blue-700' :
+                            'bg-gray-100 text-gray-600'
+                          }`}>
+                            {priorityChore.priority === 'urgent' ? '🔥' :
+                             priorityChore.priority === 'high' ? '⚡' :
+                             priorityChore.priority === 'medium' ? '📌' : '📝'} {priorityChore.priority.charAt(0).toUpperCase() + priorityChore.priority.slice(1)}
+                          </span>
+                        )}
+                        
+                        <div className="px-2 py-1 rounded-lg text-xs font-medium bg-blue-100 text-blue-700">
+                          To Do
+                        </div>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => handleUpdateChore(priorityChore.id, { status: 'doing' })}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                    >
-                      Start Now
-                    </button>
+
+                    {priorityChore.dueDate && new Date(priorityChore.dueDate) < new Date() && (
+                      <div className="mb-3">
+                        <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg text-xs font-medium">
+                          ⚠️ Overdue
+                        </span>
+                      </div>
+                    )}
+                    
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleUpdateChore(priorityChore.id, { status: 'doing' })}
+                        className="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-xs font-medium transition-colors"
+                      >
+                        Start
+                      </button>
+                    </div>
                   </div>
                 );
               })()}
