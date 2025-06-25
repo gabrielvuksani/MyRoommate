@@ -1,0 +1,157 @@
+Create a mobile app called RoomieHub that simplifies shared living through these key requirements:
+
+CORE FEATURES:
+1. Smart Group Chat
+- Real-time messaging with reactions, GIFs, and voice notes
+- Messages can link to bills, chores, events, or groceries
+- Threaded conversations for better organization
+
+2. Automated Chore Management
+- Kanban-style board (To-Do/Doing/Done)
+- Auto-rotating assignments with customizable schedules
+- Push notifications with 24h snooze option
+- Gamified with 7-day streaks and celebrations
+
+3. Expense Tracking & Settlement
+- Quick expense entry via receipt scan or manual input
+- Flexible splitting options (equal, custom shares, percentages)
+- Real-time balance dashboard with one-tap settlement
+- Monthly financial reports (CSV/PDF)
+
+4. Integrated Calendar
+- Color-coded events for rent, utilities, social gatherings
+- Automatic chore/bill deadline integration
+- 3-day and same-day push notifications
+- Syncs with external calendars
+
+5. Collaborative Shopping List
+- Real-time inventory tracking with quantity indicators
+- Purchase marking with optional cost splitting
+- Smart restock suggestions based on usage patterns
+
+TECHNICAL REQUIREMENTS:
+- Maximum 3 taps for core actions
+- Real-time synchronization across devices
+- External payment app integration (Venmo, PayPal, etc.)
+- Accessibility compliance (VoiceOver, large text, colorblind-friendly)
+- Receipt OCR integration
+
+SUCCESS CRITERIA:
+New users must complete house setup, roommate invitation, chore creation, and bill splitting within 5 minutes without requiring a tutorial.
+
+Design for iOS and Android with an intuitive, modern interface prioritizing ease of use and quick access to essential features.
+
+
+More context:
+# RoomieHub
+
+**Mission**
+Give every shared household one calm, central place to talk, plan, clean, and split costs. Open the app → know exactly what needs your attention.
+
+---
+
+### 1. Core use cases (MUST nail these)
+
+* **Chat that keeps context**
+
+  * Real-time group chat with reactions, GIFs, voice notes.
+  * Any message can be linked to a bill, chore, calendar event, or grocery item so details never get buried.
+
+* **Chores that run themselves**
+
+  * Kanban board: To-Do → Doing → Done.
+  * Auto-rotating assignments, recurrence rules (daily, weekly, monthly, custom).
+  * Push reminder + optional “snooze 24 h” button.
+  * Streak tracker and fun confetti when someone hits 7 chores in a row.
+
+* **Bills & balances without headaches**
+
+  * Add an expense in two taps (scan receipt or type).
+  * Split equally, by shares, or custom percentages.
+  * Running balance screen shows who owes whom; one-tap “Settle Up” opens preferred payment method (Venmo, PayPal, Interac, Revolut, etc.).
+  * Export monthly CSV or PDF of all expenses for transparency.
+
+* **Shared calendar everyone actually checks**
+
+  * Colour-coded events: rent due, utility cutoff, birthdays, house dinner.
+  * Chore deadlines and bill due dates are auto-added.
+  * Push alerts: three-day reminder + day-of.
+
+* **Smart grocery & supplies list**
+
+  * Real-time collaborative list with item counts (e.g., “Eggs – 0 left”).
+  * Swipe right to mark bought; app asks whether to attach the cost to a new bill.
+  * Low-stock warnings based on purchase frequency (“We’re out of toilet paper every 10 days – want a recurring bulk order?”).
+
+---
+
+### 2. Nice-to-have boosters (if time allows)
+
+* **Roomie Profiles** – avatar, pronouns, allergy/diet notes, quiet hours, payment handles.
+* **House Rules & Agreement** – a simple checklist everyone e-signs at onboarding; editable later.
+* **Conflict Log** – private note space to record disputes; optional mediation tips.
+* **Guest Mode** – register visiting friends so housemates know who’s around and split added costs if needed.
+* **Energy Tracker** – enter monthly utility totals → app graphs usage vs. last month and suggests savings.
+* **Gamified Leaderboard** – points for chores done, bills logged on time, helpful chat replies; optional prize pool.
+
+---
+
+### 3. Essential user flows (step-by-step)
+
+1. **Onboarding**
+
+   * Choose “Create house” or “Join with code / QR”.
+   * Set rent amount + due date, default currency, payment links.
+   * Pick initial chore template (bathroom, kitchen, trash).
+   * Invite others via link or QR.
+
+2. **Add a bill**
+
+   * Tap “+ Bill” → snap receipt → OCR pulls total and vendor.
+   * Select payer → choose split method → save.
+   * Balances update; optional reminder sent to owing roommates.
+
+3. **Mark chore done**
+
+   * Drag card to “Done” or tap checkbox.
+   * Streak updated; if chore recurring, next due date auto-generated and, if rotation enabled, assigned to next roommate.
+
+4. **Plan event**
+
+   * Tap date in calendar → enter title, time, choose icon (party, maintenance, landlord visit).
+   * Toggle “notify all”.
+   * Event appears on dashboard and sends reminders.
+
+---
+
+### 4. Interaction principles
+
+* All high-value actions ≤ 3 taps away.
+* Swipe gestures for the repetitive stuff (settle, delete, mark done).
+* Push notifications respect each roommate’s quiet-hour setting.
+* Friendly micro-copy with emojis where helpful (“🎉 Bathroom sparkles! Thanks, Alex.”).
+* Accessibility baked in: VoiceOver labels, large-text support, colour-blind-safe palette.
+
+---
+
+### 5. External hooks (keep technical detail minimal)
+
+* Real-time sync, auth, and push – any mainstream backend-as-a-service (Firebase, Supabase, Appwrite).
+* Payments – deep-link to external apps; no money handled in-app.
+* Receipt OCR – free tier of any widely available vision API.
+* Optional calendar sync – export iCal feed per house.
+
+---
+
+### 6. Stretch delights
+
+* Voice command: “Hey RoomieHub, add milk.”
+* Home-screen widget: today’s chores + who owes you.
+* AR view: overlay chores (e.g., highlight spots to clean) using device camera.
+* Move-out mode: archive balances, export data, reset house code for new tenants.
+
+---
+
+### 7. Definition of “done”
+
+* A new user can create a house, invite roommates, add a chore, add a bill, and see it reflected in everyone’s app in under five minutes — no tutorial needed.
