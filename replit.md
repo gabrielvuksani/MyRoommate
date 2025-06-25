@@ -117,7 +117,8 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Implemented calendar event deletion with mutation and UI updates
 - ✓ Added proper error handling and cache invalidation for all delete operations
 - ✓ Maintained consistent styling with red-themed delete buttons across all components
-- ✓ Protected settled expenses from deletion - delete button only shows for unsettled expenses
+- ✓ Replaced delete button with "Settled" indicator for fully settled expenses
+- ✓ Positioned settlement status in same location as delete button for consistent layout
 - ✓ Fixed settlement status calculation and display formatting in expense cards
 - ✓ Enhanced bottom navigation transparency (0.25 opacity) to show more background content
 - ✓ Completely redesigned message bubbles with visionOS/iMessage/Airbnb design fusion
