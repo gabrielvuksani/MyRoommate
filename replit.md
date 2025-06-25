@@ -111,9 +111,11 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Enhanced messages app with increased spacing above input to prevent text cutoff
+- ✓ Implemented visionOS floating header design across all pages (home, chores, expenses, calendar, profile, settings, messages)
 - ✓ Fixed messages app layout with proper header styling matching other pages (page-title class)
 - ✓ Restored floating-header with backdrop blur maintaining original visionOS aesthetic
-- ✓ Adjusted message container positioning (top-[120px]) for proper spacing below header
+- ✓ Adjusted message container positioning with proper spacing below header and above input
 - ✓ Prevented message overflow beyond input area with proper height constraints
 - ✓ Maintained original UI design while ensuring messages stay within designated bounds
 - ✓ Updated h2 element styling from "text-headline font-semibold text-blue-700" to "font-semibold text-[#1a1a1a] text-[22px]"
