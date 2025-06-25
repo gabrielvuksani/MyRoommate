@@ -43,7 +43,10 @@ export default function Expenses() {
       }));
       
       await apiRequest("POST", "/api/expenses", {
-        expense: expenseData,
+        expense: {
+          ...expenseData,
+          amount: parseFloat(expenseData.amount).toString(),
+        },
         splits,
       });
     },

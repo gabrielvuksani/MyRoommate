@@ -111,7 +111,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "No household found" });
       }
       
-      const data = insertChoreSchema.parse(req.body);
+      const { dueDate, ...rest } = req.body;
+      const data = insertChoreSchema.parse({
+        ...rest,
+        dueDate: dueDate ? new Date(dueDate) : null,
+      });
       const chore = await storage.createChore({
         ...data,
         householdId: membership.household.id,
@@ -174,7 +178,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { expense: expenseData, splits } = req.body;
-      const validatedExpense = insertExpenseSchema.parse(expenseData);
+      const validatedExpense = insertExpenseSchema.parse({
+        ...expenseData,
+        amount: expenseData.amount.toString(),
+      });
       
       const expense = await storage.createExpense(
         {
@@ -233,7 +240,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "No household found" });
       }
       
-      const data = insertCalendarEventSchema.parse(req.body);
+      const { startDate, endDate, ...rest } = req.body;
+      const data = insertCalendarEventSchema.parse({
+        ...rest,
+        startDate: new Date(startDate),
+        endDate: endDate ? new Date(endDate) : null,
+      });
       const event = await storage.createCalendarEvent({
         ...data,
         householdId: membership.household.id,

@@ -29,7 +29,12 @@ export default function Calendar() {
 
   const createEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
-      await apiRequest("POST", "/api/calendar", eventData);
+      const dataToSend = {
+        ...eventData,
+        startDate: new Date(eventData.startDate).toISOString(),
+        endDate: eventData.endDate ? new Date(eventData.endDate).toISOString() : null,
+      };
+      await apiRequest("POST", "/api/calendar", dataToSend);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });

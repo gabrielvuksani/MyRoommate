@@ -35,7 +35,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   
   // Household operations
-  createHousehold(household: InsertHousehold): Promise<Household>;
+  createHousehold(household: InsertHousehold & { inviteCode: string }): Promise<Household>;
   getHousehold(id: string): Promise<Household | undefined>;
   getHouseholdByInviteCode(code: string): Promise<Household | undefined>;
   joinHousehold(householdId: string, userId: string): Promise<HouseholdMember>;
@@ -92,7 +92,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async createHousehold(household: InsertHousehold): Promise<Household> {
+  async createHousehold(household: InsertHousehold & { inviteCode: string }): Promise<Household> {
     const [created] = await db.insert(households).values(household).returning();
     return created;
   }

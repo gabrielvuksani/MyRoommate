@@ -34,7 +34,11 @@ export default function Chores() {
 
   const createChoreMutation = useMutation({
     mutationFn: async (choreData: any) => {
-      await apiRequest("POST", "/api/chores", choreData);
+      const dataToSend = {
+        ...choreData,
+        dueDate: choreData.dueDate ? new Date(choreData.dueDate).toISOString() : null,
+      };
+      await apiRequest("POST", "/api/chores", dataToSend);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
@@ -72,10 +76,7 @@ export default function Chores() {
   const handleCreateChore = () => {
     if (!newChore.title.trim()) return;
     
-    createChoreMutation.mutate({
-      ...newChore,
-      dueDate: newChore.dueDate ? new Date(newChore.dueDate).toISOString() : null,
-    });
+    createChoreMutation.mutate(newChore);
   };
 
   const handleUpdateChore = (id: string, updates: any) => {

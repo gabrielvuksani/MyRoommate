@@ -226,12 +226,32 @@ export default function Home() {
       <div className="h-6 bg-white"></div>
       
       <div className="px-4 pt-4 pb-6 bg-white">
-        <h1 className="text-ios-large-title font-bold text-black">
-          Good morning, {firstName}
-        </h1>
-        <p className="text-ios-subhead text-ios-gray-5 mt-1">
-          Here's what needs your attention
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-ios-large-title font-bold text-black">
+              Good morning, {firstName}
+            </h1>
+            <p className="text-ios-subhead text-ios-gray-5 mt-1">
+              Here's what needs your attention
+            </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <button 
+              onClick={() => setLocation('/settings')}
+              className="w-10 h-10 bg-ios-gray rounded-full flex items-center justify-center"
+            >
+              <span className="text-ios-body">⚙️</span>
+            </button>
+            <button 
+              onClick={() => setLocation('/profile')}
+              className="w-10 h-10 bg-ios-blue rounded-full flex items-center justify-center"
+            >
+              <span className="text-white text-ios-footnote font-medium">
+                {firstName[0]?.toUpperCase() || '?'}
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
       
       <div className="px-4 space-y-3">

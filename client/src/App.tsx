@@ -11,6 +11,8 @@ import Chores from "@/pages/chores";
 import Expenses from "@/pages/expenses";
 import Calendar from "@/pages/calendar";
 import Messages from "@/pages/messages";
+import Settings from "@/pages/settings";
+import Profile from "@/pages/profile";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
@@ -36,6 +38,8 @@ function Router() {
             <Route path="/expenses" component={Expenses} />
             <Route path="/calendar" component={Calendar} />
             <Route path="/messages" component={Messages} />
+            <Route path="/settings" component={Settings} />
+            <Route path="/profile" component={Profile} />
           </>
         )}
         <Route component={NotFound} />
