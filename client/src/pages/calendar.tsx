@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react";
 
 export default function Calendar() {
@@ -22,7 +22,6 @@ export default function Calendar() {
   });
   
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["/api/calendar"],
@@ -44,20 +43,13 @@ export default function Calendar() {
         title: '',
         description: '',
         startDate: '',
+        endDate: '',
         color: '#3B82F6',
         type: 'social',
       });
-      toast({
-        title: "Success",
-        description: "Event created successfully",
-      });
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to create event",
-        variant: "destructive",
-      });
+      console.error("Failed to create event:", error);
     },
   });
 

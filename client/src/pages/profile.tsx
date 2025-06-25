@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, ArrowLeft, Edit3, Copy } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Profile() {
   const { user } = useAuth();
-  const { toast } = useToast();
+
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState({ firstName: "", lastName: "" });
@@ -44,17 +44,9 @@ export default function Profile() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       setIsEditOpen(false);
-      toast({
-        title: "Name updated!",
-        description: "Your name has been successfully updated.",
-      });
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update name",
-        variant: "destructive",
-      });
+      console.error("Failed to update name:", error);
     },
   });
 
@@ -70,10 +62,6 @@ export default function Profile() {
   const copyInviteCode = () => {
     if (household?.inviteCode) {
       navigator.clipboard.writeText(household.inviteCode);
-      toast({
-        title: "Copied!",
-        description: "Invite code copied to clipboard",
-      });
     }
   };
 

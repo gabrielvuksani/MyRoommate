@@ -111,6 +111,12 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Completely removed all toast notifications app-wide as requested by user
+- ✓ Replaced toast notifications with console error logging for debugging
+- ✓ Removed useToast imports and dependencies from all pages (calendar, expenses, chores, profile, onboarding, settings)
+- ✓ Maintained required validation for "Assign to" and date fields in chores modal
+- ✓ Fixed calendar modal endDate field state consistency
+- ✓ Applied comprehensive text truncation and overflow handling throughout the app
 - ✓ Redesigned dropdown components with visionOS glass morphism aesthetics
 - ✓ Added backdrop blur, rounded corners, and smooth animations to Select components
 - ✓ Enhanced dropdown triggers with hover states and rotation animations

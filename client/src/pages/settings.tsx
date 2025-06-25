@@ -3,13 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Copy, LogOut, Users, Home, ArrowLeft } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 
 export default function Settings() {
   const { user } = useAuth();
-  const { toast } = useToast();
+
   const [, setLocation] = useLocation();
   const [headerScrolled, setHeaderScrolled] = useState(false);
 
@@ -29,10 +29,6 @@ export default function Settings() {
   const handleCopyInviteCode = () => {
     if (household?.inviteCode) {
       navigator.clipboard.writeText(household.inviteCode);
-      toast({
-        title: "Copied!",
-        description: "Invite code copied to clipboard",
-      });
     }
   };
 

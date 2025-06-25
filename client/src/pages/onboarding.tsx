@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+
 import { useLocation } from "wouter";
 import { CheckCircle, Users, Home, ArrowRight } from "lucide-react";
 
@@ -13,7 +13,7 @@ export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
-  const { toast } = useToast();
+
   const queryClient = useQueryClient();
   
   const [userData, setUserData] = useState({
@@ -33,10 +33,6 @@ export default function Onboarding() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
-      toast({
-        title: "Success!",
-        description: "Your household has been created",
-      });
       setLocation('/');
     },
   });
@@ -47,10 +43,6 @@ export default function Onboarding() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
-      toast({
-        title: "Welcome!",
-        description: "You've joined the household",
-      });
       setLocation('/');
     },
   });

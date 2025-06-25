@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+
 import ExpenseCard from "@/components/expense-card";
 import { Plus } from "lucide-react";
 
@@ -33,7 +33,6 @@ export default function Expenses() {
   });
 
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -84,17 +83,9 @@ export default function Expenses() {
         category: "",
         splitType: "equal",
       });
-      toast({
-        title: "Success",
-        description: "Expense added successfully",
-      });
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to add expense",
-        variant: "destructive",
-      });
+      console.error("Failed to add expense:", error);
     },
   });
 

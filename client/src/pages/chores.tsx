@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+
 import ChoreBoard from "@/components/chore-board";
 import StreakWidget from "@/components/streak-widget";
 import { Plus } from "lucide-react";
@@ -24,7 +24,6 @@ export default function Chores() {
   });
   
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,17 +60,9 @@ export default function Chores() {
         dueDate: '',
         recurrence: '',
       });
-      toast({
-        title: "Success",
-        description: "Chore created successfully",
-      });
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to create chore",
-        variant: "destructive",
-      });
+      console.error("Failed to create chore:", error);
     },
   });
 
@@ -85,11 +76,6 @@ export default function Chores() {
     },
     onError: (error) => {
       console.error('Error updating chore:', error);
-      toast({
-        title: "Error", 
-        description: "Failed to update chore",
-        variant: "destructive",
-      });
     },
   });
 
@@ -102,7 +88,9 @@ export default function Chores() {
     });
   };
 
-  const canCreateChore = newChore.title.trim().length > 0;
+  const canCreateChore = newChore.title.trim().length > 0 && 
+                         newChore.assignedTo.length > 0 && 
+                         newChore.dueDate.length > 0;
 
   const handleUpdateChore = (id: string, updates: any) => {
     updateChoreMutation.mutate({ id, updates });
@@ -150,9 +138,9 @@ export default function Chores() {
                     onChange={(e) => setNewChore({ ...newChore, description: e.target.value })}
                     className="input-modern w-full"
                   />
-                  <Select value={newChore.assignedTo} onValueChange={(value) => setNewChore({ ...newChore, assignedTo: value })}>
+                  <Select value={newChore.assignedTo} onValueChange={(value) => setNewChore({ ...newChore, assignedTo: value })} required>
                     <SelectTrigger className="input-modern">
-                      <SelectValue placeholder="Assign to..." />
+                      <SelectValue placeholder="Assign to... *" />
                     </SelectTrigger>
                     <SelectContent>
                       {household?.members?.map((member: any) => (
@@ -167,6 +155,8 @@ export default function Chores() {
                     value={newChore.dueDate}
                     onChange={(e) => setNewChore({ ...newChore, dueDate: e.target.value })}
                     className="input-modern w-full"
+                    required
+                    placeholder="Due date *"
                   />
                   <Select value={newChore.recurrence} onValueChange={(value) => setNewChore({ ...newChore, recurrence: value })}>
                     <SelectTrigger className="input-modern">
