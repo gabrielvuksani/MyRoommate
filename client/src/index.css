@@ -133,7 +133,7 @@
 }
 
 .floating-header.scrolled {
-  background: rgba(255, 255, 255, 0.95);
+  background: transparent;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);

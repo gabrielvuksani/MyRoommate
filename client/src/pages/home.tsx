@@ -284,7 +284,10 @@ export default function Home() {
                 {/* Today's Schedule */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Today's Events */}
-                  <div className="bg-gray-50 rounded-xl p-4">
+                  <button
+                    onClick={() => setLocation("/calendar")}
+                    className="bg-gray-50 rounded-xl p-4 w-full text-left hover:bg-gray-100 transition-colors btn-animated"
+                  >
                     <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
                       <Calendar className="w-4 h-4 mr-2 text-blue-600" />
                       Today's Events
@@ -333,10 +336,13 @@ export default function Home() {
                         );
                       })()}
                     </div>
-                  </div>
+                  </button>
 
                   {/* Priority Chores */}
-                  <div className="bg-gray-50 rounded-xl p-4">
+                  <button
+                    onClick={() => setLocation("/chores")}
+                    className="bg-gray-50 rounded-xl p-4 w-full text-left hover:bg-gray-100 transition-colors btn-animated"
+                  >
                     <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
                       <CheckSquare className="w-4 h-4 mr-2 text-emerald-600" />
                       Priority Chores
@@ -383,7 +389,7 @@ export default function Home() {
                         );
                       })()}
                     </div>
-                  </div>
+                  </button>
                 </div>
               </div>
             </CardContent>

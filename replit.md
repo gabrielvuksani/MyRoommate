@@ -123,6 +123,8 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Updated Today's Focus priority chore card to match exact todo card styling from ChoreBoard
 - ✓ Added priority icons, status badges, and overdue detection consistent with main chore display
 - ✓ Unified layout and typography to create seamless visual experience
+- ✓ Made Today's Events and Priority Chores cards clickable on home page
+- ✓ Added navigation to calendar and chores pages following same pattern as other home page cards
 - ✓ Enhanced bottom navigation transparency (0.25 opacity) to show more background content
 - ✓ Completely redesigned message bubbles with visionOS/iMessage/Airbnb design fusion
 - ✓ Your messages: emerald-cyan gradients with custom tails and glass overlay effects
