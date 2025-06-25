@@ -14,7 +14,7 @@ export default function BottomNavigation() {
 
   return (
     <nav className="tab-navigation">
-      <div className="flex items-center justify-around">
+      <div className="flex items-center justify-center w-full max-w-sm">
         {tabs.map(({ id, path, label, Icon }) => {
           const isActive = location === path;
           

@@ -327,15 +327,17 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 6px;
-  margin: 12px;
+  margin: 0 12px 12px 12px;
   box-shadow: var(--shadow-medium);
   position: fixed;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
-  max-width: 420px;
+  max-width: 400px;
   width: calc(100% - 24px);
+  display: flex;
+  justify-content: center;
 }
 
 .tab-item {
