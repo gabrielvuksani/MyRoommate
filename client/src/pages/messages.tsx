@@ -47,6 +47,19 @@ export default function Messages() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle keyboard visibility on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      // Scroll to bottom when keyboard appears
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !household || !user) return;
@@ -80,7 +93,7 @@ export default function Messages() {
       </div>
 
       {/* Messages Area - Takes remaining space */}
-      <div className="flex-1 px-6 py-4 space-y-2 overflow-y-auto pb-20">
+      <div className="flex-1 px-6 py-4 space-y-2 overflow-y-auto">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full py-12">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mb-4">
@@ -97,8 +110,8 @@ export default function Messages() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input - Fixed at bottom */}
-      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 px-4 py-3">
+      {/* Message Input - Sticky at bottom */}
+      <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-3 flex-shrink-0" style={{ marginBottom: '80px' }}>
         <form onSubmit={handleSendMessage} className="flex items-center space-x-3">
           <div className="flex-1 bg-gray-100 rounded-full px-4 py-2">
             <Input
