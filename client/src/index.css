@@ -180,7 +180,7 @@
 
 /* Minimal Tab Navigation */
 .tab-navigation {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
   -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
   border-top: 1px solid rgba(255, 255, 255, 0.18);
