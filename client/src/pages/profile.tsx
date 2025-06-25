@@ -109,24 +109,28 @@ export default function Profile() {
 
   return (
     <div className="page-container">
-      <div className="floating-header">
+      {/* visionOS Header */}
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
-          <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => setLocation('/')}
-              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all"
-            >
-              <ArrowLeft size={18} />
-            </button>
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="page-title">Profile & Settings</h1>
-              <p className="page-subtitle">Manage your account & app settings</p>
+              <h1 className="page-title">Profile</h1>
+              <p className="page-subtitle">Your account settings</p>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-accent to-accent-hover rounded-2xl flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold">
+                  {user?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
       
-      <div className="page-content space-y-6">
+      {/* Content */}
+      <div className="flex-1 px-6 pb-6 page-content-with-header">
         {/* Profile Header */}
         <Card className="smart-card">
           <CardContent className="p-6">

@@ -141,7 +141,7 @@ export default function Calendar() {
 
   return (
     <div className="page-container">
-      {/* Dynamic Header */}
+      {/* visionOS Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center justify-between">
@@ -149,6 +149,18 @@ export default function Calendar() {
               <h1 className="page-title">Calendar</h1>
               <p className="page-subtitle">Shared events</p>
             </div>
+            
+            <div className="flex items-center space-x-4">
+              <button 
+                onClick={() => setIsCreateOpen(true)}
+                className="w-12 h-12 bg-gradient-to-br from-orange to-orange-light rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              >
+                <Plus size={20} className="text-white" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
             
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
@@ -207,13 +219,15 @@ export default function Calendar() {
                 </div>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
         </div>
       </div>
       
-      <div className="page-content space-y-8">
+      {/* Calendar Content */}
+      <div className="flex-1 px-6 pb-6 page-content-with-header">
         {/* Interactive Calendar */}
-        <Card className="glass-card">
+        <Card className="smart-card mb-6">
           <CardContent className="p-8">
             {/* Calendar Header with Navigation */}
             <div className="flex items-center justify-between mb-8">

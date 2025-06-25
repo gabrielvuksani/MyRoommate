@@ -60,18 +60,27 @@ export default function Messages() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 flex flex-col">
-      <div className="floating-header border-b border-default">
-        <div className="px-6 py-4">
-          <h1 className="text-large-title font-bold text-primary">House Chat</h1>
-          <p className="text-subhead text-secondary mt-1">
-            {household?.members?.map((m: any) => m.user.firstName || m.user.email?.split('@')[0]).join(', ')}
-          </p>
+    <div className="page-container flex flex-col">
+      {/* visionOS Header */}
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
+        <div className="page-header">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="page-title">Messages</h1>
+              <p className="page-subtitle">Group chat</p>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl flex items-center justify-center shadow-lg">
+                <MessageSquare size={20} className="text-white" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Chat Messages */}
-      <div className="flex-1 px-6 py-6 space-y-4 overflow-y-auto">
+      {/* Chat Interface */}
+      <div className="flex-1 flex flex-col page-content-with-header">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-64">
             <p className="text-body text-secondary">No messages yet. Start the conversation!</p>
