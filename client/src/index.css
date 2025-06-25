@@ -119,13 +119,32 @@
   border-color: var(--primary);
 }
 
-/* Clean Header */
+/* Unified Header */
 .floating-header {
   background: var(--background);
   position: sticky;
   top: 0;
   z-index: 50;
   padding-top: env(safe-area-inset-top);
+}
+
+.page-header {
+  padding: 24px 16px 16px 16px;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.page-subtitle {
+  font-size: 17px;
+  color: #6b7280;
+  margin-top: 4px;
+  margin-bottom: 0;
 }
 
 .header-content {
@@ -422,7 +441,7 @@
 .page-container {
   min-height: 100vh;
   background: var(--background);
-  padding-bottom: 80px;
+  padding-bottom: 100px;
   position: relative;
   max-width: 430px;
   margin: 0 auto;

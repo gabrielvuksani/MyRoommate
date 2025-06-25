@@ -222,17 +222,42 @@ export default function Home() {
 
   return (
     <div className="page-container">
-      {/* Header with Large Title */}
+      {/* Unified Header */}
       <div className="floating-header">
-        <div className="px-4 pt-6 pb-4">
-          <h1 className="text-4xl font-bold text-gray-900 leading-tight">
-            {greeting}, {firstName}
-          </h1>
+        <div className="page-header">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="page-title">{greeting}, {firstName}</h1>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => setLocation('/messages')}
+                className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+              >
+                <MessageSquare size={16} className="text-gray-600" />
+              </button>
+              <button 
+                onClick={() => setLocation('/settings')}
+                className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+              >
+                <Settings size={16} className="text-gray-600" />
+              </button>
+              <button 
+                onClick={() => setLocation('/profile')}
+                className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center hover:bg-primary/20 transition-colors"
+              >
+                <span className="text-primary text-sm font-semibold">
+                  {firstName[0]?.toUpperCase() || '?'}
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       
       {/* Smart Cards Stack */}
-      <div className="px-4 space-y-3">
+      <div className="px-4 space-y-3 pb-4">
         {/* 1. Chore Card */}
         {nextChore ? (
           <div 

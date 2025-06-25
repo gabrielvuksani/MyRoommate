@@ -131,15 +131,13 @@ export default function Calendar() {
 
   return (
     <div className="page-container">
-      {/* Clean Header */}
+      {/* Unified Header */}
       <div className="floating-header">
-        <div className="px-4 py-6">
+        <div className="page-header">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900">Calendar</h1>
-              <p className="text-lg text-gray-600 mt-1">
-                Shared events
-              </p>
+              <h1 className="page-title">Calendar</h1>
+              <p className="page-subtitle">Shared events</p>
             </div>
             
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>

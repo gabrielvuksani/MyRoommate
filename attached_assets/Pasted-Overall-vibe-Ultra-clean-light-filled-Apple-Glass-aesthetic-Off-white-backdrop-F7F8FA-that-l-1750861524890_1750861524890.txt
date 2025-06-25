@@ -1,0 +1,67 @@
+Overall vibe
+Ultra-clean, light-filled, “Apple-Glass” aesthetic
+
+Off-white backdrop (#F7F8FA) that lets cards float.
+
+One accent colour only (pick a fresh teal or coral); everything else stays neutral.
+
+Real shadows instead of dotted borders; nothing screams for attention unless it’s tappable.
+
+Global rules
+Token	Value	Purpose
+Edge margin	20 pt	Breathing room left & right
+Card radius	14 pt	Soft but modern
+Card shadow	y = 2 pt, blur = 12 pt, 10 % black	Floating, not bulky
+Card inner padding	18 pt	Comfortable reading
+Gap between cards	24 pt	Distinct sections
+Accent	#00C2B3 (swap in theme)	Buttons, notification dots
+Font	SF Pro	Title-1 28 / Bold; Body 17 / Regular
+
+1 · Home (Dashboard)
+Section	What to show	Visual treatment
+Greeting	“Good morning, Gabriel”	Title-1, bold, no wrap, 4 pt bottom line
+Next chore	Task name • assignee chip • due date • primary button	Left-aligned stack; button full width inside card footer
+Bills	Net balance headline, subtitle line (“All settled” / “You owe…”)	If zero balance, card collapses to 75 pt height with a single centred message + add button
+Calendar	Next event line; small 5-day ribbon preview	Use subtle icon (#8E8E93) + text; hide empty ribbon on free days
+Chat	Last message preview + unread badge	Badge uses accent; preview truncated to one line
+
+Remove the dashed placeholders: when a category is empty, shrink the card and show an upbeat micro-illustration (monotone, 48 × 48 pt) plus an “Add” button in accent colour.
+
+2 · Bottom bar
+Frosted glass effect, 90 % opacity.
+
+Icons only (SF Symbols, outline); labels appear on selection.
+
+Active tab = filled symbol + accent glow dot under it (4 pt).
+
+3 · Colour discipline
+Accent = buttons, active icons, unread count.
+
+Greys = text (#111 to #6E6E73), lines (#E5E5EA).
+
+Background = never pure white; cards are white, app canvas is off-white so they pop.
+
+4 · Motion & feedback
+Card tap → 6 pt scale-down spring then push to detail screen (280 ms).
+
+“Mark done” / “Settle up” → tick fills button, light haptic.
+
+Pull-to-refresh → thin accent progress bar slides in under greeting, retracts on success.
+
+5 · Accessibility
+Touch targets ≥ 48 × 48 pt.
+
+Text supports Dynamic Type tiers without truncating key data.
+
+VoiceOver labels follow: “Next chore: take out trash, due today, assigned to you, double-tap to mark done.”
+
+Quick visual checklist for every screen
+Can I hide a border and rely on shadow or spacing instead?
+
+Is the accent colour used in more than three places at once? If yes, tone it down.
+
+Does each card read like a self-contained thought at arm’s length?
+
+When empty, does a section still look intentional (no placeholders with dashed lines)?
+
+Hand these guidelines to the agent; the current layout will re-render in a calmer, more premium style.
