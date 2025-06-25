@@ -1,0 +1,41 @@
+**Copy-paste prompt for the AI builder**
+
+> **Home Page (Dashboard) – RoomieFlow**
+> Goal: a warm, airy “hub” that instantly shows each roommate what matters *today*.
+> Follow Airbnb/Apple visual language: lots of white space, big rounded cards, gentle motion, SF Pro type scale, accent-colour highlights.
+>
+> **Layout**
+> • Safe-area top padding + 16 pt edge margins.
+> • Large Title (“Good morning, Alex”) left-aligned, 34 pt, Bold.
+> • Below title, vertical stack of **4 dynamic cards** (max height 180 pt each, 12 pt gap):
+>
+> 1. **Chore Card** – shows next chore’s icon, name, assignee avatar, “Mark done” pill button.
+> 2. **Bills Card** – total balance line (“You owe \$23”), list of up to 2 outstanding items, “Settle up” button.
+> 3. **Calendar Card** – today’s event chip (time + title) and mini month toggle.
+> 4. **Chat Card** – last message preview + unread badge.
+>    • If any section has nothing due today, replace its card with an “empty-state” version: friendly illustration + quick-add button.
+>
+> **Visual rules**
+> • Card container: 12 pt radius, soft shadow (y = 2, blur = 8, 10 % black).
+> • Internal grid: 16 pt padding, 8 pt row spacing.
+> • Accent colour (#00C2B3 default) for primary buttons, unread badge, progress rings.
+> • Icons from SF Symbols, Outline style 24 × 24 pt; filled on interaction.
+> • Typography scale: Title 3 20 / Semibold for card headings; Body 17 / Regular for details; Footnote 13 for timestamps.
+>
+> **Interactions**
+> • Tap a card → slides in corresponding detail tab (300 ms ease-in-out).
+> • Swipe right on a card → quick action (e.g., complete chore, mark bill paid) with light haptic.
+> • Pull-to-refresh triggers a subtle spinner above title (accent colour stroke).
+>
+> **State handling**
+> • Animate card reorder when priorities change (spring 0.5 damping).
+> • Offline: show grey “syncing…” banner pinned below title; queue actions locally.
+> • Dark mode: swap surfaces to #1C1C1E, use inner stroke instead of shadow.
+>
+> **Accessibility**
+> • All interactive zones ≥ 44 × 44 pt.
+> • Dynamic Type scales up to Accessibility XL without truncation.
+> • VoiceOver labels: “Trash night chore, due today, assigned to you, double-tap to mark done.”
+>
+> **Deliverable**
+> A single SwiftUI view (or equivalent) implementing the above layout, tokens, and interactions—ready to slot into the app’s tab bar as “Home.”

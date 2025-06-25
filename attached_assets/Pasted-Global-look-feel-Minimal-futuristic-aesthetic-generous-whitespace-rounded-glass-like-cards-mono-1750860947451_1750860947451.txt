@@ -1,0 +1,73 @@
+Global look & feel
+Minimal-futuristic aesthetic: generous whitespace, rounded glass-like cards, monochrome base with a single bold accent. Fluid motion, soft shadows, tactile haptics. All data lives in one real-time cloud database so every change is visible to all roommates instantly—even offline edits queue and merge later.
+
+1 · Home (Dashboard)
+Large greeting (“Morning, Alex”) followed by four stacked smart cards (Chore • Bills • Calendar • Chat).
+
+Cards auto-collapse if empty, slide to reorder by urgency.
+
+Top-pull refresh; offline banner if not synced.
+
+2 · Chat
+Full-height conversation thread for the household.
+
+Rounded bubbles, subtle gradient on sender’s messages, quick emoji reactions, image drops.
+
+Threaded replies slide in on tap.
+
+Messages stored in /households/{id}/messages collection; realtime listener for zero-lag feel.
+
+3 · Calendar
+Split view: minimal month grid above, agenda list below.
+
+Color chips: rent = accent, chores = neutral, social events = secondary tint.
+
+Long-press to add, drag to reschedule.
+
+Events saved under /households/{id}/events, optionally mirrored to each user’s device calendar.
+
+4 · Chores
+Horizontal swipeable “Chore Chips” (capsules) sorted by due date.
+
+Tap chip to mark complete → fills with accent, plays light haptic, updates streak.
+
+Auto-rotation logic handled server-side; each chip stores next-assignee field.
+
+5 · Bills & Expenses
+Ledger list: avatar • description • amount • status pill (“settled / you owe / owed to you”).
+
+Header shows net balance (“You owe $23”).
+
+“Add” sheet supports equal or custom split; recurring toggle for rent & utilities.
+
+Debts saved in /households/{id}/expenses with ledger sub-docs for each payer.
+
+6 · Grocery & Supplies
+Minimal checklist with animated strike-through on tap.
+
+Items auto-group by aisle (produce, pantry, cleaning) using simple tag field.
+
+Toggle to hide bought items after 24 h.
+
+Dataset: /households/{id}/groceries.
+
+7 · Polls
+Card grid of active polls: question, option chips with live vote counts.
+
+Tap to vote; percentages animate in real time.
+
+Auto-close after deadline and show final result.
+
+Stored at /households/{id}/polls with votes sub-collection.
+
+8 · Profile & Settings
+Avatar, preferred payment handles, notification toggles, accent-colour picker.
+
+“Move-out” button exports personal data and removes user from household node.
+
+9 · Onboarding
+Flow: Create or Join Household → pick accent colour → allow notifications → land on Home.
+
+Invite sharing via deep link that pre-fills household ID.
+
+Deliverable: Screens following the above specifications, connected to a shared cloud database with real-time sync, offline queueing, and push notifications.

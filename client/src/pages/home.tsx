@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { CheckSquare, DollarSign, Calendar, MessageSquare, Plus } from "lucide-react";
+import { CheckSquare, DollarSign, Calendar, MessageSquare, ChevronRight, Bell, Settings } from "lucide-react";
 
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -136,7 +136,7 @@ export default function Home() {
     return (
       <div className="page-container">
         <div className="floating-header">
-          <div className="px-6 py-6">
+          <div className="px-4 py-6">
             <h1 className="header-content text-3xl font-black tracking-tight">RoomieFlow</h1>
             <p className="text-subhead text-secondary mt-1">Create or join a household to get started</p>
           </div>
@@ -222,184 +222,168 @@ export default function Home() {
   const recentMessages = messages.slice(-2);
   const upcomingEvents = calendarEvents.slice(0, 2);
   const netBalance = (balance?.totalOwed || 0) - (balance?.totalOwing || 0);
-
   const firstName = user.firstName || user.email?.split('@')[0] || 'there';
 
   return (
     <div className="page-container">
-      {/* visionOS Header */}
+      {/* Apple-standard Header */}
       <div className="floating-header">
-        <div className="px-6 py-6">
+        <div className="px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="header-content text-3xl font-black tracking-tight">RoomieFlow</h1>
-              <p className="text-subhead text-secondary mt-1">
-                Hey {firstName}! 👋
+              <h1 className="text-large-title font-bold text-primary">Good morning</h1>
+              <p className="text-body text-secondary mt-1">
+                {firstName}
               </p>
             </div>
             
-            <button 
-              onClick={() => setLocation('/settings')}
-              className="w-10 h-10 bg-surface border border-border-subtle rounded-full flex items-center justify-center text-primary font-semibold text-sm hover:bg-surface-secondary transition-all"
-            >
-              {firstName[0]?.toUpperCase() || '?'}
-            </button>
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => setLocation('/settings')}
+                className="w-11 h-11 bg-surface-secondary/50 rounded-full flex items-center justify-center hover:bg-surface-secondary transition-colors"
+              >
+                <Settings size={20} className="text-secondary" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
       
-      <div className="page-content space-y-8">
-        {/* Quick Actions - Things 3 inspired */}
-        <div className="space-y-3">
-          <button
-            onClick={() => setLocation('/chores')}
-            className="w-full flex items-center justify-between p-5 bg-surface border border-border-subtle rounded-2xl shadow-soft hover:shadow-medium transition-all duration-150 group"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                <CheckSquare size={20} className="text-primary" />
-              </div>
-              <div className="text-left">
-                <p className="text-body font-semibold text-primary">Chores</p>
-                <p className="text-caption text-secondary">
-                  {activeChores.length} active task{activeChores.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-            </div>
-            <div className="w-6 h-6 bg-tertiary/30 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <span className="text-xs text-tertiary">→</span>
-            </div>
-          </button>
+      <div className="page-content space-y-6">
+        {/* Dashboard Cards - Airbnb style */}
+        <div className="space-y-4">
+          {/* Balance Summary Card */}
+          {balance && (netBalance !== 0 || balance.totalOwed > 0 || balance.totalOwing > 0) && (
+            <Card className="glass-card">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-footnote text-secondary">Your balance</p>
+                    <p className={`text-title-1 font-semibold ${
+                      netBalance >= 0 ? 'text-accent' : 'text-destructive'
+                    }`}>
+                      {netBalance >= 0 ? '+' : ''}${Math.abs(netBalance).toFixed(2)}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => setLocation('/expenses')}
+                    className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center"
+                  >
+                    <ChevronRight size={16} className="text-primary" />
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-          <button
-            onClick={() => setLocation('/expenses')}
-            className="w-full flex items-center justify-between p-5 bg-surface border border-border-subtle rounded-2xl shadow-soft hover:shadow-medium transition-all duration-150 group"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
-                <DollarSign size={20} className="text-accent" />
-              </div>
-              <div className="text-left">
-                <p className="text-body font-semibold text-primary">Expenses</p>
-                <p className="text-caption text-secondary">
-                  {netBalance >= 0 ? `+$${netBalance.toFixed(2)} owed to you` : `$${Math.abs(netBalance).toFixed(2)} you owe`}
-                </p>
-              </div>
-            </div>
-            <div className="w-6 h-6 bg-tertiary/30 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <span className="text-xs text-tertiary">→</span>
-            </div>
-          </button>
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 gap-4">
+            <Card 
+              className="glass-card cursor-pointer hover:shadow-medium transition-all duration-300"
+              onClick={() => setLocation('/chores')}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 bg-primary/15 rounded-lg flex items-center justify-center">
+                    <CheckSquare size={16} className="text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-body font-semibold text-primary">Chores</p>
+                    <p className="text-footnote text-secondary truncate">
+                      {activeChores.length} active
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-          <button
-            onClick={() => setLocation('/calendar')}
-            className="w-full flex items-center justify-between p-5 bg-surface border border-border-subtle rounded-2xl shadow-soft hover:shadow-medium transition-all duration-150 group"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-warning/10 rounded-xl flex items-center justify-center">
-                <Calendar size={20} className="text-warning" />
-              </div>
-              <div className="text-left">
-                <p className="text-body font-semibold text-primary">Calendar</p>
-                <p className="text-caption text-secondary">
-                  {upcomingEvents.length} upcoming event{upcomingEvents.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-            </div>
-            <div className="w-6 h-6 bg-tertiary/30 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <span className="text-xs text-tertiary">→</span>
-            </div>
-          </button>
+            <Card 
+              className="glass-card cursor-pointer hover:shadow-medium transition-all duration-300"
+              onClick={() => setLocation('/calendar')}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 bg-warning/15 rounded-lg flex items-center justify-center">
+                    <Calendar size={16} className="text-warning" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-body font-semibold text-primary">Calendar</p>
+                    <p className="text-footnote text-secondary truncate">
+                      {upcomingEvents.length} upcoming
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-          <button
-            onClick={() => setLocation('/messages')}
-            className="w-full flex items-center justify-between p-5 bg-surface border border-border-subtle rounded-2xl shadow-soft hover:shadow-medium transition-all duration-150 group"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center">
-                <MessageSquare size={20} className="text-secondary" />
-              </div>
-              <div className="text-left">
-                <p className="text-body font-semibold text-primary">Messages</p>
-                <p className="text-caption text-secondary">
-                  {recentMessages.length} recent message{recentMessages.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-            </div>
-            <div className="w-6 h-6 bg-tertiary/30 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <span className="text-xs text-tertiary">→</span>
-            </div>
-          </button>
+          {/* Recent Activity */}
+          {(recentMessages.length > 0 || activeChores.length > 0) && (
+            <Card className="glass-card">
+              <CardContent className="p-4">
+                <h3 className="text-headline font-semibold text-primary mb-3">Recent activity</h3>
+                <div className="space-y-3">
+                  {recentMessages.slice(0, 2).map((message: any) => (
+                    <div 
+                      key={message.id} 
+                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-secondary/50 transition-colors cursor-pointer"
+                      onClick={() => setLocation('/messages')}
+                    >
+                      <div className="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center">
+                        <span className="text-secondary text-sm font-medium">
+                          {message.user.firstName?.[0] || '?'}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-body text-primary truncate">{message.content}</p>
+                        <p className="text-footnote text-secondary">
+                          {message.user.firstName} • {new Date(message.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {activeChores.slice(0, 1).map((chore: any) => (
+                    <div 
+                      key={chore.id} 
+                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-secondary/50 transition-colors cursor-pointer"
+                      onClick={() => setLocation('/chores')}
+                    >
+                      <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                        <CheckSquare size={16} className="text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-body text-primary truncate">{chore.title}</p>
+                        <p className="text-footnote text-secondary">
+                          {chore.assignedUser?.firstName || 'Unassigned'} • Due {chore.dueDate ? new Date(chore.dueDate).toLocaleDateString() : 'soon'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Empty State */}
+          {recentMessages.length === 0 && activeChores.length === 0 && upcomingEvents.length === 0 && (
+            <Card className="glass-card">
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 bg-surface-secondary rounded-full flex items-center justify-center mx-auto mb-3">
+                  <CheckSquare size={24} className="text-tertiary" />
+                </div>
+                <h3 className="text-headline font-semibold text-primary mb-1">All caught up</h3>
+                <p className="text-body text-secondary mb-4">No recent activity to show</p>
+                <Button 
+                  onClick={() => setLocation('/chores')}
+                  className="bg-primary text-white px-6 py-2 rounded-lg text-body font-medium"
+                >
+                  Add a chore
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
-
-        {/* Splitwise-inspired Balance Summary */}
-        {balance && (netBalance !== 0 || balance.totalOwed > 0 || balance.totalOwing > 0) && (
-          <Card className="glass-card">
-            <CardContent className="p-6">
-              <div className="text-center">
-                <p className="text-caption text-secondary mb-1">Your balance</p>
-                <p className={`text-title-1 font-bold mb-6 ${
-                  netBalance >= 0 ? 'text-accent' : 'text-destructive'
-                }`}>
-                  {netBalance >= 0 ? '+' : ''}${netBalance.toFixed(2)}
-                </p>
-                
-                {(balance.totalOwed > 0 || balance.totalOwing > 0) && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <p className="text-caption text-secondary">You owe</p>
-                      <p className="text-headline font-semibold text-destructive">${balance.totalOwing.toFixed(2)}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-caption text-secondary">You're owed</p>
-                      <p className="text-headline font-semibold text-accent">${balance.totalOwed.toFixed(2)}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Recent Activity - Notion inspired */}
-        {(recentMessages.length > 0 || upcomingEvents.length > 0) && (
-          <Card className="glass-card">
-            <CardContent className="p-6">
-              <h3 className="text-headline font-semibold text-primary mb-4">What's new</h3>
-              <div className="space-y-3">
-                {recentMessages.slice(0, 2).map((message: any, index: number) => (
-                  <div key={message.id} className="flex items-start space-x-3 p-3 rounded-xl hover:bg-surface-secondary transition-colors cursor-pointer" onClick={() => setLocation('/messages')}>
-                    <div className="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-secondary text-sm font-medium">
-                        {message.user.firstName?.[0] || '?'}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-body text-primary truncate">{message.content}</p>
-                      <p className="text-caption text-secondary">
-                        {message.user.firstName} • {new Date(message.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                
-                {upcomingEvents.slice(0, 1).map((event: any) => (
-                  <div key={event.id} className="flex items-start space-x-3 p-3 rounded-xl hover:bg-surface-secondary transition-colors cursor-pointer" onClick={() => setLocation('/calendar')}>
-                    <div className="w-8 h-8 bg-warning/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Calendar size={16} className="text-warning" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-body text-primary truncate">{event.title}</p>
-                      <p className="text-caption text-secondary">
-                        {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {event.creator?.firstName}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
