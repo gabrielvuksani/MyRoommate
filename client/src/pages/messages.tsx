@@ -254,7 +254,7 @@ export default function Messages() {
           border: '1px solid rgba(255, 255, 255, 0.3)',
         }}
       >
-        <div className="page-header">
+        <div className="page-header bg-[transparent]">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="page-title">Messages</h1>
@@ -263,7 +263,6 @@ export default function Messages() {
           </div>
         </div>
       </div>
-
       {/* Messages Container */}
       <div className="pt-32 pb-32 px-6">
         <div className="max-w-3xl mx-auto">
@@ -342,7 +341,6 @@ export default function Messages() {
           </div>
         </div>
       </div>
-
       {/* Message Input - Fixed at bottom with visionOS styling */}
       <div className="fixed bottom-[88px] left-0 right-0 z-40 px-6">
         <div className="max-w-3xl mx-auto">
