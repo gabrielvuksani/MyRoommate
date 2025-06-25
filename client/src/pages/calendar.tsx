@@ -16,7 +16,6 @@ export default function Calendar() {
     title: '',
     description: '',
     startDate: '',
-    endDate: '',
     color: '#3B82F6',
     type: 'social',
   });
@@ -65,7 +64,7 @@ export default function Calendar() {
     if (!canCreateEvent) return;
     
     const startDateTime = new Date(newEvent.startDate);
-    const endDateTime = newEvent.endDate ? new Date(newEvent.endDate) : new Date(startDateTime.getTime() + 60 * 60 * 1000);
+    const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000); // 1 hour later
     
     const eventData = {
       title: newEvent.title,
@@ -73,7 +72,7 @@ export default function Calendar() {
       startDate: startDateTime.toISOString(),
       endDate: endDateTime.toISOString(),
       color: newEvent.color || '#3B82F6',
-      type: newEvent.type || 'personal'
+      type: 'personal'
     };
     
     createEventMutation.mutate(eventData);
@@ -212,7 +211,6 @@ export default function Calendar() {
                         value={newEvent.endDate}
                         onChange={(e) => setNewEvent({ ...newEvent, endDate: e.target.value })}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                        placeholder="Optional - defaults to 1 hour"
                       />
                     </div>
                   </div>

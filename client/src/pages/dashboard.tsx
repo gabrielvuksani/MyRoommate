@@ -128,7 +128,7 @@ export default function Dashboard() {
             </button>
             <div>
               <h1 className="page-title">Performance Dashboard</h1>
-              <p className="page-subtitle">{household?.name} household analytics</p>
+              <p className="page-subtitle">{household.name} household analytics</p>
             </div>
           </div>
           
