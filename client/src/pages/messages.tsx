@@ -86,6 +86,9 @@ export default function Messages() {
   }, [messages, typingUsers]);
 
   useEffect(() => {
+    // Scroll to top when page loads
+    window.scrollTo(0, 0);
+    
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 20);
     };

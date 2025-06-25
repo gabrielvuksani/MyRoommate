@@ -111,6 +111,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Updated h2 element styling from "text-headline font-semibold text-blue-700" to "font-semibold text-[#1a1a1a] text-[22px]"
+- ✓ Implemented scroll-to-top functionality across all pages (home, chores, expenses, calendar, messages, profile, settings, onboarding)
+- ✓ Added window.scrollTo(0, 0) in useEffect hooks to ensure pages start at top when navigating
+- ✓ Enhanced user experience with consistent page positioning behavior
 - ✓ Reverted unnecessary filtering complexity from chores page per user feedback
 - ✓ Redesigned chores page with modern todo app patterns inspired by top productivity apps
 - ✓ Added "Today's Focus" section highlighting urgent/overdue tasks with intelligent prioritization

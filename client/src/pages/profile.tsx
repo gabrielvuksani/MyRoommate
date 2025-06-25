@@ -29,6 +29,9 @@ export default function Profile() {
   });
 
   useEffect(() => {
+    // Scroll to top when page loads
+    window.scrollTo(0, 0);
+    
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 20);
     };
