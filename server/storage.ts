@@ -39,6 +39,7 @@ export interface IStorage {
   getHousehold(id: string): Promise<Household | undefined>;
   getHouseholdByInviteCode(code: string): Promise<Household | undefined>;
   joinHousehold(householdId: string, userId: string): Promise<HouseholdMember>;
+  leaveHousehold(userId: string): Promise<void>;
   getHouseholdMembers(householdId: string): Promise<(HouseholdMember & { user: User })[]>;
   getUserHousehold(userId: string): Promise<(HouseholdMember & { household: Household }) | undefined>;
   
@@ -115,6 +116,10 @@ export class DatabaseStorage implements IStorage {
       .values({ householdId, userId })
       .returning();
     return member;
+  }
+
+  async leaveHousehold(userId: string): Promise<void> {
+    await db.delete(householdMembers).where(eq(householdMembers.userId, userId));
   }
 
   async getHouseholdMembers(householdId: string): Promise<(HouseholdMember & { user: User })[]> {

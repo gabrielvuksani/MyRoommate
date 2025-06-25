@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, ArrowLeft, Edit3, Copy } from "lucide-react";
+import { LogOut, ArrowLeft, Edit3, Copy, UserMinus } from "lucide-react";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -47,6 +47,23 @@ export default function Profile() {
     },
     onError: (error: any) => {
       console.error("Failed to update name:", error);
+    },
+  });
+
+  const leaveHouseholdMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/households/leave", {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      setLocation("/onboarding");
+    },
+    onError: (error: any) => {
+      console.error("Failed to leave household:", error);
     },
   });
 
@@ -302,16 +319,28 @@ export default function Profile() {
           </Card>
         )}
 
-        {/* Sign Out */}
+        {/* Actions */}
         <Card className="smart-card">
           <CardContent className="p-6">
-            <Button
-              onClick={logout}
-              className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700"
-            >
-              <LogOut size={20} />
-              <span>Sign Out</span>
-            </Button>
+            <div className="space-y-3">
+              {household && (
+                <Button
+                  onClick={() => leaveHouseholdMutation.mutate()}
+                  disabled={leaveHouseholdMutation.isPending}
+                  className="w-full bg-orange-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-orange-700 disabled:opacity-50"
+                >
+                  <UserMinus size={20} />
+                  <span>{leaveHouseholdMutation.isPending ? "Leaving..." : "Leave Household"}</span>
+                </Button>
+              )}
+              <Button
+                onClick={logout}
+                className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700"
+              >
+                <LogOut size={20} />
+                <span>Sign Out</span>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

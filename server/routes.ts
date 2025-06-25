@@ -102,6 +102,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/households/leave', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      await storage.leaveHousehold(userId);
+      res.json({ message: "Successfully left household" });
+    } catch (error) {
+      console.error("Error leaving household:", error);
+      res.status(500).json({ message: "Failed to leave household" });
+    }
+  });
+
   app.get('/api/households/current', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
