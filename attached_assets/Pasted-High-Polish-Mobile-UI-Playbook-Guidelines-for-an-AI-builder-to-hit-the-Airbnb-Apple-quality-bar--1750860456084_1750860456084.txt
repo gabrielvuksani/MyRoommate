@@ -1,0 +1,103 @@
+High-Polish Mobile UI Playbook
+Guidelines for an AI builder to hit the “Airbnb / Apple” quality bar on the RoomieFlow app.
+
+1. Anchor everything in a few core principles
+Unified – every screen and component feels like part of one system (no odd one-offs).
+
+Universal – welcoming visuals and copy that work for a global, diverse audience.
+
+Iconic – bold, instantly recognisable shapes; nothing fussy.
+
+Conversational – motion and copy that talk to the user in a friendly, human tone. 
+medium.com
+
+2. Layout & spacing
+Base grid: multiples of 8 pt; half-steps (4 pt) only for fine tweaks.
+
+Edge margin = 16 pt on phones; keep text columns ≤ 600 pt wide to avoid fatigue. 
+developer.apple.com
+
+Group related elements with consistent vertical rhythm—e.g., 24 pt between card stacks, 12 pt between a label and its value.
+
+3. Typography
+Use SF Pro (Apple system font) in a type scale: Large Title 34 / Bold → Title 1 28 / Semibold → Body 17 / Regular → Footnote 13 / Regular.
+
+Never track body text; instead rely on correct line-height (≥ 120 % of font size).
+
+Reserve weight shifts (Regular → Semibold) to signal “tap targets” or totals.
+
+4. Colour & contrast
+Pick one brand accent (e.g., teal #00C2B3). Use it for:
+
+Primary buttons
+
+Active tab & selected states
+
+Progress rings
+
+Desaturate all other UI chrome (greys 90 %, 70 %, 40 %).
+
+Maintain WCAG AA contrast for text: ≥ 4.5:1 for body, 3:1 for large text.
+
+5. Iconography & imagery
+All icons from SF Symbols, “Regular” weight, outlined style for idle states, filled on action.
+
+Keep stroke width uniform (≈ 1.5 pt) to match text weight.
+
+Use square, softly shadowed “cards” for photos/avatars—8 pt corner radius, 8 pt inner padding.
+
+6. Motion & micro-interactions
+Duration guidelines: micro-states 120 ms, element transitions 300 ms, page transitions ≤ 450 ms.
+
+Use ease-in-out-curve on entrances; ease-out on exits so the interface “rests”.
+
+Add UIImpactFeedbackStyle.light haptic on:
+
+Marking a chore done
+
+Sending a chat message
+
+Completing a payment split
+
+Animate progress rings and balance counters with counting-up tween (30 fps cap for battery).
+
+7. Component kit (reusable, token-driven)
+Purpose	Component	Key rules
+Overview	Dashboard Card	16 pt padding, 8 pt internal grid, icon 24 × 24 pt, title Body Semibold, subtitle Footnote Regular.
+Comms	Chat Bubble	12 pt radius; sender accent background at 15 % opacity; 4 pt tail offset.
+Planning	Calendar Tile	44 × 44 pt tappable; selected = filled accent circle with white numeral.
+Money	Expense Row	Leading avatar 40 pt, two-line title/amount stack, trailing “Settle” pill button.
+Tasks	Chore Chip	Capsule, accent border 1 pt; tick animation fills background on completion.
+
+All components read their size, typography, spacing, radius, elevation, and colour from a single token file so dark-mode/theming is automatic.
+
+8. Accessibility essentials
+All touch targets ≥ 44 × 44 pt.
+
+Respect iOS Dynamic Type—scale fonts & line-heights via UIFontMetrics.
+
+Provide VoiceOver labels (“Trash night – due today, assigned to Alex”) and accessibility actions for swipe gestures.
+
+Offer a high-contrast toggle: swap greys to #000/#FFF and bump border thickness to 2 pt. 
+medium.com
+
+9. Dark mode / theming
+Use paired colour tokens (surfaceLight / surfaceDark, textPrimaryLight / textPrimaryDark).
+
+Keep accent colour identical in both modes for brand recognition (unless fails contrast).
+
+Elevation: shadows in light mode, subtle inner strokes or overlays in dark mode.
+
+10. Performance & polish checklist
+App launch < 400 ms on an iPhone 15.
+
+Scroll at 120 fps (remove expensive shadows in long lists).
+
+Defer network calls until after first frame.
+
+Prefetch images and cache chat history locally for offline reads.
+
+Ship with lightweight empty states: illustration + sentence + primary button.
+
+Summary for the AI builder
+Use a 16 pt edge margin, 8 pt grid, SF Pro type scale, accent-driven colour scheme, SF Symbols icon set, subtle haptics, and tokenised components. Prioritise clarity, warmth, and effortless flow—everything else (code structure, database) is up to you.

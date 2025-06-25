@@ -1,0 +1,40 @@
+### Everyday living & utilities
+
+* **Splitwise** – sets the gold standard for making money-splitting painless: ultra-clean totals screen, friendly colour palette, and zero-friction editing.
+* **Headspace** – calm motion, soft gradients, and playful illustrations turn routine meditation into a tiny delight every time you open it. ([winners.webbyawards.com][1])
+* **Monzo** (banking) – card-based feed, bold typography, and instant feedback on every transaction keep complex finances feeling human.
+
+### Communication & collaboration
+
+* **Slack** – consistently sharp iconography and thoughtful micro-interactions (reactions, threads) that scale from two users to thousands.
+* **Notion** – minimal but powerful; blocks and drag-handles guide users without clutter, while light/dark theming feels native on iOS.
+
+### Tasks & organisation
+
+* **Things 3** – award-winning structure: large touch targets, subtle shadows, natural language date parsing; everything animates just enough.
+* **Trello** – card-based kanban board with smooth drag-and-drop and colour labels that make task states obvious at a glance.
+
+### Travel & mobility
+
+* **Uber** – high-contrast map layer, dynamic fare estimate pill, and one-hand reachable controls; proves that information density can stay elegant.
+* **Hopper** – playful predictions and pastel charts wrap sophisticated price models in a welcoming look.
+
+### Wellness & fitness
+
+* **Strava** – clear data visualisation, personalised heat maps, and satisfying trophy animations reward healthy habits.
+* **Oura** – ring-friendly sleep scores presented with airy spacing and gentle gradients.
+
+### Creative & play
+
+* **Procreate Dreams** – Apple Design Award winner; fluid gesture-driven timeline editing and subtle haptics make pro animation touch-first. ([developer.apple.com][2])
+* **NYT Games** – recent Design Award winner for inclusivity; crisp typography, dark-mode perfection, and tactile puzzle interactions. ([developer.apple.com][2])
+
+### Why they’re great (traits to study)
+
+1. **Hierarchy & whitespace** – generous padding keeps even data-heavy screens calm.
+2. **Consistent iconography** – custom icon sets in a single stroke weight feel cohesive.
+3. **Micro-interactions** – tiny haptics or easing curves signal success without words.
+4. **Dark-mode parity** – every colour token designed in pairs, not afterthoughts.
+5. **Accessibility** – larger tap targets, VoiceOver labels, and Dynamic Type support baked in from day one.
+
+Use these patterns as inspiration when polishing your roommate app’s dashboard cards, chat bubbles, chore check-offs, and bill-split flows.

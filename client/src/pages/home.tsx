@@ -249,177 +249,157 @@ export default function Home() {
       </div>
       
       <div className="page-content space-y-8">
-        {/* Quick Actions Grid */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Quick Actions - Things 3 inspired */}
+        <div className="space-y-3">
           <button
             onClick={() => setLocation('/chores')}
-            className="group bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl p-6 text-white shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
+            className="w-full flex items-center justify-between p-5 bg-surface border border-border-subtle rounded-2xl shadow-soft hover:shadow-medium transition-all duration-150 group"
           >
-            <CheckSquare size={28} className="mb-3" />
-            <div className="text-left">
-              <p className="text-headline font-bold">Chores</p>
-              <p className="text-caption opacity-90">Manage tasks</p>
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                <CheckSquare size={20} className="text-primary" />
+              </div>
+              <div className="text-left">
+                <p className="text-body font-semibold text-primary">Chores</p>
+                <p className="text-caption text-secondary">
+                  {activeChores.length} active task{activeChores.length !== 1 ? 's' : ''}
+                </p>
+              </div>
+            </div>
+            <div className="w-6 h-6 bg-tertiary/30 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <span className="text-xs text-tertiary">→</span>
             </div>
           </button>
-          
+
           <button
             onClick={() => setLocation('/expenses')}
-            className="group bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl p-6 text-white shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
+            className="w-full flex items-center justify-between p-5 bg-surface border border-border-subtle rounded-2xl shadow-soft hover:shadow-medium transition-all duration-150 group"
           >
-            <DollarSign size={28} className="mb-3" />
-            <div className="text-left">
-              <p className="text-headline font-bold">Expenses</p>
-              <p className="text-caption opacity-90">Split bills</p>
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
+                <DollarSign size={20} className="text-accent" />
+              </div>
+              <div className="text-left">
+                <p className="text-body font-semibold text-primary">Expenses</p>
+                <p className="text-caption text-secondary">
+                  {netBalance >= 0 ? `+$${netBalance.toFixed(2)} owed to you` : `$${Math.abs(netBalance).toFixed(2)} you owe`}
+                </p>
+              </div>
+            </div>
+            <div className="w-6 h-6 bg-tertiary/30 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <span className="text-xs text-tertiary">→</span>
             </div>
           </button>
-          
+
           <button
             onClick={() => setLocation('/calendar')}
-            className="group bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl p-6 text-white shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
+            className="w-full flex items-center justify-between p-5 bg-surface border border-border-subtle rounded-2xl shadow-soft hover:shadow-medium transition-all duration-150 group"
           >
-            <Calendar size={28} className="mb-3" />
-            <div className="text-left">
-              <p className="text-headline font-bold">Calendar</p>
-              <p className="text-caption opacity-90">Plan events</p>
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-warning/10 rounded-xl flex items-center justify-center">
+                <Calendar size={20} className="text-warning" />
+              </div>
+              <div className="text-left">
+                <p className="text-body font-semibold text-primary">Calendar</p>
+                <p className="text-caption text-secondary">
+                  {upcomingEvents.length} upcoming event{upcomingEvents.length !== 1 ? 's' : ''}
+                </p>
+              </div>
+            </div>
+            <div className="w-6 h-6 bg-tertiary/30 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <span className="text-xs text-tertiary">→</span>
             </div>
           </button>
-          
+
           <button
             onClick={() => setLocation('/messages')}
-            className="group bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl p-6 text-white shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
+            className="w-full flex items-center justify-between p-5 bg-surface border border-border-subtle rounded-2xl shadow-soft hover:shadow-medium transition-all duration-150 group"
           >
-            <MessageSquare size={28} className="mb-3" />
-            <div className="text-left">
-              <p className="text-headline font-bold">Chat</p>
-              <p className="text-caption opacity-90">Group messages</p>
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center">
+                <MessageSquare size={20} className="text-secondary" />
+              </div>
+              <div className="text-left">
+                <p className="text-body font-semibold text-primary">Messages</p>
+                <p className="text-caption text-secondary">
+                  {recentMessages.length} recent message{recentMessages.length !== 1 ? 's' : ''}
+                </p>
+              </div>
+            </div>
+            <div className="w-6 h-6 bg-tertiary/30 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <span className="text-xs text-tertiary">→</span>
             </div>
           </button>
         </div>
 
-        {/* Smart Balance Card */}
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-title-2 font-bold text-primary">Money Balance</h2>
-                <p className="text-subhead text-secondary">Your financial status</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-2xl flex items-center justify-center">
-                <DollarSign className="text-white" size={24} />
-              </div>
-            </div>
-            {balance ? (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-4 bg-red-50 rounded-2xl">
-                  <span className="text-body font-medium text-gray-700">You owe:</span>
-                  <span className="text-title-3 font-bold text-red-600">
-                    ${balance.totalOwing.toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center p-4 bg-green-50 rounded-2xl">
-                  <span className="text-body font-medium text-gray-700">You're owed:</span>
-                  <span className="text-title-3 font-bold text-green-600">
-                    ${balance.totalOwed.toFixed(2)}
-                  </span>
-                </div>
-                <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
-                  <div className="flex justify-between items-center">
-                    <span className="text-headline font-bold text-gray-800">Net balance:</span>
-                    <span className={`text-title-2 font-black ${
-                      netBalance >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {netBalance >= 0 ? '+' : ''}${netBalance.toFixed(2)}
-                    </span>
+        {/* Splitwise-inspired Balance Summary */}
+        {balance && (netBalance !== 0 || balance.totalOwed > 0 || balance.totalOwing > 0) && (
+          <Card className="glass-card">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-caption text-secondary mb-1">Your balance</p>
+                <p className={`text-title-1 font-bold mb-6 ${
+                  netBalance >= 0 ? 'text-accent' : 'text-destructive'
+                }`}>
+                  {netBalance >= 0 ? '+' : ''}${netBalance.toFixed(2)}
+                </p>
+                
+                {(balance.totalOwed > 0 || balance.totalOwing > 0) && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <p className="text-caption text-secondary">You owe</p>
+                      <p className="text-headline font-semibold text-destructive">${balance.totalOwing.toFixed(2)}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-caption text-secondary">You're owed</p>
+                      <p className="text-headline font-semibold text-accent">${balance.totalOwed.toFixed(2)}</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
-            ) : (
-              <div className="animate-pulse space-y-4">
-                <div className="h-16 bg-gray-200 rounded-2xl"></div>
-                <div className="h-16 bg-gray-200 rounded-2xl"></div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Recent Activity */}
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <h2 className="text-title-2 font-bold text-primary mb-4">Recent Activity</h2>
-            <div className="space-y-4">
-              {activeChores.length > 0 && (
-                <div className="flex items-center justify-between p-4 bg-surface-secondary rounded-2xl">
-                  <div className="flex items-center space-x-3">
-                    <CheckSquare size={20} className="text-primary" />
-                    <div>
-                      <p className="text-body font-medium text-primary">
-                        {activeChores.length} active chore{activeChores.length !== 1 ? 's' : ''}
-                      </p>
-                      <p className="text-caption text-secondary">Tap to manage</p>
+        {/* Recent Activity - Notion inspired */}
+        {(recentMessages.length > 0 || upcomingEvents.length > 0) && (
+          <Card className="glass-card">
+            <CardContent className="p-6">
+              <h3 className="text-headline font-semibold text-primary mb-4">What's new</h3>
+              <div className="space-y-3">
+                {recentMessages.slice(0, 2).map((message: any, index: number) => (
+                  <div key={message.id} className="flex items-start space-x-3 p-3 rounded-xl hover:bg-surface-secondary transition-colors cursor-pointer" onClick={() => setLocation('/messages')}>
+                    <div className="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-secondary text-sm font-medium">
+                        {message.user.firstName?.[0] || '?'}
+                      </span>
                     </div>
-                  </div>
-                  <button 
-                    onClick={() => setLocation('/chores')}
-                    className="text-primary text-sm font-medium"
-                  >
-                    View
-                  </button>
-                </div>
-              )}
-              
-              {recentMessages.length > 0 && (
-                <div className="flex items-center justify-between p-4 bg-surface-secondary rounded-2xl">
-                  <div className="flex items-center space-x-3">
-                    <MessageSquare size={20} className="text-primary" />
-                    <div>
-                      <p className="text-body font-medium text-primary">
-                        {recentMessages.length} new message{recentMessages.length !== 1 ? 's' : ''}
-                      </p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-body text-primary truncate">{message.content}</p>
                       <p className="text-caption text-secondary">
-                        {recentMessages[recentMessages.length - 1]?.user?.firstName || 'Someone'} sent a message
+                        {message.user.firstName} • {new Date(message.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>
-                  <button 
-                    onClick={() => setLocation('/messages')}
-                    className="text-primary text-sm font-medium"
-                  >
-                    View
-                  </button>
-                </div>
-              )}
-              
-              {upcomingEvents.length > 0 && (
-                <div className="flex items-center justify-between p-4 bg-surface-secondary rounded-2xl">
-                  <div className="flex items-center space-x-3">
-                    <Calendar size={20} className="text-primary" />
-                    <div>
-                      <p className="text-body font-medium text-primary">
-                        {upcomingEvents.length} upcoming event{upcomingEvents.length !== 1 ? 's' : ''}
-                      </p>
+                ))}
+                
+                {upcomingEvents.slice(0, 1).map((event: any) => (
+                  <div key={event.id} className="flex items-start space-x-3 p-3 rounded-xl hover:bg-surface-secondary transition-colors cursor-pointer" onClick={() => setLocation('/calendar')}>
+                    <div className="w-8 h-8 bg-warning/20 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Calendar size={16} className="text-warning" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-body text-primary truncate">{event.title}</p>
                       <p className="text-caption text-secondary">
-                        Next: {upcomingEvents[0]?.title}
+                        {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {event.creator?.firstName}
                       </p>
                     </div>
                   </div>
-                  <button 
-                    onClick={() => setLocation('/calendar')}
-                    className="text-primary text-sm font-medium"
-                  >
-                    View
-                  </button>
-                </div>
-              )}
-              
-              {activeChores.length === 0 && recentMessages.length === 0 && upcomingEvents.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-subhead text-secondary">All caught up!</p>
-                  <p className="text-caption text-tertiary mt-1">No recent activity</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

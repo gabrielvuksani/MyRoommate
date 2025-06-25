@@ -271,11 +271,11 @@ export default function Calendar() {
               })}
             </div>
             
-            {/* Daily Schedule View */}
+            {/* Clean Daily Schedule */}
             {selectedDate && (
-              <div className="daily-schedule">
+              <div className="bg-surface border border-border-subtle rounded-2xl p-5 shadow-soft">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-headline font-bold text-primary">
+                  <h3 className="text-headline font-semibold text-primary">
                     {selectedDate.toLocaleDateString('en-US', { 
                       weekday: 'long',
                       month: 'long', 
@@ -288,43 +288,37 @@ export default function Calendar() {
                       setNewEvent(prev => ({ ...prev, startDate: dateString }));
                       setIsCreateOpen(true);
                     }}
-                    className="text-primary text-sm font-medium"
+                    className="text-primary text-sm font-medium px-3 py-1 bg-primary/10 rounded-lg hover:bg-primary/20 transition-colors"
                   >
-                    + Add Event
+                    Add
                   </button>
                 </div>
                 {getDayEvents(selectedDate.getDate()).length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-subhead text-secondary">No events scheduled</p>
-                    <p className="text-caption text-tertiary mt-1">Tap + Add Event to create one</p>
+                  <div className="text-center py-6">
+                    <p className="text-body text-secondary">No events</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {getDayEvents(selectedDate.getDate()).map((event: any) => (
-                      <div key={event.id} className="event-item">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="text-body font-semibold text-primary">{event.title}</p>
-                            <div className="flex items-center space-x-2 mt-1">
-                              <p className="text-caption text-secondary">
-                                {new Date(event.startDate).toLocaleTimeString('en-US', {
-                                  hour: 'numeric',
-                                  minute: '2-digit'
-                                })}
-                              </p>
-                              <span className="w-1 h-1 bg-tertiary rounded-full"></span>
-                              <p className="text-caption text-secondary">
-                                {event.creator?.firstName || 'Unknown'}
-                              </p>
-                            </div>
-                            {event.description && (
-                              <p className="text-caption text-tertiary mt-2">{event.description}</p>
-                            )}
+                      <div key={event.id} className="flex items-center space-x-3 p-3 rounded-xl hover:bg-surface-secondary transition-colors">
+                        <div className="flex-1">
+                          <p className="text-body font-medium text-primary">{event.title}</p>
+                          <div className="flex items-center space-x-2 mt-1">
+                            <p className="text-caption text-secondary">
+                              {new Date(event.startDate).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit'
+                              })}
+                            </p>
+                            <span className="w-1 h-1 bg-tertiary rounded-full"></span>
+                            <p className="text-caption text-secondary">
+                              {event.creator?.firstName || 'Unknown'}
+                            </p>
                           </div>
-                          <span className="text-caption text-secondary capitalize px-2 py-1 bg-surface-secondary rounded-lg ml-3">
-                            {event.type}
-                          </span>
                         </div>
+                        <span className="text-caption text-tertiary capitalize px-2 py-1 bg-surface-overlay rounded-md">
+                          {event.type}
+                        </span>
                       </div>
                     ))}
                   </div>

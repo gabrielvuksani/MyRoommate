@@ -136,5 +136,6 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
-Design preferences: Fast animations (0.15-0.2s), fun but not overwhelming, Airbnb/Apple aesthetic with roomy whitespace.
+Design preferences: Fast animations (0.15-0.2s), minimalistic but futuristic, inspired by award-winning apps like Splitwise, Things 3, Notion, and Headspace.
 App branding: RoomieFlow (not RoomieHub) - one app that removes every headache of living with roommates.
+Design inspiration: Hierarchy & whitespace, consistent iconography, micro-interactions, generous padding, large touch targets, subtle shadows.
