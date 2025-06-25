@@ -109,7 +109,7 @@ export default function Profile() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="w-20 h-20 bg-primary/10 rounded-lg flex items-center justify-center">
+                <div className="w-20 h-20 bg-primary/10 rounded-md flex items-center justify-center">
                   <span className="text-primary text-2xl font-bold">
                     {user.firstName?.[0] || user.email?.[0] || '?'}
                   </span>
