@@ -111,6 +111,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Fixed modal centering and z-index layering issues across all modals
+- ✓ Restored calendar modal functionality with new gradient design
+- ✓ Fixed profile picture consistency using emerald-cyan gradient throughout app
+- ✓ Enhanced dialog system with proper viewport-relative positioning
 - ✓ Completely overhauled modal system with modern glass design and animations
 - ✓ Enhanced dialog components with backdrop blur and rounded corners
 - ✓ Redesigned all creation modals (chores, expenses, calendar) with gradient headers

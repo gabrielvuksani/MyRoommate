@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
@@ -16,8 +16,7 @@ export default function Calendar() {
     title: '',
     description: '',
     startDate: '',
-    startTime: '',
-    color: '#007AFF',
+    color: 'blue',
     type: 'social',
   });
   
@@ -44,8 +43,7 @@ export default function Calendar() {
         title: '',
         description: '',
         startDate: '',
-        startTime: '',
-        color: '#007AFF',
+        color: 'blue',
         type: 'social',
       });
       toast({
@@ -63,14 +61,21 @@ export default function Calendar() {
   });
 
   const handleCreateEvent = () => {
-    if (!newEvent.title.trim() || !newEvent.startDate) return;
+    if (!canCreateEvent) return;
     
-    const startDateTime = new Date(`${newEvent.startDate}T${newEvent.startTime || '00:00'}`);
+    const startDateTime = new Date(newEvent.startDate);
+    const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000); // 1 hour later
     
-    createEventMutation.mutate({
-      ...newEvent,
+    const eventData = {
+      title: newEvent.title,
+      description: newEvent.description || '',
       startDate: startDateTime.toISOString(),
-    });
+      endDate: endDateTime.toISOString(),
+      color: newEvent.color || 'blue',
+      type: 'personal'
+    };
+    
+    createEventMutation.mutate(eventData);
   };
 
   const canCreateEvent = newEvent.title.trim().length > 0 && newEvent.startDate.trim().length > 0;
@@ -160,7 +165,7 @@ export default function Calendar() {
                 <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-6 text-white">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold text-white">Create Event</DialogTitle>
-                    <p className="text-purple-100 text-sm mt-1">Schedule something for your household</p>
+                    <DialogDescription className="text-purple-100 text-sm mt-1">Schedule something for your household</DialogDescription>
                   </DialogHeader>
                 </div>
                 
