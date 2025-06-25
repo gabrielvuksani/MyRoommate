@@ -13,13 +13,8 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <nav className="tab-navigation" style={{
-      background: 'rgba(255, 255, 255, 0.6)',
-      backdropFilter: 'blur(20px) saturate(1.8)',
-      WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-      border: '1px solid rgba(255, 255, 255, 0.3)',
-    }}>
-      <div className="flex items-center justify-center w-full">
+    <nav className="tab-navigation">
+      <div className="flex items-center justify-center space-x-2 w-full max-w-md">
         {tabs.map(({ id, path, label, Icon }) => {
           const isActive = location === path;
           
@@ -27,12 +22,10 @@ export default function BottomNavigation() {
             <button
               key={id}
               onClick={() => setLocation(path)}
-              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 nav-transition ${
-                isActive ? 'active animate-scale-in' : 'inactive'
-              }`}
+              className={`tab-item ${isActive ? 'active' : 'inactive'}`}
             >
-              <Icon size={18} className="flex-shrink-0" />
-              <span className="text-xs mt-0.5 font-medium truncate">{label}</span>
+              <Icon size={24} strokeWidth={2.5} className="flex-shrink-0" />
+              <span className="text-xs font-semibold mt-1 tracking-tight">{label}</span>
             </button>
           );
         })}
