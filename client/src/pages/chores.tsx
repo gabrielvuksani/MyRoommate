@@ -197,7 +197,6 @@ export default function Chores() {
           </div>
         </div>
       </div>
-      
       <div className="page-content space-y-6">
         {/* Today's Focus */}
         {Array.isArray(chores) && chores.length > 0 && (
@@ -224,9 +223,8 @@ export default function Chores() {
                 
                 if (!priorityChore) {
                   return (
-                    <p className="text-blue-600 font-medium">
-                      All caught up! No pending chores.
-                    </p>
+                    <p className="font-medium text-[#1a1a1a]">All caught up! No pending chores.
+                                          </p>
                   );
                 }
                 
