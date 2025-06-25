@@ -111,7 +111,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
-- ✓ Enhanced bottom navigation transparency (0.25 opacity) to show more background content
+- ✓ Unified glass morphism design language across entire interface using message input styling as gold standard
+- ✓ Applied glass-card classes to messages header and bottom navigation for consistent visionOS aesthetic
+- ✓ Fixed message bubble tail from rhombus to clean 2x2px square with emerald-cyan gradient
+- ✓ Enhanced bottom navigation transparency (0.6 opacity) to show more background content
 - ✓ Completely redesigned message bubbles with visionOS/iMessage/Airbnb design fusion
 - ✓ Your messages: emerald-cyan gradients with custom tails and glass overlay effects
 - ✓ Received messages: pure visionOS glass morphism with advanced backdrop blur

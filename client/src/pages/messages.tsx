@@ -245,20 +245,14 @@ export default function Messages() {
   return (
     <div className="page-container page-transition">
       {/* visionOS Header */}
-      <div 
-        className={`floating-header ${headerScrolled ? "scrolled" : ""}`}
-        style={{
-          background: 'rgba(255, 255, 255, 0.6)',
-          backdropFilter: 'blur(20px) saturate(1.8)',
-          WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-        }}
-      >
-        <div className="page-header">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="page-title">Messages</h1>
-              <p className="page-subtitle">Chat with your household</p>
+      <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
+        <div className="glass-card rounded-3xl shadow-lg border border-white/20">
+          <div className="page-header">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="page-title">Messages</h1>
+                <p className="page-subtitle">Chat with your household</p>
+              </div>
             </div>
           </div>
         </div>
