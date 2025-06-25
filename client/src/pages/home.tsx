@@ -156,75 +156,110 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* Main Content Grid - 2x2 cards layout */}
-        <div className="grid grid-cols-2 gap-4">
-          {/* Split Bill Card */}
-          <Card className="glass-card">
-            <CardContent className="p-6">
-              <button 
-                onClick={() => setLocation('/expenses')}
-                className="w-full text-left transition-all btn-animated animate-slide-in-left"
-                style={{ animationDelay: '300ms' }}
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mb-4">
-                  <DollarSign className="text-white" size={20} />
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-1">Split Bill</h4>
-                <p className="text-sm text-gray-600">Add new expense</p>
-              </button>
-            </CardContent>
-          </Card>
+        {/* Today's Priority */}
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold text-gray-900">Today's Priority</h3>
           
-          {/* Add Event Card */}
-          <Card className="glass-card">
-            <CardContent className="p-6">
-              <button 
-                onClick={() => setLocation('/calendar')}
-                className="w-full text-left transition-all btn-animated animate-slide-in-right"
-                style={{ animationDelay: '350ms' }}
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
-                  <Calendar className="text-white" size={20} />
+          {nextChore ? (
+            <div 
+              className="smart-card p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-primary cursor-pointer animate-slide-up btn-animated"
+              style={{ animationDelay: '200ms' }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <p className="text-sm font-medium text-primary">Next up</p>
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-1">{nextChore.title}</h4>
+                  {nextChore.description && (
+                    <p className="text-sm text-gray-600 mb-3">{nextChore.description}</p>
+                  )}
+                  <div className="flex items-center space-x-3 text-xs text-gray-500">
+                    <span>{nextChore.assignedUser?.firstName || 'Unassigned'}</span>
+                    {nextChore.dueDate && (
+                      <>
+                        <span>•</span>
+                        <span>Due {new Date(nextChore.dueDate).toLocaleDateString()}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-1">Add Event</h4>
-                <p className="text-sm text-gray-600">Schedule something</p>
-              </button>
-            </CardContent>
-          </Card>
+                <ArrowRight size={20} className="text-gray-400 ml-4" />
+              </div>
+            </div>
+          ) : (
+            <div 
+              className="smart-card p-8 text-center bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-dashed border-green-200 cursor-pointer animate-scale-in btn-animated"
+              style={{ animationDelay: '200ms' }}
+            >
+              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                <CheckSquare size={24} className="text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">All caught up!</h3>
+              <p className="text-gray-600 mb-6">No chores need your attention today</p>
+              <div className="flex items-center justify-center space-x-2 text-primary font-medium">
+                <span>View Dashboard</span>
+                <ArrowRight size={16} />
+              </div>
+            </div>
+          )}
+        </div>
 
-          {/* Chores Card */}
-          <Card className="glass-card">
-            <CardContent className="p-6">
-              <button 
-                onClick={() => setLocation('/chores')}
-                className="w-full text-left transition-all btn-animated animate-slide-in-left"
-                style={{ animationDelay: '400ms' }}
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mb-4">
-                  <CheckSquare className="text-white" size={20} />
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-1">Chores</h4>
-                <p className="text-sm text-gray-600">Manage tasks</p>
-              </button>
-            </CardContent>
-          </Card>
-
-          {/* Chat Card */}
-          <Card className="glass-card">
-            <CardContent className="p-6">
-              <button 
-                onClick={() => setLocation('/messages')}
-                className="w-full text-left transition-all btn-animated animate-slide-in-right"
-                style={{ animationDelay: '450ms' }}
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mb-4">
-                  <MessageCircle className="text-white" size={20} />
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-1">Chat</h4>
-                <p className="text-sm text-gray-600">Send message</p>
-              </button>
-            </CardContent>
-          </Card>
+        {/* Recent Activity */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold text-gray-900">Recent Activity</h3>
+            <button 
+              onClick={() => setLocation('/messages')}
+              className="text-sm text-primary font-medium hover:text-primary/80 transition-colors"
+            >
+              View all
+            </button>
+          </div>
+          
+          {recentMessages.length > 0 ? (
+            <div className="smart-card p-6 animate-slide-up" style={{ animationDelay: '250ms' }}>
+              <div className="space-y-4">
+                {recentMessages.map((message: any) => (
+                  <div key={message.id} className="flex items-start space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-medium">
+                        {message.user.firstName?.[0] || message.user.email?.[0]}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <p className="text-sm font-medium text-gray-900">
+                          {message.user.firstName || message.user.email?.split('@')[0]}
+                        </p>
+                        <span className="text-xs text-gray-500">
+                          {new Date(message.createdAt).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600">{message.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div 
+              className="smart-card p-8 text-center border-2 border-dashed border-gray-200 cursor-pointer animate-fade-in btn-animated"
+              onClick={() => setLocation('/messages')}
+              style={{ animationDelay: '250ms' }}
+            >
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                <MessageCircle size={24} className="text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Start the conversation</h3>
+              <p className="text-gray-600 mb-6">No messages yet. Say hello to your roommates!</p>
+              <div className="flex items-center justify-center space-x-2 text-primary font-medium">
+                <span>Send Message</span>
+                <ArrowRight size={16} />
+              </div>
+            </div>
+          )}
         </div>
 
 

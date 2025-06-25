@@ -111,11 +111,13 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Integrated navigation into hero stats cards - clickable stats that take you to respective pages
+- ✓ Added Recent Activity section back to home page with message display
+- ✓ Removed secondary card grid in favor of combined stats/navigation approach
+- ✓ Enhanced home page layout with Today's Priority and Recent Activity sections
+- ✓ Maintained responsive design with proper mobile/desktop breakpoints
 - ✓ Removed hover animations from home page cards for cleaner interactions
 - ✓ Added page transitions across all pages with page-enter animation class
-- ✓ Created 2x2 grid layout with 4 cards matching expenses page card styling
-- ✓ Implemented glass-card styling with proper Card/CardContent components
-- ✓ Added dedicated cards for Split Bill, Add Event, Chores, and Chat
 - ✓ Implemented responsive grid layout for home page sections
 - ✓ Added responsive breakpoints for mobile, tablet, and desktop views
 - ✓ Created adaptive stats grid (2 cols mobile, 4 cols desktop)
