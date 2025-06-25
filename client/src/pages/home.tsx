@@ -223,7 +223,7 @@ export default function Home() {
 
   return (
     <div className="page-container">
-      {/* Premium Header */}
+      {/* visionOS Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center justify-between">
@@ -232,12 +232,12 @@ export default function Home() {
               <p className="page-subtitle">What needs your attention</p>
             </div>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4">
               <button 
                 onClick={() => setLocation('/profile')}
-                className="w-10 h-10 bg-accent-light rounded-full flex items-center justify-center hover:bg-accent-light/80 transition-colors"
+                className="w-12 h-12 bg-gradient-to-br from-accent to-accent-hover rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               >
-                <span className="text-accent text-sm font-semibold">
+                <span className="text-white font-bold">
                   {firstName[0]?.toUpperCase() || '?'}
                 </span>
               </button>
@@ -303,13 +303,13 @@ export default function Home() {
             onClick={() => setLocation('/chores')}
             style={{ animationDelay: '100ms' }}
           >
-              <div className="w-16 h-16 bg-success-light rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <CheckSquare size={24} className="text-success" />
+              <div className="w-20 h-20 bg-gradient-to-br from-green to-green-light rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg">
+                <CheckSquare size={32} className="text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">All caught up</h3>
-              <p className="text-neutral-500 mb-6 leading-relaxed">No chores need your attention today</p>
-              <button className="bg-accent text-white px-6 py-3 rounded-full font-semibold hover:bg-accent-dark transition-colors">
-                Add chore
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">All caught up!</h3>
+              <p className="text-gray-600 mb-8 leading-relaxed text-lg">No chores need your attention today</p>
+              <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-accent-hover hover:shadow-xl transition-all duration-300 hover:scale-105">
+                Add Chore
               </button>
           </div>
         )}
