@@ -119,13 +119,20 @@
   border-color: var(--primary);
 }
 
-/* Unified Header */
+/* Unified Header with Scroll Effect */
 .floating-header {
-  background: var(--background);
+  background: transparent;
   position: sticky;
   top: 0;
   z-index: 50;
   padding-top: env(safe-area-inset-top);
+  transition: background-color 0.2s ease, backdrop-filter 0.2s ease;
+}
+
+.floating-header.scrolled {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .page-header {

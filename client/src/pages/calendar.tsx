@@ -131,8 +131,8 @@ export default function Calendar() {
 
   return (
     <div className="page-container">
-      {/* Unified Header */}
-      <div className="floating-header">
+      {/* Dynamic Header */}
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center justify-between">
             <div>

@@ -14,6 +14,7 @@ export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [headerScrolled, setHeaderScrolled] = useState(false);
   const queryClient = useQueryClient();
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -222,8 +223,8 @@ export default function Home() {
 
   return (
     <div className="page-container">
-      {/* Unified Header */}
-      <div className="floating-header">
+      {/* Dynamic Header */}
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center justify-between">
             <div>

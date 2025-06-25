@@ -111,14 +111,14 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **December 25, 2024 (Latest):**
-- ✓ Standardized time format app-wide to HH:MM AM/PM without seconds
-- ✓ Unified header design across all pages with consistent layout
-- ✓ Updated all time displays in messages, calendar events, and home cards
-- ✓ Enhanced date/time formatting for better readability
-- ✓ Maintained consistent navigation structure across all pages
-- ✓ Improved user experience with cleaner time display standards
-- ✓ Fixed formatting inconsistencies in expense and event timestamps
-- ✓ Applied professional time formatting throughout the application
+- ✓ Implemented dynamic headers that appear on scroll with blur backdrop
+- ✓ Reduced tab bar width (90% max-width 380px) with rounded top corners
+- ✓ Completely redesigned chat page with modern conversation layout
+- ✓ Enhanced message bubbles with user avatars and improved spacing
+- ✓ Removed seconds from all time displays and standardized to HH:MM AM/PM
+- ✓ Added scroll-triggered header backgrounds for premium feel
+- ✓ Improved message input with modern rounded design and send button
+- ✓ Enhanced visual hierarchy with better message grouping and timestamps
 
 **December 25, 2024 (Earlier):**
 - ✓ Redesigned with futuristic minimalistic Apple/Airbnb-inspired aesthetics
