@@ -51,14 +51,14 @@ export default function Home() {
         <div className="page-content">
           <Card className="glass-card">
             <CardContent className="p-8 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center mx-auto mb-6">
                 <HomeIcon size={32} className="text-white" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-4">Create or Join a Household</h2>
               <p className="text-gray-600 mb-8">Start managing your shared living space with roommates</p>
               <button 
                 onClick={() => setLocation('/onboarding')}
-                className="bg-gradient-to-r from-primary to-primary/80 text-white px-8 py-4 rounded-xl font-semibold btn-animated shadow-lg hover:shadow-xl transition-all"
+                className="bg-primary text-white px-8 py-4 rounded-xl font-semibold btn-animated shadow-lg hover:shadow-xl transition-all"
               >
                 Get Started
               </button>

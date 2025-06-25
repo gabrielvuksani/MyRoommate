@@ -111,6 +111,9 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Hidden bottom navigation tabs for users not connected to a household
+- ✓ Fixed "Create or Join a Household" card styling to match other glass cards
+- ✓ Enhanced modal design with gradient headers and improved form layout
 - ✓ Removed completion notifications for smoother chore interactions
 - ✓ Created streak visualization widget showing top 3 streak leaders
 - ✓ Added daily completion counter to streak widget
