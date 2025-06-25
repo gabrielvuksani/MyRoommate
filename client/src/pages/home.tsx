@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { CheckSquare, DollarSign, Calendar, MessageCircle, ArrowRight } from "lucide-react";
+import { CheckSquare, DollarSign, Calendar, MessageCircle, ArrowRight, Home as HomeIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -49,16 +49,21 @@ export default function Home() {
           </div>
         </div>
         <div className="page-content">
-          <div className="smart-card p-8 text-center">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Create or Join a Household</h2>
-            <p className="text-gray-600 mb-6">Start managing your shared living space</p>
-            <button 
-              onClick={() => setLocation('/settings')}
-              className="bg-primary text-white px-6 py-3 rounded-xl font-semibold btn-animated"
-            >
-              Get Started
-            </button>
-          </div>
+          <Card className="glass-card">
+            <CardContent className="p-8 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <HomeIcon size={32} className="text-white" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Create or Join a Household</h2>
+              <p className="text-gray-600 mb-8">Start managing your shared living space with roommates</p>
+              <button 
+                onClick={() => setLocation('/onboarding')}
+                className="bg-gradient-to-r from-primary to-primary/80 text-white px-8 py-4 rounded-xl font-semibold btn-animated shadow-lg hover:shadow-xl transition-all"
+              >
+                Get Started
+              </button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -145,7 +150,7 @@ export default function Home() {
           </Card>
 
           {/* Additional stats for larger screens */}
-          <Card className="glass-card hidden md:block">
+          <Card className="glass-card">
             <CardContent className="p-6 text-center animate-fade-in" style={{ animationDelay: '200ms' }}>
               <button 
                 onClick={() => setLocation('/calendar')}
@@ -160,7 +165,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card hidden md:block">
+          <Card className="glass-card">
             <CardContent className="p-6 text-center animate-fade-in" style={{ animationDelay: '300ms' }}>
               <button 
                 onClick={() => setLocation('/messages')}
@@ -218,7 +223,7 @@ export default function Home() {
                 <CardContent className="p-6">
                   <button 
                     onClick={() => setLocation('/chores')}
-                    className="w-full text-center border-2 border-dashed border-gray-200 py-8 transition-all hover:border-gray-300"
+                    className="w-full text-center border-gray-200 py-8 transition-all hover:border-gray-300"
                   >
                     <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
                       <CheckSquare size={24} className="text-white" />
