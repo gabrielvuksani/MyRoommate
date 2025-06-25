@@ -251,6 +251,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch('/api/expense-splits/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const splitId = req.params.id;
+      const { settled } = req.body;
+      
+      // Verify user has access to this expense split
+      const membership = await storage.getUserHousehold(userId);
+      if (!membership) {
+        return res.status(404).json({ message: "No household found" });
+      }
+      
+      const updatedSplit = await storage.updateExpenseSplit(splitId, settled);
+      res.json(updatedSplit);
+    } catch (error) {
+      console.error("Error updating expense split:", error);
+      res.status(500).json({ message: "Failed to update expense split" });
+    }
+  });
+
   app.get('/api/balance', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;

@@ -30,7 +30,11 @@ export default function Expenses() {
     amount: "",
     category: "",
     splitType: "equal",
+    paidBy: "",
+    customSplits: {} as Record<string, string>,
   });
+  const [activeTab, setActiveTab] = useState<"all" | "unsettled" | "settled">("all");
+  const [showCustomSplits, setShowCustomSplits] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -58,17 +62,35 @@ export default function Expenses() {
 
   const createExpenseMutation = useMutation({
     mutationFn: async (expenseData: any) => {
-      const splits = household.members.map((member: any) => ({
-        userId: member.userId,
-        amount: (
-          parseFloat(expenseData.amount) / household.members.length
-        ).toFixed(2),
-      }));
+      let splits;
+      const totalAmount = parseFloat(expenseData.amount);
+      
+      if (expenseData.splitType === "equal") {
+        const amountPerPerson = (totalAmount / household.members.length).toFixed(2);
+        splits = household.members.map((member: any) => ({
+          userId: member.userId,
+          amount: amountPerPerson,
+        }));
+      } else if (expenseData.splitType === "custom") {
+        splits = household.members.map((member: any) => ({
+          userId: member.userId,
+          amount: expenseData.customSplits[member.userId] || "0",
+        }));
+      } else if (expenseData.splitType === "percentage") {
+        splits = household.members.map((member: any) => {
+          const percentage = parseFloat(expenseData.customSplits[member.userId] || "0") / 100;
+          return {
+            userId: member.userId,
+            amount: (totalAmount * percentage).toFixed(2),
+          };
+        });
+      }
 
       await apiRequest("POST", "/api/expenses", {
         expense: {
           ...expenseData,
-          amount: parseFloat(expenseData.amount).toString(),
+          amount: totalAmount.toString(),
+          paidBy: expenseData.paidBy,
         },
         splits,
       });
@@ -82,6 +104,8 @@ export default function Expenses() {
         amount: "",
         category: "",
         splitType: "equal",
+        paidBy: "",
+        customSplits: {},
       });
     },
     onError: (error) => {
@@ -98,7 +122,30 @@ export default function Expenses() {
   const canCreateExpense =
     newExpense.title.trim().length > 0 &&
     newExpense.amount.trim().length > 0 &&
-    parseFloat(newExpense.amount) > 0;
+    parseFloat(newExpense.amount) > 0 &&
+    newExpense.paidBy.trim().length > 0;
+
+  // Filter expenses based on active tab
+  const filteredExpenses = expenses.filter((expense: any) => {
+    if (activeTab === "all") return true;
+    
+    const hasUnsettledSplits = expense.splits?.some((split: any) => !split.settled);
+    if (activeTab === "unsettled") return hasUnsettledSplits;
+    if (activeTab === "settled") return !hasUnsettledSplits;
+    
+    return true;
+  });
+
+  // Settlement functionality
+  const settleSplitMutation = useMutation({
+    mutationFn: async ({ splitId, settled }: { splitId: string; settled: boolean }) => {
+      await apiRequest("PATCH", `/api/expense-splits/${splitId}`, { settled });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
+    },
+  });
 
   const netBalance = (balance?.totalOwed || 0) - (balance?.totalOwing || 0);
 
@@ -161,10 +208,29 @@ export default function Expenses() {
                     className="input-modern w-full"
                   />
                   <Select
-                    value={newExpense.splitType}
+                    value={newExpense.paidBy}
                     onValueChange={(value) =>
-                      setNewExpense({ ...newExpense, splitType: value })
+                      setNewExpense({ ...newExpense, paidBy: value })
                     }
+                  >
+                    <SelectTrigger className="input-modern">
+                      <SelectValue placeholder="Paid by..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {household?.members?.map((member: any) => (
+                        <SelectItem key={member.userId} value={member.userId}>
+                          {member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={newExpense.splitType}
+                    onValueChange={(value) => {
+                      setNewExpense({ ...newExpense, splitType: value });
+                      setShowCustomSplits(value !== "equal");
+                    }}
                   >
                     <SelectTrigger className="input-modern">
                       <SelectValue placeholder="Split method..." />
@@ -175,6 +241,47 @@ export default function Expenses() {
                       <SelectItem value="percentage">By Percentage</SelectItem>
                     </SelectContent>
                   </Select>
+
+                  {showCustomSplits && newExpense.amount && (
+                    <div className="space-y-3">
+                      <div className="text-sm font-medium text-gray-600">
+                        {newExpense.splitType === "percentage" ? "Percentage Split" : "Custom Amount Split"}
+                      </div>
+                      {household?.members?.map((member: any) => (
+                        <div key={member.userId} className="flex items-center space-x-3">
+                          <span className="text-sm w-20 truncate">
+                            {member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'}
+                          </span>
+                          <input
+                            type="number"
+                            step={newExpense.splitType === "percentage" ? "1" : "0.01"}
+                            placeholder={newExpense.splitType === "percentage" ? "%" : "$"}
+                            value={newExpense.customSplits[member.userId] || ""}
+                            onChange={(e) =>
+                              setNewExpense({
+                                ...newExpense,
+                                customSplits: {
+                                  ...newExpense.customSplits,
+                                  [member.userId]: e.target.value,
+                                },
+                              })
+                            }
+                            className="input-modern flex-1 text-sm"
+                          />
+                        </div>
+                      ))}
+                      {newExpense.splitType === "percentage" && (
+                        <div className="text-xs text-gray-500">
+                          Total: {Object.values(newExpense.customSplits).reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0)}%
+                        </div>
+                      )}
+                      {newExpense.splitType === "custom" && (
+                        <div className="text-xs text-gray-500">
+                          Total: ${Object.values(newExpense.customSplits).reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0).toFixed(2)} of ${newExpense.amount}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <button
                     onClick={handleCreateExpense}
                     disabled={
@@ -235,18 +342,44 @@ export default function Expenses() {
           </CardContent>
         </Card>
 
-        {/* Recent Expenses */}
+        {/* Expense Filter Tabs */}
+        <div className="flex space-x-1 p-1 bg-gray-100 rounded-xl">
+          {(["all", "unsettled", "settled"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === tab
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* Filtered Expenses */}
         <Card className="glass-card">
           <CardContent className="p-6">
             <h2 className="text-headline font-semibold text-primary mb-4">
-              Recent Expenses
+              {activeTab === "all" ? "All Expenses" : 
+               activeTab === "unsettled" ? "Unsettled Expenses" : "Settled Expenses"}
             </h2>
             <div className="space-y-3">
-              {expenses.length === 0 ? (
-                <p className="text-body text-secondary">No expenses yet</p>
+              {filteredExpenses.length === 0 ? (
+                <p className="text-body text-secondary">
+                  {activeTab === "all" ? "No expenses yet" :
+                   activeTab === "unsettled" ? "No unsettled expenses" : "No settled expenses"}
+                </p>
               ) : (
-                expenses.map((expense: any) => (
-                  <ExpenseCard key={expense.id} expense={expense} />
+                filteredExpenses.map((expense: any) => (
+                  <ExpenseCard 
+                    key={expense.id} 
+                    expense={expense} 
+                    onSettleExpense={settleSplitMutation.mutate}
+                    showSettlement={activeTab !== "settled"}
+                  />
                 ))
               )}
             </div>
