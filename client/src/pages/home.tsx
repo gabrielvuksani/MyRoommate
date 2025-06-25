@@ -161,9 +161,10 @@ export default function Home() {
           {/* Left Column - Priority & Actions */}
           <div className="lg:col-span-2 space-y-6">
             {/* Today's Priority */}
-            <h3 className="text-xl font-bold text-gray-900">Today's Priority</h3>
-            
-            {nextChore ? (
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold text-gray-900">Today's Priority</h3>
+              
+              {nextChore ? (
                 <div 
                   className="smart-card p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-primary cursor-pointer animate-slide-up btn-animated"
                   style={{ animationDelay: '200ms' }}
