@@ -13,7 +13,11 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <nav className="tab-navigation">
+    <nav className="tab-navigation" style={{
+      background: 'rgba(255, 255, 255, 0.1)',
+      backdropFilter: 'blur(40px) saturate(1.8) brightness(1.1)',
+      WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.1)',
+    }}>
       <div className="flex items-center justify-center w-full">
         {tabs.map(({ id, path, label, Icon }) => {
           const isActive = location === path;
