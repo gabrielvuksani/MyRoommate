@@ -206,7 +206,7 @@ export default function Chores() {
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                   <span className="text-blue-600 font-semibold">🎯</span>
                 </div>
-                <h2 className="text-headline font-semibold text-blue-700">Today's Focus</h2>
+                <h2 className="font-semibold text-[#1a1a1a] text-[22px]">Today's Focus</h2>
               </div>
               
               {(() => {
