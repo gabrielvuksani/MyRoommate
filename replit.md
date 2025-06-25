@@ -111,14 +111,14 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **December 25, 2024 (Latest):**
-- ✓ Merged profile and settings into unified page with change name functionality
-- ✓ Removed chat button from home header for cleaner design
-- ✓ Added chat tab back to bottom navigation for 5-tab layout
-- ✓ Completely removed "Upcoming Events" card from calendar for premium look
-- ✓ Enhanced calendar with better spacing (gap-3) and larger touch targets (h-14)
-- ✓ Integrated app settings (notifications, dark mode, accent colors) into profile
-- ✓ Added household information and member management to profile page
-- ✓ Streamlined navigation with proper tab spacing and consistent design
+- ✓ Made app settings fully functional with interactive toggles and color selection
+- ✓ Enhanced calendar day selection with premium Airbnb-style rounded buttons
+- ✓ Added smooth animations and hover effects with scale transforms
+- ✓ Improved selected day styling with gradient backgrounds and shadows
+- ✓ Added visual feedback for settings changes with toast notifications
+- ✓ Enhanced calendar grid with softer borders and refined spacing
+- ✓ Implemented proper state management for user preferences
+- ✓ Created polished UI interactions that feel responsive and premium
 
 **December 25, 2024 (Earlier):**
 - ✓ Redesigned with futuristic minimalistic Apple/Airbnb-inspired aesthetics

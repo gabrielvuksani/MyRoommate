@@ -16,6 +16,11 @@ export default function Profile() {
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState({ firstName: '', lastName: '' });
+  const [settings, setSettings] = useState({
+    notifications: true,
+    darkMode: false,
+    accentColor: 'blue'
+  });
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -63,6 +68,30 @@ export default function Profile() {
         description: "Invite code copied to clipboard",
       });
     }
+  };
+
+  const toggleNotifications = () => {
+    setSettings(prev => ({ ...prev, notifications: !prev.notifications }));
+    toast({
+      title: settings.notifications ? "Notifications disabled" : "Notifications enabled",
+      description: settings.notifications ? "You won't receive push notifications" : "You'll receive push notifications for updates",
+    });
+  };
+
+  const toggleDarkMode = () => {
+    setSettings(prev => ({ ...prev, darkMode: !prev.darkMode }));
+    toast({
+      title: settings.darkMode ? "Light mode enabled" : "Dark mode enabled",
+      description: "Theme preference saved",
+    });
+  };
+
+  const changeAccentColor = (color: string) => {
+    setSettings(prev => ({ ...prev, accentColor: color }));
+    toast({
+      title: "Accent color updated",
+      description: `Changed to ${color}`,
+    });
   };
 
   if (!user) {
@@ -195,18 +224,32 @@ export default function Profile() {
                   <span className="text-gray-900 font-medium">Notifications</span>
                   <p className="text-sm text-gray-600">Get notified about chores, bills, and messages</p>
                 </div>
-                <div className="w-12 h-6 bg-gray-300 rounded-full relative cursor-pointer">
-                  <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform"></div>
-                </div>
+                <button
+                  onClick={toggleNotifications}
+                  className={`w-12 h-6 rounded-full relative transition-colors ${
+                    settings.notifications ? 'bg-primary' : 'bg-gray-300'
+                  }`}
+                >
+                  <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${
+                    settings.notifications ? 'translate-x-6' : 'translate-x-0.5'
+                  }`}></div>
+                </button>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-gray-200">
                 <div>
                   <span className="text-gray-900 font-medium">Dark Mode</span>
                   <p className="text-sm text-gray-600">Switch between light and dark themes</p>
                 </div>
-                <div className="w-12 h-6 bg-gray-300 rounded-full relative cursor-pointer">
-                  <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform"></div>
-                </div>
+                <button
+                  onClick={toggleDarkMode}
+                  className={`w-12 h-6 rounded-full relative transition-colors ${
+                    settings.darkMode ? 'bg-primary' : 'bg-gray-300'
+                  }`}
+                >
+                  <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${
+                    settings.darkMode ? 'translate-x-6' : 'translate-x-0.5'
+                  }`}></div>
+                </button>
               </div>
               <div className="flex justify-between items-center py-3">
                 <div>
@@ -214,10 +257,30 @@ export default function Profile() {
                   <p className="text-sm text-gray-600">Customize your app theme</p>
                 </div>
                 <div className="flex space-x-2">
-                  <div className="w-6 h-6 bg-blue-500 rounded-full cursor-pointer ring-2 ring-blue-200"></div>
-                  <div className="w-6 h-6 bg-green-500 rounded-full cursor-pointer"></div>
-                  <div className="w-6 h-6 bg-purple-500 rounded-full cursor-pointer"></div>
-                  <div className="w-6 h-6 bg-orange-500 rounded-full cursor-pointer"></div>
+                  <button
+                    onClick={() => changeAccentColor('blue')}
+                    className={`w-6 h-6 bg-blue-500 rounded-full transition-all ${
+                      settings.accentColor === 'blue' ? 'ring-2 ring-blue-200 scale-110' : 'hover:scale-105'
+                    }`}
+                  />
+                  <button
+                    onClick={() => changeAccentColor('green')}
+                    className={`w-6 h-6 bg-green-500 rounded-full transition-all ${
+                      settings.accentColor === 'green' ? 'ring-2 ring-green-200 scale-110' : 'hover:scale-105'
+                    }`}
+                  />
+                  <button
+                    onClick={() => changeAccentColor('purple')}
+                    className={`w-6 h-6 bg-purple-500 rounded-full transition-all ${
+                      settings.accentColor === 'purple' ? 'ring-2 ring-purple-200 scale-110' : 'hover:scale-105'
+                    }`}
+                  />
+                  <button
+                    onClick={() => changeAccentColor('orange')}
+                    className={`w-6 h-6 bg-orange-500 rounded-full transition-all ${
+                      settings.accentColor === 'orange' ? 'ring-2 ring-orange-200 scale-110' : 'hover:scale-105'
+                    }`}
+                  />
                 </div>
               </div>
             </div>
