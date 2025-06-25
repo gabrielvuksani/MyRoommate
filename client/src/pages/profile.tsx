@@ -116,21 +116,21 @@ export default function Profile() {
         <Card className="smart-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 flex-1 min-w-0">
                 <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
                     {user.firstName?.[0] || user.email?.[0] || "?"}
                   </span>
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-2xl font-bold text-gray-900 truncate">
                     {user.firstName && user.lastName
                       ? `${user.firstName} ${user.lastName}`
                       : user.firstName ||
                         user.email?.split("@")[0] ||
                         "Unknown User"}
                   </h2>
-                  <p className="text-gray-600">{user.email}</p>
+                  <p className="text-gray-600 truncate" title={user.email}>{user.email}</p>
                 </div>
               </div>
 
@@ -143,7 +143,7 @@ export default function Profile() {
                         lastName: user.lastName || "",
                       });
                     }}
-                    className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all p-0"
+                    className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all p-0 flex-shrink-0"
                   >
                     <Edit3 size={16} className="text-gray-600" />
                   </Button>
@@ -198,8 +198,8 @@ export default function Profile() {
             </h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                <span className="text-gray-600">User ID</span>
-                <span className="text-gray-900 font-mono text-sm">
+                <span className="text-gray-600 flex-shrink-0">User ID</span>
+                <span className="text-gray-900 font-mono text-sm truncate ml-4" title={user.id}>
                   {user.id}
                 </span>
               </div>
@@ -222,8 +222,8 @@ export default function Profile() {
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-gray-600">Name</span>
-                  <span className="text-gray-900 font-semibold">
+                  <span className="text-gray-600 flex-shrink-0">Name</span>
+                  <span className="text-gray-900 font-semibold truncate ml-4" title={household.name}>
                     {household.name}
                   </span>
                 </div>
@@ -289,8 +289,8 @@ export default function Profile() {
                             "?"}
                         </span>
                       </div>
-                      <div>
-                        <p className="text-gray-900 font-medium">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-gray-900 font-medium truncate">
                           {member.user.firstName && member.user.lastName
                             ? `${member.user.firstName} ${member.user.lastName}`
                             : member.user.firstName ||
@@ -303,7 +303,7 @@ export default function Profile() {
                       </div>
                     </div>
                     {member.role && (
-                      <span className="text-sm text-gray-600 capitalize px-2 py-1 bg-gray-100 rounded">
+                      <span className="text-sm text-gray-600 capitalize px-2 py-1 bg-gray-100 rounded flex-shrink-0">
                         {member.role}
                       </span>
                     )}
