@@ -350,55 +350,7 @@ export default function Calendar() {
           </CardContent>
         </Card>
 
-        {/* Upcoming Events */}
-        <Card className="glass-card">
-          <CardContent className="p-8">
-            <div className="flex items-center mb-6">
-              <CalendarIcon size={24} className="text-primary mr-3" />
-              <h2 className="text-title-2 font-semibold text-primary">Upcoming Events</h2>
-            </div>
-            
-            <div className="space-y-4">
-              {events.length === 0 ? (
-                <div className="text-center py-12">
-                  <CalendarIcon size={48} className="text-secondary mx-auto mb-4 opacity-40" />
-                  <p className="text-body text-secondary">No upcoming events</p>
-                  <p className="text-footnote text-tertiary mt-1">Tap the + button or click on a day to create your first event</p>
-                </div>
-              ) : (
-                events.map((event: any) => (
-                  <div key={event.id} className="flex items-start space-x-4 p-4 rounded-2xl bg-surface hover:bg-surface-secondary transition-all duration-300 cursor-pointer group">
-                    <div className="w-4 h-16 rounded-full bg-gradient-to-b from-primary to-secondary flex-shrink-0"></div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-headline font-semibold text-primary group-hover:text-accent transition-colors">
-                        {event.title}
-                      </p>
-                      <p className="text-subhead text-secondary mt-1">
-                        {new Date(event.startDate).toLocaleDateString('en-US', { 
-                          weekday: 'long',
-                          month: 'long', 
-                          day: 'numeric',
-                          year: 'numeric'
-                        })} at {new Date(event.startDate).toLocaleTimeString('en-US', {
-                          hour: 'numeric',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                      {event.description && (
-                        <p className="text-footnote text-tertiary mt-2 line-clamp-2">{event.description}</p>
-                      )}
-                    </div>
-                    <div className="flex-shrink-0">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-caption font-medium bg-surface text-secondary capitalize">
-                        {event.type}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
+
       </div>
     </div>
   );

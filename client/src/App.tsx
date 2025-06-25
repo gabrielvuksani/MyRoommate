@@ -38,7 +38,7 @@ function Router() {
             <Route path="/expenses" component={Expenses} />
             <Route path="/calendar" component={Calendar} />
             <Route path="/messages" component={Messages} />
-            <Route path="/settings" component={Settings} />
+    
             <Route path="/profile" component={Profile} />
           </>
         )}
