@@ -97,9 +97,9 @@ export default function Home() {
             </div>
             <button 
               onClick={() => setLocation('/profile')}
-              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg btn-animated"
+              className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg btn-animated"
             >
-              <span className="text-white font-bold text-lg">
+              <span className="text-white font-bold text-sm">
                 {firstName[0]?.toUpperCase() || '?'}
               </span>
             </button>
