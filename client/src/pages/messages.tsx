@@ -248,13 +248,13 @@ export default function Messages() {
       <div 
         className={`floating-header ${headerScrolled ? "scrolled" : ""}`}
         style={{
-          background: 'rgba(255, 255, 255, 0.6)',
+          background: 'transparent',
           backdropFilter: 'blur(20px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
           border: '1px solid rgba(255, 255, 255, 0.3)',
         }}
       >
-        <div className="page-header bg-[transparent]">
+        <div className="page-header">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="page-title">Messages</h1>
