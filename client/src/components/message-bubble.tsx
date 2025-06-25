@@ -45,16 +45,15 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
             className={`relative group ${isPending ? 'opacity-70' : ''}`}
             style={{
               background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
-              borderRadius: '24px 24px 8px 24px',
+              borderRadius: '24px',
               padding: '14px 18px',
               boxShadow: '0 8px 32px rgba(16, 185, 129, 0.25), 0 2px 8px rgba(0, 0, 0, 0.1)',
               backdropFilter: 'blur(8px)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-[24px_24px_8px_24px] pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-[24px] pointer-events-none"></div>
             <p className="text-white font-medium leading-relaxed relative z-10">{message.content}</p>
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-gradient-to-br from-emerald-400 to-cyan-400 rotate-45 transform origin-center shadow-sm"></div>
           </div>
         </div>
       </div>
