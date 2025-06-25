@@ -5,7 +5,9 @@ const config: CapacitorConfig = {
   appName: 'MyRoommate',
   webDir: 'dist/public',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    url: 'https://605e9f51-ac45-473e-8a9d-c0795b618f01-00-1epp5col3qtfm.worf.replit.dev',
+    cleartext: false
   },
   ios: {
     scheme: 'MyRoommate',
@@ -25,6 +27,9 @@ const config: CapacitorConfig = {
     StatusBar: {
       style: "light",
       backgroundColor: "#000000"
+    },
+    Browser: {
+      presentationStyle: "popover"
     }
   }
 };

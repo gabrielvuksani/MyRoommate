@@ -6,10 +6,12 @@ Your MyRoommate web app has been successfully converted to a native iOS app usin
 
 ## What's Been Created
 
-✅ **Capacitor Configuration**: Complete iOS project setup
+✅ **Capacitor Configuration**: Complete iOS project setup with deployed API endpoint
 ✅ **Native iOS Project**: Located in `ios/App/` directory
-✅ **Capacitor Plugins**: Status bar, splash screen, haptics, keyboard, and app lifecycle
+✅ **Capacitor Plugins**: Status bar, splash screen, haptics, keyboard, browser, and app lifecycle
 ✅ **Build Scripts**: Automated web asset generation and sync
+✅ **API Integration**: Connected to deployed Replit endpoint for authentication and database
+✅ **Authentication Flow**: Properly configured OAuth with Browser plugin for iOS
 
 ## Project Structure
 
