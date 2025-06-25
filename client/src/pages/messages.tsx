@@ -52,6 +52,8 @@ export default function Messages() {
         }
       }
     },
+    userId: user?.id,
+    householdId: household?.id,
   });
 
   const scrollToBottom = () => {

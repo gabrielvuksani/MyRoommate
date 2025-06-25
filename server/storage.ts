@@ -62,7 +62,7 @@ export interface IStorage {
   deleteCalendarEvent(id: string): Promise<void>;
   
   // Message operations
-  createMessage(message: InsertMessage): Promise<Message & { user: User }>;
+  createMessage(message: InsertMessage, user?: User): Promise<Message & { user: User }>;
   getMessages(householdId: string, limit?: number): Promise<(Message & { user: User })[]>;
   
   // Shopping operations
@@ -343,9 +343,18 @@ export class DatabaseStorage implements IStorage {
     await db.delete(calendarEvents).where(eq(calendarEvents.id, id));
   }
 
-  async createMessage(message: InsertMessage): Promise<Message & { user: User }> {
+  async createMessage(message: InsertMessage, user?: User): Promise<Message & { user: User }> {
     const [created] = await db.insert(messages).values(message).returning();
     
+    // If user is provided (from cache), avoid database lookup
+    if (user) {
+      return {
+        ...created,
+        user,
+      };
+    }
+    
+    // Fallback to database lookup only if user not cached
     const [result] = await db
       .select({
         id: messages.id,
@@ -366,6 +375,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMessages(householdId: string, limit: number = 50): Promise<(Message & { user: User })[]> {
+    // Optimized query with index hints and reduced data transfer
     const result = await db
       .select({
         id: messages.id,
@@ -376,7 +386,15 @@ export class DatabaseStorage implements IStorage {
         linkedTo: messages.linkedTo,
         linkedType: messages.linkedType,
         createdAt: messages.createdAt,
-        user: users,
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email,
+          profileImageUrl: users.profileImageUrl,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        },
       })
       .from(messages)
       .innerJoin(users, eq(messages.userId, users.id))

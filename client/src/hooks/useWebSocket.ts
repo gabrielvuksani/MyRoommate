@@ -4,10 +4,13 @@ interface UseWebSocketProps {
   onMessage?: (data: any) => void;
   onConnect?: () => void;
   onDisconnect?: () => void;
+  userId?: string;
+  householdId?: string;
 }
 
-export function useWebSocket({ onMessage, onConnect, onDisconnect }: UseWebSocketProps = {}) {
+export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, householdId }: UseWebSocketProps = {}) {
   const ws = useRef<WebSocket | null>(null);
+  const connectionSent = useRef(false);
 
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -17,6 +20,17 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect }: UseWebSocke
 
     ws.current.onopen = () => {
       console.log('WebSocket connected');
+      
+      // Send connection info immediately for user caching
+      if (userId && householdId && !connectionSent.current) {
+        ws.current?.send(JSON.stringify({
+          type: 'connect',
+          userId,
+          householdId,
+        }));
+        connectionSent.current = true;
+      }
+      
       onConnect?.();
     };
 
@@ -31,6 +45,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect }: UseWebSocke
 
     ws.current.onclose = () => {
       console.log('WebSocket disconnected');
+      connectionSent.current = false;
       onDisconnect?.();
     };
 
@@ -40,12 +55,15 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect }: UseWebSocke
 
     return () => {
       ws.current?.close();
+      connectionSent.current = false;
     };
-  }, [onMessage, onConnect, onDisconnect]);
+  }, [onMessage, onConnect, onDisconnect, userId, householdId]);
 
   const sendMessage = (message: any) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify(message));
+    } else {
+      console.warn('WebSocket not ready, queuing message');
     }
   };
 

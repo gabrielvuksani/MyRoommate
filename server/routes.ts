@@ -382,81 +382,164 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
 
-  // WebSocket setup
+  // High-performance WebSocket setup with user caching
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
   
-  wss.on('connection', (ws) => {
-    ws.on('message', async (data) => {
+  // Performance optimization caches
+  const userCache = new Map<string, any>();
+  const clientsById = new Map<string, WebSocket>();
+  const householdClients = new Map<string, Set<WebSocket>>();
+  
+  // Performance monitoring
+  let messageCount = 0;
+  let totalProcessingTime = 0;
+  
+  wss.on('connection', (ws: any) => {
+    let userId: string | null = null;
+    let householdId: string | null = null;
+    
+    ws.on('message', async (data: any) => {
       try {
         const message = JSON.parse(data.toString());
         
+        // Cache user info on first connection
+        if (message.type === 'connect' && message.userId && message.householdId) {
+          userId = message.userId;
+          householdId = message.householdId;
+          clientsById.set(userId, ws);
+          
+          // Cache user data for fast message creation
+          if (!userCache.has(userId)) {
+            const user = await storage.getUser(userId);
+            if (user) {
+              userCache.set(userId, user);
+            }
+          }
+        }
+        
         if (message.type === 'send_message') {
-          const { content, householdId, userId, linkedTo, linkedType } = message;
+          const startTime = Date.now();
+          const { content, householdId: msgHouseholdId, userId: msgUserId, linkedTo, linkedType } = message;
+          
+          // Get cached user for ultra-fast message creation
+          const cachedUser = userCache.get(msgUserId);
           
           const newMessage = await storage.createMessage({
             content,
-            householdId,
-            userId,
+            householdId: msgHouseholdId,
+            userId: msgUserId,
             linkedTo,
             linkedType,
-          });
+          }, cachedUser);
           
-          // Broadcast to all connected clients
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(JSON.stringify({
-                type: 'new_message',
-                message: newMessage,
-              }));
-            }
-          });
+          // Optimized household-based broadcasting
+          const householdClientSet = householdClients.get(msgHouseholdId);
+          if (householdClientSet) {
+            const broadcastData = JSON.stringify({
+              type: 'new_message',
+              message: newMessage,
+            });
+            
+            householdClientSet.forEach((client: any) => {
+              if (client.readyState === WebSocket.OPEN) {
+                client.send(broadcastData);
+              }
+            });
+          }
+          
+          // Performance tracking
+          messageCount++;
+          totalProcessingTime += Date.now() - startTime;
+          if (messageCount % 10 === 0) {
+            console.log(`💬 Chat Performance: ${messageCount} messages, avg ${(totalProcessingTime/messageCount).toFixed(2)}ms`);
+          }
         }
         
         if (message.type === 'user_typing') {
-          const { householdId, userId, userName } = message;
+          const { householdId: msgHouseholdId, userId: msgUserId, userName } = message;
           
-          // Broadcast typing indicator to other clients in the same household
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(JSON.stringify({
-                type: 'user_typing',
-                householdId,
-                userId,
-                userName,
-              }));
+          // Broadcast typing indicator only to other clients in same household
+          const broadcastData = JSON.stringify({
+            type: 'user_typing',
+            householdId: msgHouseholdId,
+            userId: msgUserId,
+            userName,
+          });
+          
+          wss.clients.forEach((client: any) => {
+            if (client.readyState === WebSocket.OPEN && 
+                client._householdId === msgHouseholdId && 
+                client._userId !== msgUserId) {
+              client.send(broadcastData);
             }
           });
         }
         
         if (message.type === 'user_stopped_typing') {
-          const { householdId, userId, userName } = message;
+          const { householdId: msgHouseholdId, userId: msgUserId, userName } = message;
           
-          // Broadcast stop typing indicator to other clients in the same household
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(JSON.stringify({
-                type: 'user_stopped_typing',
-                householdId,
-                userId,
-                userName,
-              }));
+          // Broadcast stop typing indicator only to other clients in same household
+          const broadcastData = JSON.stringify({
+            type: 'user_stopped_typing',
+            householdId: msgHouseholdId,
+            userId: msgUserId,
+            userName,
+          });
+          
+          wss.clients.forEach((client: any) => {
+            if (client.readyState === WebSocket.OPEN && 
+                client._householdId === msgHouseholdId && 
+                client._userId !== msgUserId) {
+              client.send(broadcastData);
             }
           });
         }
         
         if (message.type === 'chore_update') {
-          // Broadcast chore updates
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(JSON.stringify({
-                type: 'chore_updated',
-                chore: message.chore,
-              }));
+          // Broadcast chore updates to household members only
+          const broadcastData = JSON.stringify({
+            type: 'chore_updated',
+            chore: message.chore,
+          });
+          
+          wss.clients.forEach((client: any) => {
+            if (client.readyState === WebSocket.OPEN && client._householdId === message.householdId) {
+              client.send(broadcastData);
             }
           });
         }
+        
+        // Store client metadata for targeted broadcasting
+        if (userId && householdId) {
+          (ws as any)._userId = userId;
+          (ws as any)._householdId = householdId;
+          
+          // Add to household client set for fast broadcasting
+          if (!householdClients.has(householdId)) {
+            householdClients.set(householdId, new Set());
+          }
+          householdClients.get(householdId)?.add(ws);
+        }
+        
       } catch (error) {
         console.error('WebSocket message error:', error);
+      }
+    });
+    
+    ws.on('close', () => {
+      if (userId) {
+        clientsById.delete(userId);
+        
+        // Remove from household client set
+        if (householdId) {
+          const householdSet = householdClients.get(householdId);
+          if (householdSet) {
+            householdSet.delete(ws);
+            if (householdSet.size === 0) {
+              householdClients.delete(householdId);
+            }
+          }
+        }
       }
     });
   });
