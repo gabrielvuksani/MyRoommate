@@ -370,16 +370,19 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Right Column - Recent Activity */}
-          <div className="lg:col-span-1 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-gray-900">Recent Activity</h3>
-              <button 
-                onClick={() => setLocation('/messages')}
-                className="text-sm text-primary font-medium transition-colors"
-              >
-                View all
-              </button>
-            </div>
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                  <MessageCircle className="w-5 h-5 mr-2 text-primary" />
+                  Recent Activity
+                </h2>
+                <button 
+                  onClick={() => setLocation('/messages')}
+                  className="text-sm text-primary font-medium transition-colors"
+                >
+                  View All
+                </button>
+              </div>
             
             {recentMessages.length > 0 ? (
               <Card className="glass-card">
