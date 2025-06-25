@@ -13,6 +13,7 @@ import Calendar from "@/pages/calendar";
 import Messages from "@/pages/messages";
 import Settings from "@/pages/settings";
 import Profile from "@/pages/profile";
+import Onboarding from "@/pages/onboarding";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
@@ -33,6 +34,7 @@ function Router() {
           <Route path="/" component={Landing} />
         ) : (
           <>
+            <Route path="/onboarding" component={Onboarding} />
             <Route path="/" component={Home} />
             <Route path="/chores" component={Chores} />
             <Route path="/expenses" component={Expenses} />
