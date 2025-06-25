@@ -42,7 +42,11 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
           <p className="text-ios-body text-black">{message.content}</p>
         </div>
         <p className="text-ios-caption text-ios-gray-5 mt-1 ml-1">
-          {userName} • {new Date(message.createdAt).toLocaleTimeString()}
+          {userName} • {new Date(message.createdAt).toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+          })}
         </p>
       </div>
     </div>

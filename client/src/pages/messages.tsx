@@ -83,7 +83,7 @@ export default function Messages() {
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 px-6 py-6 space-y-4 overflow-y-auto">
+      <div className="flex-1 px-6 py-4 space-y-2 overflow-y-auto">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-64">
             <p className="text-body text-secondary">No messages yet. Start the conversation!</p>
