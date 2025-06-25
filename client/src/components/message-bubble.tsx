@@ -55,10 +55,9 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-[24px_24px_6px_24px] pointer-events-none"></div>
             <p className="text-white font-medium leading-relaxed relative z-10">{message.content}</p>
             <div 
-              className="absolute bottom-0 right-0 w-3 h-3 rotate-45 transform origin-center"
+              className="absolute bottom-0 right-0 w-2 h-2"
               style={{
                 background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
-                clipPath: 'polygon(0 0, 100% 100%, 0 100%)',
               }}
             ></div>
           </div>
