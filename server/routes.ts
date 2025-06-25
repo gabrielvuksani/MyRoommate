@@ -75,9 +75,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const { inviteCode } = req.body;
       
-      const household = await storage.getHouseholdByInviteCode(inviteCode);
+      console.log("Join household attempt:", { userId, inviteCode, codeLength: inviteCode?.length });
+      
+      if (!inviteCode || inviteCode.trim().length === 0) {
+        return res.status(400).json({ message: "Invite code is required" });
+      }
+      
+      const household = await storage.getHouseholdByInviteCode(inviteCode.trim().toUpperCase());
+      console.log("Household lookup result:", household ? `Found: ${household.name}` : "Not found");
+      
       if (!household) {
         return res.status(404).json({ message: "Invalid invite code" });
+      }
+      
+      // Check if user is already a member
+      const existingMembership = await storage.getUserHousehold(userId);
+      if (existingMembership && existingMembership.household.id === household.id) {
+        return res.status(400).json({ message: "You are already a member of this household" });
       }
       
       const member = await storage.joinHousehold(household.id, userId);

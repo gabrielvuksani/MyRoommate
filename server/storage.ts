@@ -103,7 +103,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getHouseholdByInviteCode(code: string): Promise<Household | undefined> {
+    console.log("Storage: Looking up household with invite code:", code);
     const [household] = await db.select().from(households).where(eq(households.inviteCode, code));
+    console.log("Storage: Household found:", household ? `ID: ${household.id}, Name: ${household.name}` : "Not found");
     return household;
   }
 
