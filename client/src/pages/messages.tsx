@@ -29,10 +29,19 @@ export default function Messages() {
   const { sendMessage } = useWebSocket({
     onMessage: (data) => {
       if (data.type === "new_message") {
-        queryClient.setQueryData(["/api/messages"], (old: any) => [
-          ...(old || []),
-          data.message,
-        ]);
+        // Immediately update the messages in the cache for real-time display
+        queryClient.setQueryData(["/api/messages"], (old: any) => {
+          const messages = old || [];
+          // Check if message already exists to prevent duplicates
+          const exists = messages.some((msg: any) => msg.id === data.message.id);
+          if (!exists) {
+            return [...messages, data.message];
+          }
+          return messages;
+        });
+        
+        // Scroll to bottom when new message arrives
+        setTimeout(scrollToBottom, 100);
       } else if (data.type === "user_typing") {
         if (data.userId !== user?.id) {
           setTypingUsers(prev => {
@@ -45,6 +54,9 @@ export default function Messages() {
           setTimeout(() => {
             setTypingUsers(prev => prev.filter(name => name !== data.userName));
           }, 3000);
+          
+          // Auto-scroll when typing indicators appear
+          setTimeout(scrollToBottom, 100);
         }
       } else if (data.type === "user_stopped_typing") {
         if (data.userId !== user?.id) {
@@ -125,6 +137,8 @@ export default function Messages() {
     e.preventDefault();
     if (!newMessage.trim() || !household || !user) return;
 
+    const messageContent = newMessage.trim();
+    
     // Clear typing indicator
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
@@ -140,14 +154,34 @@ export default function Messages() {
       });
     }
 
+    // Optimistic update - show message immediately
+    const optimisticMessage = {
+      id: `temp-${Date.now()}`,
+      content: messageContent,
+      householdId: household.id,
+      userId: user.id,
+      createdAt: new Date(),
+      user: user,
+      type: null,
+      linkedTo: null,
+      linkedType: null,
+    };
+
+    queryClient.setQueryData(["/api/messages"], (old: any) => [
+      ...(old || []),
+      optimisticMessage,
+    ]);
+
+    // Send via WebSocket
     sendMessage({
       type: "send_message",
-      content: newMessage.trim(),
+      content: messageContent,
       householdId: household.id,
       userId: user.id,
     });
 
     setNewMessage("");
+    setTimeout(scrollToBottom, 50);
   };
 
   const quickMessages = [
@@ -160,12 +194,32 @@ export default function Messages() {
   const handleQuickMessage = (text: string) => {
     if (!household || !user) return;
     
+    // Optimistic update for quick messages too
+    const optimisticMessage = {
+      id: `temp-${Date.now()}`,
+      content: text,
+      householdId: household.id,
+      userId: user.id,
+      createdAt: new Date(),
+      user: user,
+      type: null,
+      linkedTo: null,
+      linkedType: null,
+    };
+
+    queryClient.setQueryData(["/api/messages"], (old: any) => [
+      ...(old || []),
+      optimisticMessage,
+    ]);
+    
     sendMessage({
       type: "send_message",
       content: text,
       householdId: household.id,
       userId: user.id,
     });
+
+    setTimeout(scrollToBottom, 50);
   };
 
   if (isLoading) {
