@@ -343,7 +343,7 @@ export default function Messages() {
               onSubmit={handleSendMessage}
               className="flex items-center space-x-3"
             >
-              <div className="flex-1 bg-gray-100/80 rounded-full px-4 py-3 backdrop-blur-sm">
+              <div className="flex-1 rounded-full px-4 py-3">
                 <Input
                   type="text"
                   placeholder="Type a message..."
