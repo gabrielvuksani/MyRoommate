@@ -23,7 +23,7 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
     
     return (
       <div className="flex justify-end mb-4 animate-fade-in">
-        <div className="flex flex-col items-end max-w-sm">
+        <div className="flex flex-col items-end max-w-xs">
           <div className="flex items-center space-x-3 mb-2">
             <span className="text-xs text-gray-400 font-medium">
               {new Date(message.createdAt).toLocaleTimeString('en-US', { 
@@ -35,14 +35,26 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
             <span className="text-xs text-gray-600 font-semibold">
               {userName}
             </span>
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center shadow-md">
-              <span className="text-white text-sm font-semibold">
+            <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
+              <span className="text-white text-xs font-bold">
                 {message.user?.firstName?.[0] || message.user?.email?.[0] || 'Y'}
               </span>
             </div>
           </div>
-          <div className={`bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl rounded-tr-lg px-5 py-3 shadow-lg ${isPending ? 'opacity-70' : ''}`}>
-            <p className="text-white font-medium leading-relaxed">{message.content}</p>
+          <div 
+            className={`relative group ${isPending ? 'opacity-70' : ''}`}
+            style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
+              borderRadius: '24px 24px 8px 24px',
+              padding: '14px 18px',
+              boxShadow: '0 8px 32px rgba(16, 185, 129, 0.25), 0 2px 8px rgba(0, 0, 0, 0.1)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-[24px_24px_8px_24px] pointer-events-none"></div>
+            <p className="text-white font-medium leading-relaxed relative z-10">{message.content}</p>
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-gradient-to-br from-emerald-400 to-cyan-400 rotate-45 transform origin-center shadow-sm"></div>
           </div>
         </div>
       </div>
@@ -54,10 +66,10 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
 
   return (
     <div className="flex justify-start mb-4 animate-fade-in">
-      <div className="flex flex-col items-start max-w-sm">
+      <div className="flex flex-col items-start max-w-xs">
         <div className="flex items-center space-x-3 mb-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center shadow-md">
-            <span className="text-white text-sm font-semibold">{userInitial}</span>
+          <div className="w-7 h-7 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
+            <span className="text-white text-xs font-bold">{userInitial}</span>
           </div>
           <span className="text-xs text-gray-600 font-semibold">
             {userName}
@@ -70,8 +82,20 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
             })}
           </span>
         </div>
-        <div className="glass-card rounded-3xl rounded-tl-lg px-5 py-3 shadow-lg">
-          <p className="text-gray-900 font-medium leading-relaxed">{message.content}</p>
+        <div 
+          className="relative group"
+          style={{
+            background: 'rgba(255, 255, 255, 0.85)',
+            borderRadius: '24px 24px 24px 8px',
+            padding: '14px 18px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
+            backdropFilter: 'blur(20px) saturate(1.8)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 rounded-[24px_24px_24px_8px] pointer-events-none"></div>
+          <p className="text-gray-900 font-medium leading-relaxed relative z-10">{message.content}</p>
+          <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-white/85 rotate-45 transform origin-center shadow-sm backdrop-blur-sm"></div>
         </div>
       </div>
     </div>

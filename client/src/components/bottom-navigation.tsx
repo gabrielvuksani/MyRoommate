@@ -14,7 +14,7 @@ export default function BottomNavigation() {
 
   return (
     <nav className="tab-navigation" style={{
-      background: 'rgba(255, 255, 255, 0.1)',
+      background: 'rgba(255, 255, 255, 0.25)',
       backdropFilter: 'blur(40px) saturate(1.8) brightness(1.1)',
       WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.1)',
     }}>
