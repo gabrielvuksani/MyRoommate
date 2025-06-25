@@ -14,7 +14,7 @@ import { Plus } from "lucide-react";
 export default function Chores() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [headerScrolled, setHeaderScrolled] = useState(false);
-  const [activeTab, setActiveTab] = useState<"all" | "todo" | "doing" | "done">("all");
+
   const [newChore, setNewChore] = useState({
     title: '',
     description: '',
@@ -98,14 +98,7 @@ export default function Chores() {
     updateChoreMutation.mutate({ id, updates });
   };
 
-  // Filter chores based on active tab
-  const filteredChores = chores.filter((chore: any) => {
-    if (activeTab === "all") return true;
-    if (activeTab === "todo") return chore.status === "todo" || !chore.status;
-    if (activeTab === "doing") return chore.status === "doing";
-    if (activeTab === "done") return chore.status === "done";
-    return true;
-  });
+
 
   if (isLoading) {
     return (
@@ -206,32 +199,105 @@ export default function Chores() {
       </div>
       
       <div className="page-content space-y-6">
-        {/* Chore Filter Tabs */}
-        <div className="flex space-x-1 p-1 bg-gray-100 rounded-xl">
-          {(["all", "todo", "doing", "done"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === tab
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-gray-600 hover:text-gray-800"
-              }`}
-            >
-              {tab === "todo" ? "To Do" : tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+        {/* Today's Focus */}
+        {Array.isArray(chores) && chores.length > 0 && (
+          <Card className="glass-card border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 font-semibold">🎯</span>
+                </div>
+                <h2 className="text-headline font-semibold text-blue-700">Today's Focus</h2>
+              </div>
+              
+              {(() => {
+                const urgentChores = chores.filter((c: any) => 
+                  (c.status === 'todo' || !c.status) && 
+                  c.priority === 'urgent'
+                );
+                const overdueChores = chores.filter((c: any) => 
+                  (c.status === 'todo' || !c.status) && 
+                  c.dueDate && new Date(c.dueDate) < new Date()
+                );
+                const priorityChore = urgentChores[0] || overdueChores[0] || 
+                  chores.find((c: any) => c.status === 'todo' || !c.status);
+                
+                if (!priorityChore) {
+                  return (
+                    <p className="text-blue-600 font-medium">
+                      All caught up! No pending chores.
+                    </p>
+                  );
+                }
+                
+                return (
+                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/40">
+                    <h3 className="font-semibold text-primary mb-2">{priorityChore.title}</h3>
+                    <div className="flex items-center gap-4 text-sm text-secondary mb-3">
+                      <span>{priorityChore.assignedUser?.firstName || 'Unassigned'}</span>
+                      {priorityChore.dueDate && (
+                        <span className={new Date(priorityChore.dueDate) < new Date() ? 'text-red-600 font-medium' : ''}>
+                          Due {new Date(priorityChore.dueDate).toLocaleDateString()}
+                        </span>
+                      )}
+                      {priorityChore.priority && (
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          priorityChore.priority === 'urgent' ? 'bg-red-100 text-red-700' :
+                          priorityChore.priority === 'high' ? 'bg-orange-100 text-orange-700' :
+                          'bg-blue-100 text-blue-700'
+                        }`}>
+                          {priorityChore.priority.charAt(0).toUpperCase() + priorityChore.priority.slice(1)}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleUpdateChore(priorityChore.id, { status: 'doing' })}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Start Now
+                    </button>
+                  </div>
+                );
+              })()}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600 mb-1">
+                {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'todo' || !c.status).length : 0}
+              </div>
+              <div className="text-sm text-secondary">To Do</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-orange-600 mb-1">
+                {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'doing').length : 0}
+              </div>
+              <div className="text-sm text-secondary">In Progress</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-green-600 mb-1">
+                {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'done').length : 0}
+              </div>
+              <div className="text-sm text-secondary">Done</div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Chores Overview */}
+        {/* All Chores */}
         <Card className="glass-card">
           <CardContent className="p-6">
-            <h2 className="text-headline font-semibold text-primary mb-4">
-              {activeTab === "all" ? "All Chores" : 
-               activeTab === "todo" ? "To Do" : 
-               activeTab === "doing" ? "In Progress" : "Completed"}
-            </h2>
-            <ChoreBoard chores={filteredChores} onUpdateChore={handleUpdateChore} />
+            <h2 className="text-headline font-semibold text-primary mb-4">All Chores</h2>
+            <ChoreBoard chores={Array.isArray(chores) ? chores : []} onUpdateChore={handleUpdateChore} />
           </CardContent>
         </Card>
       </div>

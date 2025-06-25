@@ -162,20 +162,7 @@ export default function ChoreBoard({ chores, onUpdateChore }: ChoresBoardProps) 
     );
   };
 
-  // Simple list view for filtered chores
-  if (chores.length > 0 && (chores.every(c => c.status === 'todo') || chores.every(c => c.status === 'doing') || chores.every(c => c.status === 'done'))) {
-    return (
-      <div className="space-y-3">
-        {chores.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-secondary">No chores found</p>
-          </div>
-        ) : (
-          chores.map(chore => <ChoreCard key={chore.id} chore={chore} />)
-        )}
-      </div>
-    );
-  }
+
 
   // Full kanban board view for all chores
   return (
