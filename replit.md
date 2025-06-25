@@ -110,7 +110,17 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 
 ## Recent Changes
 
-**December 25, 2024:**
+**December 25, 2024 (Latest):**
+- ✓ Reduced animations for faster feel while maintaining fun factor
+- ✓ Completely redesigned header with RoomieFlow branding and gradient text
+- ✓ Enhanced home page with colorful gradient action cards
+- ✓ Added daily schedule view to calendar with clickable day navigation
+- ✓ Made bottom tab navigation more compact and responsive
+- ✓ Improved balance card with better visual hierarchy
+- ✓ Fixed duplicate key warnings in calendar rendering
+- ✓ Optimized transitions to 0.15-0.2s for snappy feel
+
+**December 25, 2024 (Earlier):**
 - ✓ Redesigned with futuristic minimalistic Apple/Airbnb-inspired aesthetics
 - ✓ Implemented floating glass headers with backdrop blur effects
 - ✓ Created floating tab navigation with modern interactions
@@ -126,3 +136,5 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Design preferences: Fast animations (0.15-0.2s), fun but not overwhelming, Airbnb/Apple aesthetic with roomy whitespace.
+App branding: RoomieFlow (not RoomieHub) - one app that removes every headache of living with roommates.

@@ -44,7 +44,7 @@ export default function Settings() {
   return (
     <div className="page-container">
       <div className="floating-header">
-        <div className="px-6 py-4">
+        <div className="px-6 py-8">
           <div className="flex items-center space-x-4">
             <button 
               onClick={() => setLocation('/')}
@@ -53,8 +53,8 @@ export default function Settings() {
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h1 className="text-large-title font-bold text-primary">Settings</h1>
-              <p className="text-subhead text-secondary mt-1">Manage your household</p>
+              <h1 className="header-content text-4xl font-black tracking-tight">Settings</h1>
+              <p className="text-subhead text-secondary mt-2 font-medium">Manage your household</p>
             </div>
           </div>
         </div>

@@ -136,21 +136,21 @@ export default function Calendar() {
 
   return (
     <div className="page-container">
-      {/* Futuristic Floating Header */}
+      {/* Clean Modern Header */}
       <div className="floating-header">
-        <div className="px-6 py-6">
+        <div className="px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-large-title font-bold text-primary">Calendar</h1>
-              <p className="text-subhead text-secondary mt-1">
-                Manage your schedule and events
+              <h1 className="header-content text-4xl font-black tracking-tight">RoomieFlow</h1>
+              <p className="text-subhead text-secondary mt-2 font-medium">
+                Your shared calendar and events
               </p>
             </div>
             
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
                 <button className="btn-floating">
-                  <Plus size={24} />
+                  <Plus size={22} />
                 </button>
               </DialogTrigger>
               <DialogContent className="modal-content">
@@ -248,7 +248,7 @@ export default function Calendar() {
             </div>
 
             {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-1">
               {calendarDays.map((day, index) => {
                 if (!day) {
                   return <div key={`empty-${index}`} className="calendar-day opacity-0"></div>;
@@ -271,19 +271,47 @@ export default function Calendar() {
                     className={`calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasEvents ? 'has-events' : ''}`}
                   >
                     <span className="relative z-10">{day}</span>
-                    {hasEvents && (
-                      <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
-                        <div className="flex space-x-1">
-                          {dayEvents.slice(0, 3).map((_, i) => (
-                            <div key={i} className="w-1 h-1 bg-current rounded-full opacity-60"></div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </button>
                 );
               })}
             </div>
+            
+            {/* Daily Schedule View */}
+            {selectedDate && (
+              <div className="daily-schedule">
+                <h3 className="text-headline font-semibold text-primary mb-3">
+                  {selectedDate.toLocaleDateString('en-US', { 
+                    weekday: 'long',
+                    month: 'long', 
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </h3>
+                {getDayEvents(selectedDate.getDate()).length === 0 ? (
+                  <p className="text-subhead text-secondary">No events scheduled for this day</p>
+                ) : (
+                  <div className="space-y-2">
+                    {getDayEvents(selectedDate.getDate()).map((event: any) => (
+                      <div key={event.id} className="flex items-center space-x-3 p-3 bg-surface-secondary rounded-lg">
+                        <div className="w-3 h-3 bg-accent rounded-full flex-shrink-0"></div>
+                        <div className="flex-1">
+                          <p className="text-body font-medium text-primary">{event.title}</p>
+                          <p className="text-caption text-secondary">
+                            {new Date(event.startDate).toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
+                        <span className="text-caption text-secondary capitalize px-2 py-1 bg-surface rounded">
+                          {event.type}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
