@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(0, 0%, 9%);
+  --muted: hsl(215, 16%, 97%);
+  --muted-foreground: hsl(215, 8%, 45%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(0, 0%, 9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(0, 0%, 9%);
+  --border: hsl(214, 13%, 91%);
+  --input: hsl(214, 13%, 91%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(215, 16%, 97%);
+  --secondary-foreground: hsl(215, 19%, 35%);
+  --accent: hsl(215, 16%, 97%);
+  --accent-foreground: hsl(215, 19%, 35%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(207, 90%, 54%);
+  --radius: 0.75rem;
+  
+  /* iOS-inspired colors */
+  --ios-blue: hsl(207, 90%, 54%);
+  --ios-gray: hsl(217, 19%, 97%);
+  --ios-gray-2: hsl(223, 11%, 90%);
+  --ios-gray-3: hsl(220, 7%, 78%);
+  --ios-gray-4: hsl(223, 7%, 82%);
+  --ios-gray-5: hsl(224, 6%, 58%);
+  --ios-gray-6: hsl(223, 6%, 29%);
+  --ios-green: hsl(142, 71%, 45%);
+  --ios-orange: hsl(28, 100%, 50%);
+  --ios-red: hsl(4, 90%, 58%);
+  --card-bg: hsl(0, 0%, 100%);
+}
+
+.dark {
+  --background: hsl(224, 71%, 4%);
+  --foreground: hsl(213, 31%, 91%);
+  --muted: hsl(223, 47%, 11%);
+  --muted-foreground: hsl(215, 13%, 65%);
+  --popover: hsl(224, 71%, 4%);
+  --popover-foreground: hsl(213, 31%, 91%);
+  --card: hsl(224, 71%, 4%);
+  --card-foreground: hsl(213, 31%, 91%);
+  --border: hsl(216, 34%, 17%);
+  --input: hsl(216, 34%, 17%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(223, 47%, 11%);
+  --secondary-foreground: hsl(213, 31%, 91%);
+  --accent: hsl(223, 47%, 11%);
+  --accent-foreground: hsl(213, 31%, 91%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(213, 31%, 91%);
+  --ring: hsl(207, 90%, 54%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-system;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .font-system {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+  }
+  
+  .text-ios-large-title {
+    font-size: 34px;
+    line-height: 41px;
+    font-weight: 700;
+  }
+  
+  .text-ios-title-1 {
+    font-size: 28px;
+    line-height: 34px;
+    font-weight: 700;
+  }
+  
+  .text-ios-title-2 {
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 700;
+  }
+  
+  .text-ios-headline {
+    font-size: 17px;
+    line-height: 22px;
+    font-weight: 600;
+  }
+  
+  .text-ios-body {
+    font-size: 17px;
+    line-height: 22px;
+    font-weight: 400;
+  }
+  
+  .text-ios-callout {
+    font-size: 16px;
+    line-height: 21px;
+    font-weight: 400;
+  }
+  
+  .text-ios-subhead {
+    font-size: 15px;
+    line-height: 20px;
+    font-weight: 400;
+  }
+  
+  .text-ios-footnote {
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 400;
+  }
+  
+  .text-ios-caption {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+  }
+  
+  .bg-ios-gray {
+    background-color: var(--ios-gray);
+  }
+  
+  .bg-ios-blue {
+    background-color: var(--ios-blue);
+  }
+  
+  .bg-ios-green {
+    background-color: var(--ios-green);
+  }
+  
+  .bg-ios-orange {
+    background-color: var(--ios-orange);
+  }
+  
+  .bg-ios-red {
+    background-color: var(--ios-red);
+  }
+  
+  .text-ios-blue {
+    color: var(--ios-blue);
+  }
+  
+  .text-ios-green {
+    color: var(--ios-green);
+  }
+  
+  .text-ios-orange {
+    color: var(--ios-orange);
+  }
+  
+  .text-ios-red {
+    color: var(--ios-red);
+  }
+  
+  .text-ios-gray-5 {
+    color: var(--ios-gray-5);
+  }
+  
+  .text-ios-gray-6 {
+    color: var(--ios-gray-6);
+  }
+  
+  .border-ios-blue {
+    border-color: var(--ios-blue);
+  }
+  
+  .border-ios-green {
+    border-color: var(--ios-green);
+  }
+  
+  .border-ios-orange {
+    border-color: var(--ios-orange);
+  }
+  
+  .border-ios-red {
+    border-color: var(--ios-red);
+  }
+  
+  .border-ios-gray-2 {
+    border-color: var(--ios-gray-2);
+  }
+  
+  .border-ios-gray-3 {
+    border-color: var(--ios-gray-3);
+  }
+  
+  .card-shadow {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .tab-shadow {
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05);
+  }
+}
