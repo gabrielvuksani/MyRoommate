@@ -303,7 +303,7 @@ export default function Expenses() {
         </div>
       </div>
 
-      <div className="page-content space-y-6">
+      <div className="page-content space-y-6 pt-36">
         {/* Balance Overview */}
         <Card className="glass-card">
           <CardContent className="p-6">
