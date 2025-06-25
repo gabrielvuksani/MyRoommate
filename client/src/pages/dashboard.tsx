@@ -11,12 +11,15 @@ import {
   Target,
   Award,
   Clock,
-  BarChart3
+  BarChart3,
+  ArrowLeft
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function Dashboard() {
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('week');
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,8 +58,19 @@ export default function Dashboard() {
       <div className="page-container page-transition">
         <div className="floating-header">
           <div className="page-header">
-            <h1 className="page-title">Dashboard</h1>
-            <p className="page-subtitle">Join a household to view analytics</p>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setLocation('/')}
+                className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
+              </button>
+              <div>
+                <h1 className="page-title">Dashboard</h1>
+                <p className="page-subtitle">Join a household to view analytics</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -104,9 +118,18 @@ export default function Dashboard() {
       {/* Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
-          <div>
-            <h1 className="page-title">Performance Dashboard</h1>
-            <p className="page-subtitle">{household.name} household analytics</p>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setLocation('/')}
+              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <div>
+              <h1 className="page-title">Performance Dashboard</h1>
+              <p className="page-subtitle">{household.name} household analytics</p>
+            </div>
           </div>
           
           <div className="flex space-x-2">
