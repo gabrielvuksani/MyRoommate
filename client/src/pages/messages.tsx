@@ -60,21 +60,21 @@ export default function Messages() {
   }
 
   return (
-    <div className="min-h-screen bg-ios-gray pb-24 flex flex-col">
-      <div className="h-6 bg-white"></div>
+    <div className="min-h-screen bg-surface pb-24 flex flex-col">
+      <div className="h-6 bg-surface-elevated"></div>
       
-      <div className="px-4 pt-4 pb-6 bg-white border-b border-ios-gray-2">
-        <h1 className="text-ios-large-title font-bold text-black">House Chat</h1>
-        <p className="text-ios-subhead text-ios-gray-5 mt-1">
+      <div className="page-header border-b border-default">
+        <h1 className="text-large-title font-bold text-primary">House Chat</h1>
+        <p className="text-subhead text-secondary mt-2">
           {household?.members?.map((m: any) => m.user.firstName || m.user.email?.split('@')[0]).join(', ')}
         </p>
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 px-4 py-4 space-y-4 overflow-y-auto">
+      <div className="flex-1 px-6 py-6 space-y-4 overflow-y-auto">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-64">
-            <p className="text-ios-body text-ios-gray-5">No messages yet. Start the conversation!</p>
+            <p className="text-body text-secondary">No messages yet. Start the conversation!</p>
           </div>
         ) : (
           messages.map((message: any) => (

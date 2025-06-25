@@ -222,31 +222,31 @@ export default function Home() {
   const firstName = user.firstName || user.email?.split('@')[0] || 'there';
 
   return (
-    <div className="min-h-screen bg-ios-gray pb-20">
-      <div className="h-6 bg-white"></div>
+    <div className="min-h-screen bg-surface pb-20">
+      <div className="h-6 bg-surface-elevated"></div>
       
-      <div className="px-4 pt-4 pb-6 bg-white">
+      <div className="px-6 pt-6 pb-8 bg-surface-elevated">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-ios-large-title font-bold text-black">
+            <h1 className="text-large-title font-bold text-primary">
               Good morning, {firstName}
             </h1>
-            <p className="text-ios-subhead text-ios-gray-5 mt-1">
+            <p className="text-subhead text-secondary mt-2">
               Here's what needs your attention
             </p>
           </div>
           <div className="flex items-center space-x-3">
             <button 
               onClick={() => setLocation('/settings')}
-              className="w-10 h-10 bg-ios-gray rounded-full flex items-center justify-center"
+              className="w-12 h-12 bg-surface rounded-full flex items-center justify-center shadow-sm border border-default hover:shadow-md transition-all duration-200"
             >
-              <span className="text-ios-body">⚙️</span>
+              <span className="text-xl">⚙️</span>
             </button>
             <button 
               onClick={() => setLocation('/profile')}
-              className="w-10 h-10 bg-ios-blue rounded-full flex items-center justify-center"
+              className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200"
             >
-              <span className="text-white text-ios-footnote font-medium">
+              <span className="text-inverse text-footnote font-medium">
                 {firstName[0]?.toUpperCase() || '?'}
               </span>
             </button>
@@ -254,7 +254,7 @@ export default function Home() {
         </div>
       </div>
       
-      <div className="px-4 space-y-3">
+      <div className="px-6 space-y-6">
         {/* Active Chores Card */}
         <Card className="card-shadow">
           <CardContent className="p-4">

@@ -72,6 +72,8 @@ export default function Calendar() {
     });
   };
 
+  const canCreateEvent = newEvent.title.trim().length > 0 && newEvent.startDate.trim().length > 0;
+
   // Simple calendar grid for current month
   const today = new Date();
   const currentMonth = today.getMonth();
@@ -101,14 +103,14 @@ export default function Calendar() {
   }
 
   return (
-    <div className="min-h-screen bg-ios-gray pb-20">
-      <div className="h-6 bg-white"></div>
+    <div className="page-container">
+      <div className="h-6 bg-surface-elevated"></div>
       
-      <div className="px-4 pt-4 pb-6 bg-white">
+      <div className="page-header">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-ios-large-title font-bold text-black">Calendar</h1>
-            <p className="text-ios-subhead text-ios-gray-5 mt-1">
+            <h1 className="text-large-title font-bold text-primary">Calendar</h1>
+            <p className="text-subhead text-secondary mt-2">
               {monthNames[currentMonth]} {currentYear}
             </p>
           </div>
@@ -156,20 +158,20 @@ export default function Calendar() {
                     <SelectItem value="bill">Bill</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button 
+                <button
                   onClick={handleCreateEvent}
-                  disabled={!newEvent.title.trim() || !newEvent.startDate || createEventMutation.isPending}
-                  className="w-full bg-ios-blue hover:bg-ios-blue/90"
+                  disabled={!canCreateEvent || createEventMutation.isPending}
+                  className="btn-primary w-full"
                 >
                   {createEventMutation.isPending ? "Creating..." : "Create Event"}
-                </Button>
+                </button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
       </div>
       
-      <div className="px-4 space-y-4">
+      <div className="page-content space-y-6">
         {/* Mini Calendar */}
         <Card className="card-shadow">
           <CardContent className="p-4">

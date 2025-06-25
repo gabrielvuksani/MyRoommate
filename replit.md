@@ -108,10 +108,19 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - **iOS Styling**: Native iOS design patterns and color scheme
 - **Touch Interactions**: Optimized for touch-based navigation
 
-## Changelog
+## Recent Changes
 
-Changelog:
-- June 25, 2025. Initial setup
+**December 25, 2024:**
+- ✓ Implemented modern Apple-inspired design system with futuristic elements
+- ✓ Created comprehensive validation system preventing form submission with invalid data
+- ✓ Unified design language across all pages with consistent spacing, typography, and interactions
+- ✓ Enhanced UI with modern color palette, shadows, and micro-interactions
+- ✓ Added proper form validation for chores, expenses, and calendar events
+- ✓ Upgraded navigation with smooth transitions and modern styling
+- ✓ Fixed all validation errors in chore, expense, and calendar creation
+
+**Previous:**
+- June 25, 2025. Initial setup and core functionality
 
 ## User Preferences
 

@@ -23,15 +23,15 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-ios-gray pb-20">
-      <div className="h-6 bg-white"></div>
+    <div className="page-container">
+      <div className="h-6 bg-surface-elevated"></div>
       
-      <div className="px-4 pt-4 pb-6 bg-white">
-        <h1 className="text-ios-large-title font-bold text-black">Profile</h1>
-        <p className="text-ios-subhead text-ios-gray-5 mt-1">Your account information</p>
+      <div className="page-header">
+        <h1 className="text-large-title font-bold text-primary">Profile</h1>
+        <p className="text-subhead text-secondary mt-2">Your account information</p>
       </div>
       
-      <div className="px-4 space-y-4">
+      <div className="page-content space-y-6">
         {/* Profile Info */}
         <Card className="card-shadow">
           <CardContent className="p-4">

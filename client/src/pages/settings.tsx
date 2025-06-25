@@ -40,15 +40,15 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-ios-gray pb-20">
-      <div className="h-6 bg-white"></div>
+    <div className="page-container">
+      <div className="h-6 bg-surface-elevated"></div>
       
-      <div className="px-4 pt-4 pb-6 bg-white">
-        <h1 className="text-ios-large-title font-bold text-black">Settings</h1>
-        <p className="text-ios-subhead text-ios-gray-5 mt-1">Manage your household</p>
+      <div className="page-header">
+        <h1 className="text-large-title font-bold text-primary">Settings</h1>
+        <p className="text-subhead text-secondary mt-2">Manage your household</p>
       </div>
       
-      <div className="px-4 space-y-4">
+      <div className="page-content space-y-6">
         {/* Household Info */}
         <Card className="card-shadow">
           <CardContent className="p-4">

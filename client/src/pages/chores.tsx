@@ -76,8 +76,13 @@ export default function Chores() {
   const handleCreateChore = () => {
     if (!newChore.title.trim()) return;
     
-    createChoreMutation.mutate(newChore);
+    createChoreMutation.mutate({
+      ...newChore,
+      assignedTo: newChore.assignedTo || null,
+    });
   };
+
+  const canCreateChore = newChore.title.trim().length > 0;
 
   const handleUpdateChore = (id: string, updates: any) => {
     updateChoreMutation.mutate({ id, updates });
@@ -92,21 +97,21 @@ export default function Chores() {
   }
 
   return (
-    <div className="min-h-screen bg-ios-gray pb-20">
-      <div className="h-6 bg-white"></div>
+    <div className="page-container">
+      <div className="h-6 bg-surface-elevated"></div>
       
-      <div className="px-4 pt-4 pb-6 bg-white">
+      <div className="page-header">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-ios-large-title font-bold text-black">Chores</h1>
-            <p className="text-ios-subhead text-ios-gray-5 mt-1">Keep the house running smoothly</p>
+            <h1 className="text-large-title font-bold text-primary">Chores</h1>
+            <p className="text-subhead text-secondary mt-2">Keep the house running smoothly</p>
           </div>
           
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-ios-blue hover:bg-ios-blue/90 text-white rounded-full px-4 py-2">
+              <button className="btn-primary rounded-full w-12 h-12 flex items-center justify-center text-xl">
                 +
-              </Button>
+              </button>
             </DialogTrigger>
             <DialogContent className="max-w-sm mx-auto">
               <DialogHeader>
@@ -150,20 +155,20 @@ export default function Chores() {
                     <SelectItem value="monthly">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button 
+                <button
                   onClick={handleCreateChore}
-                  disabled={!newChore.title.trim() || createChoreMutation.isPending}
-                  className="w-full bg-ios-blue hover:bg-ios-blue/90"
+                  disabled={!canCreateChore || createChoreMutation.isPending}
+                  className="btn-primary w-full"
                 >
                   {createChoreMutation.isPending ? "Creating..." : "Create Chore"}
-                </Button>
+                </button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
       </div>
       
-      <div className="px-4">
+      <div className="page-content">
         <ChoreBoard chores={chores} onUpdateChore={handleUpdateChore} />
       </div>
     </div>

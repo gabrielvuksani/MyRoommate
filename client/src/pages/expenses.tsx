@@ -94,21 +94,21 @@ export default function Expenses() {
   }
 
   return (
-    <div className="min-h-screen bg-ios-gray pb-20">
-      <div className="h-6 bg-white"></div>
+    <div className="page-container">
+      <div className="h-6 bg-surface-elevated"></div>
       
-      <div className="px-4 pt-4 pb-6 bg-white">
+      <div className="page-header">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-ios-large-title font-bold text-black">Expenses</h1>
-            <p className="text-ios-subhead text-ios-gray-5 mt-1">Track and split costs easily</p>
+            <h1 className="text-large-title font-bold text-primary">Expenses</h1>
+            <p className="text-subhead text-secondary mt-2">Track and split costs easily</p>
           </div>
           
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-ios-blue hover:bg-ios-blue/90 text-white rounded-lg px-4 py-2 text-ios-footnote font-medium">
+              <button className="btn-primary rounded-lg px-6 py-3 text-footnote font-medium">
                 + Add Bill
-              </Button>
+              </button>
             </DialogTrigger>
             <DialogContent className="max-w-sm mx-auto">
               <DialogHeader>
@@ -142,20 +142,20 @@ export default function Expenses() {
                     <SelectItem value="percentage">By Percentage</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button 
+                <button
                   onClick={handleCreateExpense}
-                  disabled={!newExpense.title.trim() || !newExpense.amount || createExpenseMutation.isPending}
-                  className="w-full bg-ios-blue hover:bg-ios-blue/90"
+                  disabled={!canCreateExpense || createExpenseMutation.isPending}
+                  className="btn-primary w-full"
                 >
                   {createExpenseMutation.isPending ? "Adding..." : "Add Expense"}
-                </Button>
+                </button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
       </div>
       
-      <div className="px-4 space-y-4">
+      <div className="page-content space-y-6">
         {/* Balance Overview */}
         <Card className="card-shadow">
           <CardContent className="p-4">
