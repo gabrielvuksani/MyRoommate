@@ -309,10 +309,18 @@ export default function Home() {
 
         {/* Performance Insights */}
         <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-            <BarChart3 className="w-5 h-5 mr-2 text-primary" />
-            Household Performance
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              <BarChart3 className="w-5 h-5 mr-2 text-primary" />
+              Household Performance
+            </h2>
+            <button 
+              onClick={() => setLocation('/dashboard')}
+              className="text-sm text-primary font-medium transition-colors hover:text-primary/80"
+            >
+              View All
+            </button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {(() => {
               const completedChores = chores.filter((c: any) => c.status === 'done');
