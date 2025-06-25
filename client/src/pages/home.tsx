@@ -105,7 +105,7 @@ export default function Home() {
               className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated p-[20px] nav-transition transition-all hover:scale-[1.05] animate-fade-in"
             >
               <span className="text-white font-bold text-lg">
-                {firstName[0]?.toUpperCase() || '+'}
+                {firstName[0]?.toUpperCase() || '?'}
               </span>
             </button>
           </div>
@@ -258,8 +258,8 @@ export default function Home() {
                   <div className="space-y-4">
                     {recentMessages.map((message: any) => (
                       <div key={message.id} className="flex items-start space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center flex-shrink-0">
-                          <span className="text-white text-sm font-medium">
+                        <div className="w-10 h-10 bg-ios-gray rounded-2xl flex items-center justify-center flex-shrink-0">
+                          <span className="text-primary text-sm font-medium">
                             {message.user.firstName?.[0] || message.user.email?.[0]}
                           </span>
                         </div>
@@ -284,7 +284,7 @@ export default function Home() {
                 <CardContent className="p-6">
                   <button 
                     onClick={() => setLocation('/messages')}
-                    className="w-full text-center border-2 border-dashed border-gray-200 py-8 transition-all"
+                    className="w-full text-center border-gray-200 py-8 transition-all"
                   >
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
                       <MessageCircle size={24} className="text-white" />

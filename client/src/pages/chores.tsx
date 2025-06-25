@@ -193,8 +193,8 @@ export default function Chores() {
       </div>
       
       <div className="page-content space-y-6">
-        <StreakWidget chores={chores} />
         <ChoreBoard chores={chores} onUpdateChore={handleUpdateChore} />
+        <StreakWidget chores={chores} />
       </div>
     </div>
   );

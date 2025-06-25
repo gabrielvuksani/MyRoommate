@@ -117,8 +117,8 @@ export default function Profile() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="w-20 h-20 bg-primary/10 rounded-md flex items-center justify-center">
-                  <span className="text-primary text-2xl font-bold">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">
                     {user.firstName?.[0] || user.email?.[0] || "?"}
                   </span>
                 </div>
