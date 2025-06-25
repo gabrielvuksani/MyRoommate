@@ -111,12 +111,6 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
-- ✓ Completely redesigned onboarding page with modern visionOS-inspired glass morphism aesthetic
-- ✓ Added gradient hero icons with shadows and modern spacing throughout onboarding flow
-- ✓ Implemented feature grid with color-coded cards showcasing app capabilities
-- ✓ Applied consistent glass-card styling and modern form inputs to match app design language
-- ✓ Enhanced onboarding buttons with animations and loading states for better UX
-- ✓ Removed outdated Card components and cleaned up file structure for maintainability
 - ✓ Completely removed all toast notifications app-wide as requested by user
 - ✓ Replaced toast notifications with console error logging for debugging
 - ✓ Removed useToast imports and dependencies from all pages (calendar, expenses, chores, profile, onboarding, settings)
