@@ -111,16 +111,11 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
-- ✓ Successfully converted web app to native iOS app using Capacitor
-- ✓ Created complete iOS Xcode project in `ios/App/` directory
-- ✓ Configured Capacitor with native plugins (splash screen, status bar, haptics, keyboard, browser, app lifecycle)
-- ✓ Built automated iOS build system with `build-ios.js` script
-- ✓ Generated iOS deployment documentation (`iOS-DEPLOYMENT.md`)
-- ✓ Set up app configuration: Bundle ID `com.myroommate.app`, App Name "MyRoommate"
-- ✓ Configured iOS app to use deployed API endpoint for full authentication and database functionality
-- ✓ Added Browser plugin for OAuth authentication flow in iOS environment
-- ✓ Fixed routing issues - iOS app now properly connects to deployed backend
-- ✓ Ready for Xcode development and App Store submission with full functionality
+- ✓ Fixed header layout breaking with long names by adding proper text truncation
+- ✓ Enhanced profile avatar with emerald-cyan gradient consistent throughout app
+- ✓ Fixed React hooks error by removing iOS development artifacts
+- ✓ Cleaned up project by removing all Capacitor iOS dependencies and files
+- ✓ Restored clean web-only application architecture
 - ✓ Completely removed all toast notifications app-wide as requested by user
 - ✓ Replaced toast notifications with console error logging for debugging
 - ✓ Removed useToast imports and dependencies from all pages (calendar, expenses, chores, profile, onboarding, settings)

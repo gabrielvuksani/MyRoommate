@@ -95,14 +95,14 @@ export default function Home() {
       {/* Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="page-title">{greeting}, {firstName}</h1>
-              <p className="page-subtitle">{household.name}</p>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h1 className="page-title truncate">{greeting}, {firstName}</h1>
+              <p className="page-subtitle truncate">{household.name}</p>
             </div>
             <button 
               onClick={() => setLocation('/profile')}
-              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated p-[20px] nav-transition transition-all hover:scale-[1.05] animate-fade-in"
+              className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
             >
               <span className="text-white font-bold text-lg">
                 {firstName[0]?.toUpperCase() || '?'}
