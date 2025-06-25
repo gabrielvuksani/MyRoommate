@@ -76,13 +76,7 @@ export default function Chores() {
 
   const updateChoreMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
-      // Handle date formatting for completedAt
-      const formattedUpdates = { ...updates };
-      if (formattedUpdates.completedAt) {
-        formattedUpdates.completedAt = new Date(formattedUpdates.completedAt);
-      }
-      
-      await apiRequest("PATCH", `/api/chores/${id}`, formattedUpdates);
+      await apiRequest("PATCH", `/api/chores/${id}`, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
@@ -125,7 +119,7 @@ export default function Chores() {
   }
 
   return (
-    <div className="page-container animate-page-enter">
+    <div className="page-container page-transition">
       {/* visionOS Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">

@@ -103,7 +103,7 @@ export default function Expenses() {
   }
 
   return (
-    <div className="page-container animate-page-enter">
+    <div className="page-container page-transition">
       {/* visionOS Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">

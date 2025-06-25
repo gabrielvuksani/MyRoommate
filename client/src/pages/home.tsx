@@ -86,7 +86,7 @@ export default function Home() {
   });
 
   return (
-    <div className="page-container animate-page-enter">
+    <div className="page-container page-transition">
       {/* Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
