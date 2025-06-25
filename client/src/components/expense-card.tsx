@@ -67,7 +67,7 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
         <div className="text-right">
           <div className="flex items-center justify-end space-x-2 mb-2">
             <p className="text-title-3 font-bold text-primary">${parseFloat(expense.amount).toFixed(2)}</p>
-            {onDeleteExpense && (
+            {onDeleteExpense && !isFullySettled && (
               <button
                 onClick={() => onDeleteExpense(expense.id)}
                 className="px-2 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors"
