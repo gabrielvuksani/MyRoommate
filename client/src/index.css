@@ -122,12 +122,16 @@
 /* visionOS Header System */
 .floating-header {
   background: transparent;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   padding-top: env(safe-area-inset-top);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   border-bottom: 1px solid transparent;
+  max-width: 430px;
+  margin: 0 auto;
 }
 
 .floating-header.scrolled {
@@ -502,7 +506,7 @@
 }
 
 .page-content {
-  padding: 0 var(--space-6);
+  padding: 100px var(--space-6) 0;
 }
 
 /* Premium visionOS Cards */

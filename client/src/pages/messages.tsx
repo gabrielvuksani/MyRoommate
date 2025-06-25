@@ -256,10 +256,10 @@ export default function Messages() {
         </div>
       </div>
 
-      {/* Messages Container - Positioned between header and input */}
-      <div className="fixed top-[110px] bottom-[85px] left-0 right-0 overflow-y-auto">
-        <div className="max-w-md mx-auto h-full">
-          <div className="px-6 py-4 space-y-2 h-full flex flex-col">
+      {/* Messages Container */}
+      <div className="page-content pb-[85px]">
+        <div className="h-[calc(100vh-185px)] overflow-y-auto">
+          <div className="space-y-2 h-full flex flex-col">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center flex-1 space-y-6">
                 <div className="text-center">
