@@ -151,7 +151,7 @@ export default function Chores() {
                     className="input-modern w-full"
                   />
                   <Select value={newChore.assignedTo} onValueChange={(value) => setNewChore({ ...newChore, assignedTo: value })}>
-                    <SelectTrigger className="input-modern">
+                    <SelectTrigger>
                       <SelectValue placeholder="Assign to..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -166,10 +166,10 @@ export default function Chores() {
                     type="date"
                     value={newChore.dueDate}
                     onChange={(e) => setNewChore({ ...newChore, dueDate: e.target.value })}
-                    className="input-modern w-full"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   />
                   <Select value={newChore.recurrence} onValueChange={(value) => setNewChore({ ...newChore, recurrence: value })}>
-                    <SelectTrigger className="input-modern">
+                    <SelectTrigger>
                       <SelectValue placeholder="Recurrence..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -181,7 +181,7 @@ export default function Chores() {
                   <button
                     onClick={handleCreateChore}
                     disabled={!canCreateChore || createChoreMutation.isPending}
-                    className="btn-primary w-full"
+                    className="w-full bg-emerald-600 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-200 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {createChoreMutation.isPending ? "Creating..." : "Create Chore"}
                   </button>
