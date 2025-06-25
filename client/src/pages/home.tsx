@@ -308,7 +308,7 @@ export default function Home() {
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">All caught up!</h3>
             <p className="text-gray-600 mb-8 leading-relaxed text-lg">No chores need your attention today</p>
-            <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg transition-all duration-300">
+            <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg btn-animated">
               Add Chore
             </button>
           </div>
@@ -360,7 +360,7 @@ export default function Home() {
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">All settled!</h3>
             <p className="text-gray-600 mb-8 leading-relaxed text-lg">No outstanding bills to worry about</p>
-            <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg transition-all duration-300">
+            <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg btn-animated">
               Add Expense
             </button>
           </div>
@@ -414,7 +414,7 @@ export default function Home() {
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">Free day!</h3>
             <p className="text-gray-600 mb-8 leading-relaxed text-lg">No events scheduled for today</p>
-            <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg transition-all duration-300">
+            <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg btn-animated">
               Add Event
             </button>
           </div>

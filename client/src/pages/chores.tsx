@@ -119,8 +119,8 @@ export default function Chores() {
             
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
-                <button className="btn-floating">
-                  <span className="text-xl">+</span>
+                <button className="w-12 h-12 bg-gradient-to-br from-accent to-accent-hover rounded-2xl flex items-center justify-center shadow-lg btn-animated">
+                  <Plus size={24} className="text-white" />
                 </button>
               </DialogTrigger>
               <DialogContent className="modal-content">
