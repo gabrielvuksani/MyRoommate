@@ -52,21 +52,26 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
   const userName = message.user?.firstName || message.user?.email?.split('@')[0] || 'Unknown';
 
   return (
-    <div className="flex items-start space-x-2">
-      <div className="w-8 h-8 bg-ios-blue rounded-full flex items-center justify-center flex-shrink-0">
-        <span className="text-white text-ios-footnote font-medium">{userInitial}</span>
-      </div>
-      <div className="flex-1">
-        <div className="bg-ios-gray rounded-2xl rounded-tl-md px-4 py-3 max-w-xs">
-          <p className="text-ios-body text-black">{message.content}</p>
+    <div className="flex justify-start">
+      <div className="flex flex-col items-start">
+        <div className="flex items-center space-x-2 mb-1 px-1">
+          <div className="w-6 h-6 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
+            <span className="text-white text-xs font-medium">{userInitial}</span>
+          </div>
+          <span className="text-xs text-gray-500 font-medium">
+            {userName}
+          </span>
+          <span className="text-xs text-gray-400">
+            {new Date(message.createdAt).toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              hour12: true 
+            })}
+          </span>
         </div>
-        <p className="text-ios-caption text-ios-gray-5 mt-1 ml-1">
-          {userName} • {new Date(message.createdAt).toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-          })}
-        </p>
+        <div className="bg-gray-100 rounded-2xl rounded-tl-md px-4 py-3 max-w-xs">
+          <p className="text-sm text-black">{message.content}</p>
+        </div>
       </div>
     </div>
   );
