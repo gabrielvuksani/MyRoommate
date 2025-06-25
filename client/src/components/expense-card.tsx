@@ -42,9 +42,10 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
     }
   };
 
-  const totalSettled = expense.splits.filter((split: any) => split.settled).length;
-  const totalSplits = expense.splits.length;
-  const isFullySettled = totalSettled === totalSplits;
+  const splits = expense.splits || [];
+  const totalSettled = splits.filter((split: any) => split.settled).length;
+  const totalSplits = splits.length;
+  const isFullySettled = totalSplits > 0 && totalSettled === totalSplits;
 
   return (
     <div className="border border-gray-200 rounded-xl p-4 bg-white">
@@ -85,7 +86,7 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
 
       {/* Split Details */}
       <div className="space-y-2">
-        {expense.splits?.map((split: any) => (
+        {splits.map((split: any) => (
           <div key={split.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
             <span className="text-sm text-gray-700">
               {split.user?.firstName || split.user?.email?.split('@')[0] || 'Unknown'}
