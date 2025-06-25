@@ -252,8 +252,6 @@ export default function Messages() {
           backdropFilter: 'blur(20px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
           border: '1px solid rgba(255, 255, 255, 0.3)',
-          borderRadius: '24px',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.1)',
         }}
       >
         <div className="page-header">
