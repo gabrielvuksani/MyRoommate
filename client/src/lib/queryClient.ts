@@ -13,27 +13,6 @@ export async function apiRequest(
   data?: unknown | undefined,
 ): Promise<Response> {
   let processedData = data;
-  
-  if (data) {
-    // Convert Date objects to ISO strings for JSON serialization
-    const processData = (obj: any): any => {
-      if (obj instanceof Date) {
-        return obj.toISOString();
-      }
-      if (Array.isArray(obj)) {
-        return obj.map(processData);
-      }
-      if (obj && typeof obj === 'object') {
-        const processed: any = {};
-        for (const [key, value] of Object.entries(obj)) {
-          processed[key] = processData(value);
-        }
-        return processed;
-      }
-      return obj;
-    };
-    processedData = processData(data);
-  }
 
   const res = await fetch(url, {
     method,
