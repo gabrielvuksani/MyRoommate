@@ -327,7 +327,7 @@ export default function Calendar() {
       {selectedDate && (
         <div className="px-6 pb-8 animate-slide-up" key={selectedDate.toDateString()}>
           <div className="smart-card p-6">
-            <div className="flex items-center justify-between mb-6 pl-[16px] pr-[16px]">
+            <div className="flex items-center justify-between pl-[16px] pr-[16px] mt-[16px] mb-[16px]">
               <h3 className="text-xl font-bold text-gray-900">
                 {selectedDate.toDateString() === new Date().toDateString() ? 'Today' : 
                  selectedDate.toLocaleDateString('en-US', { 
