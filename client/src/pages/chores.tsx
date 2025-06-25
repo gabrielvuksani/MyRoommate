@@ -249,32 +249,34 @@ export default function Chores() {
                 }
                 
                 return (
-                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/40">
-                    <h3 className="font-semibold text-primary mb-2">{priorityChore.title}</h3>
-                    <div className="flex items-center gap-4 text-sm text-secondary mb-3">
-                      <span>{priorityChore.assignedUser?.firstName || 'Unassigned'}</span>
-                      {priorityChore.dueDate && (
-                        <span className={new Date(priorityChore.dueDate) < new Date() ? 'text-red-600 font-medium' : ''}>
-                          Due {new Date(priorityChore.dueDate).toLocaleDateString()}
-                        </span>
-                      )}
-                      {priorityChore.priority && (
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          priorityChore.priority === 'urgent' ? 'bg-red-100 text-red-700' :
-                          priorityChore.priority === 'high' ? 'bg-orange-100 text-orange-700' :
-                          'bg-blue-100 text-blue-700'
-                        }`}>
-                          {priorityChore.priority.charAt(0).toUpperCase() + priorityChore.priority.slice(1)}
-                        </span>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => handleUpdateChore(priorityChore.id, { status: 'doing' })}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                    >
-                      Start Now
-                    </button>
-                  </div>
+                  <Card className="glass-card">
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-primary mb-2">{priorityChore.title}</h3>
+                      <div className="flex items-center gap-4 text-sm text-secondary mb-3">
+                        <span>{priorityChore.assignedUser?.firstName || 'Unassigned'}</span>
+                        {priorityChore.dueDate && (
+                          <span className={new Date(priorityChore.dueDate) < new Date() ? 'text-red-600 font-medium' : ''}>
+                            Due {new Date(priorityChore.dueDate).toLocaleDateString()}
+                          </span>
+                        )}
+                        {priorityChore.priority && (
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            priorityChore.priority === 'urgent' ? 'bg-red-100 text-red-700' :
+                            priorityChore.priority === 'high' ? 'bg-orange-100 text-orange-700' :
+                            'bg-blue-100 text-blue-700'
+                          }`}>
+                            {priorityChore.priority.charAt(0).toUpperCase() + priorityChore.priority.slice(1)}
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleUpdateChore(priorityChore.id, { status: 'doing' })}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                      >
+                        Start Now
+                      </button>
+                    </CardContent>
+                  </Card>
                 );
               })()}
             </CardContent>
