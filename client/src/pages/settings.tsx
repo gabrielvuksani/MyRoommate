@@ -2,12 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { Copy, LogOut, Users, Home } from "lucide-react";
+import { Copy, LogOut, Users, Home, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 export default function Settings() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -43,8 +45,18 @@ export default function Settings() {
     <div className="page-container">
       <div className="floating-header">
         <div className="px-6 py-4">
-          <h1 className="text-large-title font-bold text-primary">Settings</h1>
-          <p className="text-subhead text-secondary mt-1">Manage your household</p>
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={() => setLocation('/')}
+              className="calendar-header-nav"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <div>
+              <h1 className="text-large-title font-bold text-primary">Settings</h1>
+              <p className="text-subhead text-secondary mt-1">Manage your household</p>
+            </div>
+          </div>
         </div>
       </div>
       

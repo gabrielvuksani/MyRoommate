@@ -76,44 +76,106 @@
 .text-warning { color: var(--warning); }
 .text-destructive { color: var(--destructive); }
 
-/* Futuristic Glass Cards */
+/* Futuristic iOS 26 Design System */
 .glass-card {
   background: var(--surface-overlay);
   backdrop-filter: var(--blur-medium);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-soft);
-  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+  opacity: 0.6;
 }
 
 .glass-card:hover {
   box-shadow: var(--shadow-medium);
-  border-color: var(--border-strong);
-  transform: translateY(-2px);
+  border-color: var(--border);
+  transform: translateY(-4px) scale(1.01);
 }
 
 .elevated-card {
   background: var(--surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border);
-  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .elevated-card:hover {
-  box-shadow: var(--shadow-medium);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-strong);
+  transform: translateY(-2px);
 }
 
-/* Floating Header */
+/* Ultra-Futuristic Floating Header */
 .floating-header {
-  background: var(--surface-overlay);
-  backdrop-filter: var(--blur-medium);
-  border-bottom: 1px solid var(--border);
+  background: var(--surface-glass);
+  backdrop-filter: var(--blur-heavy);
+  border-bottom: 1px solid var(--border-subtle);
   position: sticky;
   top: 0;
-  z-index: 40;
-  animation: slideDown 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  z-index: 50;
+  animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 32px hsla(15, 15%, 15%, 0.04);
+}
+
+.floating-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+}
+
+/* Advanced Tab Navigation */
+.tab-navigation {
+  background: var(--surface-glass);
+  backdrop-filter: var(--blur-heavy);
+  border-top: 1px solid var(--border-subtle);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 8px 12px 20px;
+  box-shadow: 0 -8px 32px hsla(15, 15%, 15%, 0.08);
+}
+
+.tab-item {
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-item.active {
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.tab-item.inactive {
+  color: var(--text-secondary);
+}
+
+.tab-item:hover {
+  background: var(--surface-overlay);
+  transform: translateY(-1px);
 }
 
 /* Modern Button System */
@@ -328,6 +390,28 @@
   to { opacity: 1; }
 }
 
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalSlideIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(40px) scale(0.95);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -336,11 +420,14 @@
 .animate-fade-in { animation: fadeIn 0.3s ease-out; }
 .animate-pulse { animation: pulse 2s infinite; }
 
-/* Page Layout */
+/* Advanced Page Layout */
 .page-container {
   min-height: 100vh;
-  background: var(--background);
-  padding-bottom: 100px;
+  background: linear-gradient(135deg, 
+    var(--background) 0%, 
+    #f8fafc 100%);
+  padding-bottom: 120px;
+  position: relative;
 }
 
 .page-header {
@@ -350,7 +437,132 @@
 }
 
 .page-content {
-  padding: 24px;
+  padding: 32px 24px;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Futuristic Interactive Elements */
+.btn-floating {
+  background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-medium);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-floating::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.6s;
+}
+
+.btn-floating:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: var(--shadow-strong);
+}
+
+.btn-floating:hover::before {
+  left: 100%;
+}
+
+.input-modern {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-primary);
+}
+
+.input-modern:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.modal-content {
+  background: var(--surface-overlay);
+  backdrop-filter: var(--blur-medium);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-strong);
+  animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Calendar Specific Styles */
+.calendar-day {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  position: relative;
+  color: var(--text-primary);
+}
+
+.calendar-day:hover {
+  background: var(--surface-overlay);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.calendar-day.today {
+  background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-medium);
+}
+
+.calendar-day.selected {
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-soft);
+  border: 2px solid var(--primary);
+}
+
+.calendar-day.has-events::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.calendar-header-nav {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.calendar-header-nav:hover {
+  background: var(--surface-overlay);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
 }
 
 /* Legacy mappings */

@@ -26,7 +26,7 @@ export default function BottomNavigation() {
                 isActive ? 'active' : 'inactive'
               }`}
             >
-              <Icon size={20} className="flex-shrink-0" />
+              <Icon size={18} className="flex-shrink-0" />
               <span className="text-caption mt-1 font-medium">{label}</span>
             </button>
           );

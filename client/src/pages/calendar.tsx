@@ -1,16 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react";
 
 export default function Calendar() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [newEvent, setNewEvent] = useState({
     title: '',
     description: '',
@@ -74,19 +74,22 @@ export default function Calendar() {
 
   const canCreateEvent = newEvent.title.trim().length > 0 && newEvent.startDate.trim().length > 0;
 
-  // Simple calendar grid for current month
+  // Calendar logic
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
   const today = new Date();
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
+  
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
   const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
   const daysInMonth = lastDayOfMonth.getDate();
   const startingDayOfWeek = firstDayOfMonth.getDay();
 
   const calendarDays = [];
+  // Add empty cells for days before the month starts
   for (let i = 0; i < startingDayOfWeek; i++) {
     calendarDays.push(null);
   }
+  // Add all days of the month
   for (let day = 1; day <= daysInMonth; day++) {
     calendarDays.push(day);
   }
@@ -94,30 +97,60 @@ export default function Calendar() {
   const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
 
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
+    if (direction === 'prev') {
+      newDate.setMonth(currentMonth - 1);
+    } else {
+      newDate.setMonth(currentMonth + 1);
+    }
+    setCurrentDate(newDate);
+  };
+
+  const handleDayClick = (day: number) => {
+    const clickedDate = new Date(currentYear, currentMonth, day);
+    setSelectedDate(clickedDate);
+    
+    // Pre-fill the form with the selected date
+    const dateString = clickedDate.toISOString().split('T')[0];
+    setNewEvent(prev => ({ ...prev, startDate: dateString }));
+    setIsCreateOpen(true);
+  };
+
+  const getDayEvents = (day: number) => {
+    return events.filter((event: any) => {
+      const eventDate = new Date(event.startDate);
+      return eventDate.getDate() === day && 
+             eventDate.getMonth() === currentMonth && 
+             eventDate.getFullYear() === currentYear;
+    });
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-ios-gray">
-        <div className="w-8 h-8 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
     <div className="page-container">
+      {/* Futuristic Floating Header */}
       <div className="floating-header">
-        <div className="px-6 py-4">
+        <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-large-title font-bold text-primary">Calendar</h1>
               <p className="text-subhead text-secondary mt-1">
-                {monthNames[currentMonth]} {currentYear}
+                Manage your schedule and events
               </p>
             </div>
-          
+            
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
                 <button className="btn-floating">
-                  <span className="text-xl">+</span>
+                  <Plus size={24} />
                 </button>
               </DialogTrigger>
               <DialogContent className="modal-content">
@@ -175,65 +208,128 @@ export default function Calendar() {
         </div>
       </div>
       
-      <div className="page-content space-y-6">
-        {/* Mini Calendar */}
+      <div className="page-content space-y-8">
+        {/* Interactive Calendar */}
         <Card className="glass-card">
-          <CardContent className="p-6">
+          <CardContent className="p-8">
+            {/* Calendar Header with Navigation */}
+            <div className="flex items-center justify-between mb-8">
+              <button 
+                onClick={() => navigateMonth('prev')}
+                className="calendar-header-nav"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              
+              <div className="text-center">
+                <h2 className="text-title-2 font-bold text-primary">
+                  {monthNames[currentMonth]} {currentYear}
+                </h2>
+                <p className="text-footnote text-secondary mt-1">
+                  Tap a day to create an event
+                </p>
+              </div>
+              
+              <button 
+                onClick={() => navigateMonth('next')}
+                className="calendar-header-nav"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+
+            {/* Days of Week Header */}
             <div className="grid grid-cols-7 gap-2 mb-4">
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
-                <div key={day} className="text-center text-caption text-secondary font-medium">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                <div key={day} className="text-center text-caption text-secondary font-semibold py-2">
                   {day}
                 </div>
               ))}
             </div>
+
+            {/* Calendar Grid */}
             <div className="grid grid-cols-7 gap-2">
-              {calendarDays.map((day, index) => (
-                <div key={index} className="text-center text-subhead h-8 flex items-center justify-center relative">
-                  {day ? (
-                    <>
-                      <span className={day === today.getDate() ? 
-                        "bg-primary text-inverse rounded-full w-6 h-6 flex items-center justify-center text-caption" : 
-                        "text-primary"
-                      }>
-                        {day}
-                      </span>
-                      {events.some((event: any) => 
-                        new Date(event.startDate).getDate() === day &&
-                        new Date(event.startDate).getMonth() === currentMonth
-                      ) && (
-                        <div className="w-1 h-1 bg-primary rounded-full absolute bottom-0"></div>
-                      )}
-                    </>
-                  ) : null}
-                </div>
-              ))}
+              {calendarDays.map((day, index) => {
+                if (!day) {
+                  return <div key={`empty-${index}`} className="calendar-day opacity-0"></div>;
+                }
+                
+                const isToday = day === today.getDate() && 
+                               currentMonth === today.getMonth() && 
+                               currentYear === today.getFullYear();
+                const isSelected = selectedDate && 
+                                 day === selectedDate.getDate() && 
+                                 currentMonth === selectedDate.getMonth() && 
+                                 currentYear === selectedDate.getFullYear();
+                const dayEvents = getDayEvents(day);
+                const hasEvents = dayEvents.length > 0;
+
+                return (
+                  <button
+                    key={`day-${day}`}
+                    onClick={() => handleDayClick(day)}
+                    className={`calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasEvents ? 'has-events' : ''}`}
+                  >
+                    <span className="relative z-10">{day}</span>
+                    {hasEvents && (
+                      <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
+                        <div className="flex space-x-1">
+                          {dayEvents.slice(0, 3).map((_, i) => (
+                            <div key={i} className="w-1 h-1 bg-current rounded-full opacity-60"></div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
 
         {/* Upcoming Events */}
         <Card className="glass-card">
-          <CardContent className="p-6">
-            <h2 className="text-headline font-semibold text-primary mb-4">Upcoming Events</h2>
-            <div className="space-y-3">
+          <CardContent className="p-8">
+            <div className="flex items-center mb-6">
+              <CalendarIcon size={24} className="text-primary mr-3" />
+              <h2 className="text-title-2 font-semibold text-primary">Upcoming Events</h2>
+            </div>
+            
+            <div className="space-y-4">
               {events.length === 0 ? (
-                <p className="text-body text-secondary">No upcoming events</p>
+                <div className="text-center py-12">
+                  <CalendarIcon size={48} className="text-secondary mx-auto mb-4 opacity-40" />
+                  <p className="text-body text-secondary">No upcoming events</p>
+                  <p className="text-footnote text-tertiary mt-1">Tap the + button or click on a day to create your first event</p>
+                </div>
               ) : (
                 events.map((event: any) => (
-                  <div key={event.id} className="flex items-center space-x-3 py-3">
-                    <div 
-                      className="w-3 h-8 rounded-full bg-primary"
-                    ></div>
-                    <div className="flex-1">
-                      <p className="text-body font-medium text-primary">{event.title}</p>
-                      <p className="text-footnote text-secondary">
-                        {new Date(event.startDate).toLocaleDateString()} • {new Date(event.startDate).toLocaleTimeString()}
+                  <div key={event.id} className="flex items-start space-x-4 p-4 rounded-2xl bg-surface hover:bg-surface-secondary transition-all duration-300 cursor-pointer group">
+                    <div className="w-4 h-16 rounded-full bg-gradient-to-b from-primary to-secondary flex-shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-headline font-semibold text-primary group-hover:text-accent transition-colors">
+                        {event.title}
+                      </p>
+                      <p className="text-subhead text-secondary mt-1">
+                        {new Date(event.startDate).toLocaleDateString('en-US', { 
+                          weekday: 'long',
+                          month: 'long', 
+                          day: 'numeric',
+                          year: 'numeric'
+                        })} at {new Date(event.startDate).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit'
+                        })}
                       </p>
                       {event.description && (
-                        <p className="text-footnote text-secondary mt-1">{event.description}</p>
+                        <p className="text-footnote text-tertiary mt-2 line-clamp-2">{event.description}</p>
                       )}
                     </div>
-                    <span className="text-caption text-secondary capitalize">{event.type}</span>
+                    <div className="flex-shrink-0">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-caption font-medium bg-surface text-secondary capitalize">
+                        {event.type}
+                      </span>
+                    </div>
                   </div>
                 ))
               )}
