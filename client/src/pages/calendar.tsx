@@ -16,6 +16,7 @@ export default function Calendar() {
     title: '',
     description: '',
     startDate: '',
+    endDate: '',
     color: '#3B82F6',
     type: 'social',
   });
@@ -64,7 +65,9 @@ export default function Calendar() {
     if (!canCreateEvent) return;
     
     const startDateTime = new Date(newEvent.startDate);
-    const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000); // 1 hour later
+    const endDateTime = newEvent.endDate ? 
+      new Date(newEvent.endDate) : 
+      new Date(startDateTime.getTime() + 60 * 60 * 1000); // 1 hour later if no end time
     
     const eventData = {
       title: newEvent.title,
@@ -72,7 +75,7 @@ export default function Calendar() {
       startDate: startDateTime.toISOString(),
       endDate: endDateTime.toISOString(),
       color: newEvent.color || '#3B82F6',
-      type: 'personal'
+      type: newEvent.type || 'personal'
     };
     
     createEventMutation.mutate(eventData);
@@ -205,12 +208,13 @@ export default function Calendar() {
                     </div>
                     
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-700">End Time</label>
+                      <label className="text-sm font-semibold text-gray-700">End Time (Optional)</label>
                       <input
                         type="datetime-local"
                         value={newEvent.endDate}
                         onChange={(e) => setNewEvent({ ...newEvent, endDate: e.target.value })}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        placeholder="Leave empty for 1-hour duration"
                       />
                     </div>
                   </div>
@@ -414,6 +418,15 @@ export default function Calendar() {
                                 hour: 'numeric',
                                 minute: '2-digit'
                               })}
+                              {event.endDate && (
+                                <span className="text-gray-500">
+                                  {' - '}
+                                  {new Date(event.endDate).toLocaleTimeString('en-US', {
+                                    hour: 'numeric',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                              )}
                             </span>
                           </div>
                           <div className="bg-gray-100 px-3 py-2 rounded-xl">
