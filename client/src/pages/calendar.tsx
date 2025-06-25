@@ -156,46 +156,55 @@ export default function Calendar() {
                   <Plus size={24} className="text-white" />
                 </button>
               </DialogTrigger>
-              <DialogContent className="smart-card max-w-md mx-auto border-0 shadow-2xl">
-                <DialogHeader className="pb-6">
-                  <DialogTitle className="text-2xl font-bold text-gray-900">Create Event</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Event Title</label>
+              <DialogContent>
+                <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-6 text-white">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold text-white">Create Event</DialogTitle>
+                    <p className="text-purple-100 text-sm mt-1">Schedule something for your household</p>
+                  </DialogHeader>
+                </div>
+                
+                <div className="p-6 space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700">Event Title</label>
                     <input
+                      type="text"
+                      placeholder="What's happening?"
                       value={newEvent.title}
                       onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-base font-medium focus:ring-2 focus:ring-accent/20 focus:bg-white transition-all focus:outline-none"
-                      placeholder="Enter event title..."
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700">Description</label>
                     <input
+                      type="text"
+                      placeholder="Add details (optional)..."
                       value={newEvent.description}
                       onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-base font-medium focus:ring-2 focus:ring-accent/20 focus:bg-white transition-all focus:outline-none"
-                      placeholder="Event description..."
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                     />
                   </div>
+                  
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Date</label>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700">Start Time</label>
                       <input
-                        type="date"
+                        type="datetime-local"
                         value={newEvent.startDate}
                         onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-base font-medium focus:ring-2 focus:ring-accent/20 focus:bg-white transition-all focus:outline-none"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Time</label>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700">End Time</label>
                       <input
-                        type="time"
-                        value={newEvent.startTime}
-                        onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-base font-medium focus:ring-2 focus:ring-accent/20 focus:bg-white transition-all focus:outline-none"
+                        type="datetime-local"
+                        value={newEvent.endDate}
+                        onChange={(e) => setNewEvent({ ...newEvent, endDate: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                       />
                     </div>
                   </div>
