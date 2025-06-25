@@ -250,7 +250,7 @@ export default function Calendar() {
       <div className="px-6 mb-6">
         <div className="smart-card p-6 animate-fade-in">
           {/* Month Navigation */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mt-[16px] mb-[16px] ml-[4px] mr-[4px]">
             <button
               onClick={() => navigateMonth('prev')}
               className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-animated"
