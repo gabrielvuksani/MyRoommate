@@ -97,7 +97,7 @@ export default function Home() {
             </div>
             <button 
               onClick={() => setLocation('/profile')}
-              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated"
+              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated pl-[20px] pr-[20px]"
             >
               <span className="text-white font-bold text-lg">
                 {firstName[0]?.toUpperCase() || '+'}
@@ -106,7 +106,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
       <div className="page-content space-y-6">
         {/* Hero Stats */}
         <div className="grid grid-cols-2 gap-4">

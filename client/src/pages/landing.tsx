@@ -9,15 +9,15 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-ios-gray flex flex-col">
       <div className="h-6 bg-white"></div>
-      
+
       <div className="flex-1 flex flex-col items-center justify-center px-6">
         <div className="text-center mb-12">
           <h1 className="text-ios-large-title font-bold text-black mb-4">
-            RoomieHub
+            MyRoommate
           </h1>
           <p className="text-ios-body text-ios-gray-5 max-w-sm">
-            Simplify shared living with your roommates. 
-            Manage chores, split expenses, and stay connected.
+            Simplify shared living with your roommates. Manage chores, split
+            expenses, and stay connected.
           </p>
         </div>
 
@@ -29,8 +29,12 @@ export default function Landing() {
                   <span className="text-white text-ios-body">✓</span>
                 </div>
                 <div>
-                  <h3 className="text-ios-headline font-semibold text-black">Smart Chores</h3>
-                  <p className="text-ios-footnote text-ios-gray-5">Auto-rotating assignments</p>
+                  <h3 className="text-ios-headline font-semibold text-black">
+                    Smart Chores
+                  </h3>
+                  <p className="text-ios-footnote text-ios-gray-5">
+                    Auto-rotating assignments
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -43,8 +47,12 @@ export default function Landing() {
                   <span className="text-white text-ios-body">$</span>
                 </div>
                 <div>
-                  <h3 className="text-ios-headline font-semibold text-black">Easy Expenses</h3>
-                  <p className="text-ios-footnote text-ios-gray-5">Split bills instantly</p>
+                  <h3 className="text-ios-headline font-semibold text-black">
+                    Easy Expenses
+                  </h3>
+                  <p className="text-ios-footnote text-ios-gray-5">
+                    Split bills instantly
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -57,8 +65,12 @@ export default function Landing() {
                   <span className="text-white text-ios-body">💬</span>
                 </div>
                 <div>
-                  <h3 className="text-ios-headline font-semibold text-black">Stay Connected</h3>
-                  <p className="text-ios-footnote text-ios-gray-5">Real-time group chat</p>
+                  <h3 className="text-ios-headline font-semibold text-black">
+                    Stay Connected
+                  </h3>
+                  <p className="text-ios-footnote text-ios-gray-5">
+                    Real-time group chat
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -67,7 +79,7 @@ export default function Landing() {
 
         <Button
           onClick={handleLogin}
-          className="w-full max-w-sm bg-ios-blue hover:bg-ios-blue/90 text-white py-4 rounded-lg text-ios-body font-medium"
+          className="w-full max-w-sm bg-ios-blue hover:bg-ios-blue/90 text-white py-4 rounded-lg font-medium"
         >
           Get Started
         </Button>
