@@ -243,6 +243,7 @@ export const shoppingItemsRelations = relations(shoppingItems, ({ one }) => ({
 // Insert schemas
 export const insertHouseholdSchema = createInsertSchema(households).omit({
   id: true,
+  inviteCode: true,
   createdAt: true,
   updatedAt: true,
 });
