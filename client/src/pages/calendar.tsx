@@ -246,7 +246,6 @@ export default function Calendar() {
           </div>
         </div>
       </div>
-      
       {/* Calendar Section */}
       <div className="px-6 mb-6">
         <div className="smart-card p-6 animate-fade-in">
@@ -274,7 +273,7 @@ export default function Calendar() {
           {/* Calendar Grid */}
           <div className="space-y-4">
             {/* Day Headers */}
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-2 ml-[6px] mr-[6px]">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
                 <div key={day} className="text-center text-sm font-bold text-gray-500 py-3">
                   {day}
@@ -324,7 +323,6 @@ export default function Calendar() {
           </div>
         </div>
       </div>
-
       {/* Selected Day Events */}
       {selectedDate && (
         <div className="px-6 pb-8 animate-slide-up" key={selectedDate.toDateString()}>
