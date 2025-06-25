@@ -380,13 +380,18 @@ export default function Calendar() {
                         {event.description && (
                           <p className="text-gray-700 mb-3">{event.description}</p>
                         )}
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-start flex-wrap gap-2">
                           <div className="bg-white px-3 py-2 rounded-xl shadow-sm">
                             <span className="text-gray-800 font-semibold text-sm">
                               {new Date(event.startDate).toLocaleTimeString('en-US', {
                                 hour: 'numeric',
                                 minute: '2-digit'
                               })}
+                            </span>
+                          </div>
+                          <div className="bg-gray-100 px-3 py-2 rounded-xl">
+                            <span className="text-gray-700 font-semibold text-sm">
+                              {event.creator?.firstName || 'Unknown'}
                             </span>
                           </div>
                           {event.type && (
@@ -396,11 +401,6 @@ export default function Calendar() {
                               </span>
                             </div>
                           )}
-                          <div className="bg-gray-100 px-3 py-2 rounded-xl">
-                            <span className="text-gray-700 font-semibold text-sm">
-                              {event.creator?.firstName || 'Unknown'}
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </div>
