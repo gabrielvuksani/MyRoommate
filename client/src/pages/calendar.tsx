@@ -214,30 +214,42 @@ export default function Calendar() {
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Event Type</label>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700">Event Type</label>
                     <Select value={newEvent.type} onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}>
-                      <SelectTrigger className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-base font-medium focus:ring-2 focus:ring-accent/20">
-                        <SelectValue />
+                      <SelectTrigger className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500">
+                        <SelectValue placeholder="Choose event type" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border-0 shadow-lg">
-                        <SelectItem value="social">🎉 Social</SelectItem>
-                        <SelectItem value="work">💼 Work</SelectItem>
-                        <SelectItem value="personal">👤 Personal</SelectItem>
-                        <SelectItem value="household">🏠 Household</SelectItem>
+                      <SelectContent className="rounded-xl border-0 shadow-xl">
+                        <SelectItem value="social" className="rounded-lg">🎉 Social</SelectItem>
+                        <SelectItem value="work" className="rounded-lg">💼 Work</SelectItem>
+                        <SelectItem value="personal" className="rounded-lg">👤 Personal</SelectItem>
+                        <SelectItem value="household" className="rounded-lg">🏠 Household</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Color</label>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700">Event Color</label>
                     <div className="flex items-center space-x-3">
                       <input
                         type="color"
                         value={newEvent.color}
                         onChange={(e) => setNewEvent({ ...newEvent, color: e.target.value })}
-                        className="w-16 h-12 bg-gray-50 border-0 rounded-xl cursor-pointer"
+                        className="w-16 h-12 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer"
                       />
-                      <span className="text-gray-600 font-medium">Choose event color</span>
+                      <div className="flex space-x-2">
+                        {['#3B82F6', '#10B981', '#EF4444', '#8B5CF6', '#F59E0B', '#000000'].map((color) => (
+                          <button
+                            key={color}
+                            type="button"
+                            onClick={() => setNewEvent({ ...newEvent, color })}
+                            className={`w-8 h-8 rounded-full border-2 transition-all ${
+                              newEvent.color === color ? 'border-gray-800 scale-110' : 'border-gray-300'
+                            }`}
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>

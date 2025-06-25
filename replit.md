@@ -111,6 +111,12 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Created interactive household performance dashboard with real-time analytics
+- ✓ Added member performance tracking with completion rates and streaks
+- ✓ Implemented key metrics display (chore completion, spending, engagement)
+- ✓ Added dashboard navigation tab to bottom navigation
+- ✓ Fixed calendar event type styling and modal layout consistency
+- ✓ Moved streak leaders to bottom of chores page for better hierarchy
 - ✓ Fixed modal centering and z-index layering issues across all modals
 - ✓ Restored calendar modal functionality with new gradient design
 - ✓ Fixed profile picture consistency using emerald-cyan gradient throughout app
