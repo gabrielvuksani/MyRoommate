@@ -163,7 +163,7 @@ export default function Home() {
             <CardContent className="p-6">
               <button 
                 onClick={() => setLocation('/expenses')}
-                className="w-full text-left hover:shadow-lg transition-all btn-animated animate-slide-in-left"
+                className="w-full text-left transition-all btn-animated animate-slide-in-left"
                 style={{ animationDelay: '300ms' }}
               >
                 <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mb-4">
@@ -180,7 +180,7 @@ export default function Home() {
             <CardContent className="p-6">
               <button 
                 onClick={() => setLocation('/calendar')}
-                className="w-full text-left hover:shadow-lg transition-all btn-animated animate-slide-in-right"
+                className="w-full text-left transition-all btn-animated animate-slide-in-right"
                 style={{ animationDelay: '350ms' }}
               >
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
@@ -197,7 +197,7 @@ export default function Home() {
             <CardContent className="p-6">
               <button 
                 onClick={() => setLocation('/chores')}
-                className="w-full text-left hover:shadow-lg transition-all btn-animated animate-slide-in-left"
+                className="w-full text-left transition-all btn-animated animate-slide-in-left"
                 style={{ animationDelay: '400ms' }}
               >
                 <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mb-4">
@@ -214,7 +214,7 @@ export default function Home() {
             <CardContent className="p-6">
               <button 
                 onClick={() => setLocation('/messages')}
-                className="w-full text-left hover:shadow-lg transition-all btn-animated animate-slide-in-right"
+                className="w-full text-left transition-all btn-animated animate-slide-in-right"
                 style={{ animationDelay: '450ms' }}
               >
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mb-4">

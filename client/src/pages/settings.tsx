@@ -53,7 +53,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="page-container">
+    <div className="page-container page-enter">
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center space-x-4">
