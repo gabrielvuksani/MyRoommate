@@ -97,10 +97,10 @@ export default function Home() {
             </div>
             <button 
               onClick={() => setLocation('/profile')}
-              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md flex items-center justify-center shadow-lg btn-animated"
+              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated"
             >
               <span className="text-white font-bold text-lg">
-                {firstName[0]?.toUpperCase() || '?'}
+                {firstName[0]?.toUpperCase() || '+'}
               </span>
             </button>
           </div>
