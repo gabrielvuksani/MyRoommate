@@ -111,6 +111,9 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Redesigned dropdown components with visionOS glass morphism aesthetics
+- ✓ Added backdrop blur, rounded corners, and smooth animations to Select components
+- ✓ Enhanced dropdown triggers with hover states and rotation animations
 - ✓ Fixed dropdown functionality inside all modals by adjusting z-index layering
 - ✓ Enhanced modal positioning and spacing across all dialogs
 - ✓ Fixed modal centering and z-index layering issues across all modals
