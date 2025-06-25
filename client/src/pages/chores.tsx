@@ -9,18 +9,19 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 
 import ChoreBoard from "@/components/chore-board";
-import StreakWidget from "@/components/streak-widget";
 import { Plus } from "lucide-react";
 
 export default function Chores() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [activeTab, setActiveTab] = useState<"all" | "todo" | "doing" | "done">("all");
   const [newChore, setNewChore] = useState({
     title: '',
     description: '',
     assignedTo: '',
     dueDate: '',
     recurrence: '',
+    priority: 'medium',
   });
   
   const queryClient = useQueryClient();
@@ -59,6 +60,7 @@ export default function Chores() {
         assignedTo: '',
         dueDate: '',
         recurrence: '',
+        priority: 'medium',
       });
     },
     onError: (error) => {
@@ -95,6 +97,15 @@ export default function Chores() {
   const handleUpdateChore = (id: string, updates: any) => {
     updateChoreMutation.mutate({ id, updates });
   };
+
+  // Filter chores based on active tab
+  const filteredChores = chores.filter((chore: any) => {
+    if (activeTab === "all") return true;
+    if (activeTab === "todo") return chore.status === "todo" || !chore.status;
+    if (activeTab === "doing") return chore.status === "doing";
+    if (activeTab === "done") return chore.status === "done";
+    return true;
+  });
 
   if (isLoading) {
     return (
@@ -168,6 +179,18 @@ export default function Chores() {
                       <SelectItem value="monthly">Monthly</SelectItem>
                     </SelectContent>
                   </Select>
+                  
+                  <Select value={newChore.priority} onValueChange={(value) => setNewChore({ ...newChore, priority: value })}>
+                    <SelectTrigger className="input-modern">
+                      <SelectValue placeholder="Priority..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low Priority</SelectItem>
+                      <SelectItem value="medium">Medium Priority</SelectItem>
+                      <SelectItem value="high">High Priority</SelectItem>
+                      <SelectItem value="urgent">Urgent</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <button
                     onClick={handleCreateChore}
                     disabled={!canCreateChore || createChoreMutation.isPending}
@@ -183,8 +206,34 @@ export default function Chores() {
       </div>
       
       <div className="page-content space-y-6">
-        <ChoreBoard chores={chores} onUpdateChore={handleUpdateChore} />
-        <StreakWidget chores={chores} />
+        {/* Chore Filter Tabs */}
+        <div className="flex space-x-1 p-1 bg-gray-100 rounded-xl">
+          {(["all", "todo", "doing", "done"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === tab
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              {tab === "todo" ? "To Do" : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* Chores Overview */}
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <h2 className="text-headline font-semibold text-primary mb-4">
+              {activeTab === "all" ? "All Chores" : 
+               activeTab === "todo" ? "To Do" : 
+               activeTab === "doing" ? "In Progress" : "Completed"}
+            </h2>
+            <ChoreBoard chores={filteredChores} onUpdateChore={handleUpdateChore} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
