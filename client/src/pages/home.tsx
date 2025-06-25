@@ -94,8 +94,8 @@ export default function Home() {
   });
 
   return (
-    <>
-      {/* Fixed Header */}
+    <div className="page-container page-transition">
+      {/* Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center justify-between gap-3">
@@ -115,9 +115,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Page Content */}
-      <div className="page-container page-transition">
-        <div className="page-content space-y-6">
+      <div className="page-content space-y-6">
         {/* Hero Stats */}
         <div className="grid grid-cols-2 gap-4">
           <Card className="glass-card">
@@ -446,7 +444,11 @@ export default function Home() {
             )}
           </div>
         </div>
+
+        
+
+
       </div>
-    </>
+    </div>
   );
 }
