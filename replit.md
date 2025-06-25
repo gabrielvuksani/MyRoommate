@@ -120,7 +120,8 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Replaced delete button with "Settled" indicator for fully settled expenses
 - ✓ Positioned settlement status in same location as delete button for consistent layout
 - ✓ Fixed settlement status calculation and display formatting in expense cards
-- ✓ Updated priority chore div in chores page to use consistent glass-card design system
+- ✓ Fixed priority chore div in chores page to match exact design patterns used throughout the file
+- ✓ Removed nested Card components and applied proper glass morphism styling
 - ✓ Enhanced bottom navigation transparency (0.25 opacity) to show more background content
 - ✓ Completely redesigned message bubbles with visionOS/iMessage/Airbnb design fusion
 - ✓ Your messages: emerald-cyan gradients with custom tails and glass overlay effects
