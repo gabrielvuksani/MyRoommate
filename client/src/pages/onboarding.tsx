@@ -69,7 +69,7 @@ export default function Onboarding() {
   const firstName = userData.firstName || user?.firstName || user?.email?.split('@')[0] || 'there';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
+    <div className="min-h-screen page-container flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         
         {/* Step 1: Welcome */}
