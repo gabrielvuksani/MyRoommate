@@ -282,7 +282,7 @@ export default function Calendar() {
             </div>
             
             {/* Calendar Days */}
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-2 pl-[6px] pr-[6px] pt-[12px] pb-[12px]">
               {calendarDays.map((day, index) => {
                 if (!day) {
                   return <div key={`empty-${index}`} className="h-12"></div>;
