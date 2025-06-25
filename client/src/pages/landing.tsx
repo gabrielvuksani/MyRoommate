@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, DollarSign, MessageCircle, Home, Users, Calendar, Sparkles } from "lucide-react";
 import { useEffect } from "react";
 
@@ -113,23 +114,25 @@ export default function Landing() {
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
             return (
-              <div
+              <Card
                 key={index}
-                className="glass-card p-8 rounded-3xl hover:scale-[1.02] transition-all duration-200 group"
+                className="glass-card hover:scale-[1.02] transition-all duration-200 group"
                 style={{
                   animationDelay: `${index * 0.1}s`
                 }}
               >
-                <div className={`w-14 h-14 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-200 shadow-lg`}>
-                  <IconComponent size={22} className="text-white" />
-                </div>
-                <h3 className="font-semibold text-[#1a1a1a] text-[18px] mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
+                <CardContent className="p-6">
+                  <div className={`w-12 h-12 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200 shadow-lg`}>
+                    <IconComponent size={20} className="text-white" />
+                  </div>
+                  <h3 className="font-semibold text-[#1a1a1a] text-[18px] mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

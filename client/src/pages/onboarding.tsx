@@ -74,7 +74,8 @@ export default function Onboarding() {
         
         {/* Step 1: Welcome */}
         {step === 1 && (
-          <div className="glass-card p-8 rounded-3xl text-center page-enter">
+          <Card className="glass-card text-center page-enter">
+            <CardContent className="p-6">
             <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
               <Home size={32} className="text-white" />
             </div>
@@ -119,12 +120,14 @@ export default function Onboarding() {
               Get Started
               <ArrowRight size={16} className="ml-2" />
             </Button>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Step 2: Household Setup */}
         {step === 2 && (
-          <div className="glass-card p-8 rounded-3xl page-enter">
+          <Card className="glass-card page-enter">
+            <CardContent className="p-6">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-violet-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-purple-500/25">
                 <Users size={24} className="text-white" />
@@ -214,12 +217,14 @@ export default function Onboarding() {
                 Continue
               </Button>
             </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Step 3: Confirmation */}
         {step === 3 && (
-          <div className="glass-card p-8 rounded-3xl text-center page-enter">
+          <Card className="glass-card text-center page-enter">
+            <CardContent className="p-6">
             <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/25">
               <CheckCircle size={24} className="text-white" />
             </div>
@@ -262,7 +267,8 @@ export default function Onboarding() {
                 )}
               </Button>
             </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Step indicator */}
