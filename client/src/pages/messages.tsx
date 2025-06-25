@@ -90,7 +90,7 @@ export default function Messages() {
     window.scrollTo(0, 0);
     
     const handleScroll = () => {
-      setHeaderScrolled(window.scrollY > 20);
+      setHeaderScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);

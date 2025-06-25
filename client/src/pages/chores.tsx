@@ -200,7 +200,7 @@ export default function Chores() {
           </div>
         </div>
       </div>
-      <div className="page-content space-y-6 pt-36">
+      <div className="page-content space-y-6 pt-32">
         {/* Today's Focus */}
         {Array.isArray(chores) && chores.length > 0 && (
           <Card className="glass-card border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">

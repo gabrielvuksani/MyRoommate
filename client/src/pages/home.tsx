@@ -35,7 +35,7 @@ export default function Home() {
     window.scrollTo(0, 0);
     
     const handleScroll = () => {
-      setHeaderScrolled(window.scrollY > 20);
+      setHeaderScrolled(window.scrollY > 10);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -115,7 +115,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="page-content space-y-6 pt-36">
+      <div className="page-content space-y-6 pt-32">
         {/* Hero Stats */}
         <div className="grid grid-cols-2 gap-4">
           <Card className="glass-card">

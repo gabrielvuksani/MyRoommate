@@ -121,25 +121,29 @@
 
 /* visionOS Header System */
 .floating-header {
-  background: transparent;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  padding-top: env(safe-area-inset-top);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   border-bottom: 1px solid transparent;
-  max-width: 430px;
-  margin: 0 auto;
+  padding-top: env(safe-area-inset-top);
 }
 
 .floating-header.scrolled {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.08);
+}
+
+.floating-header .page-header {
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 24px 24px 16px 24px;
 }
 
 /* Apple Typography */
@@ -507,6 +511,38 @@
 
 .page-content {
   padding: 140px var(--spacing-lg) 0;
+}
+
+/* Floating Header System */
+.floating-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(247, 248, 250, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-bottom: 1px solid transparent;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.floating-header.scrolled {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.floating-header .header-content {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80px;
 }
 
 /* Premium visionOS Cards */

@@ -70,7 +70,7 @@ export default function Settings() {
         </div>
       </div>
       
-      <div className="page-content space-y-6 pt-36">
+      <div className="page-content space-y-6 pt-32">
         {/* Household Info */}
         <div className="smart-card p-6 animate-fade-in">
             <div className="flex items-center space-x-3 mb-4">
