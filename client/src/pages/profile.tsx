@@ -2,7 +2,13 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, ArrowLeft, Edit3, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +21,7 @@ export default function Profile() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editName, setEditName] = useState({ firstName: '', lastName: '' });
+  const [editName, setEditName] = useState({ firstName: "", lastName: "" });
   const [headerScrolled, setHeaderScrolled] = useState(false);
 
   const { data: household } = useQuery({
@@ -27,8 +33,8 @@ export default function Profile() {
       setHeaderScrolled(window.scrollY > 20);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const updateNameMutation = useMutation({
@@ -73,7 +79,7 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="page-container">
+      <div className="page-container page-transition">
         <div className="floating-header">
           <div className="page-header">
             <h1 className="page-title">Profile & Settings</h1>
@@ -86,23 +92,25 @@ export default function Profile() {
 
   return (
     <div className="page-container page-enter">
-      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
+      <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
         <div className="page-header">
           <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => setLocation('/')}
+            <button
+              onClick={() => setLocation("/")}
               className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all"
             >
               <ArrowLeft size={18} />
             </button>
             <div>
               <h1 className="page-title">Profile & Settings</h1>
-              <p className="page-subtitle">Manage your account & app settings</p>
+              <p className="page-subtitle">
+                Manage your account & app settings
+              </p>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div className="page-content space-y-6">
         {/* Profile Header */}
         <Card className="smart-card">
@@ -111,29 +119,28 @@ export default function Profile() {
               <div className="flex items-center space-x-4">
                 <div className="w-20 h-20 bg-primary/10 rounded-md flex items-center justify-center">
                   <span className="text-primary text-2xl font-bold">
-                    {user.firstName?.[0] || user.email?.[0] || '?'}
+                    {user.firstName?.[0] || user.email?.[0] || "?"}
                   </span>
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">
-                    {user.firstName && user.lastName ? 
-                      `${user.firstName} ${user.lastName}` : 
-                      user.firstName || 
-                      user.email?.split('@')[0] || 
-                      'Unknown User'
-                    }
+                    {user.firstName && user.lastName
+                      ? `${user.firstName} ${user.lastName}`
+                      : user.firstName ||
+                        user.email?.split("@")[0] ||
+                        "Unknown User"}
                   </h2>
                   <p className="text-gray-600">{user.email}</p>
                 </div>
               </div>
-              
+
               <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogTrigger asChild>
                   <Button
                     onClick={() => {
                       setEditName({
-                        firstName: user.firstName || '',
-                        lastName: user.lastName || '',
+                        firstName: user.firstName || "",
+                        lastName: user.lastName || "",
                       });
                     }}
                     className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all p-0"
@@ -143,27 +150,38 @@ export default function Profile() {
                 </DialogTrigger>
                 <DialogContent className="modal-content">
                   <DialogHeader className="px-6 pt-6 pb-2">
-                    <DialogTitle className="text-xl font-bold text-gray-900">Edit Name</DialogTitle>
+                    <DialogTitle className="text-xl font-bold text-gray-900">
+                      Edit Name
+                    </DialogTitle>
                   </DialogHeader>
                   <div className="px-6 pb-6 space-y-4">
                     <Input
                       placeholder="First name"
                       value={editName.firstName}
-                      onChange={(e) => setEditName({ ...editName, firstName: e.target.value })}
+                      onChange={(e) =>
+                        setEditName({ ...editName, firstName: e.target.value })
+                      }
                       className="w-full p-4 border border-gray-200 rounded-xl"
                     />
                     <Input
                       placeholder="Last name"
                       value={editName.lastName}
-                      onChange={(e) => setEditName({ ...editName, lastName: e.target.value })}
+                      onChange={(e) =>
+                        setEditName({ ...editName, lastName: e.target.value })
+                      }
                       className="w-full p-4 border border-gray-200 rounded-xl"
                     />
-                    <Button 
+                    <Button
                       onClick={handleUpdateName}
-                      disabled={!editName.firstName.trim() || updateNameMutation.isPending}
+                      disabled={
+                        !editName.firstName.trim() ||
+                        updateNameMutation.isPending
+                      }
                       className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
                     >
-                      {updateNameMutation.isPending ? "Saving..." : "Save Changes"}
+                      {updateNameMutation.isPending
+                        ? "Saving..."
+                        : "Save Changes"}
                     </Button>
                   </div>
                 </DialogContent>
@@ -175,11 +193,15 @@ export default function Profile() {
         {/* Account Details */}
         <Card className="smart-card">
           <CardContent className="p-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Account details</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              Account details
+            </h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center py-3 border-b border-gray-200">
                 <span className="text-gray-600">User ID</span>
-                <span className="text-gray-900 font-mono text-sm">{user.id}</span>
+                <span className="text-gray-900 font-mono text-sm">
+                  {user.id}
+                </span>
               </div>
               <div className="flex justify-between items-center py-3">
                 <span className="text-gray-600">Member since</span>
@@ -191,22 +213,26 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-
-
         {/* Household Information */}
         {household && (
           <Card className="smart-card">
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Household Information</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Household Information
+              </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
                   <span className="text-gray-600">Name</span>
-                  <span className="text-gray-900 font-semibold">{household.name}</span>
+                  <span className="text-gray-900 font-semibold">
+                    {household.name}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
                   <span className="text-gray-600">Invite Code</span>
                   <div className="flex items-center space-x-3">
-                    <span className="text-gray-900 font-mono text-sm bg-gray-100 px-2 py-1 rounded">{household.inviteCode}</span>
+                    <span className="text-gray-900 font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                      {household.inviteCode}
+                    </span>
                     <button
                       onClick={copyInviteCode}
                       className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg btn-animated"
@@ -217,48 +243,62 @@ export default function Profile() {
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
                   <span className="text-gray-600">Members</span>
-                  <span className="text-gray-900">{household.members?.length || 0}</span>
+                  <span className="text-gray-900">
+                    {household.members?.length || 0}
+                  </span>
                 </div>
                 {household.rentAmount && (
                   <div className="flex justify-between items-center py-3 border-b border-gray-200">
                     <span className="text-gray-600">Monthly Rent</span>
-                    <span className="text-gray-900">${household.rentAmount}</span>
+                    <span className="text-gray-900">
+                      ${household.rentAmount}
+                    </span>
                   </div>
                 )}
                 {household.rentDueDay && (
                   <div className="flex justify-between items-center py-3">
                     <span className="text-gray-600">Rent Due Day</span>
-                    <span className="text-gray-900">{household.rentDueDay}</span>
+                    <span className="text-gray-900">
+                      {household.rentDueDay}
+                    </span>
                   </div>
                 )}
               </div>
             </CardContent>
           </Card>
         )}
-        
+
         {/* Household Members */}
         {household?.members && (
           <Card className="smart-card">
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Household Members</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Household Members
+              </h3>
               <div className="space-y-3">
                 {household.members.map((member: any) => (
-                  <div key={member.id} className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0"
+                  >
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                         <span className="text-primary font-semibold text-sm">
-                          {member.user.firstName?.[0] || member.user.email?.[0] || '?'}
+                          {member.user.firstName?.[0] ||
+                            member.user.email?.[0] ||
+                            "?"}
                         </span>
                       </div>
                       <div>
                         <p className="text-gray-900 font-medium">
-                          {member.user.firstName && member.user.lastName 
+                          {member.user.firstName && member.user.lastName
                             ? `${member.user.firstName} ${member.user.lastName}`
-                            : member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'
-                          }
+                            : member.user.firstName ||
+                              member.user.email?.split("@")[0] ||
+                              "Unknown"}
                         </p>
                         <p className="text-sm text-gray-600">
-                          {member.role === 'admin' ? 'Administrator' : 'Member'}
+                          {member.role === "admin" ? "Administrator" : "Member"}
                         </p>
                       </div>
                     </div>
@@ -277,7 +317,7 @@ export default function Profile() {
         {/* Sign Out */}
         <Card className="smart-card">
           <CardContent className="p-6">
-            <Button 
+            <Button
               onClick={logout}
               className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700"
             >

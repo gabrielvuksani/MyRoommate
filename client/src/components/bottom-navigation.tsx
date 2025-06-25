@@ -14,7 +14,7 @@ export default function BottomNavigation() {
 
   return (
     <nav className="tab-navigation">
-      <div className="flex items-center justify-center w-full max-w-sm">
+      <div className="flex items-center justify-center w-full">
         {tabs.map(({ id, path, label, Icon }) => {
           const isActive = location === path;
           
@@ -22,7 +22,7 @@ export default function BottomNavigation() {
             <button
               key={id}
               onClick={() => setLocation(path)}
-              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 nav-transition px-1 ${
+              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 nav-transition ${
                 isActive ? 'active animate-scale-in' : 'inactive'
               }`}
             >
