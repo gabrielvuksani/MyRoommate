@@ -4,13 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ExpenseCard from "@/components/expense-card";
+import { Plus } from "lucide-react";
 
 export default function Expenses() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [headerScrolled, setHeaderScrolled] = useState(false);
   const [newExpense, setNewExpense] = useState({
     title: '',
     amount: '',
@@ -20,6 +22,14 @@ export default function Expenses() {
   
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -94,12 +104,13 @@ export default function Expenses() {
 
   return (
     <div className="page-container">
-      <div className="floating-header">
-        <div className="px-6 py-4">
+      {/* visionOS Header */}
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
+        <div className="page-header">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-large-title font-bold text-primary">Expenses</h1>
-              <p className="text-subhead text-secondary mt-1">Track and split costs easily</p>
+              <h1 className="page-title">Expenses</h1>
+              <p className="page-subtitle">Split bills and track balances</p>
             </div>
             
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>

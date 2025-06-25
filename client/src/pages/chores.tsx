@@ -5,13 +5,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ChoreBoard from "@/components/chore-board";
+import { Plus } from "lucide-react";
 
 export default function Chores() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [headerScrolled, setHeaderScrolled] = useState(false);
   const [newChore, setNewChore] = useState({
     title: '',
     description: '',
@@ -22,6 +24,14 @@ export default function Chores() {
   
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -98,12 +108,13 @@ export default function Chores() {
 
   return (
     <div className="page-container">
-      <div className="floating-header">
-        <div className="px-6 py-4">
+      {/* visionOS Header */}
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
+        <div className="page-header">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-large-title font-bold text-primary">Chores</h1>
-              <p className="text-subhead text-secondary mt-1">Keep the house running smoothly</p>
+              <h1 className="page-title">Chores</h1>
+              <p className="page-subtitle">Manage household tasks</p>
             </div>
             
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>

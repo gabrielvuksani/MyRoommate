@@ -8,6 +8,7 @@ import MessageBubble from "@/components/message-bubble";
 
 export default function Messages() {
   const [newMessage, setNewMessage] = useState('');
+  const [headerScrolled, setHeaderScrolled] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -37,6 +38,14 @@ export default function Messages() {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !household || !user) return;
@@ -60,13 +69,16 @@ export default function Messages() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 flex flex-col">
-      <div className="floating-header border-b border-default">
-        <div className="px-6 py-4">
-          <h1 className="text-large-title font-bold text-primary">House Chat</h1>
-          <p className="text-subhead text-secondary mt-1">
-            {household?.members?.map((m: any) => m.user.firstName || m.user.email?.split('@')[0]).join(', ')}
-          </p>
+    <div className="page-container">
+      {/* visionOS Header */}
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
+        <div className="page-header">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="page-title">Messages</h1>
+              <p className="page-subtitle">Chat with your household</p>
+            </div>
+          </div>
         </div>
       </div>
 
