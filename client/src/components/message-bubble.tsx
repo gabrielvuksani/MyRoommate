@@ -10,9 +10,9 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
 
   if (isSystemMessage) {
     return (
-      <div className="flex justify-center">
-        <div className="bg-ios-gray-4 rounded-full px-3 py-1">
-          <p className="text-ios-caption text-ios-gray-6">{message.content}</p>
+      <div className="flex justify-center mb-4">
+        <div className="glass-card px-4 py-2 rounded-full">
+          <p className="text-xs text-gray-600 font-medium">{message.content}</p>
         </div>
       </div>
     );
@@ -22,27 +22,27 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
     const userName = message.user?.firstName || message.user?.email?.split('@')[0] || 'You';
     
     return (
-      <div className="flex justify-end">
-        <div className="flex flex-col items-end">
-          <div className="flex items-center space-x-2 mb-1 px-1">
-            <span className="text-xs text-gray-400">
+      <div className="flex justify-end mb-4 animate-fade-in">
+        <div className="flex flex-col items-end max-w-sm">
+          <div className="flex items-center space-x-3 mb-2">
+            <span className="text-xs text-gray-400 font-medium">
               {new Date(message.createdAt).toLocaleTimeString('en-US', { 
                 hour: 'numeric', 
                 minute: '2-digit',
                 hour12: true 
               })}
             </span>
-            <span className="text-xs text-gray-500 font-medium">
+            <span className="text-xs text-gray-600 font-semibold">
               {userName}
             </span>
-            <div className="w-6 h-6 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs font-medium">
+            <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center shadow-md">
+              <span className="text-white text-sm font-semibold">
                 {message.user?.firstName?.[0] || message.user?.email?.[0] || 'Y'}
               </span>
             </div>
           </div>
-          <div className={`bg-ios-blue rounded-2xl rounded-tr-md px-4 py-3 max-w-xs ${isPending ? 'opacity-70' : ''}`}>
-            <p className="text-ios-body text-white">{message.content}</p>
+          <div className={`bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl rounded-tr-lg px-5 py-3 shadow-lg ${isPending ? 'opacity-70' : ''}`}>
+            <p className="text-white font-medium leading-relaxed">{message.content}</p>
           </div>
         </div>
       </div>
@@ -53,16 +53,16 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
   const userName = message.user?.firstName || message.user?.email?.split('@')[0] || 'Unknown';
 
   return (
-    <div className="flex justify-start">
-      <div className="flex flex-col items-start">
-        <div className="flex items-center space-x-2 mb-1 px-1">
-          <div className="w-6 h-6 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs font-medium">{userInitial}</span>
+    <div className="flex justify-start mb-4 animate-fade-in">
+      <div className="flex flex-col items-start max-w-sm">
+        <div className="flex items-center space-x-3 mb-2">
+          <div className="w-8 h-8 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center shadow-md">
+            <span className="text-white text-sm font-semibold">{userInitial}</span>
           </div>
-          <span className="text-xs text-gray-500 font-medium">
+          <span className="text-xs text-gray-600 font-semibold">
             {userName}
           </span>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-400 font-medium">
             {new Date(message.createdAt).toLocaleTimeString('en-US', { 
               hour: 'numeric', 
               minute: '2-digit',
@@ -70,8 +70,8 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
             })}
           </span>
         </div>
-        <div className="bg-gray-100 rounded-2xl rounded-tl-md px-4 py-3 max-w-xs">
-          <p className="text-sm text-black">{message.content}</p>
+        <div className="glass-card rounded-3xl rounded-tl-lg px-5 py-3 shadow-lg">
+          <p className="text-gray-900 font-medium leading-relaxed">{message.content}</p>
         </div>
       </div>
     </div>

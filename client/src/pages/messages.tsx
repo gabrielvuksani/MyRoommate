@@ -257,37 +257,37 @@ export default function Messages() {
       </div>
 
       {/* Messages Container */}
-      <div className="page-content pb-[85px]">
-        <div className="h-[calc(100vh-185px)] overflow-y-auto">
-          <div className="space-y-2 h-full flex flex-col">
+      <div className="pt-32 pb-32 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="min-h-[60vh] flex flex-col">
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center flex-1 space-y-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mb-4 mx-auto">
-                    <MessageCircle size={24} className="text-white" />
+              <div className="flex-1 flex flex-col items-center justify-center space-y-8 py-12">
+                <div className="text-center animate-fade-in">
+                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center mb-6 mx-auto shadow-lg">
+                    <MessageCircle size={28} className="text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
                     No messages yet
                   </h3>
-                  <p className="text-gray-600 text-center mb-6">
-                    Start the conversation with your roommates!
+                  <p className="text-gray-600 text-center max-w-sm mx-auto">
+                    Start the conversation with your roommates and keep everyone connected!
                   </p>
                 </div>
                 
                 {/* Quick Message Starters */}
-                <div className="w-full max-w-sm space-y-3">
-                  <p className="text-sm font-medium text-gray-700 text-center mb-3">Quick conversation starters:</p>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="w-full max-w-lg space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                  <p className="text-sm font-semibold text-gray-800 text-center">Quick conversation starters:</p>
+                  <div className="grid grid-cols-2 gap-4">
                     {quickMessages.map((quick, index) => {
                       const IconComponent = quick.icon;
                       return (
                         <button
                           key={index}
                           onClick={() => handleQuickMessage(quick.text)}
-                          className="p-3 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md group"
+                          className="glass-card p-4 hover:scale-[1.02] transition-all duration-200 group"
                         >
-                          <div className={`w-8 h-8 bg-gradient-to-br ${quick.color} rounded-xl flex items-center justify-center mb-2 mx-auto group-hover:scale-110 transition-transform duration-200`}>
-                            <IconComponent size={16} className="text-white" />
+                          <div className={`w-10 h-10 bg-gradient-to-br ${quick.color} rounded-2xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform duration-200 shadow-md`}>
+                            <IconComponent size={18} className="text-white" />
                           </div>
                           <p className="text-xs text-gray-700 font-medium text-center leading-tight">
                             {quick.text}
@@ -299,39 +299,35 @@ export default function Messages() {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col">
-                <div className="flex-1">
-                  {messages.map((message: any) => (
-                    <MessageBubble
-                      key={message.id}
-                      message={message}
-                      currentUserId={user?.id}
-                    />
-                  ))}
-                  
-                  {/* Typing Indicator */}
-                  {typingUsers.length > 0 && (
-                    <div className="flex justify-start">
-                      <div className="flex flex-col items-start">
-                        <div className="bg-gray-100 rounded-2xl rounded-tl-md px-4 py-3">
-                          <div className="flex items-center space-x-1">
-                            <span className="text-sm text-gray-600">
-                              {typingUsers.length === 1 
-                                ? `${typingUsers[0]} is typing`
-                                : `${typingUsers.slice(0, -1).join(', ')} and ${typingUsers[typingUsers.length - 1]} are typing`
-                              }
-                            </span>
-                            <div className="flex space-x-1 ml-2">
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                            </div>
-                          </div>
+              <div className="flex-1 space-y-4">
+                {messages.map((message: any) => (
+                  <MessageBubble
+                    key={message.id}
+                    message={message}
+                    currentUserId={user?.id}
+                  />
+                ))}
+                
+                {/* Typing Indicator */}
+                {typingUsers.length > 0 && (
+                  <div className="flex justify-start animate-fade-in">
+                    <div className="glass-card px-4 py-3 rounded-2xl rounded-tl-md max-w-xs">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-600 font-medium">
+                          {typingUsers.length === 1 
+                            ? `${typingUsers[0]} is typing`
+                            : `${typingUsers.slice(0, -1).join(', ')} and ${typingUsers[typingUsers.length - 1]} are typing`
+                          }
+                        </span>
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
             )}
@@ -339,29 +335,33 @@ export default function Messages() {
         </div>
       </div>
 
-      {/* Message Input - Fixed at bottom */}
-      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 px-4 py-3 z-40">
-        <form
-          onSubmit={handleSendMessage}
-          className="flex items-center space-x-3"
-        >
-          <div className="flex-1 bg-gray-100 rounded-full px-4 py-2">
-            <Input
-              type="text"
-              placeholder="Type a message..."
-              value={newMessage}
-              onChange={(e) => handleTyping(e.target.value)}
-              className="w-full bg-transparent border-none text-sm text-black placeholder-gray-500 focus:outline-none focus:ring-0"
-            />
+      {/* Message Input - Fixed at bottom with visionOS styling */}
+      <div className="fixed bottom-[88px] left-0 right-0 z-40 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="glass-card p-4 rounded-3xl shadow-lg border border-white/20">
+            <form
+              onSubmit={handleSendMessage}
+              className="flex items-center space-x-3"
+            >
+              <div className="flex-1 bg-gray-100/80 rounded-full px-4 py-3 backdrop-blur-sm">
+                <Input
+                  type="text"
+                  placeholder="Type a message..."
+                  value={newMessage}
+                  onChange={(e) => handleTyping(e.target.value)}
+                  className="w-full bg-transparent border-none text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 p-0"
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={!newMessage.trim()}
+                className="w-11 h-11 bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 rounded-full flex items-center justify-center p-0 shadow-lg transition-all duration-200 disabled:opacity-50"
+              >
+                <span className="text-white text-lg font-medium">→</span>
+              </Button>
+            </form>
           </div>
-          <Button
-            type="submit"
-            disabled={!newMessage.trim()}
-            className="w-10 h-10 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center p-0"
-          >
-            <span className="text-white text-lg">→</span>
-          </Button>
-        </form>
+        </div>
       </div>
     </div>
   );
