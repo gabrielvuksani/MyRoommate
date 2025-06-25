@@ -76,7 +76,8 @@ export default function Chores() {
 
   const updateChoreMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
-      await apiRequest("PATCH", `/api/chores/${id}`, updates);
+      const response = await apiRequest("PATCH", `/api/chores/${id}`, updates);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
