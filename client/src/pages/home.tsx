@@ -14,7 +14,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useLocation, Link } from "wouter";
+import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 
 export default function Home() {
@@ -284,62 +284,59 @@ export default function Home() {
                 {/* Today's Schedule */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Today's Events */}
-                  <Link href="/calendar">
-                    <div className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors cursor-pointer">
-                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
-                        <Calendar className="w-4 h-4 mr-2 text-blue-600" />
-                        Today's Events
-                      </h4>
-                      <div className="space-y-2">
-                        {(() => {
-                          const today = new Date();
-                          const todayEvents = calendarEvents
-                            .filter((event: any) => {
-                              const eventDate = new Date(event.startDate);
-                              return (
-                                eventDate.toDateString() === today.toDateString()
-                              );
-                            })
-                            .slice(0, 3);
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                      <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                      Today's Events
+                    </h4>
+                    <div className="space-y-2">
+                      {(() => {
+                        const today = new Date();
+                        const todayEvents = calendarEvents
+                          .filter((event: any) => {
+                            const eventDate = new Date(event.startDate);
+                            return (
+                              eventDate.toDateString() === today.toDateString()
+                            );
+                          })
+                          .slice(0, 3);
 
-                          return todayEvents.length > 0 ? (
-                            todayEvents.map((event: any) => (
+                        return todayEvents.length > 0 ? (
+                          todayEvents.map((event: any) => (
+                            <div
+                              key={event.id}
+                              className="flex items-center space-x-3"
+                            >
                               <div
-                                key={event.id}
-                                className="flex items-center space-x-3"
-                              >
-                                <div
-                                  className="w-3 h-3 rounded-full"
-                                  style={{
-                                    backgroundColor: event.color || "#3B82F6",
-                                  }}
-                                ></div>
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium text-gray-900">
-                                    {event.title}
-                                  </p>
-                                  <p className="text-xs text-gray-600">
-                                    {new Date(event.startDate).toLocaleTimeString(
-                                      [],
-                                      { hour: "2-digit", minute: "2-digit" },
-                                    )}
-                                  </p>
-                                </div>
+                                className="w-3 h-3 rounded-full"
+                                style={{
+                                  backgroundColor: event.color || "#3B82F6",
+                                }}
+                              ></div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {event.title}
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  {new Date(event.startDate).toLocaleTimeString(
+                                    [],
+                                    { hour: "2-digit", minute: "2-digit" },
+                                  )}
+                                </p>
                               </div>
-                            ))
-                          ) : (
-                            <p className="text-sm text-gray-600">
-                              No events scheduled
-                            </p>
-                          );
-                        })()}
-                      </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-600">
+                            No events scheduled
+                          </p>
+                        );
+                      })()}
                     </div>
-                  </Link>
+                  </div>
 
                   {/* Priority Chores */}
-                  <Link href="/chores">
-                    <div className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors cursor-pointer">
+                  <div className="bg-gray-50 rounded-xl p-4">
                     <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
                       <CheckSquare className="w-4 h-4 mr-2 text-emerald-600" />
                       Priority Chores
@@ -386,8 +383,7 @@ export default function Home() {
                         );
                       })()}
                     </div>
-                    </div>
-                  </Link>
+                  </div>
                 </div>
               </div>
             </CardContent>
