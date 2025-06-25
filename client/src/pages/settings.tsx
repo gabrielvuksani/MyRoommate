@@ -5,15 +5,26 @@ import { useAuth } from "@/hooks/useAuth";
 import { Copy, LogOut, Users, Home, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { useState, useEffect } from "react";
 
 export default function Settings() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const [headerScrolled, setHeaderScrolled] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
   });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleCopyInviteCode = () => {
     if (household?.inviteCode) {
@@ -43,7 +54,7 @@ export default function Settings() {
 
   return (
     <div className="page-container">
-      <div className="floating-header">
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center space-x-4">
             <button 

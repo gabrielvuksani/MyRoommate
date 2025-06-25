@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { LogOut, ArrowLeft, Edit3, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Profile() {
@@ -16,15 +16,20 @@ export default function Profile() {
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState({ firstName: '', lastName: '' });
-  const [settings, setSettings] = useState({
-    notifications: true,
-    darkMode: false,
-    accentColor: 'blue'
-  });
+  const [headerScrolled, setHeaderScrolled] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
   });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const updateNameMutation = useMutation({
     mutationFn: async (data: { firstName: string; lastName: string }) => {
@@ -66,30 +71,6 @@ export default function Profile() {
     }
   };
 
-  const toggleNotifications = () => {
-    setSettings(prev => ({ ...prev, notifications: !prev.notifications }));
-    toast({
-      title: settings.notifications ? "Notifications disabled" : "Notifications enabled",
-      description: settings.notifications ? "You won't receive push notifications" : "You'll receive push notifications for updates",
-    });
-  };
-
-  const toggleDarkMode = () => {
-    setSettings(prev => ({ ...prev, darkMode: !prev.darkMode }));
-    toast({
-      title: settings.darkMode ? "Light mode enabled" : "Dark mode enabled",
-      description: "Theme preference saved",
-    });
-  };
-
-  const changeAccentColor = (color: string) => {
-    setSettings(prev => ({ ...prev, accentColor: color }));
-    toast({
-      title: "Accent color updated",
-      description: `Changed to ${color}`,
-    });
-  };
-
   if (!user) {
     return (
       <div className="page-container">
@@ -105,7 +86,7 @@ export default function Profile() {
 
   return (
     <div className="page-container">
-      <div className="floating-header">
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center space-x-4">
             <button 
