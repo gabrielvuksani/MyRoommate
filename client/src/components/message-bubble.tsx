@@ -6,6 +6,7 @@ interface MessageBubbleProps {
 export default function MessageBubble({ message, currentUserId }: MessageBubbleProps) {
   const isOwnMessage = message.userId === currentUserId;
   const isSystemMessage = message.type === 'system';
+  const isPending = message.id?.startsWith('temp-');
 
   if (isSystemMessage) {
     return (
@@ -40,7 +41,7 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
               </span>
             </div>
           </div>
-          <div className="bg-ios-blue rounded-2xl rounded-tr-md px-4 py-3 max-w-xs">
+          <div className={`bg-ios-blue rounded-2xl rounded-tr-md px-4 py-3 max-w-xs ${isPending ? 'opacity-70' : ''}`}>
             <p className="text-ios-body text-white">{message.content}</p>
           </div>
         </div>

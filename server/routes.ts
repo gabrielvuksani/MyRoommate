@@ -408,6 +408,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           householdId = message.householdId;
           clientsById.set(userId, ws);
           
+          // Store client metadata for targeted broadcasting
+          (ws as any)._userId = userId;
+          (ws as any)._householdId = householdId;
+          
+          // Add to household client set for fast broadcasting
+          if (!householdClients.has(householdId)) {
+            householdClients.set(householdId, new Set());
+          }
+          householdClients.get(householdId)?.add(ws);
+          
           // Cache user data for fast message creation
           if (!userCache.has(userId)) {
             const user = await storage.getUser(userId);
@@ -509,17 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
-        // Store client metadata for targeted broadcasting
-        if (userId && householdId) {
-          (ws as any)._userId = userId;
-          (ws as any)._householdId = householdId;
-          
-          // Add to household client set for fast broadcasting
-          if (!householdClients.has(householdId)) {
-            householdClients.set(householdId, new Set());
-          }
-          householdClients.get(householdId)?.add(ws);
-        }
+
         
       } catch (error) {
         console.error('WebSocket message error:', error);

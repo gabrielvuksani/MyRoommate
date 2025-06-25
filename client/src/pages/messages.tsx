@@ -32,10 +32,19 @@ export default function Messages() {
         // Immediately update the messages in the cache for real-time display
         queryClient.setQueryData(["/api/messages"], (old: any) => {
           const messages = old || [];
-          // Check if message already exists to prevent duplicates
-          const exists = messages.some((msg: any) => msg.id === data.message.id);
-          if (!exists) {
-            return [...messages, data.message];
+          // Replace temp optimistic message with real one, or add if not exists
+          const tempIndex = messages.findIndex((msg: any) => msg.id.startsWith('temp-') && msg.content === data.message.content && msg.userId === data.message.userId);
+          if (tempIndex !== -1) {
+            // Replace temp message with real one
+            const newMessages = [...messages];
+            newMessages[tempIndex] = data.message;
+            return newMessages;
+          } else {
+            // Check if real message already exists to prevent duplicates
+            const exists = messages.some((msg: any) => msg.id === data.message.id);
+            if (!exists) {
+              return [...messages, data.message];
+            }
           }
           return messages;
         });
