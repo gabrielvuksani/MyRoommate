@@ -83,35 +83,42 @@ export default function Messages() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col max-w-md mx-auto">
-      {/* Header */}
-      <div className="bg-white px-6 pt-16 pb-4 border-b border-gray-100 flex-shrink-0">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-          <p className="text-sm text-gray-600">Chat with your household</p>
+    <div className="page-container page-enter">
+      {/* visionOS Header */}
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
+        <div className="page-header">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="page-title">Messages</h1>
+              <p className="page-subtitle">Chat with your household</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Messages Area - Takes remaining space */}
-      <div className="flex-1 px-6 py-4 space-y-2 overflow-y-auto">
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full py-12">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mb-4">
-              <MessageCircle size={24} className="text-white" />
+      {/* Content with top padding for fixed header */}
+      <div className="pt-24 pb-32">
+        {/* Messages Area */}
+        <div className="px-6 py-4 space-y-2 min-h-screen">
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-64">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mb-4">
+                <MessageCircle size={24} className="text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No messages yet</h3>
+              <p className="text-gray-600 text-center">Start the conversation with your roommates!</p>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No messages yet</h3>
-            <p className="text-gray-600 text-center">Start the conversation with your roommates!</p>
-          </div>
-        ) : (
-          messages.map((message: any) => (
-            <MessageBubble key={message.id} message={message} currentUserId={user?.id} />
-          ))
-        )}
-        <div ref={messagesEndRef} />
+          ) : (
+            messages.map((message: any) => (
+              <MessageBubble key={message.id} message={message} currentUserId={user?.id} />
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
-      {/* Message Input - Sticky at bottom */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-3 flex-shrink-0" style={{ marginBottom: '80px' }}>
+      {/* Message Input - Fixed at bottom */}
+      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 px-4 py-3 z-40">
         <form onSubmit={handleSendMessage} className="flex items-center space-x-3">
           <div className="flex-1 bg-gray-100 rounded-full px-4 py-2">
             <Input
