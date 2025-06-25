@@ -302,13 +302,13 @@ export default function Home() {
             onClick={() => setLocation('/chores')}
             style={{ animationDelay: '100ms' }}
           >
-            <div className="p-6 text-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <CheckSquare size={24} className="text-gray-400" />
+            <div className="p-8 text-center">
+              <div className="w-16 h-16 bg-success-light rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <CheckSquare size={28} className="text-success" />
               </div>
-              <h3 className="text-lg font-medium text-gray-600 mb-1">All caught up!</h3>
-              <p className="text-sm text-gray-500 mb-4">No chores due today</p>
-              <button className="bg-primary text-white px-4 py-2 rounded-full text-sm font-medium">
+              <h3 className="text-xl font-semibold text-text-primary mb-2">All caught up!</h3>
+              <p className="text-text-secondary mb-6">No chores due today</p>
+              <button className="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-dark transition-colors">
                 Add chore
               </button>
             </div>

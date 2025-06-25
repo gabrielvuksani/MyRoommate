@@ -119,39 +119,44 @@
   border-color: var(--primary);
 }
 
-/* Unified Header with Scroll Effect */
+/* Smart Scroll Header System */
 .floating-header {
   background: transparent;
   position: sticky;
   top: 0;
   z-index: 50;
   padding-top: env(safe-area-inset-top);
-  transition: background-color 0.2s ease, backdrop-filter 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-bottom: 1px solid transparent;
 }
 
 .floating-header.scrolled {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--glass-strong);
+  backdrop-filter: var(--blur-medium);
+  border-bottom: 1px solid var(--border-secondary);
+  box-shadow: var(--shadow-sm);
 }
 
+/* Airbnb-Style Headers */
 .page-header {
-  padding: 24px 16px 16px 16px;
+  padding: var(--space-6) var(--space-4) var(--space-4) var(--space-4);
 }
 
 .page-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
   line-height: 1.2;
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .page-subtitle {
-  font-size: 17px;
-  color: #6b7280;
-  margin-top: 4px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
   margin-bottom: 0;
+  font-weight: 400;
 }
 
 .header-content {
@@ -444,14 +449,19 @@
 .animate-fade-in { animation: fadeIn 0.3s ease-out; }
 .animate-pulse { animation: pulse 2s infinite; }
 
-/* Apple Mobile Layout */
+/* Minimalist Mobile Layout */
 .page-container {
   min-height: 100vh;
   background: var(--background);
   padding-bottom: 100px;
   position: relative;
-  max-width: 430px;
+  max-width: 428px;
   margin: 0 auto;
+  overflow-x: hidden;
+}
+
+.page-content {
+  padding: var(--space-4);
 }
 
 .page-header {

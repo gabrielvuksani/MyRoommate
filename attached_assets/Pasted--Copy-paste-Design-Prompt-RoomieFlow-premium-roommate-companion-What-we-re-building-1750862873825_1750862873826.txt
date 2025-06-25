@@ -1,0 +1,58 @@
+**Copy-paste Design Prompt
+(RoomieFlow — premium roommate companion)**
+
+---
+
+### What we’re building
+
+An iOS app that keeps house-sharing smooth: **chores, bills, calendar, chat, grocery list, polls** — all in one place.
+
+### How it should *feel*
+
+Premium • Sophisticated • Effortless • Minimal (never bare)
+Imagine Apple Wallet crossed with Airbnb’s calm spaciousness.
+
+---
+
+### Core design cues (the agent chooses specifics)
+
+| Pillar        | Direction                                                                |
+| ------------- | ------------------------------------------------------------------------ |
+| **Colour**    | Quiet neutrals everywhere; one refined accent for actions & status.      |
+| **Type**      | Clean modern sans; hierarchy via size & weight, not loud colours.        |
+| **Shapes**    | Soft but mature corner radius; consistent across cards, chips, buttons.  |
+| **Depth**     | Feather-light shadows to hint interactivity; no dotted or heavy borders. |
+| **Motion**    | Quick, understated transitions; tiny haptic ticks on success.            |
+| **Copy tone** | Friendly, concise, first-person (“Your next chore is…”).                 |
+
+---
+
+### Screen priorities
+
+| Screen        | Show first                                                                | Then                                  | Main action              |
+| ------------- | ------------------------------------------------------------------------- | ------------------------------------- | ------------------------ |
+| **Home**      | What needs attention today (next chore • unpaid balance • upcoming event) | Friendly greeting • last chat snippet | Tap a card to dive in    |
+| **Chores**    | Today’s tasks carousel                                                    | History streaks                       | “Mark done”              |
+| **Bills**     | Net balance headline                                                      | Itemised list                         | “Add expense” / “Settle” |
+| **Calendar**  | Compact month                                                             | Agenda list                           | “Add event”              |
+| **Chat**      | Household thread                                                          | Reactions, inline images              | Compose                  |
+| **Groceries** | Live checklist                                                            | Purchased archive                     | “Add item”               |
+| **Polls**     | Active polls grid                                                         | Past polls                            | Vote                     |
+
+*For every empty state:* classy line illustration + single accent button (e.g., “Add chore”) — no grey boxes.
+
+---
+
+### Accessibility must-haves
+
+* Thumb-sized tap targets
+* Full Dynamic Type scaling
+* VoiceOver speaks role + status (“Rent due tomorrow, you owe \$550, double-tap to view”)
+
+---
+
+### Self-check mantra
+
+> **“Everything visible has a clear job, nothing more.”**
+
+Hand these guard-rails to the design agent; let it own the detailed palette, icon set, spacing system, and final layouts — as long as the result feels premium, sophisticated, and instantly understandable.
