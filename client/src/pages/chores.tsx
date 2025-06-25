@@ -84,6 +84,19 @@ export default function Chores() {
     },
   });
 
+  const deleteChoreMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest("DELETE", `/api/chores/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
+    },
+    onError: (error) => {
+      console.error('Error deleting chore:', error);
+    },
+  });
+
   const handleCreateChore = () => {
     if (!newChore.title.trim()) return;
     
@@ -99,6 +112,10 @@ export default function Chores() {
 
   const handleUpdateChore = (id: string, updates: any) => {
     updateChoreMutation.mutate({ id, updates });
+  };
+
+  const handleDeleteChore = (id: string) => {
+    deleteChoreMutation.mutate(id);
   };
 
 
@@ -298,7 +315,7 @@ export default function Chores() {
         <Card className="glass-card">
           <CardContent className="p-6">
             <h2 className="text-headline font-semibold text-primary mb-4">All Chores</h2>
-            <ChoreBoard chores={Array.isArray(chores) ? chores : []} onUpdateChore={handleUpdateChore} />
+            <ChoreBoard chores={Array.isArray(chores) ? chores : []} onUpdateChore={handleUpdateChore} onDeleteChore={handleDeleteChore} />
           </CardContent>
         </Card>
       </div>

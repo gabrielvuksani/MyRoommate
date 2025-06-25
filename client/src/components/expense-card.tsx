@@ -1,10 +1,11 @@
 interface ExpenseCardProps {
   expense: any;
   onSettleExpense?: (params: { splitId: string; settled: boolean }) => void;
+  onDeleteExpense?: (id: string) => void;
   showSettlement?: boolean;
 }
 
-export default function ExpenseCard({ expense, onSettleExpense, showSettlement = true }: ExpenseCardProps) {
+export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense, showSettlement = true }: ExpenseCardProps) {
   const getCategoryIcon = (category: string) => {
     switch (category?.toLowerCase()) {
       case 'groceries':
@@ -63,7 +64,17 @@ export default function ExpenseCard({ expense, onSettleExpense, showSettlement =
           </div>
         </div>
         <div className="text-right">
-          <p className="text-title-3 font-bold text-primary">${parseFloat(expense.amount).toFixed(2)}</p>
+          <div className="flex items-center justify-end space-x-2 mb-2">
+            <p className="text-title-3 font-bold text-primary">${parseFloat(expense.amount).toFixed(2)}</p>
+            {onDeleteExpense && (
+              <button
+                onClick={() => onDeleteExpense(expense.id)}
+                className="px-2 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors"
+              >
+                Delete
+              </button>
+            )}
+          </div>
           <div className={`px-2 py-1 rounded-lg text-xs font-medium ${
             isFullySettled ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
           }`}>

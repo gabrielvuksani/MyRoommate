@@ -15,8 +15,8 @@ export default function BottomNavigation() {
   return (
     <nav className="tab-navigation" style={{
       background: 'rgba(255, 255, 255, 0.6)',
-      backdropFilter: 'blur(20px) saturate(1.8)',
-      WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+      backdropFilter: 'blur(12px) saturate(1.8)',
+      WebkitBackdropFilter: 'blur(12px) saturate(1.8)',
       border: '1px solid rgba(255, 255, 255, 0.3)',
     }}>
       <div className="flex items-center justify-center w-full">

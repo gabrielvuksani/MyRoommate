@@ -65,6 +65,19 @@ export default function Calendar() {
     },
   });
 
+  const deleteEventMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest("DELETE", `/api/calendar-events/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/calendar-events"] });
+    },
+    onError: (error) => {
+      console.error('Error deleting event:', error);
+    },
+  });
+
   const handleCreateEvent = () => {
     if (!canCreateEvent) return;
     
@@ -86,6 +99,10 @@ export default function Calendar() {
   };
 
   const canCreateEvent = newEvent.title.trim().length > 0 && newEvent.startDate.trim().length > 0;
+
+  const handleDeleteEvent = (id: string) => {
+    deleteEventMutation.mutate(id);
+  };
 
   // Calendar logic
   const currentMonth = currentDate.getMonth();
@@ -414,7 +431,15 @@ export default function Calendar() {
                         style={{ backgroundColor: event.color || '#007AFF' }}
                       ></div>
                       <div className="flex-1">
-                        <h4 className="font-bold text-gray-900 text-lg mb-2">{event.title}</h4>
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-bold text-gray-900 text-lg">{event.title}</h4>
+                          <button
+                            onClick={() => handleDeleteEvent(event.id)}
+                            className="px-2 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
                         {event.description && (
                           <p className="text-gray-700 mb-3">{event.description}</p>
                         )}

@@ -111,6 +111,12 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Completed delete functionality implementation across all three core pages
+- ✓ Added delete buttons to ChoreBoard component with proper mutation handling
+- ✓ Enhanced ExpenseCard component with delete functionality and API integration
+- ✓ Implemented calendar event deletion with mutation and UI updates
+- ✓ Added proper error handling and cache invalidation for all delete operations
+- ✓ Maintained consistent styling with red-themed delete buttons across all components
 - ✓ Enhanced bottom navigation transparency (0.25 opacity) to show more background content
 - ✓ Completely redesigned message bubbles with visionOS/iMessage/Airbnb design fusion
 - ✓ Your messages: emerald-cyan gradients with custom tails and glass overlay effects

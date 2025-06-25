@@ -3,9 +3,10 @@ import { Card, CardContent } from "@/components/ui/card";
 interface ChoresBoardProps {
   chores: any[];
   onUpdateChore: (id: string, updates: any) => void;
+  onDeleteChore: (id: string) => void;
 }
 
-export default function ChoreBoard({ chores, onUpdateChore }: ChoresBoardProps) {
+export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: ChoresBoardProps) {
   // Sort chores by priority (urgent > high > medium > low) and then by due date
   const sortChoresByPriority = (choreList: any[]) => {
     const priorityOrder: { [key: string]: number } = { urgent: 4, high: 3, medium: 2, low: 1 };
@@ -157,6 +158,12 @@ export default function ChoreBoard({ chores, onUpdateChore }: ChoresBoardProps) 
               Reopen
             </button>
           )}
+          <button
+            onClick={() => onDeleteChore(chore.id)}
+            className="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors"
+          >
+            Delete
+          </button>
         </div>
       </div>
     );

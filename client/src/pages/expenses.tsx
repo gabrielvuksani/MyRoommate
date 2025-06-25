@@ -116,10 +116,28 @@ export default function Expenses() {
     },
   });
 
+  const deleteExpenseMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest("DELETE", `/api/expenses/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
+    },
+    onError: (error) => {
+      console.error('Error deleting expense:', error);
+    },
+  });
+
   const handleCreateExpense = () => {
     if (!newExpense.title.trim() || !newExpense.amount) return;
 
     createExpenseMutation.mutate(newExpense);
+  };
+
+  const handleDeleteExpense = (id: string) => {
+    deleteExpenseMutation.mutate(id);
   };
 
   const canCreateExpense =
@@ -381,6 +399,7 @@ export default function Expenses() {
                     key={expense.id} 
                     expense={expense} 
                     onSettleExpense={settleSplitMutation.mutate}
+                    onDeleteExpense={handleDeleteExpense}
                     showSettlement={activeTab !== "settled"}
                   />
                 ))
