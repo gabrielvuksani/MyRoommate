@@ -133,8 +133,8 @@ export default function Chores() {
                   <Plus size={24} className="text-white" />
                 </button>
               </DialogTrigger>
-              <DialogContent className="modal-content">
-                <DialogHeader className="px-6 pt-6 pb-2">
+              <DialogContent>
+                <DialogHeader className="px-6 pt-6 pb-6">
                   <DialogTitle className="text-title-2 font-bold text-primary">Create New Chore</DialogTitle>
                 </DialogHeader>
                 <div className="px-6 pb-6 space-y-5">

@@ -148,8 +148,8 @@ export default function Profile() {
                     <Edit3 size={16} className="text-gray-600" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="modal-content">
-                  <DialogHeader className="px-6 pt-6 pb-2">
+                <DialogContent>
+                  <DialogHeader className="px-6 pt-6 pb-6">
                     <DialogTitle className="text-xl font-bold text-gray-900">
                       Edit Name
                     </DialogTitle>
