@@ -412,6 +412,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
+        if (message.type === 'user_typing') {
+          const { householdId, userId, userName } = message;
+          
+          // Broadcast typing indicator to other clients in the same household
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({
+                type: 'user_typing',
+                householdId,
+                userId,
+                userName,
+              }));
+            }
+          });
+        }
+        
+        if (message.type === 'user_stopped_typing') {
+          const { householdId, userId, userName } = message;
+          
+          // Broadcast stop typing indicator to other clients in the same household
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({
+                type: 'user_stopped_typing',
+                householdId,
+                userId,
+                userName,
+              }));
+            }
+          });
+        }
+        
         if (message.type === 'chore_update') {
           // Broadcast chore updates
           wss.clients.forEach((client) => {

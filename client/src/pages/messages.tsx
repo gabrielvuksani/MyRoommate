@@ -5,12 +5,15 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import MessageBubble from "@/components/message-bubble";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
 
 export default function Messages() {
   const [newMessage, setNewMessage] = useState("");
   const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -30,6 +33,23 @@ export default function Messages() {
           ...(old || []),
           data.message,
         ]);
+      } else if (data.type === "user_typing") {
+        if (data.userId !== user?.id) {
+          setTypingUsers(prev => {
+            if (!prev.includes(data.userName)) {
+              return [...prev, data.userName];
+            }
+            return prev;
+          });
+          // Clear typing indicator after 3 seconds
+          setTimeout(() => {
+            setTypingUsers(prev => prev.filter(name => name !== data.userName));
+          }, 3000);
+        }
+      } else if (data.type === "user_stopped_typing") {
+        if (data.userId !== user?.id) {
+          setTypingUsers(prev => prev.filter(name => name !== data.userName));
+        }
       }
     },
   });
@@ -40,7 +60,7 @@ export default function Messages() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, typingUsers]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,9 +83,60 @@ export default function Messages() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleTyping = (value: string) => {
+    setNewMessage(value);
+    
+    if (!household || !user) return;
+    
+    const userName = user.firstName || user.email?.split('@')[0] || 'Unknown';
+    
+    if (value.trim() && !isTyping) {
+      setIsTyping(true);
+      sendMessage({
+        type: "user_typing",
+        householdId: household.id,
+        userId: user.id,
+        userName,
+      });
+    }
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Set new timeout to stop typing indicator
+    typingTimeoutRef.current = setTimeout(() => {
+      if (isTyping) {
+        setIsTyping(false);
+        sendMessage({
+          type: "user_stopped_typing",
+          householdId: household.id,
+          userId: user.id,
+          userName,
+        });
+      }
+    }, 1000);
+  };
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !household || !user) return;
+
+    // Clear typing indicator
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    if (isTyping) {
+      setIsTyping(false);
+      const userName = user.firstName || user.email?.split('@')[0] || 'Unknown';
+      sendMessage({
+        type: "user_stopped_typing",
+        householdId: household.id,
+        userId: user.id,
+        userName,
+      });
+    }
 
     sendMessage({
       type: "send_message",
@@ -75,6 +146,24 @@ export default function Messages() {
     });
 
     setNewMessage("");
+  };
+
+  const quickMessages = [
+    { icon: Coffee, text: "Anyone want coffee?", color: "from-amber-400 to-orange-500" },
+    { icon: ShoppingCart, text: "Going grocery shopping, need anything?", color: "from-green-400 to-emerald-500" },
+    { icon: Home, text: "Who's home tonight?", color: "from-blue-400 to-cyan-500" },
+    { icon: Calendar, text: "Movie night this weekend?", color: "from-purple-400 to-pink-500" },
+  ];
+
+  const handleQuickMessage = (text: string) => {
+    if (!household || !user) return;
+    
+    sendMessage({
+      type: "send_message",
+      content: text,
+      householdId: household.id,
+      userId: user.id,
+    });
   };
 
   if (isLoading) {
@@ -104,16 +193,42 @@ export default function Messages() {
         {/* Messages Area */}
         <div className="px-6 py-4 space-y-2">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mb-4">
-                <MessageCircle size={24} className="text-white" />
+            <div className="flex flex-col items-center justify-center h-64 space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mb-4 mx-auto">
+                  <MessageCircle size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  No messages yet
+                </h3>
+                <p className="text-gray-600 text-center mb-6">
+                  Start the conversation with your roommates!
+                </p>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                No messages yet
-              </h3>
-              <p className="text-gray-600 text-center">
-                Start the conversation with your roommates!
-              </p>
+              
+              {/* Quick Message Starters */}
+              <div className="w-full max-w-sm space-y-3">
+                <p className="text-sm font-medium text-gray-700 text-center mb-3">Quick conversation starters:</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {quickMessages.map((quick, index) => {
+                    const IconComponent = quick.icon;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => handleQuickMessage(quick.text)}
+                        className="p-3 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md group"
+                      >
+                        <div className={`w-8 h-8 bg-gradient-to-br ${quick.color} rounded-xl flex items-center justify-center mb-2 mx-auto group-hover:scale-110 transition-transform duration-200`}>
+                          <IconComponent size={16} className="text-white" />
+                        </div>
+                        <p className="text-xs text-gray-700 font-medium text-center leading-tight">
+                          {quick.text}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           ) : (
             messages.map((message: any) => (
@@ -124,6 +239,30 @@ export default function Messages() {
               />
             ))
           )}
+          
+          {/* Typing Indicator */}
+          {typingUsers.length > 0 && (
+            <div className="flex justify-start">
+              <div className="flex flex-col items-start">
+                <div className="bg-gray-100 rounded-2xl rounded-tl-md px-4 py-3">
+                  <div className="flex items-center space-x-1">
+                    <span className="text-sm text-gray-600">
+                      {typingUsers.length === 1 
+                        ? `${typingUsers[0]} is typing`
+                        : `${typingUsers.slice(0, -1).join(', ')} and ${typingUsers[typingUsers.length - 1]} are typing`
+                      }
+                    </span>
+                    <div className="flex space-x-1 ml-2">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -139,7 +278,7 @@ export default function Messages() {
               type="text"
               placeholder="Type a message..."
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={(e) => handleTyping(e.target.value)}
               className="w-full bg-transparent border-none text-sm text-black placeholder-gray-500 focus:outline-none focus:ring-0"
             />
           </div>
