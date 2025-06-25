@@ -13,7 +13,7 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <nav className="tab-navigation mt-[6px] mb-[6px] ml-[20px] mr-[20px] pt-[7px] pb-[7px] bg-[#ffffff12]" style={{
+    <nav className="tab-navigation mt-[6px] mb-[6px] ml-[20px] mr-[20px] pt-[7px] pb-[7px] bg-[transparent]" style={{
       background: 'rgba(255, 255, 255, 0.6)',
       backdropFilter: 'blur(12px) saturate(1.8)',
       WebkitBackdropFilter: 'blur(12px) saturate(1.8)',
