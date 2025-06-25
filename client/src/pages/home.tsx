@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { CheckSquare, DollarSign, Calendar, MessageSquare, Plus, Clock, User, ChevronRight } from "lucide-react";
+import { CheckSquare, DollarSign, Calendar, MessageSquare, Plus, Clock, User, ChevronRight, Settings } from "lucide-react";
 
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth();
