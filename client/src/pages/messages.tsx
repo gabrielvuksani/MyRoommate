@@ -85,14 +85,22 @@ export default function Messages() {
     scrollToBottom();
   }, [messages, typingUsers]);
 
+  // Scroll to bottom when messages finish loading
   useEffect(() => {
-    // Scroll to top when page loads
-    window.scrollTo(0, 0);
-    
+    if (!isLoading && messages.length > 0) {
+      setTimeout(scrollToBottom, 200);
+    }
+  }, [isLoading, messages.length]);
+
+  useEffect(() => {
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
+    
+    // Scroll to bottom after messages load
+    setTimeout(scrollToBottom, 100);
+    
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
