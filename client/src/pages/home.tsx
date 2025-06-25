@@ -299,129 +299,124 @@ export default function Home() {
           </div>
         ) : (
           <div 
-            className="empty-state-card cursor-pointer animate-fade-in hover:scale-102"
+            className="empty-state-card cursor-pointer animate-fade-in"
             onClick={() => setLocation('/chores')}
             style={{ animationDelay: '100ms' }}
           >
-              <div className="w-20 h-20 bg-gradient-to-br from-green to-green-light rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg">
-                <CheckSquare size={32} className="text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">All caught up!</h3>
-              <p className="text-gray-600 mb-8 leading-relaxed text-lg">No chores need your attention today</p>
-              <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-accent-hover hover:shadow-xl transition-all duration-300 hover:scale-105">
-                Add Chore
-              </button>
+            <div className="w-20 h-20 bg-gradient-to-br from-green to-green-light rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg">
+              <CheckSquare size={32} className="text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">All caught up!</h3>
+            <p className="text-gray-600 mb-8 leading-relaxed text-lg">No chores need your attention today</p>
+            <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg transition-all duration-300">
+              Add Chore
+            </button>
           </div>
         )}
 
-        {/* 2. Bills Card */}
+        {/* Bills Card */}
         {balance && (netBalance !== 0 || balance.totalOwed > 0 || balance.totalOwing > 0) ? (
-          <div 
-            className="smart-card interactive cursor-pointer animate-slide-up hover:scale-102"
+          <Card 
+            className="smart-card interactive cursor-pointer animate-slide-up"
             onClick={() => setLocation('/expenses')}
             style={{ animationDelay: '200ms' }}
           >
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
-                    <DollarSign size={16} className="text-green-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900">Bills</h3>
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-orange to-orange-light rounded-2xl flex items-center justify-center shadow-lg">
+                  <DollarSign size={24} className="text-white" />
                 </div>
-                <ChevronRight size={20} className="text-gray-400" />
-              </div>
-              
-              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Your balance</p>
-                  <p className={`text-2xl font-bold ${
-                    netBalance >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {netBalance >= 0 ? '+' : ''}${Math.abs(netBalance).toFixed(2)}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {netBalance >= 0 ? "You're owed money" : "You owe money"}
-                  </p>
+                  <h3 className="font-bold text-gray-900 text-xl leading-tight">Your balance</h3>
+                  <p className="text-gray-600 text-base mt-1 font-medium">Money matters</p>
                 </div>
-                
-                <button className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium">
-                  Settle up
-                </button>
               </div>
+              <ChevronRight size={20} className="text-gray-300 mt-2" />
             </div>
-          </div>
+            
+            <div className="space-y-4">
+              {balance.totalOwed > 0 && (
+                <div className="flex justify-between items-center p-4 bg-green-light rounded-2xl">
+                  <span className="font-semibold text-gray-700">You're owed</span>
+                  <span className="font-bold text-green text-xl">+${balance.totalOwed}</span>
+                </div>
+              )}
+              {balance.totalOwing > 0 && (
+                <div className="flex justify-between items-center p-4 bg-red-light rounded-2xl">
+                  <span className="font-semibold text-gray-700">You owe</span>
+                  <span className="font-bold text-red text-xl">-${balance.totalOwing}</span>
+                </div>
+              )}
+            </div>
+          </Card>
         ) : (
           <div 
-            className="empty-state-card cursor-pointer animate-fade-in hover:scale-102"
+            className="empty-state-card cursor-pointer animate-fade-in"
             onClick={() => setLocation('/expenses')}
             style={{ animationDelay: '200ms' }}
           >
-            <div className="p-6 text-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <DollarSign size={24} className="text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-600 mb-1">All settled!</h3>
-              <p className="text-sm text-gray-500 mb-4">No outstanding bills</p>
-              <button className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium">
-                Add expense
-              </button>
+            <div className="w-16 h-16 bg-gradient-to-br from-orange to-orange-light rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <DollarSign size={28} className="text-white" />
             </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">All settled!</h3>
+            <p className="text-gray-600 mb-8 leading-relaxed text-lg">No outstanding bills to worry about</p>
+            <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg transition-all duration-300">
+              Add Expense
+            </button>
           </div>
         )}
 
-        {/* 3. Calendar Card */}
+        {/* Calendar Card */}
         {todayEvents.length > 0 ? (
-          <div 
-            className="smart-card interactive cursor-pointer animate-slide-up hover:scale-102"
+          <Card 
+            className="smart-card interactive cursor-pointer animate-slide-up"
             onClick={() => setLocation('/calendar')}
-            style={{ animationDelay: '300ms' }}
+            style={{ animationDelay: '400ms' }}
           >
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Calendar size={16} className="text-orange-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900">Today</h3>
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-orange to-orange-light rounded-2xl flex items-center justify-center shadow-lg">
+                  <Calendar size={24} className="text-white" />
                 </div>
-                <ChevronRight size={20} className="text-gray-400" />
+                <div>
+                  <h3 className="font-bold text-gray-900 text-xl leading-tight">Today's events</h3>
+                  <p className="text-gray-600 text-base mt-1 font-medium">{todayEvents.length} scheduled</p>
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                {todayEvents.slice(0, 2).map((event: any) => (
-                  <div key={event.id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
-                    <div className="w-2 h-8 bg-orange-400 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{event.title}</p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(event.startDate).toLocaleTimeString('en-US', {
-                          hour: 'numeric',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ChevronRight size={20} className="text-gray-300 mt-2" />
             </div>
-          </div>
+            
+            <div className="space-y-3">
+              {todayEvents.slice(0, 2).map((event: any) => (
+                <div key={event.id} className="flex items-center space-x-4 p-4 bg-gradient-to-r from-orange-light to-orange-light/50 rounded-2xl">
+                  <div className="w-3 h-12 bg-orange rounded-full"></div>
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-900 text-lg">{event.title}</p>
+                    <p className="text-gray-600 font-medium">
+                      {new Date(event.startDate).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         ) : (
           <div 
-            className="empty-state-card cursor-pointer animate-fade-in hover:scale-102"
+            className="empty-state-card cursor-pointer animate-fade-in"
             onClick={() => setLocation('/calendar')}
-            style={{ animationDelay: '300ms' }}
+            style={{ animationDelay: '400ms' }}
           >
-            <div className="p-6 text-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Calendar size={24} className="text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-600 mb-1">Free day!</h3>
-              <p className="text-sm text-gray-500 mb-4">No events scheduled</p>
-              <button className="bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium">
-                Add event
-              </button>
+            <div className="w-16 h-16 bg-gradient-to-br from-orange to-orange-light rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <Calendar size={28} className="text-white" />
             </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Free day!</h3>
+            <p className="text-gray-600 mb-8 leading-relaxed text-lg">No events scheduled for today</p>
+            <button className="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg transition-all duration-300">
+              Add Event
+            </button>
           </div>
         )}
 

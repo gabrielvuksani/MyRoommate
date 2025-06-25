@@ -466,16 +466,17 @@
   padding: 0 var(--space-6);
 }
 
-/* Wallet-Style Cards */
+/* Premium visionOS Cards */
 .smart-card {
   background: var(--white);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-2);
-  border: 0.5px solid var(--gray-200);
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--gray-200);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
-  padding: var(--space-6);
+  padding: var(--space-8);
   position: relative;
+  backdrop-filter: blur(10px);
 }
 
 .smart-card::before {
@@ -485,36 +486,52 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
   pointer-events: none;
 }
 
 .smart-card.interactive {
-  transform: translateY(0);
-  box-shadow: var(--shadow-2);
-  border-color: var(--gray-200);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  border-color: var(--gray-100);
 }
 
 .smart-card.interactive:active {
-  transform: translateY(1px) scale(0.98);
-  transition: all 0.1s ease;
-  box-shadow: var(--shadow-1);
+  transform: translateY(2px) scale(0.99);
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .empty-state-card {
-  background: var(--white);
+  background: linear-gradient(135deg, var(--white) 0%, var(--gray-50) 100%);
   border: 2px dashed var(--gray-300);
   border-radius: var(--radius-xl);
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   padding: var(--space-12);
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-state-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 122, 255, 0.05), transparent);
+  transition: left 0.6s ease;
+}
+
+.empty-state-card:active::before {
+  left: 100%;
 }
 
 .empty-state-card:active {
-  background: var(--gray-50);
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--accent-subtle) 100%);
   border-color: var(--accent);
-  transform: translateY(1px) scale(0.98);
-  transition: all 0.1s ease;
+  transform: translateY(2px) scale(0.99);
+  transition: all 0.15s ease;
 }
 
 .page-header {
