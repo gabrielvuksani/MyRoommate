@@ -249,7 +249,7 @@ export default function Messages() {
         <div className="page-header">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="font-semibold text-[#1a1a1a] text-[22px]">Messages</h1>
+              <h1 className="page-title">Messages</h1>
               <p className="page-subtitle">Chat with your household</p>
             </div>
           </div>
@@ -257,7 +257,7 @@ export default function Messages() {
       </div>
 
       {/* Messages Container - Positioned between header and input */}
-      <div className="fixed top-[100px] bottom-[100px] left-0 right-0 overflow-y-auto">
+      <div className="fixed top-[120px] bottom-[100px] left-0 right-0 overflow-y-auto">
         <div className="max-w-md mx-auto h-full">
           <div className="px-6 py-4 space-y-2 h-full flex flex-col">
             {messages.length === 0 ? (
