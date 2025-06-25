@@ -128,9 +128,6 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Fixed messages page to scroll to bottom on load and show latest messages
 - ✓ Removed conflicting scroll-to-top behavior specific to messages page
 - ✓ Adjusted send button positioning in message input for better visual alignment
-- ✓ Fixed landing page routing by correcting authentication query handling for unauthenticated users
-- ✓ Enhanced message input styling with proper gap spacing and input field background
-- ✓ Restored proper authentication flow to prevent 404 errors for new users
 - ✓ Enhanced bottom navigation transparency (0.25 opacity) to show more background content
 - ✓ Completely redesigned message bubbles with visionOS/iMessage/Airbnb design fusion
 - ✓ Your messages: emerald-cyan gradients with custom tails and glass overlay effects

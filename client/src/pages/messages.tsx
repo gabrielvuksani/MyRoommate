@@ -355,9 +355,9 @@ export default function Messages() {
           <div className="glass-card p-4 rounded-3xl shadow-lg border border-white/20">
             <form
               onSubmit={handleSendMessage}
-              className="flex items-center gap-3"
+              className="flex items-center space-x-2"
             >
-              <div className="flex-1 rounded-full px-4 py-3 bg-gray-50 border border-gray-100">
+              <div className="flex-1 rounded-full px-4 py-3 mr-1">
                 <Input
                   type="text"
                   placeholder="Type a message..."
@@ -369,7 +369,7 @@ export default function Messages() {
               <Button
                 type="submit"
                 disabled={!newMessage.trim()}
-                className="w-11 h-11 bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 rounded-full flex items-center justify-center p-0 shadow-lg transition-all duration-200 disabled:opacity-50 shrink-0"
+                className="w-11 h-11 bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 rounded-full flex items-center justify-center p-0 shadow-lg transition-all duration-200 disabled:opacity-50 ml-1"
               >
                 <span className="text-white text-lg font-medium">→</span>
               </Button>
