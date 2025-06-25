@@ -44,17 +44,17 @@ export default function Settings() {
   return (
     <div className="page-container">
       <div className="floating-header">
-        <div className="px-6 py-6">
+        <div className="px-4 py-6">
           <div className="flex items-center space-x-4">
             <button 
               onClick={() => setLocation('/')}
-              className="w-10 h-10 bg-surface border border-border-subtle rounded-full flex items-center justify-center hover:bg-surface-secondary transition-all"
+              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all"
             >
               <ArrowLeft size={18} />
             </button>
             <div>
-              <h1 className="header-content text-3xl font-black tracking-tight">Settings</h1>
-              <p className="text-subhead text-secondary mt-1">Manage household</p>
+              <h1 className="text-4xl font-bold text-gray-900">Settings</h1>
+              <p className="text-lg text-gray-600 mt-1">App & household settings</p>
             </div>
           </div>
         </div>
