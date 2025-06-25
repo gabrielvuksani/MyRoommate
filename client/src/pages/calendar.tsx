@@ -396,6 +396,11 @@ export default function Calendar() {
                               </span>
                             </div>
                           )}
+                          <div className="bg-gray-100 px-3 py-2 rounded-xl">
+                            <span className="text-gray-700 font-semibold text-sm">
+                              {event.creator?.firstName || 'Unknown'}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
