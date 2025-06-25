@@ -223,20 +223,21 @@ export default function Home() {
 
   return (
     <div className="page-container">
-      {/* Dynamic Header */}
+      {/* Premium Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="page-title">{greeting}, {firstName}</h1>
+              <p className="page-subtitle">What needs your attention</p>
             </div>
             
             <div className="flex items-center space-x-3">
               <button 
                 onClick={() => setLocation('/profile')}
-                className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center hover:bg-primary/20 transition-colors"
+                className="w-10 h-10 bg-accent-light rounded-full flex items-center justify-center hover:bg-accent-light/80 transition-colors"
               >
-                <span className="text-primary text-sm font-semibold">
+                <span className="text-accent text-sm font-semibold">
                   {firstName[0]?.toUpperCase() || '?'}
                 </span>
               </button>
@@ -302,16 +303,14 @@ export default function Home() {
             onClick={() => setLocation('/chores')}
             style={{ animationDelay: '100ms' }}
           >
-            <div className="p-8 text-center">
-              <div className="w-16 h-16 bg-success-light rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <CheckSquare size={28} className="text-success" />
+              <div className="w-16 h-16 bg-success-light rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <CheckSquare size={24} className="text-success" />
               </div>
-              <h3 className="text-xl font-semibold text-text-primary mb-2">All caught up!</h3>
-              <p className="text-text-secondary mb-6">No chores due today</p>
-              <button className="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-dark transition-colors">
+              <h3 className="text-xl font-semibold text-neutral-900 mb-2">All caught up</h3>
+              <p className="text-neutral-500 mb-6 leading-relaxed">No chores need your attention today</p>
+              <button className="bg-accent text-white px-6 py-3 rounded-full font-semibold hover:bg-accent-dark transition-colors">
                 Add chore
               </button>
-            </div>
           </div>
         )}
 

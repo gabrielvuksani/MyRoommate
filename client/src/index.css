@@ -119,40 +119,40 @@
   border-color: var(--primary);
 }
 
-/* Smart Scroll Header System */
+/* Premium Header System */
 .floating-header {
   background: transparent;
   position: sticky;
   top: 0;
   z-index: 50;
   padding-top: env(safe-area-inset-top);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   border-bottom: 1px solid transparent;
 }
 
 .floating-header.scrolled {
-  background: var(--glass-strong);
-  backdrop-filter: var(--blur-medium);
-  border-bottom: 1px solid var(--border-secondary);
-  box-shadow: var(--shadow-sm);
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  border-bottom: 1px solid var(--border-light);
+  box-shadow: var(--shadow-soft);
 }
 
-/* Airbnb-Style Headers */
+/* Clean Modern Typography */
 .page-header {
-  padding: var(--space-6) var(--space-4) var(--space-4) var(--space-4);
+  padding: var(--space-8) var(--space-6) var(--space-4) var(--space-6);
 }
 
 .page-title {
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 2.25rem;
+  font-weight: 700;
   color: var(--text-primary);
-  line-height: 1.2;
+  line-height: 1.1;
   margin: 0;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 .page-subtitle {
-  font-size: 1rem;
+  font-size: 1.125rem;
   color: var(--text-secondary);
   margin-top: var(--space-1);
   margin-bottom: 0;
@@ -461,7 +461,39 @@
 }
 
 .page-content {
-  padding: var(--space-4);
+  padding: 0 var(--space-6);
+}
+
+/* Premium Card System */
+.smart-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-subtle);
+  border: 1px solid var(--border-light);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  padding: var(--space-6);
+}
+
+.smart-card.interactive:hover {
+  box-shadow: var(--shadow-gentle);
+  transform: translateY(-1px);
+  border-color: var(--border);
+}
+
+.empty-state-card {
+  background: var(--surface-elevated);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: var(--space-8);
+  text-align: center;
+}
+
+.empty-state-card:hover {
+  background: var(--surface);
+  border-color: var(--text-tertiary);
+  transform: translateY(-1px);
 }
 
 .page-header {
