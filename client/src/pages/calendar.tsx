@@ -140,67 +140,103 @@ export default function Calendar() {
   }
 
   return (
-    <div className="page-container">
-      {/* Dynamic Header */}
+    <div className="page-container animate-page-enter">
+      {/* visionOS Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="page-title">Calendar</h1>
-              <p className="page-subtitle">Shared events</p>
+              <p className="page-subtitle">Your household schedule</p>
             </div>
             
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
-                <button className="w-11 h-11 bg-primary rounded-2xl flex items-center justify-center shadow-soft hover:shadow-medium transition-all">
-                  <Plus size={20} className="text-white" />
+                <button className="w-12 h-12 bg-gradient-to-br from-accent to-accent-hover rounded-2xl flex items-center justify-center shadow-lg btn-animated">
+                  <Plus size={24} className="text-white" />
                 </button>
               </DialogTrigger>
-              <DialogContent className="modal-content">
-                <DialogHeader className="px-6 pt-6 pb-2">
-                  <DialogTitle className="text-title-2 font-bold text-primary">Create New Event</DialogTitle>
+              <DialogContent className="smart-card max-w-md mx-auto border-0 shadow-2xl">
+                <DialogHeader className="pb-6">
+                  <DialogTitle className="text-2xl font-bold text-gray-900">Create Event</DialogTitle>
                 </DialogHeader>
-                <div className="px-6 pb-6 space-y-5">
-                  <input
-                    placeholder="Event title"
-                    value={newEvent.title}
-                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                    className="w-full p-4 bg-surface border border-border-subtle rounded-2xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  />
-                  <input
-                    placeholder="Description (optional)"
-                    value={newEvent.description}
-                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                    className="w-full p-4 bg-surface border border-border-subtle rounded-2xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  />
-                  <input
-                    type="date"
-                    value={newEvent.startDate}
-                    onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
-                    className="w-full p-4 bg-surface border border-border-subtle rounded-2xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  />
-                  <input
-                    type="time"
-                    value={newEvent.startTime}
-                    onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                    className="w-full p-4 bg-surface border border-border-subtle rounded-2xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  />
-                  <Select value={newEvent.type} onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}>
-                    <SelectTrigger className="w-full p-4 bg-surface border border-border-subtle rounded-2xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
-                      <SelectValue placeholder="Event type..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-surface border border-border-subtle rounded-2xl shadow-strong">
-                      <SelectItem value="social">Social</SelectItem>
-                      <SelectItem value="rent">Rent</SelectItem>
-                      <SelectItem value="utility">Utility</SelectItem>
-                      <SelectItem value="chore">Chore</SelectItem>
-                      <SelectItem value="bill">Bill</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <button
-                    onClick={handleCreateEvent}
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Event Title</label>
+                    <input
+                      value={newEvent.title}
+                      onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-base font-medium focus:ring-2 focus:ring-accent/20 focus:bg-white transition-all focus:outline-none"
+                      placeholder="Enter event title..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                    <input
+                      value={newEvent.description}
+                      onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-base font-medium focus:ring-2 focus:ring-accent/20 focus:bg-white transition-all focus:outline-none"
+                      placeholder="Event description..."
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Date</label>
+                      <input
+                        type="date"
+                        value={newEvent.startDate}
+                        onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-base font-medium focus:ring-2 focus:ring-accent/20 focus:bg-white transition-all focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Time</label>
+                      <input
+                        type="time"
+                        value={newEvent.startTime}
+                        onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-base font-medium focus:ring-2 focus:ring-accent/20 focus:bg-white transition-all focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Event Type</label>
+                    <Select value={newEvent.type} onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}>
+                      <SelectTrigger className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-base font-medium focus:ring-2 focus:ring-accent/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-0 shadow-lg">
+                        <SelectItem value="social">🎉 Social</SelectItem>
+                        <SelectItem value="work">💼 Work</SelectItem>
+                        <SelectItem value="personal">👤 Personal</SelectItem>
+                        <SelectItem value="household">🏠 Household</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Color</label>
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="color"
+                        value={newEvent.color}
+                        onChange={(e) => setNewEvent({ ...newEvent, color: e.target.value })}
+                        className="w-16 h-12 bg-gray-50 border-0 rounded-xl cursor-pointer"
+                      />
+                      <span className="text-gray-600 font-medium">Choose event color</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-3 pt-6">
+                  <button 
+                    onClick={() => setIsCreateOpen(false)}
+                    className="px-6 py-3 text-gray-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors btn-animated"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleCreateEvent} 
                     disabled={!canCreateEvent || createEventMutation.isPending}
-                    className="w-full bg-primary text-white p-4 rounded-2xl font-semibold transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-accent text-white px-6 py-3 rounded-xl font-bold shadow-lg btn-animated disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {createEventMutation.isPending ? "Creating..." : "Create Event"}
                   </button>
@@ -211,50 +247,40 @@ export default function Calendar() {
         </div>
       </div>
       
-      <div className="page-content space-y-8">
-        {/* Interactive Calendar */}
-        <Card className="glass-card">
-          <CardContent className="p-8">
-            {/* Calendar Header with Navigation */}
-            <div className="flex items-center justify-between mb-8">
-              <button 
-                onClick={() => navigateMonth('prev')}
-                className="calendar-header-nav"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              
-              <div className="text-center">
-                <h2 className="text-title-2 font-bold text-primary">
-                  {monthNames[currentMonth]} {currentYear}
-                </h2>
-                <p className="text-footnote text-secondary mt-1">
-                  Tap a day to create an event
-                </p>
-              </div>
-              
-              <button 
-                onClick={() => navigateMonth('next')}
-                className="calendar-header-nav"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
+      <div className="px-6 mb-8">
+        {/* Calendar Container */}
+        <div className="smart-card p-6 animate-fade-in">
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => navigateMonth('prev')}
+              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-animated"
+            >
+              <ChevronLeft size={20} className="text-gray-600" />
+            </button>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {monthNames[currentMonth]} {currentYear}
+            </h2>
+            <button
+              onClick={() => navigateMonth('next')}
+              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-animated"
+            >
+              <ChevronRight size={20} className="text-gray-600" />
+            </button>
+          </div>
 
-            {/* Days of Week Header */}
-            <div className="grid grid-cols-7 gap-3 mb-5">
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                <div key={day} className="text-center text-sm text-gray-500 font-medium py-2">
+          {/* Calendar Grid */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-7 gap-2">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                <div key={day} className="text-center text-sm font-bold text-gray-500 py-3">
                   {day}
                 </div>
               ))}
             </div>
-
-            {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-3">
+            <div className="grid grid-cols-7 gap-2">
               {calendarDays.map((day, index) => {
                 if (!day) {
-                  return <div key={`empty-${index}`} className="h-14"></div>;
+                  return <div key={`empty-${index}`} className="h-12"></div>;
                 }
                 
                 const isToday = day === today.getDate() && 
@@ -357,11 +383,81 @@ export default function Calendar() {
                 )}
               </div>
             )}
-          </CardContent>
-        </Card>
-
-
+          </div>
+        </div>
       </div>
+
+      {/* Selected Day Events */}
+      {selectedDate && (
+        <div className="px-6 pb-8">
+          <div className="smart-card p-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
+            <h3 className="text-xl font-bold text-gray-900 mb-6">
+              Events for {selectedDate.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                month: 'long', 
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </h3>
+            
+            {getDayEvents(selectedDate.getDate()).length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange to-orange-light rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <CalendarIcon size={28} className="text-white" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">No events scheduled</h4>
+                <p className="text-gray-600 mb-6">This day is completely free</p>
+                <button 
+                  onClick={() => setIsCreateOpen(true)}
+                  className="bg-accent text-white px-6 py-3 rounded-full font-bold shadow-lg btn-animated"
+                >
+                  Add Event
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {getDayEvents(selectedDate.getDate()).map((event: any, index: number) => (
+                  <div 
+                    key={event.id} 
+                    className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-5 border border-gray-200 animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div 
+                        className="w-4 h-16 rounded-full flex-shrink-0 shadow-sm"
+                        style={{ backgroundColor: event.color || '#007AFF' }}
+                      ></div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900 text-lg mb-2">{event.title}</h4>
+                        {event.description && (
+                          <p className="text-gray-700 font-medium mb-3 leading-relaxed">{event.description}</p>
+                        )}
+                        <div className="flex items-center space-x-4">
+                          <div className="bg-white px-3 py-2 rounded-full shadow-sm">
+                            <span className="text-gray-800 font-semibold text-sm">
+                              {new Date(event.startDate).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                          {event.type && (
+                            <div className="bg-accent-light text-accent px-3 py-2 rounded-full">
+                              <span className="capitalize font-bold text-sm">
+                                {event.type}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
