@@ -110,9 +110,36 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/callback", (req, res, next) => {
     passport.authenticate(`replitauth:${req.hostname}`, {
-      successReturnToOrRedirect: "/",
+      successReturnToOrRedirect: "/auth/success",
       failureRedirect: "/api/login",
     })(req, res, next);
+  });
+
+  // Add iOS deep link callback
+  app.get("/auth/success", (req, res) => {
+    const userAgent = req.get('User-Agent') || '';
+    const isCapacitor = userAgent.includes('Capacitor') || req.get('X-Capacitor') === 'true';
+    
+    if (isCapacitor) {
+      // For iOS app, use custom URL scheme to return to app
+      res.send(`
+        <html>
+          <head><title>Authentication Successful</title></head>
+          <body>
+            <h2>Authentication Successful!</h2>
+            <p>Redirecting back to app...</p>
+            <script>
+              setTimeout(() => {
+                window.location.href = 'myroommate://auth/success';
+              }, 1000);
+            </script>
+          </body>
+        </html>
+      `);
+    } else {
+      // For web browser, redirect normally
+      res.redirect('/');
+    }
   });
 
   app.get("/api/logout", (req, res) => {

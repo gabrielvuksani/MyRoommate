@@ -10,7 +10,7 @@ const config: CapacitorConfig = {
     cleartext: false
   },
   ios: {
-    scheme: 'MyRoommate',
+    scheme: 'myroommate',
     contentInset: 'automatic'
   },
   plugins: {

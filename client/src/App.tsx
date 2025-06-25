@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
+import { useDeepLink } from "@/hooks/useDeepLink";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
@@ -24,6 +25,9 @@ function Router() {
     queryKey: ["/api/households/current"],
     enabled: isAuthenticated,
   });
+
+  // Initialize deep link handling for iOS authentication
+  useDeepLink();
 
   if (isLoading) {
     return (

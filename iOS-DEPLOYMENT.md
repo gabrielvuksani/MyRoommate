@@ -103,6 +103,9 @@ In Xcode:
 - **Haptic Feedback**: Touch feedback for better UX
 - **Keyboard Management**: Automatic handling
 - **App Lifecycle**: Proper background/foreground handling
+- **Deep Link Authentication**: Custom URL scheme `myroommate://` for OAuth return
+- **Browser Plugin**: Seamless authentication flow with automatic app return
+- **Database Integration**: Full PostgreSQL connectivity with deployed backend
 
 ## Production Considerations
 
