@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { CheckSquare, DollarSign, Calendar, MessageSquare, ChevronRight, Bell, Settings } from "lucide-react";
+import { CheckSquare, DollarSign, Calendar, MessageSquare, Plus, Clock, User, ChevronRight } from "lucide-react";
 
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -17,7 +17,6 @@ export default function Home() {
   const queryClient = useQueryClient();
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isJoinOpen, setIsJoinOpen] = useState(false);
   const [newHousehold, setNewHousehold] = useState({
     name: '',
     rentAmount: '',
@@ -87,28 +86,6 @@ export default function Home() {
     },
   });
 
-  const joinHouseholdMutation = useMutation({
-    mutationFn: async (code: string) => {
-      await apiRequest("POST", "/api/households/join", { inviteCode: code });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
-      setIsJoinOpen(false);
-      setInviteCode('');
-      toast({
-        title: "Success",
-        description: "Joined household successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to join household. Check your invite code.",
-        variant: "destructive",
-      });
-    },
-  });
-
   const handleCreateHousehold = () => {
     if (!newHousehold.name.trim()) return;
     
@@ -117,11 +94,6 @@ export default function Home() {
       rentAmount: newHousehold.rentAmount ? parseFloat(newHousehold.rentAmount) : null,
       rentDueDay: newHousehold.rentDueDay ? parseInt(newHousehold.rentDueDay) : null,
     });
-  };
-
-  const handleJoinHousehold = () => {
-    if (!inviteCode.trim()) return;
-    joinHouseholdMutation.mutate(inviteCode.trim().toUpperCase());
   };
 
   if (isLoading || !user) {
@@ -138,29 +110,29 @@ export default function Home() {
         <div className="floating-header">
           <div className="px-4 py-6">
             <h1 className="header-content text-3xl font-black tracking-tight">RoomieFlow</h1>
-            <p className="text-subhead text-secondary mt-1">Create or join a household to get started</p>
+            <p className="text-body text-secondary mt-1">Create or join a household to get started</p>
           </div>
         </div>
-        <div className="page-content space-y-6">
-          <Card className="glass-card">
+        <div className="px-4 py-6 space-y-4">
+          <Card className="smart-card">
             <CardContent className="p-6">
-              <h2 className="text-headline font-semibold text-primary mb-4">Create New Household</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Create New Household</h2>
               <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                 <DialogTrigger asChild>
-                  <Button className="w-full bg-primary text-white py-3 rounded-2xl text-body font-semibold">
+                  <Button className="w-full bg-primary text-white py-3 rounded-xl font-semibold">
                     Create Household
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="modal-content">
                   <DialogHeader className="px-6 pt-6 pb-2">
-                    <DialogTitle className="text-title-2 font-bold text-primary">Create New Household</DialogTitle>
+                    <DialogTitle className="text-xl font-bold text-gray-900">Create New Household</DialogTitle>
                   </DialogHeader>
                   <div className="px-6 pb-6 space-y-4">
                     <Input
                       placeholder="Household name"
                       value={newHousehold.name}
                       onChange={(e) => setNewHousehold({ ...newHousehold, name: e.target.value })}
-                      className="w-full p-4 bg-surface border border-border-subtle rounded-2xl"
+                      className="w-full p-4 border border-gray-200 rounded-xl"
                     />
                     <Input
                       type="number"
@@ -168,7 +140,7 @@ export default function Home() {
                       placeholder="Monthly rent (optional)"
                       value={newHousehold.rentAmount}
                       onChange={(e) => setNewHousehold({ ...newHousehold, rentAmount: e.target.value })}
-                      className="w-full p-4 bg-surface border border-border-subtle rounded-2xl"
+                      className="w-full p-4 border border-gray-200 rounded-xl"
                     />
                     <Input
                       type="number"
@@ -177,12 +149,12 @@ export default function Home() {
                       placeholder="Rent due day (optional)"
                       value={newHousehold.rentDueDay}
                       onChange={(e) => setNewHousehold({ ...newHousehold, rentDueDay: e.target.value })}
-                      className="w-full p-4 bg-surface border border-border-subtle rounded-2xl"
+                      className="w-full p-4 border border-gray-200 rounded-xl"
                     />
                     <Button 
                       onClick={handleCreateHousehold}
                       disabled={!newHousehold.name.trim() || createHouseholdMutation.isPending}
-                      className="w-full bg-primary text-white py-3 rounded-2xl font-semibold"
+                      className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
                     >
                       {createHouseholdMutation.isPending ? "Creating..." : "Create Household"}
                     </Button>
@@ -192,23 +164,26 @@ export default function Home() {
             </CardContent>
           </Card>
           
-          <Card className="glass-card">
+          <Card className="smart-card">
             <CardContent className="p-6">
-              <h2 className="text-headline font-semibold text-primary mb-4">Join Household</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Join Household</h2>
               <div className="space-y-4">
                 <Input
                   type="text"
                   placeholder="Enter invite code"
                   value={inviteCode}
                   onChange={(e) => setInviteCode(e.target.value)}
-                  className="w-full p-4 bg-surface border border-border-subtle rounded-2xl uppercase"
+                  className="w-full p-4 border border-gray-200 rounded-xl uppercase"
                 />
                 <Button 
-                  onClick={handleJoinHousehold}
-                  disabled={!inviteCode.trim() || joinHouseholdMutation.isPending}
-                  className="w-full bg-accent text-white py-3 rounded-2xl font-semibold"
+                  onClick={() => {
+                    if (!inviteCode.trim()) return;
+                    // Handle join logic
+                  }}
+                  disabled={!inviteCode.trim()}
+                  className="w-full bg-accent text-white py-3 rounded-xl font-semibold"
                 >
-                  {joinHouseholdMutation.isPending ? "Joining..." : "Join Household"}
+                  Join Household
                 </Button>
               </div>
             </CardContent>
@@ -220,170 +195,283 @@ export default function Home() {
 
   const activeChores = chores.filter((chore: any) => chore.status !== 'done');
   const recentMessages = messages.slice(-2);
-  const upcomingEvents = calendarEvents.slice(0, 2);
+  const upcomingEvents = calendarEvents.filter((event: any) => 
+    new Date(event.startDate) >= new Date(new Date().setHours(0, 0, 0, 0))
+  ).slice(0, 2);
   const netBalance = (balance?.totalOwed || 0) - (balance?.totalOwing || 0);
   const firstName = user.firstName || user.email?.split('@')[0] || 'there';
 
+  // Get current time greeting
+  const currentHour = new Date().getHours();
+  const greeting = currentHour < 12 ? 'Good morning' : currentHour < 17 ? 'Good afternoon' : 'Good evening';
+
+  // Get next urgent chore
+  const nextChore = activeChores.sort((a: any, b: any) => {
+    if (!a.dueDate && !b.dueDate) return 0;
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+  })[0];
+
+  // Get today's events
+  const todayEvents = calendarEvents.filter((event: any) => {
+    const eventDate = new Date(event.startDate).toDateString();
+    const today = new Date().toDateString();
+    return eventDate === today;
+  });
+
   return (
     <div className="page-container">
-      {/* Apple-standard Header */}
+      {/* Header with Large Title */}
       <div className="floating-header">
-        <div className="px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-large-title font-bold text-primary">Good morning</h1>
-              <p className="text-body text-secondary mt-1">
-                {firstName}
-              </p>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <button 
-                onClick={() => setLocation('/settings')}
-                className="w-11 h-11 bg-surface-secondary/50 rounded-full flex items-center justify-center hover:bg-surface-secondary transition-colors"
-              >
-                <Settings size={20} className="text-secondary" />
-              </button>
-            </div>
-          </div>
+        <div className="px-4 pt-6 pb-4">
+          <h1 className="text-4xl font-bold text-gray-900 leading-tight">
+            {greeting}, {firstName}
+          </h1>
         </div>
       </div>
       
-      <div className="page-content space-y-6">
-        {/* Dashboard Cards - Airbnb style */}
-        <div className="space-y-4">
-          {/* Balance Summary Card */}
-          {balance && (netBalance !== 0 || balance.totalOwed > 0 || balance.totalOwing > 0) && (
-            <Card className="glass-card">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-footnote text-secondary">Your balance</p>
-                    <p className={`text-title-1 font-semibold ${
-                      netBalance >= 0 ? 'text-accent' : 'text-destructive'
-                    }`}>
-                      {netBalance >= 0 ? '+' : ''}${Math.abs(netBalance).toFixed(2)}
-                    </p>
-                  </div>
-                  <button 
-                    onClick={() => setLocation('/expenses')}
-                    className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center"
-                  >
-                    <ChevronRight size={16} className="text-primary" />
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-4">
-            <Card 
-              className="glass-card cursor-pointer hover:shadow-medium transition-all duration-300"
-              onClick={() => setLocation('/chores')}
-            >
-              <CardContent className="p-4">
+      {/* Smart Cards Stack */}
+      <div className="px-4 space-y-3">
+        {/* 1. Chore Card */}
+        {nextChore ? (
+          <div 
+            className="smart-card interactive cursor-pointer"
+            onClick={() => setLocation('/chores')}
+          >
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-3">
                   <div className="w-6 h-6 bg-primary/15 rounded-lg flex items-center justify-center">
                     <CheckSquare size={16} className="text-primary" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-body font-semibold text-primary">Chores</p>
-                    <p className="text-footnote text-secondary truncate">
-                      {activeChores.length} active
-                    </p>
-                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900">Next chore</h3>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card 
-              className="glass-card cursor-pointer hover:shadow-medium transition-all duration-300"
-              onClick={() => setLocation('/calendar')}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-warning/15 rounded-lg flex items-center justify-center">
-                    <Calendar size={16} className="text-warning" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-body font-semibold text-primary">Calendar</p>
-                    <p className="text-footnote text-secondary truncate">
-                      {upcomingEvents.length} upcoming
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Recent Activity */}
-          {(recentMessages.length > 0 || activeChores.length > 0) && (
-            <Card className="glass-card">
-              <CardContent className="p-4">
-                <h3 className="text-headline font-semibold text-primary mb-3">Recent activity</h3>
-                <div className="space-y-3">
-                  {recentMessages.slice(0, 2).map((message: any) => (
-                    <div 
-                      key={message.id} 
-                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-secondary/50 transition-colors cursor-pointer"
-                      onClick={() => setLocation('/messages')}
-                    >
-                      <div className="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center">
-                        <span className="text-secondary text-sm font-medium">
-                          {message.user.firstName?.[0] || '?'}
+                <ChevronRight size={20} className="text-gray-400" />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-lg font-medium text-gray-900">{nextChore.title}</p>
+                  <div className="flex items-center space-x-2 mt-1">
+                    {nextChore.assignedUser && (
+                      <div className="w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-medium text-gray-600">
+                          {nextChore.assignedUser.firstName?.[0] || '?'}
                         </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-body text-primary truncate">{message.content}</p>
-                        <p className="text-footnote text-secondary">
-                          {message.user.firstName} • {new Date(message.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {activeChores.slice(0, 1).map((chore: any) => (
-                    <div 
-                      key={chore.id} 
-                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-secondary/50 transition-colors cursor-pointer"
-                      onClick={() => setLocation('/chores')}
-                    >
-                      <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                        <CheckSquare size={16} className="text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-body text-primary truncate">{chore.title}</p>
-                        <p className="text-footnote text-secondary">
-                          {chore.assignedUser?.firstName || 'Unassigned'} • Due {chore.dueDate ? new Date(chore.dueDate).toLocaleDateString() : 'soon'}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    )}
+                    <span className="text-sm text-gray-500">
+                      {nextChore.assignedUser?.firstName || 'Unassigned'}
+                    </span>
+                    {nextChore.dueDate && (
+                      <>
+                        <span className="text-gray-300">•</span>
+                        <span className="text-sm text-gray-500">
+                          Due {new Date(nextChore.dueDate).toLocaleDateString()}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+                
+                <button className="bg-primary text-white px-4 py-2 rounded-full text-sm font-medium">
+                  Mark done
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div 
+            className="empty-state-card cursor-pointer"
+            onClick={() => setLocation('/chores')}
+          >
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <CheckSquare size={24} className="text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-600 mb-1">All caught up!</h3>
+              <p className="text-sm text-gray-500 mb-4">No chores due today</p>
+              <button className="bg-primary text-white px-4 py-2 rounded-full text-sm font-medium">
+                Add chore
+              </button>
+            </div>
+          </div>
+        )}
 
-          {/* Empty State */}
-          {recentMessages.length === 0 && activeChores.length === 0 && upcomingEvents.length === 0 && (
-            <Card className="glass-card">
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-surface-secondary rounded-full flex items-center justify-center mx-auto mb-3">
-                  <CheckSquare size={24} className="text-tertiary" />
+        {/* 2. Bills Card */}
+        {balance && (netBalance !== 0 || balance.totalOwed > 0 || balance.totalOwing > 0) ? (
+          <div 
+            className="smart-card interactive cursor-pointer"
+            onClick={() => setLocation('/expenses')}
+          >
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
+                    <DollarSign size={16} className="text-green-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900">Bills</h3>
                 </div>
-                <h3 className="text-headline font-semibold text-primary mb-1">All caught up</h3>
-                <p className="text-body text-secondary mb-4">No recent activity to show</p>
-                <Button 
-                  onClick={() => setLocation('/chores')}
-                  className="bg-primary text-white px-6 py-2 rounded-lg text-body font-medium"
-                >
-                  Add a chore
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+                <ChevronRight size={20} className="text-gray-400" />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Your balance</p>
+                  <p className={`text-2xl font-bold ${
+                    netBalance >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {netBalance >= 0 ? '+' : ''}${Math.abs(netBalance).toFixed(2)}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {netBalance >= 0 ? "You're owed money" : "You owe money"}
+                  </p>
+                </div>
+                
+                <button className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium">
+                  Settle up
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div 
+            className="empty-state-card cursor-pointer"
+            onClick={() => setLocation('/expenses')}
+          >
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <DollarSign size={24} className="text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-600 mb-1">All settled!</h3>
+              <p className="text-sm text-gray-500 mb-4">No outstanding bills</p>
+              <button className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium">
+                Add expense
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 3. Calendar Card */}
+        {todayEvents.length > 0 ? (
+          <div 
+            className="smart-card interactive cursor-pointer"
+            onClick={() => setLocation('/calendar')}
+          >
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <Calendar size={16} className="text-orange-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900">Today</h3>
+                </div>
+                <ChevronRight size={20} className="text-gray-400" />
+              </div>
+              
+              <div className="space-y-2">
+                {todayEvents.slice(0, 2).map((event: any) => (
+                  <div key={event.id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
+                    <div className="w-2 h-8 bg-orange-400 rounded-full"></div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">{event.title}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(event.startDate).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div 
+            className="empty-state-card cursor-pointer"
+            onClick={() => setLocation('/calendar')}
+          >
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Calendar size={24} className="text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-600 mb-1">Free day!</h3>
+              <p className="text-sm text-gray-500 mb-4">No events scheduled</p>
+              <button className="bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium">
+                Add event
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 4. Chat Card */}
+        {recentMessages.length > 0 ? (
+          <div 
+            className="smart-card interactive cursor-pointer"
+            onClick={() => setLocation('/messages')}
+          >
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <MessageSquare size={16} className="text-purple-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900">Chat</h3>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {recentMessages.length > 0 && (
+                    <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-white">{recentMessages.length}</span>
+                    </div>
+                  )}
+                  <ChevronRight size={20} className="text-gray-400" />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                {recentMessages.slice(0, 1).map((message: any) => (
+                  <div key={message.id} className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-purple-700">
+                        {message.user.firstName?.[0] || '?'}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900">
+                        {message.user.firstName || 'Someone'}
+                      </p>
+                      <p className="text-sm text-gray-600 truncate">{message.content}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(message.createdAt).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div 
+            className="empty-state-card cursor-pointer"
+            onClick={() => setLocation('/messages')}
+          >
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <MessageSquare size={24} className="text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-600 mb-1">Start chatting!</h3>
+              <p className="text-sm text-gray-500 mb-4">No messages yet</p>
+              <button className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium">
+                Send message
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -86,45 +86,46 @@
 .text-warning { color: var(--warning); }
 .text-destructive { color: var(--destructive); }
 
-/* visionOS Glass Cards */
-.glass-card {
-  background: var(--surface);
-  backdrop-filter: var(--blur-medium);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-soft);
-  transition: all 0.15s ease-out;
+/* Airbnb-style Smart Cards */
+.smart-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 300ms ease-in-out;
   position: relative;
   overflow: hidden;
+  border: none;
 }
 
-.glass-card:hover {
-  box-shadow: var(--shadow-medium);
-  transform: translateY(-1px);
+.smart-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
-.elevated-card {
-  background: var(--surface);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border-subtle);
-  transition: all 0.15s ease-out;
+.smart-card.interactive:active {
+  transform: translateY(-1px) scale(0.98);
 }
 
-.elevated-card:hover {
-  box-shadow: var(--shadow-medium);
-  transform: translateY(-1px);
+.empty-state-card {
+  background: #FAFAFA;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border: 1px dashed #E0E0E0;
+  transition: all 300ms ease-in-out;
 }
 
-/* visionOS Header */
+.empty-state-card:hover {
+  background: #F5F5F5;
+  border-color: var(--primary);
+}
+
+/* Clean Header */
 .floating-header {
-  background: var(--surface-glass);
-  backdrop-filter: var(--blur-strong);
-  border-bottom: 1px solid var(--border-subtle);
+  background: var(--background);
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: var(--shadow-soft);
+  padding-top: env(safe-area-inset-top);
 }
 
 .header-content {
@@ -135,9 +136,9 @@
   font-weight: 900;
 }
 
-/* Apple-standard Tab Navigation */
+/* Minimal Tab Navigation */
 .tab-navigation {
-  background: var(--surface-glass);
+  background: var(--surface);
   backdrop-filter: var(--blur-strong);
   border-top: 1px solid var(--border-subtle);
   position: fixed;
@@ -145,16 +146,16 @@
   left: 0;
   right: 0;
   z-index: 50;
-  padding: 8px 16px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom));
-  box-shadow: var(--shadow-medium);
+  padding: 4px 16px;
+  padding-bottom: calc(4px + env(safe-area-inset-bottom));
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tab-item {
   min-height: 44px;
   min-width: 44px;
-  padding: 6px 4px;
-  border-radius: 8px;
+  padding: 4px 2px;
+  border-radius: 6px;
   transition: all 120ms ease-out;
   position: relative;
   display: flex;
@@ -168,11 +169,11 @@
 }
 
 .tab-item.inactive {
-  color: var(--text-tertiary);
+  color: #8E8E93;
 }
 
 .tab-item:hover {
-  background: var(--surface-secondary);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 /* Modern Button System */
@@ -417,11 +418,11 @@
 .animate-fade-in { animation: fadeIn 0.3s ease-out; }
 .animate-pulse { animation: pulse 2s infinite; }
 
-/* visionOS Page Layout */
+/* Apple Mobile Layout */
 .page-container {
   min-height: 100vh;
   background: var(--background);
-  padding-bottom: 120px;
+  padding-bottom: 80px;
   position: relative;
   max-width: 430px;
   margin: 0 auto;
@@ -577,8 +578,8 @@
 }
 
 /* Legacy mappings */
-.card-shadow { @apply elevated-card; }
-.card-elevated { @apply glass-card; }
+.card-shadow { @apply smart-card; }
+.glass-card { @apply smart-card; }
 .bg-ios-gray { background-color: var(--background); }
 .bg-ios-blue { background-color: var(--primary); }
 .bg-ios-green { background-color: var(--accent); }
