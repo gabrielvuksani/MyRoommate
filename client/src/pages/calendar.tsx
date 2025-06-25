@@ -143,11 +143,11 @@ export default function Calendar() {
     <div className="page-container page-transition">
       {/* visionOS Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
-        <div className="max-w-md mx-auto px-6">
+        <div className="page-header">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
-              <p className="text-sm text-gray-600">Your household schedule</p>
+              <h1 className="page-title">Calendar</h1>
+              <p className="page-subtitle">Your household schedule</p>
             </div>
             
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
