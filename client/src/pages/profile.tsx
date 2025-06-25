@@ -119,7 +119,7 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="page-content space-y-6 pt-40">
+      <div className="pt-32 px-6 space-y-6">
         {/* Profile Header */}
         <Card className="smart-card">
           <CardContent className="p-6">
