@@ -110,11 +110,6 @@ export default function Calendar() {
   const handleDayClick = (day: number) => {
     const clickedDate = new Date(currentYear, currentMonth, day);
     setSelectedDate(clickedDate);
-    
-    // Pre-fill the form with the selected date
-    const dateString = clickedDate.toISOString().split('T')[0];
-    setNewEvent(prev => ({ ...prev, startDate: dateString }));
-    setIsCreateOpen(true);
   };
 
   const getDayEvents = (day: number) => {
@@ -136,21 +131,21 @@ export default function Calendar() {
 
   return (
     <div className="page-container">
-      {/* Clean Modern Header */}
+      {/* visionOS Header */}
       <div className="floating-header">
-        <div className="px-6 py-8">
+        <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="header-content text-4xl font-black tracking-tight">RoomieFlow</h1>
-              <p className="text-subhead text-secondary mt-2 font-medium">
-                Your shared calendar and events
+              <h1 className="header-content text-3xl font-black tracking-tight">RoomieFlow</h1>
+              <p className="text-subhead text-secondary mt-1 font-medium">
+                Shared calendar
               </p>
             </div>
             
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
                 <button className="btn-floating">
-                  <Plus size={22} />
+                  <Plus size={20} />
                 </button>
               </DialogTrigger>
               <DialogContent className="modal-content">
@@ -162,31 +157,31 @@ export default function Calendar() {
                     placeholder="Event title"
                     value={newEvent.title}
                     onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                    className="input-modern w-full"
+                    className="w-full p-4 bg-surface border border-border-subtle rounded-2xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   />
                   <input
                     placeholder="Description (optional)"
                     value={newEvent.description}
                     onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                    className="input-modern w-full"
+                    className="w-full p-4 bg-surface border border-border-subtle rounded-2xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   />
                   <input
                     type="date"
                     value={newEvent.startDate}
                     onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
-                    className="input-modern w-full"
+                    className="w-full p-4 bg-surface border border-border-subtle rounded-2xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   />
                   <input
                     type="time"
                     value={newEvent.startTime}
                     onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                    className="input-modern w-full"
+                    className="w-full p-4 bg-surface border border-border-subtle rounded-2xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   />
                   <Select value={newEvent.type} onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}>
-                    <SelectTrigger className="input-modern">
+                    <SelectTrigger className="w-full p-4 bg-surface border border-border-subtle rounded-2xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
                       <SelectValue placeholder="Event type..." />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-surface border border-border-subtle rounded-2xl shadow-strong">
                       <SelectItem value="social">Social</SelectItem>
                       <SelectItem value="rent">Rent</SelectItem>
                       <SelectItem value="utility">Utility</SelectItem>
@@ -197,7 +192,7 @@ export default function Calendar() {
                   <button
                     onClick={handleCreateEvent}
                     disabled={!canCreateEvent || createEventMutation.isPending}
-                    className="btn-primary w-full"
+                    className="w-full bg-primary text-white p-4 rounded-2xl font-semibold transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {createEventMutation.isPending ? "Creating..." : "Create Event"}
                   </button>
@@ -279,33 +274,57 @@ export default function Calendar() {
             {/* Daily Schedule View */}
             {selectedDate && (
               <div className="daily-schedule">
-                <h3 className="text-headline font-semibold text-primary mb-3">
-                  {selectedDate.toLocaleDateString('en-US', { 
-                    weekday: 'long',
-                    month: 'long', 
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-headline font-bold text-primary">
+                    {selectedDate.toLocaleDateString('en-US', { 
+                      weekday: 'long',
+                      month: 'long', 
+                      day: 'numeric'
+                    })}
+                  </h3>
+                  <button
+                    onClick={() => {
+                      const dateString = selectedDate.toISOString().split('T')[0];
+                      setNewEvent(prev => ({ ...prev, startDate: dateString }));
+                      setIsCreateOpen(true);
+                    }}
+                    className="text-primary text-sm font-medium"
+                  >
+                    + Add Event
+                  </button>
+                </div>
                 {getDayEvents(selectedDate.getDate()).length === 0 ? (
-                  <p className="text-subhead text-secondary">No events scheduled for this day</p>
+                  <div className="text-center py-8">
+                    <p className="text-subhead text-secondary">No events scheduled</p>
+                    <p className="text-caption text-tertiary mt-1">Tap + Add Event to create one</p>
+                  </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {getDayEvents(selectedDate.getDate()).map((event: any) => (
-                      <div key={event.id} className="flex items-center space-x-3 p-3 bg-surface-secondary rounded-lg">
-                        <div className="w-3 h-3 bg-accent rounded-full flex-shrink-0"></div>
-                        <div className="flex-1">
-                          <p className="text-body font-medium text-primary">{event.title}</p>
-                          <p className="text-caption text-secondary">
-                            {new Date(event.startDate).toLocaleTimeString('en-US', {
-                              hour: 'numeric',
-                              minute: '2-digit'
-                            })}
-                          </p>
+                      <div key={event.id} className="event-item">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="text-body font-semibold text-primary">{event.title}</p>
+                            <div className="flex items-center space-x-2 mt-1">
+                              <p className="text-caption text-secondary">
+                                {new Date(event.startDate).toLocaleTimeString('en-US', {
+                                  hour: 'numeric',
+                                  minute: '2-digit'
+                                })}
+                              </p>
+                              <span className="w-1 h-1 bg-tertiary rounded-full"></span>
+                              <p className="text-caption text-secondary">
+                                {event.creator?.firstName || 'Unknown'}
+                              </p>
+                            </div>
+                            {event.description && (
+                              <p className="text-caption text-tertiary mt-2">{event.description}</p>
+                            )}
+                          </div>
+                          <span className="text-caption text-secondary capitalize px-2 py-1 bg-surface-secondary rounded-lg ml-3">
+                            {event.type}
+                          </span>
                         </div>
-                        <span className="text-caption text-secondary capitalize px-2 py-1 bg-surface rounded">
-                          {event.type}
-                        </span>
                       </div>
                     ))}
                   </div>

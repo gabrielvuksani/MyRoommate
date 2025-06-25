@@ -7,8 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
+import { CheckSquare, DollarSign, Calendar, MessageSquare, Plus } from "lucide-react";
 
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -126,39 +126,41 @@ export default function Home() {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-ios-gray">
-        <div className="w-8 h-8 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (!household) {
     return (
-      <div className="min-h-screen bg-ios-gray">
-        <div className="h-6 bg-white"></div>
-        <div className="px-4 pt-4 pb-6 bg-white">
-          <h1 className="text-ios-large-title font-bold text-black">Welcome to RoomieHub</h1>
-          <p className="text-ios-subhead text-ios-gray-5 mt-1">Create or join a household to get started</p>
+      <div className="page-container">
+        <div className="floating-header">
+          <div className="px-6 py-6">
+            <h1 className="header-content text-3xl font-black tracking-tight">RoomieFlow</h1>
+            <p className="text-subhead text-secondary mt-1">Create or join a household to get started</p>
+          </div>
         </div>
-        <div className="px-4 space-y-4">
-          <Card className="card-shadow">
-            <CardContent className="p-4">
-              <h2 className="text-ios-headline font-semibold text-black mb-4">Create a New Household</h2>
+        <div className="page-content space-y-6">
+          <Card className="glass-card">
+            <CardContent className="p-6">
+              <h2 className="text-headline font-semibold text-primary mb-4">Create New Household</h2>
               <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                 <DialogTrigger asChild>
-                  <Button className="w-full bg-ios-blue text-white py-3 rounded-lg text-ios-body font-medium">
+                  <Button className="w-full bg-primary text-white py-3 rounded-2xl text-body font-semibold">
                     Create Household
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-sm mx-auto">
-                  <DialogHeader>
-                    <DialogTitle>Create New Household</DialogTitle>
+                <DialogContent className="modal-content">
+                  <DialogHeader className="px-6 pt-6 pb-2">
+                    <DialogTitle className="text-title-2 font-bold text-primary">Create New Household</DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4">
+                  <div className="px-6 pb-6 space-y-4">
                     <Input
                       placeholder="Household name"
                       value={newHousehold.name}
                       onChange={(e) => setNewHousehold({ ...newHousehold, name: e.target.value })}
+                      className="w-full p-4 bg-surface border border-border-subtle rounded-2xl"
                     />
                     <Input
                       type="number"
@@ -166,6 +168,7 @@ export default function Home() {
                       placeholder="Monthly rent (optional)"
                       value={newHousehold.rentAmount}
                       onChange={(e) => setNewHousehold({ ...newHousehold, rentAmount: e.target.value })}
+                      className="w-full p-4 bg-surface border border-border-subtle rounded-2xl"
                     />
                     <Input
                       type="number"
@@ -174,11 +177,12 @@ export default function Home() {
                       placeholder="Rent due day (optional)"
                       value={newHousehold.rentDueDay}
                       onChange={(e) => setNewHousehold({ ...newHousehold, rentDueDay: e.target.value })}
+                      className="w-full p-4 bg-surface border border-border-subtle rounded-2xl"
                     />
                     <Button 
                       onClick={handleCreateHousehold}
                       disabled={!newHousehold.name.trim() || createHouseholdMutation.isPending}
-                      className="w-full bg-ios-blue hover:bg-ios-blue/90"
+                      className="w-full bg-primary text-white py-3 rounded-2xl font-semibold"
                     >
                       {createHouseholdMutation.isPending ? "Creating..." : "Create Household"}
                     </Button>
@@ -188,21 +192,21 @@ export default function Home() {
             </CardContent>
           </Card>
           
-          <Card className="card-shadow">
-            <CardContent className="p-4">
-              <h2 className="text-ios-headline font-semibold text-black mb-4">Join a Household</h2>
-              <div className="space-y-3">
+          <Card className="glass-card">
+            <CardContent className="p-6">
+              <h2 className="text-headline font-semibold text-primary mb-4">Join Household</h2>
+              <div className="space-y-4">
                 <Input
                   type="text"
                   placeholder="Enter invite code"
                   value={inviteCode}
                   onChange={(e) => setInviteCode(e.target.value)}
-                  className="w-full border border-ios-gray-3 rounded-lg px-4 py-3 text-ios-body uppercase"
+                  className="w-full p-4 bg-surface border border-border-subtle rounded-2xl uppercase"
                 />
                 <Button 
                   onClick={handleJoinHousehold}
                   disabled={!inviteCode.trim() || joinHouseholdMutation.isPending}
-                  className="w-full bg-ios-green hover:bg-ios-green/90 text-white py-3 rounded-lg text-ios-body font-medium"
+                  className="w-full bg-accent text-white py-3 rounded-2xl font-semibold"
                 >
                   {joinHouseholdMutation.isPending ? "Joining..." : "Join Household"}
                 </Button>
@@ -223,164 +227,195 @@ export default function Home() {
 
   return (
     <div className="page-container">
+      {/* visionOS Header */}
       <div className="floating-header">
-        <div className="px-6 py-4">
+        <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-large-title font-bold text-primary animate-fade-in">
-                Good morning, {firstName}
-              </h1>
+              <h1 className="header-content text-3xl font-black tracking-tight">RoomieFlow</h1>
               <p className="text-subhead text-secondary mt-1">
-                Here's what needs your attention
+                Hey {firstName}! 👋
               </p>
             </div>
-            <div className="flex items-center space-x-3">
-              <button 
-                onClick={() => setLocation('/settings')}
-                className="btn-ghost w-11 h-11 rounded-full p-0 flex items-center justify-center"
-              >
-                <span className="text-lg">⚙️</span>
-              </button>
-              <button 
-                onClick={() => setLocation('/profile')}
-                className="w-11 h-11 bg-primary rounded-full flex items-center justify-center shadow-soft hover:shadow-medium transition-all duration-300 hover:scale-105"
-              >
-                <span className="text-inverse text-footnote font-semibold">
-                  {firstName[0]?.toUpperCase() || '?'}
-                </span>
-              </button>
-            </div>
+            
+            <button 
+              onClick={() => setLocation('/settings')}
+              className="w-10 h-10 bg-surface border border-border-subtle rounded-full flex items-center justify-center text-primary font-semibold text-sm hover:bg-surface-secondary transition-all"
+            >
+              {firstName[0]?.toUpperCase() || '?'}
+            </button>
           </div>
         </div>
       </div>
       
-      <div className="page-content space-y-6">
-        {/* Active Chores Card */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-ios-headline font-semibold text-black">Active Chores</h2>
-              <button 
-                onClick={() => setLocation('/chores')}
-                className="text-ios-footnote text-ios-blue font-medium"
-              >
-                View All
-              </button>
+      <div className="page-content space-y-8">
+        {/* Quick Actions Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            onClick={() => setLocation('/chores')}
+            className="group bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl p-6 text-white shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
+          >
+            <CheckSquare size={28} className="mb-3" />
+            <div className="text-left">
+              <p className="text-headline font-bold">Chores</p>
+              <p className="text-caption opacity-90">Manage tasks</p>
             </div>
-            <div className="space-y-2">
-              {activeChores.length === 0 ? (
-                <p className="text-ios-body text-ios-gray-5">No active chores</p>
-              ) : (
-                activeChores.slice(0, 2).map((chore: any) => (
-                  <div key={chore.id} className="flex items-center justify-between py-2">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-6 h-6 border-2 border-ios-blue rounded-full"></div>
-                      <div>
-                        <p className="text-ios-body text-black">{chore.title}</p>
-                        <p className="text-ios-footnote text-ios-gray-5">
-                          {chore.assignedUser ? `${chore.assignedUser.firstName}'s turn` : 'Unassigned'}
-                        </p>
-                      </div>
-                    </div>
-                    {chore.status === 'todo' && (
-                      <span className="text-ios-caption text-ios-orange font-medium">Pending</span>
-                    )}
+          </button>
+          
+          <button
+            onClick={() => setLocation('/expenses')}
+            className="group bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl p-6 text-white shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
+          >
+            <DollarSign size={28} className="mb-3" />
+            <div className="text-left">
+              <p className="text-headline font-bold">Expenses</p>
+              <p className="text-caption opacity-90">Split bills</p>
+            </div>
+          </button>
+          
+          <button
+            onClick={() => setLocation('/calendar')}
+            className="group bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl p-6 text-white shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
+          >
+            <Calendar size={28} className="mb-3" />
+            <div className="text-left">
+              <p className="text-headline font-bold">Calendar</p>
+              <p className="text-caption opacity-90">Plan events</p>
+            </div>
+          </button>
+          
+          <button
+            onClick={() => setLocation('/messages')}
+            className="group bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl p-6 text-white shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
+          >
+            <MessageSquare size={28} className="mb-3" />
+            <div className="text-left">
+              <p className="text-headline font-bold">Chat</p>
+              <p className="text-caption opacity-90">Group messages</p>
+            </div>
+          </button>
+        </div>
+
+        {/* Smart Balance Card */}
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-title-2 font-bold text-primary">Money Balance</h2>
+                <p className="text-subhead text-secondary">Your financial status</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-2xl flex items-center justify-center">
+                <DollarSign className="text-white" size={24} />
+              </div>
+            </div>
+            {balance ? (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center p-4 bg-red-50 rounded-2xl">
+                  <span className="text-body font-medium text-gray-700">You owe:</span>
+                  <span className="text-title-3 font-bold text-red-600">
+                    ${balance.totalOwing.toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-green-50 rounded-2xl">
+                  <span className="text-body font-medium text-gray-700">You're owed:</span>
+                  <span className="text-title-3 font-bold text-green-600">
+                    ${balance.totalOwed.toFixed(2)}
+                  </span>
+                </div>
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
+                  <div className="flex justify-between items-center">
+                    <span className="text-headline font-bold text-gray-800">Net balance:</span>
+                    <span className={`text-title-2 font-black ${
+                      netBalance >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {netBalance >= 0 ? '+' : ''}${netBalance.toFixed(2)}
+                    </span>
                   </div>
-                ))
-              )}
-            </div>
+                </div>
+              </div>
+            ) : (
+              <div className="animate-pulse space-y-4">
+                <div className="h-16 bg-gray-200 rounded-2xl"></div>
+                <div className="h-16 bg-gray-200 rounded-2xl"></div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Recent Messages Card */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-ios-headline font-semibold text-black">Recent Messages</h2>
-              <button 
-                onClick={() => setLocation('/messages')}
-                className="text-ios-footnote text-ios-blue font-medium"
-              >
-                Open Chat
-              </button>
-            </div>
-            <div className="space-y-3">
-              {recentMessages.length === 0 ? (
-                <p className="text-ios-body text-ios-gray-5">No recent messages</p>
-              ) : (
-                recentMessages.map((message: any) => (
-                  <div key={message.id} className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-ios-blue rounded-full flex items-center justify-center">
-                      <span className="text-white text-ios-footnote font-medium">
-                        {message.user.firstName?.[0] || message.user.email?.[0] || '?'}
-                      </span>
+        {/* Recent Activity */}
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <h2 className="text-title-2 font-bold text-primary mb-4">Recent Activity</h2>
+            <div className="space-y-4">
+              {activeChores.length > 0 && (
+                <div className="flex items-center justify-between p-4 bg-surface-secondary rounded-2xl">
+                  <div className="flex items-center space-x-3">
+                    <CheckSquare size={20} className="text-primary" />
+                    <div>
+                      <p className="text-body font-medium text-primary">
+                        {activeChores.length} active chore{activeChores.length !== 1 ? 's' : ''}
+                      </p>
+                      <p className="text-caption text-secondary">Tap to manage</p>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-ios-subhead text-black">{message.content}</p>
-                      <p className="text-ios-footnote text-ios-gray-5 mt-1">
-                        {message.user.firstName || message.user.email} • {new Date(message.createdAt).toLocaleTimeString()}
+                  </div>
+                  <button 
+                    onClick={() => setLocation('/chores')}
+                    className="text-primary text-sm font-medium"
+                  >
+                    View
+                  </button>
+                </div>
+              )}
+              
+              {recentMessages.length > 0 && (
+                <div className="flex items-center justify-between p-4 bg-surface-secondary rounded-2xl">
+                  <div className="flex items-center space-x-3">
+                    <MessageSquare size={20} className="text-primary" />
+                    <div>
+                      <p className="text-body font-medium text-primary">
+                        {recentMessages.length} new message{recentMessages.length !== 1 ? 's' : ''}
+                      </p>
+                      <p className="text-caption text-secondary">
+                        {recentMessages[recentMessages.length - 1]?.user?.firstName || 'Someone'} sent a message
                       </p>
                     </div>
                   </div>
-                ))
+                  <button 
+                    onClick={() => setLocation('/messages')}
+                    className="text-primary text-sm font-medium"
+                  >
+                    View
+                  </button>
+                </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Balance Summary Card */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-ios-headline font-semibold text-black">Your Balance</h2>
-              <button 
-                onClick={() => setLocation('/expenses')}
-                className="text-ios-footnote text-ios-blue font-medium"
-              >
-                See Details
-              </button>
-            </div>
-            <div className="text-center py-2">
-              <p className={`text-ios-title-1 font-bold ${netBalance >= 0 ? 'text-ios-green' : 'text-ios-red'}`}>
-                {netBalance >= 0 ? '+' : ''}${netBalance.toFixed(2)}
-              </p>
-              <p className="text-ios-footnote text-ios-gray-5 mt-1">
-                {netBalance >= 0 ? "You're owed money" : "You owe money"}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Upcoming Events Card */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-ios-headline font-semibold text-black">This Week</h2>
-              <button 
-                onClick={() => setLocation('/calendar')}
-                className="text-ios-footnote text-ios-blue font-medium"
-              >
-                Calendar
-              </button>
-            </div>
-            <div className="space-y-3">
-              {upcomingEvents.length === 0 ? (
-                <p className="text-ios-body text-ios-gray-5">No upcoming events</p>
-              ) : (
-                upcomingEvents.map((event: any) => (
-                  <div key={event.id} className="flex items-center space-x-3">
-                    <div 
-                      className="w-2 h-8 rounded-full" 
-                      style={{ backgroundColor: event.color }}
-                    ></div>
-                    <div className="flex-1">
-                      <p className="text-ios-body text-black">{event.title}</p>
-                      <p className="text-ios-footnote text-ios-gray-5">
-                        {new Date(event.startDate).toLocaleDateString()}
+              
+              {upcomingEvents.length > 0 && (
+                <div className="flex items-center justify-between p-4 bg-surface-secondary rounded-2xl">
+                  <div className="flex items-center space-x-3">
+                    <Calendar size={20} className="text-primary" />
+                    <div>
+                      <p className="text-body font-medium text-primary">
+                        {upcomingEvents.length} upcoming event{upcomingEvents.length !== 1 ? 's' : ''}
+                      </p>
+                      <p className="text-caption text-secondary">
+                        Next: {upcomingEvents[0]?.title}
                       </p>
                     </div>
                   </div>
-                ))
+                  <button 
+                    onClick={() => setLocation('/calendar')}
+                    className="text-primary text-sm font-medium"
+                  >
+                    View
+                  </button>
+                </div>
+              )}
+              
+              {activeChores.length === 0 && recentMessages.length === 0 && upcomingEvents.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-subhead text-secondary">All caught up!</p>
+                  <p className="text-caption text-tertiary mt-1">No recent activity</p>
+                </div>
               )}
             </div>
           </CardContent>
