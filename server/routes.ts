@@ -151,7 +151,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const updates = req.body;
       
-      const chore = await storage.updateChore(id, updates);
+      // Handle date fields properly
+      const processedUpdates = { ...updates };
+      if (processedUpdates.completedAt && typeof processedUpdates.completedAt === 'string') {
+        processedUpdates.completedAt = new Date(processedUpdates.completedAt);
+      }
+      if (processedUpdates.dueDate && typeof processedUpdates.dueDate === 'string') {
+        processedUpdates.dueDate = new Date(processedUpdates.dueDate);
+      }
+      
+      const chore = await storage.updateChore(id, processedUpdates);
       res.json(chore);
     } catch (error) {
       console.error("Error updating chore:", error);

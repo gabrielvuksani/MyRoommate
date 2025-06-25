@@ -60,7 +60,10 @@ export default function ChoreBoard({ chores, onUpdateChore }: ChoresBoardProps) 
           )}
           {chore.status === 'doing' && (
             <button
-              onClick={() => onUpdateChore(chore.id, { status: 'done', completedAt: new Date() })}
+              onClick={() => onUpdateChore(chore.id, { 
+                status: 'done', 
+                completedAt: new Date().toISOString()
+              })}
               className="text-ios-caption text-ios-green font-medium"
             >
               Complete
@@ -68,7 +71,10 @@ export default function ChoreBoard({ chores, onUpdateChore }: ChoresBoardProps) 
           )}
           {chore.status === 'done' && (
             <button
-              onClick={() => onUpdateChore(chore.id, { status: 'todo', completedAt: null })}
+              onClick={() => onUpdateChore(chore.id, { 
+                status: 'todo', 
+                completedAt: null 
+              })}
               className="text-ios-caption text-ios-blue font-medium"
             >
               Reopen

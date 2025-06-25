@@ -89,7 +89,7 @@ export default function Chores() {
     onError: (error) => {
       console.error('Error updating chore:', error);
       toast({
-        title: "Error",
+        title: "Error", 
         description: "Failed to update chore",
         variant: "destructive",
       });
