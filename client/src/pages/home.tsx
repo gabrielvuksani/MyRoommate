@@ -34,31 +34,29 @@ export default function Home() {
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 20);
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   if (!household) {
     return (
-      <div className="page-container page-transition">
+      <div className="page-container animate-page-enter">
         <div className="floating-header">
           <div className="page-header">
-            <h1 className="page-title">MyRoommate</h1>
-            <p className="page-subtitle">The app that removes every headache of living with roommates</p>
+            <h1 className="page-title">Welcome</h1>
+            <p className="page-subtitle">Let's get you set up</p>
           </div>
         </div>
-
-        <div className="page-content flex items-center justify-center min-h-[60vh]">
-          <Card className="glass-card max-w-md w-full">
+        <div className="page-content">
+          <Card className="glass-card">
             <CardContent className="p-8 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center mx-auto mb-6">
                 <HomeIcon size={32} className="text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Create or Join a Household</h2>
-              <p className="text-gray-600 mb-8 leading-relaxed">
-                Connect with your roommates and start managing your shared living space together.
-              </p>
-              <button
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Create or Join a Household</h2>
+              <p className="text-gray-600 mb-8">Start managing your shared living space with roommates</p>
+              <button 
                 onClick={() => setLocation('/onboarding')}
                 className="bg-primary text-white px-8 py-4 rounded-xl font-semibold btn-animated shadow-lg hover:shadow-xl transition-all"
               >
@@ -80,38 +78,50 @@ export default function Home() {
   const greeting = currentHour < 12 ? 'Good morning' : currentHour < 17 ? 'Good afternoon' : 'Good evening';
 
   const nextChore = activeChores.sort((a: any, b: any) => {
-    const aDate = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
-    const bDate = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
-    return aDate - bDate;
+    if (!a.dueDate && !b.dueDate) return 0;
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   })[0];
 
   const todayEvents = calendarEvents.filter((event: any) => {
-    const eventDate = new Date(event.startDate);
-    const today = new Date();
-    return eventDate.toDateString() === today.toDateString();
+    const eventDate = new Date(event.startDate).toDateString();
+    const today = new Date().toDateString();
+    return eventDate === today;
   });
 
   return (
     <div className="page-container page-transition">
+      {/* Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
-          <div>
-            <h1 className="page-title">{greeting}, {firstName}!</h1>
-            <p className="page-subtitle">Here's what's happening in your household</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="page-title">{greeting}, {firstName}</h1>
+              <p className="page-subtitle">{household.name}</p>
+            </div>
+            <button 
+              onClick={() => setLocation('/profile')}
+              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated p-[20px] nav-transition transition-all hover:scale-[1.05] animate-fade-in"
+            >
+              <span className="text-white font-bold text-lg">
+                {firstName[0]?.toUpperCase() || '?'}
+              </span>
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="page-content space-y-8">
+      <div className="page-content space-y-6">
         {/* Hero Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <Card className="glass-card">
             <CardContent className="p-6 text-center animate-fade-in">
               <button 
                 onClick={() => setLocation('/chores')}
                 className="w-full transition-all btn-animated"
               >
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <CheckSquare className="text-white" size={20} />
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{activeChores.length}</p>
@@ -119,14 +129,14 @@ export default function Home() {
               </button>
             </CardContent>
           </Card>
-
+          
           <Card className="glass-card">
             <CardContent className="p-6 text-center animate-fade-in" style={{ animationDelay: '100ms' }}>
               <button 
                 onClick={() => setLocation('/expenses')}
                 className="w-full transition-all btn-animated"
               >
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <DollarSign className="text-white" size={20} />
                 </div>
                 <p className="text-2xl font-bold text-gray-900">
@@ -139,6 +149,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
+          {/* Additional stats for larger screens */}
           <Card className="glass-card">
             <CardContent className="p-6 text-center animate-fade-in" style={{ animationDelay: '200ms' }}>
               <button 
@@ -356,62 +367,73 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Recent Activity - Simplified */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center">
-              <MessageCircle className="w-5 h-5 mr-2 text-primary" />
-              Recent Activity
-            </h2>
-            <button 
-              onClick={() => setLocation('/messages')}
-              className="text-sm text-primary font-medium transition-colors"
-            >
-              View All
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          {/* Right Column - Recent Activity */}
+          <div className="lg:col-span-1 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold text-gray-900">Recent Activity</h3>
+              <button 
+                onClick={() => setLocation('/messages')}
+                className="text-sm text-primary font-medium transition-colors"
+              >
+                View all
+              </button>
+            </div>
+            
             {recentMessages.length > 0 ? (
-              recentMessages.slice(0, 3).map((message: any) => (
-                <Card key={message.id} className="glass-card">
-                  <CardContent className="p-4">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-xs font-bold">
-                          {message.user.firstName?.[0] || message.user.email?.[0]?.toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-900">
-                            {message.user.firstName || message.user.email?.split('@')[0]}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {new Date(message.createdAt).toLocaleTimeString([], { 
-                              hour: '2-digit', 
-                              minute: '2-digit'
-                            })}
+              <Card className="glass-card">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    {recentMessages.map((message: any) => (
+                      <div key={message.id} className="flex items-start space-x-3">
+                        <div className="w-10 h-10 bg-ios-gray rounded-2xl flex items-center justify-center flex-shrink-0">
+                          <span className="text-primary text-sm font-medium">
+                            {message.user.firstName?.[0] || message.user.email?.[0]}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-700 mt-1 break-words">{message.content}</p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <p className="text-sm font-medium text-gray-900">
+                              {message.user.firstName || message.user.email?.split('@')[0]}
+                            </p>
+                            <span className="text-xs text-gray-500">
+                              {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600">{message.content}</p>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             ) : (
               <Card className="glass-card">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                    <MessageCircle size={20} className="text-gray-400" />
-                  </div>
-                  <p className="text-sm text-gray-600">No recent messages</p>
+                <CardContent className="p-6">
+                  <button 
+                    onClick={() => setLocation('/messages')}
+                    className="w-full text-center border-gray-200 py-8 transition-all"
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                      <MessageCircle size={24} className="text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">Start the conversation</h3>
+                    <p className="text-gray-600 mb-6">No messages yet. Say hello to your roommates!</p>
+                    <div className="flex items-center justify-center space-x-2 text-primary font-medium">
+                      <span>Send Message</span>
+                      <ArrowRight size={16} />
+                    </div>
+                  </button>
                 </CardContent>
               </Card>
             )}
           </div>
         </div>
+
+        
+
+
       </div>
     </div>
   );

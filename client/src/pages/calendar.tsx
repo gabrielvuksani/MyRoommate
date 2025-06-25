@@ -9,11 +9,7 @@ import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucid
 
 export default function Calendar() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return today;
-  });
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [newEvent, setNewEvent] = useState({
@@ -83,21 +79,6 @@ export default function Calendar() {
   };
 
   const canCreateEvent = newEvent.title.trim().length > 0 && newEvent.startDate.trim().length > 0;
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setHeaderScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Auto-select today's date on component mount
-  useEffect(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    setSelectedDate(today);
-  }, []);
 
   // Calendar logic
   const currentMonth = currentDate.getMonth();
