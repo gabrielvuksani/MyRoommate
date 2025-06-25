@@ -76,11 +76,11 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
               </button>
             )}
           </div>
-          <div className={`px-2 py-1 rounded-lg text-xs font-medium ${
+          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
             isFullySettled ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
           }`}>
             {isFullySettled ? 'Settled' : `${totalSettled}/${totalSplits} settled`}
-          </div>
+          </span>
         </div>
       </div>
 
