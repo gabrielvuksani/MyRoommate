@@ -111,12 +111,14 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Completed floating header functionality across all pages with scroll detection
+- ✓ Added scroll event listeners to calendar page to trigger header state changes
 - ✓ Implemented proper sticky floating header behavior with visionOS blur background on scroll
 - ✓ Enhanced floating header CSS with authentic visionOS backdrop blur (20px) and transparency
 - ✓ Fixed header positioning to stick at top during scroll while maintaining original visual design
 - ✓ Added subtle border and shadow effects when header is in scrolled state
 - ✓ Enhanced messages app with increased spacing above input to prevent text cutoff
-- ✓ Confirmed floating header implementation across all pages (home, chores, expenses, calendar, profile, settings, messages)
+- ✓ Confirmed floating header implementation and functionality across all pages (home, chores, expenses, calendar, profile, settings, messages)
 - ✓ Maintained original UI design elements (text, icons, spacing) while adding floating scroll behavior
 - ✓ Applied proper z-index layering for header persistence during page scroll
 - ✓ Updated h2 element styling from "text-headline font-semibold text-blue-700" to "font-semibold text-[#1a1a1a] text-[22px]"

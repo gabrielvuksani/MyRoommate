@@ -23,6 +23,18 @@ export default function Calendar() {
   
   const queryClient = useQueryClient();
 
+  useEffect(() => {
+    // Scroll to top when page loads
+    window.scrollTo(0, 0);
+    
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["/api/calendar"],
   });
