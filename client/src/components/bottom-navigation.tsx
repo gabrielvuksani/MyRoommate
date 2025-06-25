@@ -22,12 +22,12 @@ export default function BottomNavigation() {
             <button
               key={id}
               onClick={() => setLocation(path)}
-              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 transition-all hover:scale-110 ${
+              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 transition-all px-1 ${
                 isActive ? 'active animate-bounce-in' : 'inactive'
               }`}
             >
-              <Icon size={20} className="flex-shrink-0" />
-              <span className="text-xs mt-0.5 font-medium">{label}</span>
+              <Icon size={18} className="flex-shrink-0" />
+              <span className="text-xs mt-0.5 font-medium truncate">{label}</span>
             </button>
           );
         })}
