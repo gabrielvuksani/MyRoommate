@@ -98,73 +98,76 @@ export default function Chores() {
 
   return (
     <div className="page-container">
-      <div className="h-6 bg-surface-elevated"></div>
-      
-      <div className="page-header">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-large-title font-bold text-primary">Chores</h1>
-            <p className="text-subhead text-secondary mt-2">Keep the house running smoothly</p>
-          </div>
-          
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <button className="btn-primary rounded-full w-12 h-12 flex items-center justify-center text-xl">
-                +
-              </button>
-            </DialogTrigger>
-            <DialogContent className="max-w-sm mx-auto">
-              <DialogHeader>
-                <DialogTitle>Create New Chore</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <Input
-                  placeholder="Chore title"
-                  value={newChore.title}
-                  onChange={(e) => setNewChore({ ...newChore, title: e.target.value })}
-                />
-                <Textarea
-                  placeholder="Description (optional)"
-                  value={newChore.description}
-                  onChange={(e) => setNewChore({ ...newChore, description: e.target.value })}
-                />
-                <Select value={newChore.assignedTo} onValueChange={(value) => setNewChore({ ...newChore, assignedTo: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Assign to..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {household?.members?.map((member: any) => (
-                      <SelectItem key={member.userId} value={member.userId}>
-                        {member.user.firstName || member.user.email}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  type="date"
-                  value={newChore.dueDate}
-                  onChange={(e) => setNewChore({ ...newChore, dueDate: e.target.value })}
-                />
-                <Select value={newChore.recurrence} onValueChange={(value) => setNewChore({ ...newChore, recurrence: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Recurrence..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                  </SelectContent>
-                </Select>
-                <button
-                  onClick={handleCreateChore}
-                  disabled={!canCreateChore || createChoreMutation.isPending}
-                  className="btn-primary w-full"
-                >
-                  {createChoreMutation.isPending ? "Creating..." : "Create Chore"}
+      <div className="floating-header">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-large-title font-bold text-primary">Chores</h1>
+              <p className="text-subhead text-secondary mt-1">Keep the house running smoothly</p>
+            </div>
+            
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <button className="btn-floating">
+                  <span className="text-xl">+</span>
                 </button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent className="modal-content">
+                <DialogHeader className="px-6 pt-6 pb-2">
+                  <DialogTitle className="text-title-2 font-bold text-primary">Create New Chore</DialogTitle>
+                </DialogHeader>
+                <div className="px-6 pb-6 space-y-5">
+                  <input
+                    placeholder="Chore title"
+                    value={newChore.title}
+                    onChange={(e) => setNewChore({ ...newChore, title: e.target.value })}
+                    className="input-modern w-full"
+                  />
+                  <input
+                    placeholder="Description (optional)"
+                    value={newChore.description}
+                    onChange={(e) => setNewChore({ ...newChore, description: e.target.value })}
+                    className="input-modern w-full"
+                  />
+                  <Select value={newChore.assignedTo} onValueChange={(value) => setNewChore({ ...newChore, assignedTo: value })}>
+                    <SelectTrigger className="input-modern">
+                      <SelectValue placeholder="Assign to..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {household?.members?.map((member: any) => (
+                        <SelectItem key={member.userId} value={member.userId}>
+                          {member.user.firstName || member.user.email?.split('@')[0]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <input
+                    type="date"
+                    value={newChore.dueDate}
+                    onChange={(e) => setNewChore({ ...newChore, dueDate: e.target.value })}
+                    className="input-modern w-full"
+                  />
+                  <Select value={newChore.recurrence} onValueChange={(value) => setNewChore({ ...newChore, recurrence: value })}>
+                    <SelectTrigger className="input-modern">
+                      <SelectValue placeholder="Recurrence..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="daily">Daily</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <button
+                    onClick={handleCreateChore}
+                    disabled={!canCreateChore || createChoreMutation.isPending}
+                    className="btn-primary w-full"
+                  >
+                    {createChoreMutation.isPending ? "Creating..." : "Create Chore"}
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
       

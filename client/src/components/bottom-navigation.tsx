@@ -13,8 +13,8 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-white tab-shadow">
-      <div className="flex items-center justify-around py-2">
+    <nav className="tab-navigation">
+      <div className="flex items-center justify-around">
         {tabs.map(({ id, path, label, Icon }) => {
           const isActive = location === path;
           
@@ -22,15 +22,12 @@ export default function BottomNavigation() {
             <button
               key={id}
               onClick={() => setLocation(path)}
-              className="flex flex-col items-center py-2 px-4"
+              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 ${
+                isActive ? 'active' : 'inactive'
+              }`}
             >
-              <Icon 
-                size={24} 
-                className={`mb-1 ${isActive ? 'text-ios-blue' : 'text-ios-gray-5'}`}
-              />
-              <span className={`text-ios-caption ${isActive ? 'text-ios-blue font-medium' : 'text-ios-gray-5'}`}>
-                {label}
-              </span>
+              <Icon size={20} className="flex-shrink-0" />
+              <span className="text-caption mt-1 font-medium">{label}</span>
             </button>
           );
         })}

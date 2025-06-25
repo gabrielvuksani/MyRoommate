@@ -41,11 +41,11 @@ export default function Settings() {
 
   return (
     <div className="page-container">
-      <div className="h-6 bg-surface-elevated"></div>
-      
-      <div className="page-header">
-        <h1 className="text-large-title font-bold text-primary">Settings</h1>
-        <p className="text-subhead text-secondary mt-2">Manage your household</p>
+      <div className="floating-header">
+        <div className="px-6 py-4">
+          <h1 className="text-large-title font-bold text-primary">Settings</h1>
+          <p className="text-subhead text-secondary mt-1">Manage your household</p>
+        </div>
       </div>
       
       <div className="page-content space-y-6">

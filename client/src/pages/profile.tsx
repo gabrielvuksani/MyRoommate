@@ -24,11 +24,11 @@ export default function Profile() {
 
   return (
     <div className="page-container">
-      <div className="h-6 bg-surface-elevated"></div>
-      
-      <div className="page-header">
-        <h1 className="text-large-title font-bold text-primary">Profile</h1>
-        <p className="text-subhead text-secondary mt-2">Your account information</p>
+      <div className="floating-header">
+        <div className="px-6 py-4">
+          <h1 className="text-large-title font-bold text-primary">Profile</h1>
+          <p className="text-subhead text-secondary mt-1">Your account information</p>
+        </div>
       </div>
       
       <div className="page-content space-y-6">

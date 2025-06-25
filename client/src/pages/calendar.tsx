@@ -104,92 +104,95 @@ export default function Calendar() {
 
   return (
     <div className="page-container">
-      <div className="h-6 bg-surface-elevated"></div>
-      
-      <div className="page-header">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-large-title font-bold text-primary">Calendar</h1>
-            <p className="text-subhead text-secondary mt-2">
-              {monthNames[currentMonth]} {currentYear}
-            </p>
-          </div>
+      <div className="floating-header">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-large-title font-bold text-primary">Calendar</h1>
+              <p className="text-subhead text-secondary mt-1">
+                {monthNames[currentMonth]} {currentYear}
+              </p>
+            </div>
           
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-ios-blue hover:bg-ios-blue/90 text-white rounded-full px-4 py-2">
-                +
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-sm mx-auto">
-              <DialogHeader>
-                <DialogTitle>Add New Event</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <Input
-                  placeholder="Event title"
-                  value={newEvent.title}
-                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                />
-                <Textarea
-                  placeholder="Description (optional)"
-                  value={newEvent.description}
-                  onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                />
-                <Input
-                  type="date"
-                  value={newEvent.startDate}
-                  onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
-                />
-                <Input
-                  type="time"
-                  value={newEvent.startTime}
-                  onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                />
-                <Select value={newEvent.type} onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Event type..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="social">Social</SelectItem>
-                    <SelectItem value="rent">Rent</SelectItem>
-                    <SelectItem value="utility">Utility</SelectItem>
-                    <SelectItem value="chore">Chore</SelectItem>
-                    <SelectItem value="bill">Bill</SelectItem>
-                  </SelectContent>
-                </Select>
-                <button
-                  onClick={handleCreateEvent}
-                  disabled={!canCreateEvent || createEventMutation.isPending}
-                  className="btn-primary w-full"
-                >
-                  {createEventMutation.isPending ? "Creating..." : "Create Event"}
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <button className="btn-floating">
+                  <span className="text-xl">+</span>
                 </button>
-              </div>
-            </DialogContent>
+              </DialogTrigger>
+              <DialogContent className="modal-content">
+                <DialogHeader className="px-6 pt-6 pb-2">
+                  <DialogTitle className="text-title-2 font-bold text-primary">Create New Event</DialogTitle>
+                </DialogHeader>
+                <div className="px-6 pb-6 space-y-5">
+                  <input
+                    placeholder="Event title"
+                    value={newEvent.title}
+                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                    className="input-modern w-full"
+                  />
+                  <input
+                    placeholder="Description (optional)"
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                    className="input-modern w-full"
+                  />
+                  <input
+                    type="date"
+                    value={newEvent.startDate}
+                    onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
+                    className="input-modern w-full"
+                  />
+                  <input
+                    type="time"
+                    value={newEvent.startTime}
+                    onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
+                    className="input-modern w-full"
+                  />
+                  <Select value={newEvent.type} onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}>
+                    <SelectTrigger className="input-modern">
+                      <SelectValue placeholder="Event type..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="social">Social</SelectItem>
+                      <SelectItem value="rent">Rent</SelectItem>
+                      <SelectItem value="utility">Utility</SelectItem>
+                      <SelectItem value="chore">Chore</SelectItem>
+                      <SelectItem value="bill">Bill</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <button
+                    onClick={handleCreateEvent}
+                    disabled={!canCreateEvent || createEventMutation.isPending}
+                    className="btn-primary w-full"
+                  >
+                    {createEventMutation.isPending ? "Creating..." : "Create Event"}
+                  </button>
+                </div>
+              </DialogContent>
           </Dialog>
         </div>
       </div>
       
       <div className="page-content space-y-6">
         {/* Mini Calendar */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
+        <Card className="glass-card">
+          <CardContent className="p-6">
             <div className="grid grid-cols-7 gap-2 mb-4">
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
-                <div key={day} className="text-center text-ios-caption text-ios-gray-5 font-medium">
+                <div key={day} className="text-center text-caption text-secondary font-medium">
                   {day}
                 </div>
               ))}
             </div>
             <div className="grid grid-cols-7 gap-2">
               {calendarDays.map((day, index) => (
-                <div key={index} className="text-center text-ios-subhead h-8 flex items-center justify-center relative">
+                <div key={index} className="text-center text-subhead h-8 flex items-center justify-center relative">
                   {day ? (
                     <>
                       <span className={day === today.getDate() ? 
-                        "bg-ios-blue text-white rounded-full w-6 h-6 flex items-center justify-center text-ios-caption" : 
-                        "text-black"
+                        "bg-primary text-inverse rounded-full w-6 h-6 flex items-center justify-center text-caption" : 
+                        "text-primary"
                       }>
                         {day}
                       </span>
@@ -197,7 +200,7 @@ export default function Calendar() {
                         new Date(event.startDate).getDate() === day &&
                         new Date(event.startDate).getMonth() === currentMonth
                       ) && (
-                        <div className="w-1 h-1 bg-ios-blue rounded-full absolute bottom-0"></div>
+                        <div className="w-1 h-1 bg-primary rounded-full absolute bottom-0"></div>
                       )}
                     </>
                   ) : null}
@@ -208,29 +211,28 @@ export default function Calendar() {
         </Card>
 
         {/* Upcoming Events */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
-            <h2 className="text-ios-headline font-semibold text-black mb-4">Upcoming Events</h2>
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <h2 className="text-headline font-semibold text-primary mb-4">Upcoming Events</h2>
             <div className="space-y-3">
               {events.length === 0 ? (
-                <p className="text-ios-body text-ios-gray-5">No upcoming events</p>
+                <p className="text-body text-secondary">No upcoming events</p>
               ) : (
                 events.map((event: any) => (
-                  <div key={event.id} className="flex items-center space-x-3 py-2">
+                  <div key={event.id} className="flex items-center space-x-3 py-3">
                     <div 
-                      className="w-3 h-8 rounded-full" 
-                      style={{ backgroundColor: event.color }}
+                      className="w-3 h-8 rounded-full bg-primary"
                     ></div>
                     <div className="flex-1">
-                      <p className="text-ios-body font-medium text-black">{event.title}</p>
-                      <p className="text-ios-footnote text-ios-gray-5">
+                      <p className="text-body font-medium text-primary">{event.title}</p>
+                      <p className="text-footnote text-secondary">
                         {new Date(event.startDate).toLocaleDateString()} • {new Date(event.startDate).toLocaleTimeString()}
                       </p>
                       {event.description && (
-                        <p className="text-ios-footnote text-ios-gray-5 mt-1">{event.description}</p>
+                        <p className="text-footnote text-secondary mt-1">{event.description}</p>
                       )}
                     </div>
-                    <span className="text-ios-caption text-ios-gray-5 capitalize">{event.type}</span>
+                    <span className="text-caption text-secondary capitalize">{event.type}</span>
                   </div>
                 ))
               )}

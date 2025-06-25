@@ -77,11 +77,10 @@ export default function Expenses() {
   const handleCreateExpense = () => {
     if (!newExpense.title.trim() || !newExpense.amount) return;
     
-    createExpenseMutation.mutate({
-      ...newExpense,
-      amount: parseFloat(newExpense.amount),
-    });
+    createExpenseMutation.mutate(newExpense);
   };
+
+  const canCreateExpense = newExpense.title.trim().length > 0 && newExpense.amount.trim().length > 0 && parseFloat(newExpense.amount) > 0;
 
   const netBalance = (balance?.totalOwed || 0) - (balance?.totalOwing || 0);
 
@@ -95,45 +94,47 @@ export default function Expenses() {
 
   return (
     <div className="page-container">
-      <div className="h-6 bg-surface-elevated"></div>
-      
-      <div className="page-header">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-large-title font-bold text-primary">Expenses</h1>
-            <p className="text-subhead text-secondary mt-2">Track and split costs easily</p>
-          </div>
-          
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <button className="btn-primary rounded-lg px-6 py-3 text-footnote font-medium">
-                + Add Bill
-              </button>
-            </DialogTrigger>
-            <DialogContent className="max-w-sm mx-auto">
-              <DialogHeader>
-                <DialogTitle>Add New Expense</DialogTitle>
+      <div className="floating-header">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-large-title font-bold text-primary">Expenses</h1>
+              <p className="text-subhead text-secondary mt-1">Track and split costs easily</p>
+            </div>
+            
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <button className="btn-floating">
+                  <span className="text-xl">+</span>
+                </button>
+              </DialogTrigger>
+            <DialogContent className="modal-content">
+              <DialogHeader className="px-6 pt-6 pb-2">
+                <DialogTitle className="text-title-2 font-bold text-primary">Add New Expense</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4">
-                <Input
+              <div className="px-6 pb-6 space-y-5">
+                <input
                   placeholder="Expense title"
                   value={newExpense.title}
                   onChange={(e) => setNewExpense({ ...newExpense, title: e.target.value })}
+                  className="input-modern w-full"
                 />
-                <Input
+                <input
                   type="number"
                   step="0.01"
                   placeholder="Amount"
                   value={newExpense.amount}
                   onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+                  className="input-modern w-full"
                 />
-                <Input
+                <input
                   placeholder="Category (optional)"
                   value={newExpense.category}
                   onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+                  className="input-modern w-full"
                 />
                 <Select value={newExpense.splitType} onValueChange={(value) => setNewExpense({ ...newExpense, splitType: value })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="input-modern">
                     <SelectValue placeholder="Split method..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -154,17 +155,18 @@ export default function Expenses() {
           </Dialog>
         </div>
       </div>
+      </div>
       
       <div className="page-content space-y-6">
         {/* Balance Overview */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
-            <h2 className="text-ios-headline font-semibold text-black mb-4">Balance Overview</h2>
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <h2 className="text-headline font-semibold text-primary mb-4">Balance Overview</h2>
             <div className="text-center py-4">
-              <p className={`text-ios-title-1 font-bold ${netBalance >= 0 ? 'text-ios-green' : 'text-ios-red'}`}>
+              <p className={`text-title-1 font-bold ${netBalance >= 0 ? 'text-success' : 'text-destructive'}`}>
                 {netBalance >= 0 ? '+' : ''}${netBalance.toFixed(2)}
               </p>
-              <p className="text-ios-footnote text-ios-gray-5">Overall balance</p>
+              <p className="text-footnote text-secondary">Overall balance</p>
             </div>
             {balance && (
               <div className="space-y-2">
@@ -190,12 +192,12 @@ export default function Expenses() {
         </Card>
 
         {/* Recent Expenses */}
-        <Card className="card-shadow">
-          <CardContent className="p-4">
-            <h2 className="text-ios-headline font-semibold text-black mb-4">Recent Expenses</h2>
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <h2 className="text-headline font-semibold text-primary mb-4">Recent Expenses</h2>
             <div className="space-y-3">
               {expenses.length === 0 ? (
-                <p className="text-ios-body text-ios-gray-5">No expenses yet</p>
+                <p className="text-body text-secondary">No expenses yet</p>
               ) : (
                 expenses.map((expense: any) => (
                   <ExpenseCard key={expense.id} expense={expense} />

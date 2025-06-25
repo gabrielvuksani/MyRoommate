@@ -60,14 +60,14 @@ export default function Messages() {
   }
 
   return (
-    <div className="min-h-screen bg-surface pb-24 flex flex-col">
-      <div className="h-6 bg-surface-elevated"></div>
-      
-      <div className="page-header border-b border-default">
-        <h1 className="text-large-title font-bold text-primary">House Chat</h1>
-        <p className="text-subhead text-secondary mt-2">
-          {household?.members?.map((m: any) => m.user.firstName || m.user.email?.split('@')[0]).join(', ')}
-        </p>
+    <div className="min-h-screen bg-background pb-24 flex flex-col">
+      <div className="floating-header border-b border-default">
+        <div className="px-6 py-4">
+          <h1 className="text-large-title font-bold text-primary">House Chat</h1>
+          <p className="text-subhead text-secondary mt-1">
+            {household?.members?.map((m: any) => m.user.firstName || m.user.email?.split('@')[0]).join(', ')}
+          </p>
+        </div>
       </div>
 
       {/* Chat Messages */}

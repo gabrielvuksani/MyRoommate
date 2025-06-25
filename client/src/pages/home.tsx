@@ -222,39 +222,39 @@ export default function Home() {
   const firstName = user.firstName || user.email?.split('@')[0] || 'there';
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
-      <div className="h-6 bg-surface-elevated"></div>
-      
-      <div className="px-6 pt-6 pb-8 bg-surface-elevated">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-large-title font-bold text-primary">
-              Good morning, {firstName}
-            </h1>
-            <p className="text-subhead text-secondary mt-2">
-              Here's what needs your attention
-            </p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <button 
-              onClick={() => setLocation('/settings')}
-              className="w-12 h-12 bg-surface rounded-full flex items-center justify-center shadow-sm border border-default hover:shadow-md transition-all duration-200"
-            >
-              <span className="text-xl">⚙️</span>
-            </button>
-            <button 
-              onClick={() => setLocation('/profile')}
-              className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200"
-            >
-              <span className="text-inverse text-footnote font-medium">
-                {firstName[0]?.toUpperCase() || '?'}
-              </span>
-            </button>
+    <div className="page-container">
+      <div className="floating-header">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-large-title font-bold text-primary animate-fade-in">
+                Good morning, {firstName}
+              </h1>
+              <p className="text-subhead text-secondary mt-1">
+                Here's what needs your attention
+              </p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => setLocation('/settings')}
+                className="btn-ghost w-11 h-11 rounded-full p-0 flex items-center justify-center"
+              >
+                <span className="text-lg">⚙️</span>
+              </button>
+              <button 
+                onClick={() => setLocation('/profile')}
+                className="w-11 h-11 bg-primary rounded-full flex items-center justify-center shadow-soft hover:shadow-medium transition-all duration-300 hover:scale-105"
+              >
+                <span className="text-inverse text-footnote font-semibold">
+                  {firstName[0]?.toUpperCase() || '?'}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
       
-      <div className="px-6 space-y-6">
+      <div className="page-content space-y-6">
         {/* Active Chores Card */}
         <Card className="card-shadow">
           <CardContent className="p-4">
