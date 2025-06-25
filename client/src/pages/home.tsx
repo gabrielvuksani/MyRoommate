@@ -1,15 +1,29 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isJoinOpen, setIsJoinOpen] = useState(false);
+  const [newHousehold, setNewHousehold] = useState({
+    name: '',
+    rentAmount: '',
+    rentDueDay: '',
+  });
+  const [inviteCode, setInviteCode] = useState('');
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -51,6 +65,65 @@ export default function Home() {
     enabled: !!household,
   });
 
+  const createHouseholdMutation = useMutation({
+    mutationFn: async (householdData: any) => {
+      await apiRequest("POST", "/api/households", householdData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+      setIsCreateOpen(false);
+      setNewHousehold({ name: '', rentAmount: '', rentDueDay: '' });
+      toast({
+        title: "Success",
+        description: "Household created successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create household",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const joinHouseholdMutation = useMutation({
+    mutationFn: async (code: string) => {
+      await apiRequest("POST", "/api/households/join", { inviteCode: code });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+      setIsJoinOpen(false);
+      setInviteCode('');
+      toast({
+        title: "Success",
+        description: "Joined household successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to join household. Check your invite code.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCreateHousehold = () => {
+    if (!newHousehold.name.trim()) return;
+    
+    createHouseholdMutation.mutate({
+      name: newHousehold.name,
+      rentAmount: newHousehold.rentAmount ? parseFloat(newHousehold.rentAmount) : null,
+      rentDueDay: newHousehold.rentDueDay ? parseInt(newHousehold.rentDueDay) : null,
+    });
+  };
+
+  const handleJoinHousehold = () => {
+    if (!inviteCode.trim()) return;
+    joinHouseholdMutation.mutate(inviteCode.trim().toUpperCase());
+  };
+
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-ios-gray">
@@ -71,23 +144,69 @@ export default function Home() {
           <Card className="card-shadow">
             <CardContent className="p-4">
               <h2 className="text-ios-headline font-semibold text-black mb-4">Create a New Household</h2>
-              <button className="w-full bg-ios-blue text-white py-3 rounded-lg text-ios-body font-medium">
-                Create Household
-              </button>
+              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full bg-ios-blue text-white py-3 rounded-lg text-ios-body font-medium">
+                    Create Household
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-sm mx-auto">
+                  <DialogHeader>
+                    <DialogTitle>Create New Household</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <Input
+                      placeholder="Household name"
+                      value={newHousehold.name}
+                      onChange={(e) => setNewHousehold({ ...newHousehold, name: e.target.value })}
+                    />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="Monthly rent (optional)"
+                      value={newHousehold.rentAmount}
+                      onChange={(e) => setNewHousehold({ ...newHousehold, rentAmount: e.target.value })}
+                    />
+                    <Input
+                      type="number"
+                      min="1"
+                      max="31"
+                      placeholder="Rent due day (optional)"
+                      value={newHousehold.rentDueDay}
+                      onChange={(e) => setNewHousehold({ ...newHousehold, rentDueDay: e.target.value })}
+                    />
+                    <Button 
+                      onClick={handleCreateHousehold}
+                      disabled={!newHousehold.name.trim() || createHouseholdMutation.isPending}
+                      className="w-full bg-ios-blue hover:bg-ios-blue/90"
+                    >
+                      {createHouseholdMutation.isPending ? "Creating..." : "Create Household"}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
           
           <Card className="card-shadow">
             <CardContent className="p-4">
               <h2 className="text-ios-headline font-semibold text-black mb-4">Join a Household</h2>
-              <input
-                type="text"
-                placeholder="Enter invite code"
-                className="w-full border border-ios-gray-3 rounded-lg px-4 py-3 text-ios-body mb-3"
-              />
-              <button className="w-full bg-ios-green text-white py-3 rounded-lg text-ios-body font-medium">
-                Join Household
-              </button>
+              <div className="space-y-3">
+                <Input
+                  type="text"
+                  placeholder="Enter invite code"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value)}
+                  className="w-full border border-ios-gray-3 rounded-lg px-4 py-3 text-ios-body uppercase"
+                />
+                <Button 
+                  onClick={handleJoinHousehold}
+                  disabled={!inviteCode.trim() || joinHouseholdMutation.isPending}
+                  className="w-full bg-ios-green hover:bg-ios-green/90 text-white py-3 rounded-lg text-ios-body font-medium"
+                >
+                  {joinHouseholdMutation.isPending ? "Joining..." : "Join Household"}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
