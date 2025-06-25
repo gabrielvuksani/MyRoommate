@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ChoreBoard from "@/components/chore-board";
+import StreakWidget from "@/components/streak-widget";
 import { Plus } from "lucide-react";
 
 export default function Chores() {
@@ -81,10 +82,6 @@ export default function Chores() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
-      toast({
-        title: "Success",
-        description: "Chore updated successfully",
-      });
     },
     onError: (error) => {
       console.error('Error updating chore:', error);
@@ -195,7 +192,8 @@ export default function Chores() {
         </div>
       </div>
       
-      <div className="page-content">
+      <div className="page-content space-y-6">
+        <StreakWidget chores={chores} />
         <ChoreBoard chores={chores} onUpdateChore={handleUpdateChore} />
       </div>
     </div>

@@ -111,6 +111,11 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 25, 2025 (Latest):**
+- ✓ Removed completion notifications for smoother chore interactions
+- ✓ Created streak visualization widget showing top 3 streak leaders
+- ✓ Added daily completion counter to streak widget
+- ✓ Fixed chore completion functionality with proper date handling
+- ✓ Rebuilt chore update system from scratch for reliability
 - ✓ Integrated navigation into hero stats cards - clickable stats that take you to respective pages
 - ✓ Added Recent Activity section back to home page with message display
 - ✓ Removed secondary card grid in favor of combined stats/navigation approach
