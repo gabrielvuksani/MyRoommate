@@ -241,7 +241,7 @@ export default function Calendar() {
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-end space-x-3 pt-6">
+                <div className="flex justify-end space-x-3 pt-[0px] pb-[0px] pl-[12px] pr-[12px] mt-[12px] mb-[12px]">
                   <button 
                     onClick={() => setIsCreateOpen(false)}
                     className="px-6 py-3 text-gray-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors btn-animated"
