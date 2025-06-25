@@ -152,9 +152,9 @@ export default function Expenses() {
                 </button>
               </div>
             </DialogContent>
-          </Dialog>
+            </Dialog>
+          </div>
         </div>
-      </div>
       </div>
       
       <div className="page-content space-y-6">

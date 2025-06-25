@@ -170,7 +170,8 @@ export default function Calendar() {
                   </button>
                 </div>
               </DialogContent>
-          </Dialog>
+            </Dialog>
+          </div>
         </div>
       </div>
       
