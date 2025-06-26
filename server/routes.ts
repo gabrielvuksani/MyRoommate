@@ -421,6 +421,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { content, householdId } = req.body;
+      
+      if (!content || !content.trim()) {
+        return res.status(400).json({ message: "Message content is required" });
+      }
+      
+      // Verify user is member of the household
+      const membership = await storage.getUserHousehold(userId);
+      if (!membership || membership.household.id !== householdId) {
+        return res.status(403).json({ message: "Not authorized to send message to this household" });
+      }
+      
+      const messageData = {
+        content: content.trim(),
+        householdId,
+        userId,
+        type: 'text'
+      };
+      
+      const message = await storage.createMessage(messageData);
+      res.json(message);
+    } catch (error) {
+      console.error("Error creating message:", error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
   // Shopping routes
   app.get('/api/shopping', isAuthenticated, async (req: any, res) => {
     try {
