@@ -138,6 +138,28 @@ export const shoppingItems = pgTable("shopping_items", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Roommate listings table
+export const roommateListings = pgTable("roommate_listings", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  rent: decimal("rent", { precision: 10, scale: 2 }).notNull(),
+  location: varchar("location", { length: 255 }).notNull(),
+  city: varchar("city", { length: 100 }).notNull(),
+  availableFrom: timestamp("available_from").notNull(),
+  roomType: varchar("room_type", { length: 50 }).notNull(), // "private", "shared", "studio"
+  housingType: varchar("housing_type", { length: 50 }).notNull(), // "apartment", "house", "condo", "dorm"
+  amenities: text("amenities").array(),
+  images: text("images").array(),
+  preferences: text("preferences"), // roommate preferences
+  contactInfo: varchar("contact_info", { length: 255 }),
+  isActive: boolean("is_active").default(true),
+  featured: boolean("featured").default(false),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   householdMembers: many(householdMembers),
@@ -147,6 +169,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   calendarEvents: many(calendarEvents),
   messages: many(messages),
   shoppingItems: many(shoppingItems),
+  roommateListings: many(roommateListings),
 }));
 
 export const householdsRelations = relations(households, ({ many }) => ({
@@ -240,6 +263,13 @@ export const shoppingItemsRelations = relations(shoppingItems, ({ one }) => ({
   }),
 }));
 
+export const roommateListingsRelations = relations(roommateListings, ({ one }) => ({
+  creator: one(users, {
+    fields: [roommateListings.createdBy],
+    references: [users.id],
+  }),
+}));
+
 // Insert schemas
 export const insertHouseholdSchema = createInsertSchema(households).omit({
   id: true,
@@ -279,6 +309,12 @@ export const insertShoppingItemSchema = createInsertSchema(shoppingItems).omit({
   createdAt: true,
 });
 
+export const insertRoommateListingSchema = createInsertSchema(roommateListings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -297,3 +333,5 @@ export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type ShoppingItem = typeof shoppingItems.$inferSelect;
 export type InsertShoppingItem = z.infer<typeof insertShoppingItemSchema>;
+export type RoommateListing = typeof roommateListings.$inferSelect;
+export type InsertRoommateListing = z.infer<typeof insertRoommateListingSchema>;

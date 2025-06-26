@@ -10,6 +10,7 @@ import {
   insertCalendarEventSchema,
   insertMessageSchema,
   insertShoppingItemSchema,
+  insertRoommateListingSchema,
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -500,6 +501,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating shopping item:", error);
       res.status(500).json({ message: "Failed to update shopping item" });
+    }
+  });
+
+  // Roommate listing routes
+  app.get('/api/roommate-listings', async (req: any, res) => {
+    try {
+      const { city, featured } = req.query;
+      const listings = await storage.getRoommateListings(
+        city ? String(city) : undefined,
+        featured ? featured === 'true' : undefined
+      );
+      res.json(listings);
+    } catch (error) {
+      console.error("Error fetching roommate listings:", error);
+      res.status(500).json({ message: "Failed to fetch roommate listings" });
+    }
+  });
+
+  app.post('/api/roommate-listings', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const data = insertRoommateListingSchema.parse(req.body);
+      
+      const listing = await storage.createRoommateListing({
+        ...data,
+        createdBy: userId,
+      });
+      
+      res.json(listing);
+    } catch (error) {
+      console.error("Error creating roommate listing:", error);
+      res.status(500).json({ message: "Failed to create roommate listing" });
+    }
+  });
+
+  app.get('/api/roommate-listings/my', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const listings = await storage.getUserRoommateListings(userId);
+      res.json(listings);
+    } catch (error) {
+      console.error("Error fetching user's roommate listings:", error);
+      res.status(500).json({ message: "Failed to fetch your roommate listings" });
+    }
+  });
+
+  app.patch('/api/roommate-listings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const listing = await storage.updateRoommateListing(id, updates);
+      res.json(listing);
+    } catch (error) {
+      console.error("Error updating roommate listing:", error);
+      res.status(500).json({ message: "Failed to update roommate listing" });
+    }
+  });
+
+  app.delete('/api/roommate-listings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteRoommateListing(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting roommate listing:", error);
+      res.status(500).json({ message: "Failed to delete roommate listing" });
     }
   });
 

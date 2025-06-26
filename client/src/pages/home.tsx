@@ -12,16 +12,24 @@ import {
   BarChart3,
   Award,
   TrendingUp,
+  Users,
+  Search,
+  Star,
+  Plus,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { getProfileInitials } from "@/lib/nameUtils";
+import RoommateMarketplace from "@/components/roommate-marketplace";
+import RoommateListingCard from "@/components/roommate-listing-card";
 
 export default function Home() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [showMarketplace, setShowMarketplace] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -41,6 +49,12 @@ export default function Home() {
 
   const { data: balance } = useQuery({
     queryKey: ["/api/balance"],
+  });
+
+  // Fetch featured roommate listings for home page
+  const { data: featuredListings = [] } = useQuery({
+    queryKey: ['/api/roommate-listings', { featured: true }],
+    queryFn: () => fetch('/api/roommate-listings?featured=true').then(res => res.json()),
   });
 
   useEffect(() => {
@@ -570,7 +584,83 @@ export default function Home() {
             )}
           </div>
         </div>
+
+        {/* Roommate Marketplace Section */}
+        <div className="mt-12 border-t border-gray-100 pt-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-[#1a1a1a] text-[22px]">Find Roommates</h2>
+                <p className="text-gray-600 text-sm">Discover your perfect roommate match</p>
+              </div>
+            </div>
+            <Button
+              onClick={() => setShowMarketplace(true)}
+              variant="outline"
+              className="bg-white/60 backdrop-blur-sm border-gray-200 hover:bg-white/80"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Browse All
+            </Button>
+          </div>
+
+          {featuredListings.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {featuredListings.slice(0, 3).map((listing: any) => (
+                <RoommateListingCard
+                  key={listing.id}
+                  listing={listing}
+                  compact={true}
+                  onContact={(listing) => {
+                    if (listing.contactInfo) {
+                      window.open(`mailto:${listing.contactInfo}`, '_blank');
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="glass-card">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-indigo-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings yet</h3>
+                <p className="text-gray-600 mb-4">Be the first to post a roommate listing in your area</p>
+                <Button
+                  onClick={() => setShowMarketplace(true)}
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Post Listing
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {featuredListings.length > 3 && (
+            <div className="text-center">
+              <Button
+                onClick={() => setShowMarketplace(true)}
+                variant="outline"
+                className="bg-white/60 backdrop-blur-sm border-gray-200 hover:bg-white/80"
+              >
+                View {featuredListings.length - 3} more listings
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Roommate Marketplace Modal */}
+      <RoommateMarketplace
+        isOpen={showMarketplace}
+        onOpenChange={setShowMarketplace}
+      />
     </div>
   );
 }

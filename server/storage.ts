@@ -8,6 +8,7 @@ import {
   calendarEvents,
   messages,
   shoppingItems,
+  roommateListings,
   type User,
   type UpsertUser,
   type Household,
@@ -25,6 +26,8 @@ import {
   type InsertMessage,
   type ShoppingItem,
   type InsertShoppingItem,
+  type RoommateListing,
+  type InsertRoommateListing,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, sql } from "drizzle-orm";
@@ -72,6 +75,13 @@ export interface IStorage {
   getShoppingItems(householdId: string): Promise<(ShoppingItem & { creator: User; completedByUser: User | null })[]>;
   updateShoppingItem(id: string, updates: Partial<InsertShoppingItem>): Promise<ShoppingItem>;
   deleteShoppingItem(id: string): Promise<void>;
+  
+  // Roommate listing operations
+  createRoommateListing(listing: InsertRoommateListing): Promise<RoommateListing>;
+  getRoommateListings(city?: string, featured?: boolean): Promise<(RoommateListing & { creator: User })[]>;
+  updateRoommateListing(id: string, updates: Partial<InsertRoommateListing>): Promise<RoommateListing>;
+  deleteRoommateListing(id: string): Promise<void>;
+  getUserRoommateListings(userId: string): Promise<RoommateListing[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -493,6 +503,82 @@ export class DatabaseStorage implements IStorage {
 
   async deleteShoppingItem(id: string): Promise<void> {
     await db.delete(shoppingItems).where(eq(shoppingItems.id, id));
+  }
+
+  async createRoommateListing(listing: InsertRoommateListing): Promise<RoommateListing> {
+    const [created] = await db.insert(roommateListings).values(listing).returning();
+    return created;
+  }
+
+  async getRoommateListings(city?: string, featured?: boolean): Promise<(RoommateListing & { creator: User })[]> {
+    const conditions = [eq(roommateListings.isActive, true)];
+    
+    if (city) {
+      conditions.push(eq(roommateListings.city, city));
+    }
+    
+    if (featured !== undefined) {
+      conditions.push(eq(roommateListings.featured, featured));
+    }
+
+    const result = await db
+      .select({
+        id: roommateListings.id,
+        title: roommateListings.title,
+        description: roommateListings.description,
+        rent: roommateListings.rent,
+        location: roommateListings.location,
+        city: roommateListings.city,
+        availableFrom: roommateListings.availableFrom,
+        roomType: roommateListings.roomType,
+        housingType: roommateListings.housingType,
+        amenities: roommateListings.amenities,
+        images: roommateListings.images,
+        preferences: roommateListings.preferences,
+        contactInfo: roommateListings.contactInfo,
+        isActive: roommateListings.isActive,
+        featured: roommateListings.featured,
+        createdBy: roommateListings.createdBy,
+        createdAt: roommateListings.createdAt,
+        updatedAt: roommateListings.updatedAt,
+        creator: {
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        },
+      })
+      .from(roommateListings)
+      .innerJoin(users, eq(roommateListings.createdBy, users.id))
+      .where(and(...conditions))
+      .orderBy(desc(roommateListings.featured), desc(roommateListings.createdAt));
+    
+    return result;
+  }
+
+  async updateRoommateListing(id: string, updates: Partial<InsertRoommateListing>): Promise<RoommateListing> {
+    const [updated] = await db
+      .update(roommateListings)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(roommateListings.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteRoommateListing(id: string): Promise<void> {
+    await db.delete(roommateListings).where(eq(roommateListings.id, id));
+  }
+
+  async getUserRoommateListings(userId: string): Promise<RoommateListing[]> {
+    const result = await db
+      .select()
+      .from(roommateListings)
+      .where(eq(roommateListings.createdBy, userId))
+      .orderBy(desc(roommateListings.createdAt));
+    return result;
   }
 }
 
