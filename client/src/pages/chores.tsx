@@ -174,13 +174,12 @@ export default function Chores() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <input
+                  <input aria-placeholder="Due Date*" placeholder="Due date *" 
                     type="date"
                     value={newChore.dueDate}
                     onChange={(e) => setNewChore({ ...newChore, dueDate: e.target.value })}
                     className="input-modern w-full"
                     required
-                    placeholder="Due date *"
                   />
                   <Select value={newChore.recurrence} onValueChange={(value) => setNewChore({ ...newChore, recurrence: value })}>
                     <SelectTrigger className="input-modern">

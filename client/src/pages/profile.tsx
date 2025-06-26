@@ -22,8 +22,8 @@ export default function Profile() {
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState({ firstName: "", lastName: "" });
-  const [isEditingHousehold, setIsEditingHousehold] = useState(false);
-  const [householdName, setHouseholdName] = useState("");
+  const [isHouseholdEditOpen, setIsHouseholdEditOpen] = useState(false);
+  const [editHouseholdName, setEditHouseholdName] = useState("");
   const [headerScrolled, setHeaderScrolled] = useState(false);
 
   const { data: household } = useQuery({
@@ -61,7 +61,7 @@ export default function Profile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
-      setIsEditingHousehold(false);
+      setIsHouseholdEditOpen(false);
     },
     onError: (error: any) => {
       console.error("Failed to update household name:", error);
@@ -91,18 +91,8 @@ export default function Profile() {
   };
 
   const handleUpdateHouseholdName = () => {
-    if (!householdName.trim()) return;
-    updateHouseholdNameMutation.mutate(householdName);
-  };
-
-  const startEditingHousehold = () => {
-    setHouseholdName(household?.name || "");
-    setIsEditingHousehold(true);
-  };
-
-  const cancelEditingHousehold = () => {
-    setIsEditingHousehold(false);
-    setHouseholdName("");
+    if (!editHouseholdName.trim()) return;
+    updateHouseholdNameMutation.mutate(editHouseholdName);
   };
 
   const logout = () => {
@@ -140,16 +130,16 @@ export default function Profile() {
               <ArrowLeft size={18} />
             </button>
             <div>
-              <h1 className="page-title">Profile & Settings</h1>
+              <h1 className="page-title">Settings</h1>
               <p className="page-subtitle">
-                Manage your account & app settings
+                Manage your account profile & app settings
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="pt-40 px-6 space-y-6">
+      <div className="pt-36 px-6 space-y-6">
         {/* Profile Header */}
         <Card className="smart-card">
           <CardContent className="p-6">
@@ -266,57 +256,53 @@ export default function Profile() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
                   <span className="text-gray-600 flex-shrink-0">Name</span>
-                  {isEditingHousehold ? (
-                    <div className="flex items-center space-x-2 flex-1 ml-4">
-                      <Input
-                        value={householdName}
-                        onChange={(e) => setHouseholdName(e.target.value)}
-                        className="text-sm"
-                        placeholder="Enter household name"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleUpdateHouseholdName();
-                          } else if (e.key === "Escape") {
-                            cancelEditingHousehold();
-                          }
-                        }}
-                        autoFocus
-                      />
-                      <div className="flex space-x-1">
+                  <div className="flex items-center space-x-2">
+                    <span
+                      className="text-gray-900 font-semibold truncate"
+                      title={household.name}
+                    >
+                      {household.name}
+                    </span>
+                    <Dialog open={isHouseholdEditOpen} onOpenChange={setIsHouseholdEditOpen}>
+                      <DialogTrigger asChild>
                         <Button
-                          onClick={handleUpdateHouseholdName}
-                          disabled={updateHouseholdNameMutation.isPending || !householdName.trim()}
-                          size="sm"
-                          className="h-8 px-2 bg-emerald-500 hover:bg-emerald-600 text-white"
+                          onClick={() => {
+                            setEditHouseholdName(household?.name || "");
+                          }}
+                          className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all p-0 flex-shrink-0"
                         >
-                          {updateHouseholdNameMutation.isPending ? "..." : "Save"}
+                          <Edit3 size={16} className="text-gray-600" />
                         </Button>
-                        <Button
-                          onClick={cancelEditingHousehold}
-                          size="sm"
-                          variant="outline"
-                          className="h-8 px-2"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center space-x-2">
-                      <span
-                        className="text-gray-900 font-semibold truncate"
-                        title={household.name}
-                      >
-                        {household.name}
-                      </span>
-                      <button
-                        onClick={startEditingHousehold}
-                        className="p-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded btn-animated"
-                      >
-                        <Edit3 size={12} />
-                      </button>
-                    </div>
-                  )}
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader className="px-6 pt-6 pb-6">
+                          <DialogTitle className="text-xl font-bold text-gray-900">
+                            Edit Household Name
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="px-6 pb-6 space-y-4">
+                          <Input
+                            placeholder="Household name"
+                            value={editHouseholdName}
+                            onChange={(e) => setEditHouseholdName(e.target.value)}
+                            className="w-full p-4 border border-gray-200 rounded-xl"
+                          />
+                          <Button
+                            onClick={handleUpdateHouseholdName}
+                            disabled={
+                              !editHouseholdName.trim() ||
+                              updateHouseholdNameMutation.isPending
+                            }
+                            className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
+                          >
+                            {updateHouseholdNameMutation.isPending
+                              ? "Saving..."
+                              : "Save Changes"}
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
                   <span className="text-gray-600">Invite Code</span>
