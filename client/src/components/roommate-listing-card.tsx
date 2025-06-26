@@ -117,7 +117,7 @@ export default function RoommateListingCard({ listing, onContact, compact = fals
                   e.stopPropagation();
                   onContact(listing);
                 }}
-                className="text-xs px-4 py-1.5 h-auto bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0 shadow-sm"
+                className="text-xs px-4 py-1.5 h-auto bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0 shadow-sm btn-animated rounded-xl"
               >
                 Contact
               </Button>

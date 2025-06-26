@@ -143,13 +143,13 @@ export default function Roommates() {
               onClick={() => setShowPostForm(true)}
               className="w-12 h-12 bg-[var(--surface-secondary)] rounded-full flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05]"
             >
-              <Plus size={20} className="text-white" />
+              <Plus size={20} className="text-primary" />
             </button>
           </div>
         </div>
       </div>
 
-      <div className="pt-48 px-6 space-y-6">
+      <div className="pt-44 px-6 space-y-6">
         {/* Search Bar */}
         <Card className="glass-card" style={{
           background: 'var(--surface)',
