@@ -79,16 +79,26 @@ export default function Messages() {
   });
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // For users with few messages, scroll more conservatively to avoid showing empty space
+    if (messages.length <= 3) {
+      // Scroll to show the last message properly without going into padding
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    } else {
+      // For longer conversations, use normal scroll behavior
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   useEffect(() => {
-    scrollToBottom();
+    // Only auto-scroll if there are enough messages or typing indicators
+    if (messages.length > 3 || typingUsers.length > 0) {
+      scrollToBottom();
+    }
   }, [messages, typingUsers]);
 
-  // Scroll to bottom when messages finish loading
+  // Scroll to bottom when messages finish loading - only for longer conversations
   useEffect(() => {
-    if (!isLoading && messages.length > 0) {
+    if (!isLoading && messages.length > 3) {
       setTimeout(scrollToBottom, 200);
     }
   }, [isLoading, messages.length]);
@@ -98,9 +108,6 @@ export default function Messages() {
       setHeaderScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
-    
-    // Scroll to bottom after messages load
-    setTimeout(scrollToBottom, 100);
     
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
