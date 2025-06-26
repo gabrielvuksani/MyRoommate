@@ -111,6 +111,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Added name selection as step 2 in onboarding process
+- ✓ Expanded onboarding from 3 to 4 steps with dedicated name collection
+- ✓ Integrated user name updates via existing PATCH /api/auth/user endpoint
+- ✓ Enhanced onboarding flow with blue gradient User icon and proper validation
 - ✓ Updated messages page scrolling to auto-scroll to top for conversations with ≤5 messages
 - ✓ Maintained bottom-scroll behavior for longer conversations (>5 messages)
 - ✓ Created intelligent transition between top-scroll and bottom-scroll modes based on message count

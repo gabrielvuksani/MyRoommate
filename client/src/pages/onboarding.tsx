@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
 import { useLocation } from "wouter";
-import { CheckCircle, Users, Home, ArrowRight } from "lucide-react";
+import { CheckCircle, Users, Home, ArrowRight, User } from "lucide-react";
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
@@ -52,8 +52,24 @@ export default function Onboarding() {
     },
   });
 
+  const updateUserMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest("PATCH", "/api/auth/user", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+    },
+  });
+
   const handleNext = () => {
-    if (step < 3) {
+    if (step === 2) {
+      // Update user name before proceeding to household setup
+      updateUserMutation.mutate({
+        firstName: userData.firstName,
+        lastName: userData.lastName
+      });
+    }
+    if (step < 4) {
       setStep(step + 1);
     }
   };
@@ -124,8 +140,71 @@ export default function Onboarding() {
           </Card>
         )}
 
-        {/* Step 2: Household Setup */}
+        {/* Step 2: Name Selection */}
         {step === 2 && (
+          <Card className="glass-card page-enter">
+            <CardContent className="p-6">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-blue-500/25">
+                <User size={24} className="text-white" />
+              </div>
+              <h2 className="font-bold text-[#1a1a1a] text-[20px] mb-2">What should we call you?</h2>
+              <p className="text-gray-600">Choose how you'd like to appear to your roommates</p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-[#1a1a1a] mb-3">
+                  First Name
+                </label>
+                <Input
+                  placeholder="Enter your first name"
+                  value={userData.firstName}
+                  onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
+                  className="w-full h-12 rounded-xl border-0 bg-white/70 backdrop-blur-sm shadow-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-[#1a1a1a] mb-3">
+                  Last Name
+                </label>
+                <Input
+                  placeholder="Enter your last name"
+                  value={userData.lastName}
+                  onChange={(e) => setUserData({ ...userData, lastName: e.target.value })}
+                  className="w-full h-12 rounded-xl border-0 bg-white/70 backdrop-blur-sm shadow-sm"
+                />
+              </div>
+            </div>
+
+            <div className="flex space-x-3 mt-8">
+              <Button
+                onClick={() => setStep(step - 1)}
+                className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-xl shadow-sm"
+              >
+                Back
+              </Button>
+              <Button
+                onClick={handleNext}
+                disabled={!userData.firstName.trim() || updateUserMutation.isPending}
+                className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50"
+              >
+                {updateUserMutation.isPending ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Saving...</span>
+                  </div>
+                ) : (
+                  "Continue"
+                )}
+              </Button>
+            </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Step 3: Household Setup */}
+        {step === 3 && (
           <Card className="glass-card page-enter">
             <CardContent className="p-6">
             <div className="text-center mb-6">
@@ -221,8 +300,8 @@ export default function Onboarding() {
           </Card>
         )}
 
-        {/* Step 3: Confirmation */}
-        {step === 3 && (
+        {/* Step 4: Confirmation */}
+        {step === 4 && (
           <Card className="glass-card text-center page-enter">
             <CardContent className="p-6">
             <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/25">
@@ -273,7 +352,7 @@ export default function Onboarding() {
 
         {/* Step indicator */}
         <div className="flex justify-center mt-8 space-x-3">
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
               className={`h-2 rounded-full transition-all duration-300 ${
