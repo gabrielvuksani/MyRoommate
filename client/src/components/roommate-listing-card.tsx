@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Home, User, DollarSign, Star } from "lucide-react";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { format } from "date-fns";
+import { useLocation } from "wouter";
 
 interface RoommateListingCardProps {
   listing: any;
@@ -12,12 +13,17 @@ interface RoommateListingCardProps {
 }
 
 export default function RoommateListingCard({ listing, onContact, compact = false }: RoommateListingCardProps) {
+  const [, navigate] = useLocation();
+  
   const formatRent = (rent: string) => {
     return `$${parseFloat(rent).toLocaleString()}`;
   };
 
   return (
-    <Card className={`glass-card overflow-hidden transition-all duration-200 hover:shadow-lg ${compact ? 'h-auto' : 'h-full'}`} style={{
+    <Card 
+      className={`glass-card overflow-hidden transition-all duration-200 hover:shadow-lg cursor-pointer ${compact ? 'h-auto' : 'h-full'}`} 
+      onClick={() => navigate(`/listings/${listing.id}`)}
+      style={{
       background: 'var(--surface)',
       border: '1px solid var(--border)'
     }}>

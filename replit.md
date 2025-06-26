@@ -111,6 +111,17 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Created demo roommate listing endpoint at `/api/roommate-listings/demo` for testing and showcase
+- ✓ Added detailed listing view page at `/listings/:id` with comprehensive room information display
+- ✓ Implemented clickable roommate listing cards that navigate to detail page
+- ✓ Enhanced roommate listings schema with city, housingType, amenities, and images fields
+- ✓ Added getRoommateListing method to storage interface for single listing retrieval
+- ✓ Built listing detail page with floating header, image placeholder, amenities grid, and contact button
+- ✓ Applied consistent visionOS liquid glass design to listing detail page
+- ✓ Integrated creator information display with profile initials and formatted names
+- ✓ Added amenity icons mapping for visual representation of features
+
+**June 26, 2025 (Earlier):**
 - ✓ Completely restructured bottom navigation system from scratch
 - ✓ Replaced flexbox layout with CSS Grid for perfect tab alignment and centering
 - ✓ Rebuilt component architecture with proper household data fetching using useQuery pattern

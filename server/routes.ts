@@ -519,6 +519,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create demo listing (no auth required for demo)
+  app.post('/api/roommate-listings/demo', async (req: any, res) => {
+    try {
+      // Check if demo listing already exists
+      const existingListings = await storage.getRoommateListings();
+      if (existingListings.length > 0) {
+        return res.json(existingListings[0]);
+      }
+
+      const demoListing = await storage.createRoommateListing({
+        title: "Sunny Room in Modern Downtown Apartment",
+        description: "Beautiful, spacious room available in a newly renovated 3-bedroom apartment in the heart of downtown. The apartment features a modern kitchen with stainless steel appliances, hardwood floors throughout, and floor-to-ceiling windows with stunning city views. Perfect for young professionals or students looking for a vibrant living experience.",
+        rent: 1200,
+        location: "123 Main Street, Apt 4B",
+        city: "San Francisco",
+        availableFrom: new Date("2025-02-01"),
+        roomType: "private",
+        housingType: "apartment",
+        preferences: "Looking for a clean, respectful roommate who values a quiet home environment. Non-smoker preferred. We have a friendly cat, so must be pet-friendly!",
+        amenities: ["In-unit laundry", "Gym", "Rooftop deck", "High-speed WiFi", "Central AC/Heating", "Dishwasher", "Parking available"],
+        images: [],
+        contactInfo: "Please reach out through the app messaging system",
+        featured: true,
+        createdBy: null,
+      });
+      
+      res.json(demoListing);
+    } catch (error) {
+      console.error("Error creating demo listing:", error);
+      res.status(500).json({ message: "Failed to create demo listing" });
+    }
+  });
+
   app.post('/api/roommate-listings', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -544,6 +577,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user's roommate listings:", error);
       res.status(500).json({ message: "Failed to fetch your roommate listings" });
+    }
+  });
+
+  app.get('/api/roommate-listings/:id', async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const listing = await storage.getRoommateListing(id);
+      if (!listing) {
+        return res.status(404).json({ message: "Listing not found" });
+      }
+      res.json(listing);
+    } catch (error) {
+      console.error("Error fetching roommate listing:", error);
+      res.status(500).json({ message: "Failed to fetch roommate listing" });
     }
   });
 

@@ -79,6 +79,7 @@ export interface IStorage {
   // Roommate listing operations
   createRoommateListing(listing: InsertRoommateListing): Promise<RoommateListing>;
   getRoommateListings(city?: string, featured?: boolean): Promise<(RoommateListing & { creator: User })[]>;
+  getRoommateListing(id: string): Promise<(RoommateListing & { creator: User }) | undefined>;
   updateRoommateListing(id: string, updates: Partial<InsertRoommateListing>): Promise<RoommateListing>;
   deleteRoommateListing(id: string): Promise<void>;
   getUserRoommateListings(userId: string): Promise<RoommateListing[]>;
@@ -536,9 +537,13 @@ export class DatabaseStorage implements IStorage {
       description: row.roommate_listings.description,
       rent: row.roommate_listings.rent,
       location: row.roommate_listings.location,
+      city: row.roommate_listings.city,
       availableFrom: row.roommate_listings.availableFrom,
       roomType: row.roommate_listings.roomType,
+      housingType: row.roommate_listings.housingType,
       preferences: row.roommate_listings.preferences,
+      amenities: row.roommate_listings.amenities,
+      images: row.roommate_listings.images,
       contactInfo: row.roommate_listings.contactInfo,
       isActive: row.roommate_listings.isActive,
       featured: row.roommate_listings.featured,
@@ -555,6 +560,49 @@ export class DatabaseStorage implements IStorage {
         profileImageUrl: null,
       }
     }));
+  }
+
+  async getRoommateListing(id: string): Promise<(RoommateListing & { creator: User }) | undefined> {
+    const result = await db
+      .select()
+      .from(roommateListings)
+      .leftJoin(users, eq(roommateListings.createdBy, users.id))
+      .where(eq(roommateListings.id, id))
+      .limit(1);
+    
+    if (result.length === 0) return undefined;
+    
+    const row = result[0];
+    return {
+      id: row.roommate_listings.id,
+      title: row.roommate_listings.title,
+      description: row.roommate_listings.description,
+      rent: row.roommate_listings.rent,
+      location: row.roommate_listings.location,
+      city: row.roommate_listings.city,
+      availableFrom: row.roommate_listings.availableFrom,
+      roomType: row.roommate_listings.roomType,
+      housingType: row.roommate_listings.housingType,
+      preferences: row.roommate_listings.preferences,
+      amenities: row.roommate_listings.amenities,
+      images: row.roommate_listings.images,
+      contactInfo: row.roommate_listings.contactInfo,
+      isActive: row.roommate_listings.isActive,
+      featured: row.roommate_listings.featured,
+      createdBy: row.roommate_listings.createdBy,
+      createdAt: row.roommate_listings.createdAt,
+      updatedAt: row.roommate_listings.updatedAt,
+      creator: row.users || {
+        id: row.roommate_listings.createdBy || "unknown",
+        email: "unknown@example.com",
+        firstName: null,
+        lastName: null,
+        profileImageUrl: null,
+        role: "user" as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    };
   }
 
   async updateRoommateListing(id: string, updates: Partial<InsertRoommateListing>): Promise<RoommateListing> {

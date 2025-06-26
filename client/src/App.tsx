@@ -18,6 +18,7 @@ import Profile from "@/pages/profile";
 import Onboarding from "@/pages/onboarding";
 import Dashboard from "@/pages/dashboard";
 import Roommates from "@/pages/roommates";
+import ListingDetail from "@/pages/listing-detail";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
@@ -56,6 +57,7 @@ function Router() {
             <Route path="/dashboard" component={Dashboard} />
 
             <Route path="/roommates" component={Roommates} />
+            <Route path="/listings/:id" component={ListingDetail} />
           </>
         )}
         <Route component={NotFound} />
