@@ -111,6 +111,8 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Successfully wiped all user data for washingtonmanger@gmail.com including 21 messages, 1 expense split, 1 household membership, and user account
+- ✓ Completed database cleanup maintaining referential integrity across all related tables
 - ✓ Completely fixed "Ready to Go!" onboarding step 4 layout by centering all content including buttons
 - ✓ Restructured layout to use single centered container with max-width for better content organization
 - ✓ Applied proper flexbox centering (justify-center items-center) to CardContent for true vertical and horizontal centering
