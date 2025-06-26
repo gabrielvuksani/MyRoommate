@@ -31,11 +31,13 @@ export default function BottomNavigation() {
     const activeIndex = tabs.findIndex(tab => tab.path === location);
     if (activeIndex === -1) return;
     
-    // Calculate precise tab positioning with maximum width
+    // Calculate responsive tab positioning accounting for container padding
     const containerWidth = navigationRef.current.offsetWidth;
-    const tabWidth = containerWidth / tabs.length;
-    const indicatorWidth = tabWidth; // Full width to maximize clickable area coverage
-    const translateX = activeIndex * tabWidth + (tabWidth - indicatorWidth) / 2;
+    const containerPadding = 16; // 8px padding on each side from CSS
+    const availableWidth = containerWidth - containerPadding;
+    const tabWidth = availableWidth / tabs.length;
+    const indicatorWidth = tabWidth;
+    const translateX = (containerPadding / 2) + (activeIndex * tabWidth);
     
     navigationRef.current.style.setProperty('--indicator-translate', `${translateX}px`);
     navigationRef.current.style.setProperty('--indicator-width', `${indicatorWidth}px`);
@@ -44,9 +46,11 @@ export default function BottomNavigation() {
     const handleResize = () => {
       if (!navigationRef.current) return;
       const newContainerWidth = navigationRef.current.offsetWidth;
-      const newTabWidth = newContainerWidth / tabs.length;
+      const newContainerPadding = 16;
+      const newAvailableWidth = newContainerWidth - newContainerPadding;
+      const newTabWidth = newAvailableWidth / tabs.length;
       const newIndicatorWidth = newTabWidth;
-      const newTranslateX = activeIndex * newTabWidth + (newTabWidth - newIndicatorWidth) / 2;
+      const newTranslateX = (newContainerPadding / 2) + (activeIndex * newTabWidth);
       navigationRef.current.style.setProperty('--indicator-translate', `${newTranslateX}px`);
       navigationRef.current.style.setProperty('--indicator-width', `${newIndicatorWidth}px`);
     };
@@ -60,8 +64,8 @@ export default function BottomNavigation() {
       ref={navigationRef}
       className="tab-navigation" 
       style={{
-        '--indicator-translate': '0px',
-        '--indicator-width': '20%',
+        '--indicator-translate': '8px',
+        '--indicator-width': 'calc((100% - 16px) / 5)',
       } as React.CSSProperties}
     >
       <div className="flex items-center justify-center w-full">
@@ -72,12 +76,10 @@ export default function BottomNavigation() {
             <button
               key={id}
               onClick={() => setLocation(path)}
-              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 ${
-                isActive ? 'active' : 'inactive'
-              }`}
+              className={`tab-item ${isActive ? 'active' : 'inactive'}`}
             >
-              <Icon size={18} className="flex-shrink-0" />
-              <span className="text-xs mt-0.5 font-medium truncate">{label}</span>
+              <Icon className="w-4 h-4 sm:w-[18px] sm:h-[18px] md:w-5 md:h-5 flex-shrink-0" />
+              <span className="text-[10px] sm:text-xs font-medium leading-none tracking-tight whitespace-nowrap">{label}</span>
             </button>
           );
         })}
