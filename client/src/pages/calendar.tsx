@@ -197,7 +197,7 @@ export default function Calendar() {
                 
                 <div className="p-6 space-y-5">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Event Title *</label>
+                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Event Title *</label>
                     <input
                       type="text"
                       placeholder="What's happening?"
@@ -209,7 +209,7 @@ export default function Calendar() {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Description</label>
+                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Description</label>
                     <input
                       type="text"
                       placeholder="Add details (optional)..."
@@ -221,7 +221,7 @@ export default function Calendar() {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-700">Start Time</label>
+                      <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Start Time</label>
                       <input
                         type="datetime-local"
                         value={newEvent.startDate}
@@ -231,7 +231,7 @@ export default function Calendar() {
                     </div>
                     
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-700">End Time (Optional)</label>
+                      <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>End Time (Optional)</label>
                       <input
                         type="datetime-local"
                         value={newEvent.endDate}
@@ -242,7 +242,7 @@ export default function Calendar() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Event Type</label>
+                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Event Type</label>
                     <Select value={newEvent.type} onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}>
                       <SelectTrigger className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500">
                         <SelectValue placeholder="Choose event type" />
@@ -256,7 +256,7 @@ export default function Calendar() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Event Color</label>
+                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Event Color</label>
                     <div className="flex items-center space-x-3">
                       <input
                         type="color"
@@ -283,7 +283,13 @@ export default function Calendar() {
                 <div className="flex justify-end space-x-3 pt-[0px] pb-[0px] pl-[12px] pr-[12px] mt-[12px] mb-[12px]">
                   <button 
                     onClick={() => setIsCreateOpen(false)}
-                    className="px-6 py-3 text-gray-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors btn-animated"
+                    className="px-6 py-3 font-semibold rounded-xl transition-colors btn-animated"
+                    style={{ 
+                      color: 'var(--text-secondary)',
+                      backgroundColor: 'transparent'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
                     Cancel
                   </button>
@@ -307,20 +313,22 @@ export default function Calendar() {
           <div className="flex items-center justify-between mt-[16px] mb-[16px] ml-[4px] mr-[4px]">
             <button
               onClick={() => navigateMonth('prev')}
-              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-animated"
+              className="w-10 h-10 rounded-full flex items-center justify-center btn-animated"
+              style={{ backgroundColor: 'var(--bg-secondary)' }}
             >
-              <ChevronLeft size={20} className="text-gray-600" />
+              <ChevronLeft size={20} style={{ color: 'var(--text-secondary)' }} />
             </button>
             
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
               {monthNames[currentMonth]} {currentYear}
             </h2>
             
             <button
               onClick={() => navigateMonth('next')}
-              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-animated"
+              className="w-10 h-10 rounded-full flex items-center justify-center btn-animated"
+              style={{ backgroundColor: 'var(--bg-secondary)' }}
             >
-              <ChevronRight size={20} className="text-gray-600" />
+              <ChevronRight size={20} style={{ color: 'var(--text-secondary)' }} />
             </button>
           </div>
 
@@ -329,7 +337,7 @@ export default function Calendar() {
             {/* Day Headers */}
             <div className="grid grid-cols-7 gap-2 ml-[6px] mr-[6px]">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="text-center text-sm font-bold text-gray-500 py-3">
+                <div key={day} className="text-center text-sm font-bold py-3" style={{ color: 'var(--text-secondary)' }}>
                   {day}
                 </div>
               ))}
@@ -360,11 +368,18 @@ export default function Calendar() {
                       isSelected 
                         ? 'bg-primary text-white shadow-lg' 
                         : isToday
-                        ? 'bg-blue-50 text-primary font-semibold border border-primary'
-                        : hasEvents
-                        ? 'bg-gray-100 text-gray-900'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'text-primary font-semibold border border-primary'
+                        : ''
                     }`}
+                    style={{
+                      backgroundColor: isSelected ? 'var(--accent-blue)' : 
+                                     isToday ? 'var(--blue-light)' :
+                                     hasEvents ? 'var(--bg-secondary)' : 'transparent',
+                      color: isSelected ? 'white' :
+                             isToday ? 'var(--accent-blue)' :
+                             hasEvents ? 'var(--text-primary)' : 'var(--text-secondary)',
+                      borderColor: isToday ? 'var(--accent-blue)' : 'transparent'
+                    }}
                   >
                     <span className="text-sm">{day}</span>
                     {hasEvents && !isSelected && (
@@ -382,7 +397,7 @@ export default function Calendar() {
         <div className="px-6 pb-8 calendar-events-enter" key={selectedDate.toDateString()}>
           <div className="smart-card p-6 calendar-card-enter">
             <div className="flex items-center justify-between pl-[16px] pr-[16px] mt-[16px] mb-[16px]">
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {selectedDate.toDateString() === new Date().toDateString() ? 'Today' : 
                  selectedDate.toLocaleDateString('en-US', { 
                    weekday: 'long',
@@ -404,11 +419,11 @@ export default function Calendar() {
             
             {getDayEvents(selectedDate.getDate()).length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                  <CalendarIcon size={28} className="text-gray-400" />
+                <div className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                  <CalendarIcon size={28} style={{ color: 'var(--text-secondary)' }} />
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">No events scheduled</h4>
-                <p className="text-gray-600 mb-6">This day is completely free</p>
+                <h4 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>No events scheduled</h4>
+                <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>This day is completely free</p>
                 <button 
                   onClick={() => setIsCreateOpen(true)}
                   className="bg-primary text-white px-6 py-3 rounded-xl font-semibold btn-animated"
@@ -421,8 +436,13 @@ export default function Calendar() {
                 {getDayEvents(selectedDate.getDate()).map((event: any, index: number) => (
                   <div 
                     key={event.id} 
-                    className="bg-gray-50 rounded-2xl p-5 border border-gray-200 animate-fade-in"
-                    style={{ animationDelay: `${index * 100}ms` }}
+                    className="rounded-2xl p-5 animate-fade-in"
+                    style={{ 
+                      backgroundColor: 'var(--bg-secondary)',
+                      borderColor: 'var(--border-color)',
+                      border: '1px solid',
+                      animationDelay: `${index * 100}ms` 
+                    }}
                   >
                     <div className="flex items-start space-x-4">
                       <div 
@@ -431,7 +451,7 @@ export default function Calendar() {
                       ></div>
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-bold text-gray-900 text-lg">{event.title}</h4>
+                          <h4 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>{event.title}</h4>
                           <button
                             onClick={() => handleDeleteEvent(event.id)}
                             className="px-2 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors"
@@ -440,17 +460,17 @@ export default function Calendar() {
                           </button>
                         </div>
                         {event.description && (
-                          <p className="text-gray-700 mb-3">{event.description}</p>
+                          <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>{event.description}</p>
                         )}
                         <div className="flex items-start flex-wrap gap-2">
-                          <div className="bg-white px-3 py-2 rounded-xl shadow-sm">
-                            <span className="text-gray-800 font-semibold text-sm">
+                          <div className="px-3 py-2 rounded-xl shadow-sm" style={{ backgroundColor: 'var(--bg-primary)' }}>
+                            <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
                               {new Date(event.startDate).toLocaleTimeString('en-US', {
                                 hour: 'numeric',
                                 minute: '2-digit'
                               })}
                               {event.endDate && (
-                                <span className="text-gray-500">
+                                <span style={{ color: 'var(--text-secondary)' }}>
                                   {' - '}
                                   {new Date(event.endDate).toLocaleTimeString('en-US', {
                                     hour: 'numeric',
@@ -460,14 +480,14 @@ export default function Calendar() {
                               )}
                             </span>
                           </div>
-                          <div className="bg-gray-100 px-3 py-2 rounded-xl">
-                            <span className="text-gray-700 font-semibold text-sm">
+                          <div className="px-3 py-2 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                            <span className="font-semibold text-sm" style={{ color: 'var(--text-secondary)' }}>
                               {event.creator?.firstName || 'Unknown'}
                             </span>
                           </div>
                           {event.type && (
-                            <div className="bg-blue-50 text-primary px-3 py-2 rounded-xl">
-                              <span className="capitalize font-semibold text-sm">
+                            <div className="px-3 py-2 rounded-xl" style={{ backgroundColor: 'var(--blue-light)' }}>
+                              <span className="capitalize font-semibold text-sm" style={{ color: 'var(--accent-blue)' }}>
                                 {event.type}
                               </span>
                             </div>

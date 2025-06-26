@@ -352,7 +352,7 @@ export default function Home() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                             No events scheduled
                           </p>
                         );
@@ -363,9 +363,13 @@ export default function Home() {
                   {/* Priority Chores */}
                   <button
                     onClick={() => setLocation("/chores")}
-                    className="bg-gray-50 rounded-xl p-4 w-full text-left hover:bg-gray-100 transition-colors btn-animated"
+                    className="rounded-xl p-4 w-full text-left transition-colors btn-animated"
+                    style={{ 
+                      background: 'var(--surface-secondary)',
+                      borderColor: 'var(--border)'
+                    }}
                   >
-                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                    <h4 className="font-semibold mb-3 flex items-center" style={{ color: 'var(--text-primary)' }}>
                       <CheckSquare className="w-4 h-4 mr-2 text-emerald-600" />
                       Priority Chores
                     </h4>
@@ -393,10 +397,10 @@ export default function Home() {
                             >
                               <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
                               <div className="flex-1">
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                                   {chore.title}
                                 </p>
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                                   {chore.dueDate
                                     ? `Due ${new Date(chore.dueDate).toLocaleDateString()}`
                                     : "No due date"}
@@ -405,7 +409,7 @@ export default function Home() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                             No pending chores available
                           </p>
                         );
@@ -421,7 +425,7 @@ export default function Home() {
         {/* Performance Insights */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+            <h2 className="text-xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
               <BarChart3 className="w-5 h-5 mr-2 text-primary" />
               Household Performance
             </h2>
@@ -472,10 +476,10 @@ export default function Home() {
                       <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <TrendingUp className="w-6 h-6 text-white" />
                       </div>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                         {completionRate.toFixed(0)}%
                       </p>
-                      <p className="text-sm text-gray-600">Completion Rate</p>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Completion Rate</p>
                     </CardContent>
                   </Card>
 
@@ -484,10 +488,10 @@ export default function Home() {
                       <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <Award className="w-6 h-6 text-white" />
                       </div>
-                      <p className="text-lg font-bold text-gray-900">
+                      <p className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                         {topPerformer?.user?.firstName || "Team"}
                       </p>
-                      <p className="text-sm text-gray-600">Top Performer</p>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Top Performer</p>
                     </CardContent>
                   </Card>
 
@@ -496,10 +500,10 @@ export default function Home() {
                       <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <CheckSquare className="w-6 h-6 text-white" />
                       </div>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                         {activeChores.length}
                       </p>
-                      <p className="text-sm text-gray-600">Active Tasks</p>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Active Tasks</p>
                     </CardContent>
                   </Card>
                 </>
@@ -512,7 +516,7 @@ export default function Home() {
           {/* Right Column - Recent Activity */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              <h2 className="text-xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
                 <MessageCircle className="w-5 h-5 mr-2 text-primary" />
                 Recent Activity
               </h2>
@@ -540,18 +544,18 @@ export default function Home() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2 mb-1">
-                            <p className="text-sm font-medium text-gray-900">
+                            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                               {message.user.firstName ||
                                 message.user.email?.split("@")[0]}
                             </p>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                               {new Date(message.createdAt).toLocaleTimeString(
                                 [],
                                 { hour: "2-digit", minute: "2-digit" },
                               )}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                             {message.content}
                           </p>
                         </div>
@@ -570,10 +574,10 @@ export default function Home() {
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
                       <MessageCircle size={24} className="text-white" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
                       Start the conversation
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
                       No messages yet. Say hello to your roommates!
                     </p>
                     <div className="flex items-center justify-center space-x-2 text-primary font-medium">
@@ -595,8 +599,8 @@ export default function Home() {
                 <Users className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="font-semibold text-[#1a1a1a] text-[22px]">Find Roommates</h2>
-                <p className="text-gray-600 text-sm">Discover your perfect roommate match</p>
+                <h2 className="font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>Find Roommates</h2>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Discover your perfect roommate match</p>
               </div>
             </div>
             <Button
@@ -630,8 +634,8 @@ export default function Home() {
                 <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-indigo-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings yet</h3>
-                <p className="text-gray-600 mb-4">Be the first to post a roommate listing in your area</p>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>No listings yet</h3>
+                <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Be the first to post a roommate listing in your area</p>
                 <Button
                   onClick={() => setLocation("/roommates")}
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"

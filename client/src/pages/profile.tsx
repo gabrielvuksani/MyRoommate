@@ -168,14 +168,14 @@ export default function Profile() {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-2xl font-bold text-gray-900 truncate">
+                  <h2 className="text-2xl font-bold truncate" style={{ color: 'var(--text-primary)' }}>
                     {user.firstName && user.lastName
                       ? `${user.firstName} ${user.lastName}`
                       : user.firstName ||
                         user.email?.split("@")[0] ||
                         "Unknown User"}
                   </h2>
-                  <p className="text-gray-600 truncate" title={user.email}>
+                  <p className="truncate" style={{ color: 'var(--text-secondary)' }} title={user.email}>
                     {user.email}
                   </p>
                 </div>
@@ -190,14 +190,17 @@ export default function Profile() {
                         lastName: user.lastName || "",
                       });
                     }}
-                    className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all p-0 flex-shrink-0"
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
+                    style={{ backgroundColor: 'var(--bg-secondary)' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
                   >
-                    <Edit3 size={16} className="text-gray-600" />
+                    <Edit3 size={16} style={{ color: 'var(--text-secondary)' }} />
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader className="px-6 pt-6 pb-6">
-                    <DialogTitle className="text-xl font-bold text-gray-900">
+                    <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                       Edit Name
                     </DialogTitle>
                   </DialogHeader>
@@ -311,14 +314,17 @@ export default function Profile() {
                           onClick={() => {
                             setEditHouseholdName(household?.name || "");
                           }}
-                          className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all p-0 flex-shrink-0"
+                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
+                          style={{ backgroundColor: 'var(--bg-secondary)' }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
                         >
-                          <Edit3 size={16} className="text-gray-600" />
+                          <Edit3 size={16} style={{ color: 'var(--text-secondary)' }} />
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader className="px-6 pt-6 pb-6">
-                          <DialogTitle className="text-xl font-bold text-gray-900">
+                          <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                             Edit Household Name
                           </DialogTitle>
                         </DialogHeader>
@@ -346,38 +352,44 @@ export default function Profile() {
                     </Dialog>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-gray-600">Invite Code</span>
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Invite Code</span>
                   <div className="flex items-center space-x-3">
-                    <span className="text-gray-900 font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                    <span className="font-mono text-sm px-2 py-1 rounded" style={{ 
+                      color: 'var(--text-primary)', 
+                      backgroundColor: 'var(--bg-secondary)' 
+                    }}>
                       {household.inviteCode}
                     </span>
                     <button
                       onClick={copyInviteCode}
-                      className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg btn-animated"
+                      className="p-2 rounded-lg btn-animated"
+                      style={{ backgroundColor: 'var(--bg-secondary)' }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
                     >
-                      <Copy size={14} />
+                      <Copy size={14} style={{ color: 'var(--text-secondary)' }} />
                     </button>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-gray-600">Members</span>
-                  <span className="text-gray-900">
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Members</span>
+                  <span style={{ color: 'var(--text-primary)' }}>
                     {household.members?.length || 0}
                   </span>
                 </div>
                 {household.rentAmount && (
-                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                    <span className="text-gray-600">Monthly Rent</span>
-                    <span className="text-gray-900">
+                  <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Monthly Rent</span>
+                    <span style={{ color: 'var(--text-primary)' }}>
                       ${household.rentAmount}
                     </span>
                   </div>
                 )}
                 {household.rentDueDay && (
                   <div className="flex justify-between items-center py-3">
-                    <span className="text-gray-600">Rent Due Day</span>
-                    <span className="text-gray-900">
+                    <span style={{ color: 'var(--text-secondary)' }}>Rent Due Day</span>
+                    <span style={{ color: 'var(--text-primary)' }}>
                       {household.rentDueDay}
                     </span>
                   </div>
@@ -391,14 +403,15 @@ export default function Profile() {
         {household?.members && (
           <Card className="smart-card">
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
                 Household Members
               </h3>
               <div className="space-y-3">
                 {household.members.map((member: any) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0"
+                    className="flex items-center justify-between py-3 last:border-b-0"
+                    style={{ borderBottom: '1px solid var(--border-color)' }}
                   >
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -409,20 +422,23 @@ export default function Profile() {
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-gray-900 font-medium truncate">
+                        <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>
                           {member.user.firstName && member.user.lastName
                             ? `${member.user.firstName} ${member.user.lastName}`
                             : member.user.firstName ||
                               member.user.email?.split("@")[0] ||
                               "Unknown"}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {member.role === "admin" ? "Administrator" : "Member"}
                         </p>
                       </div>
                     </div>
                     {member.role && (
-                      <span className="text-sm text-gray-600 capitalize px-2 py-1 bg-gray-100 rounded flex-shrink-0">
+                      <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{ 
+                        color: 'var(--text-secondary)', 
+                        backgroundColor: 'var(--bg-secondary)' 
+                      }}>
                         {member.role}
                       </span>
                     )}

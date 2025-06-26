@@ -31,14 +31,14 @@ function Router() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-ios-gray">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <div className="w-8 h-8 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white min-h-screen relative">
+    <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
       <Switch>
         {!isAuthenticated ? (
           <Route path="/" component={Landing} />

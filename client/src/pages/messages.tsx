@@ -268,9 +268,10 @@ export default function Messages() {
     <div className="h-screen flex flex-col page-transition">
       {/* Fixed Header */}
       <div 
-        className="fixed top-0 left-0 right-0 z-50 border-b border-white/20"
+        className="fixed top-0 left-0 right-0 z-50 border-b"
         style={{
-          background: 'rgba(255, 255, 255, 0.6)',
+          backgroundColor: 'var(--header-bg)',
+          borderColor: 'var(--border-color)',
           backdropFilter: 'blur(20px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
         }}
@@ -279,8 +280,8 @@ export default function Messages() {
           <div className="page-header bg-transparent">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="page-title">Messages</h1>
-                <p className="page-subtitle">Chat with your household</p>
+                <h1 className="page-title" style={{ color: 'var(--text-primary)' }}>Messages</h1>
+                <p className="page-subtitle" style={{ color: 'var(--text-secondary)' }}>Chat with your household</p>
               </div>
               <div className="flex items-center space-x-2">
                 <div className={`w-2 h-2 rounded-full ${
@@ -288,7 +289,7 @@ export default function Messages() {
                   connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse' : 
                   'bg-red-500'
                 }`}></div>
-                <span className="text-xs text-gray-500 font-medium">
+                <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                   {connectionStatus === 'connected' ? 'You are Online' : 
                    connectionStatus === 'connecting' ? 'Connecting...' : 
                    'You are Offline'}
@@ -317,8 +318,8 @@ export default function Messages() {
                   <div className="text-center space-y-4">
                     <MessageCircle className="w-12 h-12 text-gray-400 mx-auto" />
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-2">Start the conversation</h3>
-                      <p className="text-gray-600 text-sm mb-6">Be the first to send a message to your household</p>
+                      <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Start the conversation</h3>
+                      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Be the first to send a message to your household</p>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       {conversationStarters.map((starter, index) => (
@@ -388,7 +389,8 @@ export default function Messages() {
                   placeholder="Type a message..."
                   value={newMessage}
                   onChange={(e) => handleTyping(e.target.value)}
-                  className="w-full bg-transparent border-none text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 p-0"
+                  className="w-full bg-transparent border-none text-sm focus:outline-none focus:ring-0 p-0"
+                  style={{ color: 'var(--text-primary)' }}
                 />
               </div>
               <Button

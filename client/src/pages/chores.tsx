@@ -225,7 +225,7 @@ export default function Chores() {
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                   <span className="text-blue-600 font-semibold">🎯</span>
                 </div>
-                <h2 className="font-semibold text-[#1a1a1a] text-[22px]">Today's Focus</h2>
+                <h2 className="font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>Today's Focus</h2>
               </div>
               
               {(() => {
@@ -242,7 +242,7 @@ export default function Chores() {
                 
                 if (!priorityChore) {
                   return (
-                    <p className="font-medium text-[#1a1a1a]">All caught up! No pending chores.
+                    <p className="font-medium" style={{ color: 'var(--text-primary)' }}>All caught up! No pending chores.
                                           </p>
                   );
                 }
@@ -318,7 +318,7 @@ export default function Chores() {
               <div className="text-2xl font-bold text-blue-600 mb-1">
                 {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'todo' || !c.status).length : 0}
               </div>
-              <div className="text-sm text-secondary">To Do</div>
+              <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>To Do</div>
             </CardContent>
           </Card>
           
@@ -327,7 +327,7 @@ export default function Chores() {
               <div className="text-2xl font-bold text-orange-600 mb-1">
                 {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'doing').length : 0}
               </div>
-              <div className="text-sm text-secondary">In Progress</div>
+              <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>In Progress</div>
             </CardContent>
           </Card>
           
@@ -336,7 +336,7 @@ export default function Chores() {
               <div className="text-2xl font-bold text-green-600 mb-1">
                 {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'done').length : 0}
               </div>
-              <div className="text-sm text-secondary">Done</div>
+              <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Done</div>
             </CardContent>
           </Card>
         </div>
@@ -344,7 +344,7 @@ export default function Chores() {
         {/* All Chores */}
         <Card className="glass-card">
           <CardContent className="p-6">
-            <h2 className="text-headline font-semibold text-primary mb-4">All Chores</h2>
+            <h2 className="text-headline font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>All Chores</h2>
             <ChoreBoard chores={Array.isArray(chores) ? chores : []} onUpdateChore={handleUpdateChore} onDeleteChore={handleDeleteChore} />
           </CardContent>
         </Card>
