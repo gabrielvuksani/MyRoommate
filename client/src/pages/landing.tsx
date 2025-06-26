@@ -127,7 +127,7 @@ export default function Landing() {
             return (
               <Card
                 key={index}
-                className="glass-card hover:scale-[1.02] transition-all duration-200 group"
+                className="bg-white/70 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl shadow-gray-200/50 hover:scale-[1.02] transition-all duration-200 group"
                 style={{
                   animationDelay: `${index * 0.1}s`,
                 }}
