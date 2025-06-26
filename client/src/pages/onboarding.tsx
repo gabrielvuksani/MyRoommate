@@ -280,10 +280,10 @@ export default function Onboarding() {
                   setErrorMessage('');
                   setHouseholdData({ ...householdData, action: 'create' });
                 }}
-                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
+                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 p-8 ${
                   householdData.action === 'create' 
-                    ? 'p-8 bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
-                    : 'py-8 pr-8 pl-12 glass-card hover:scale-[1.02]'
+                    ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
+                    : 'glass-card hover:scale-[1.02]'
                 }`}
                 style={householdData.action !== 'create' ? {
                   background: 'var(--surface-secondary)',
@@ -304,10 +304,10 @@ export default function Onboarding() {
                   setErrorMessage('');
                   setHouseholdData({ ...householdData, action: 'join' });
                 }}
-                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
+                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 p-8 ${
                   householdData.action === 'join' 
-                    ? 'p-8 bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
-                    : 'py-8 pr-8 pl-12 glass-card hover:scale-[1.02]'
+                    ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
+                    : 'glass-card hover:scale-[1.02]'
                 }`}
                 style={householdData.action !== 'join' ? {
                   background: 'var(--surface-secondary)',
@@ -328,10 +328,10 @@ export default function Onboarding() {
                   setErrorMessage('');
                   setHouseholdData({ ...householdData, action: 'browse' });
                 }}
-                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
+                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 p-8 ${
                   householdData.action === 'browse' 
-                    ? 'p-8 bg-gradient-to-br from-purple-400 to-violet-500 text-white shadow-lg shadow-purple-500/25' 
-                    : 'py-8 pr-8 pl-12 glass-card hover:scale-[1.02]'
+                    ? 'bg-gradient-to-br from-purple-400 to-violet-500 text-white shadow-lg shadow-purple-500/25' 
+                    : 'glass-card hover:scale-[1.02]'
                 }`}
                 style={householdData.action !== 'browse' ? {
                   background: 'var(--surface-secondary)',
@@ -343,7 +343,7 @@ export default function Onboarding() {
                 </div>
                 <div className="text-left">
                   <h3 className="font-semibold text-lg">Find Roommates</h3>
-                  <p className="text-sm opacity-80">Browse available listings</p>
+                  <p className="text-sm opacity-80">Browse available roommates and listings</p>
                 </div>
               </button>
             </div>
