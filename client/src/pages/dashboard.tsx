@@ -12,7 +12,6 @@ import {
   Award,
   Clock,
   BarChart3,
-
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { getProfileInitials } from "@/lib/nameUtils";
@@ -26,7 +25,7 @@ export default function Dashboard() {
   useEffect(() => {
     // Scroll to top on page load
     window.scrollTo(0, 0);
-    
+
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 20);
     };
@@ -145,7 +144,7 @@ export default function Dashboard() {
           <div className="flex items-center space-x-4">
             <BackButton to="/" />
             <div>
-              <h1 className="page-title">Performance Dashboard</h1>
+              <h1 className="page-title">Dashboard</h1>
               <p className="page-subtitle">
                 {(household as any).name} household analytics
               </p>
@@ -156,20 +155,25 @@ export default function Dashboard() {
 
       <div className="pt-36 px-6 space-y-6">
         {/* Time Period Filter */}
-        <div className="flex justify-center">
-          <div className="flex space-x-2 p-1 rounded-2xl" style={{ background: 'var(--surface-secondary)' }}>
+        <div className="mt-8 flex justify-center">
+          <div
+            className="flex space-x-2 p-1 rounded-2xl"
+            style={{ background: "var(--surface-secondary)" }}
+          >
             {["week", "month", "all"].map((period) => (
               <button
                 key={period}
                 onClick={() => setSelectedPeriod(period)}
                 className="px-6 py-2 rounded-xl text-sm font-semibold transition-all"
                 style={{
-                  background: selectedPeriod === period 
-                    ? 'var(--primary)' 
-                    : 'transparent',
-                  color: selectedPeriod === period 
-                    ? 'white' 
-                    : 'var(--text-secondary)'
+                  background:
+                    selectedPeriod === period
+                      ? "var(--primary)"
+                      : "transparent",
+                  color:
+                    selectedPeriod === period
+                      ? "white"
+                      : "var(--text-secondary)",
                 }}
               >
                 {period.charAt(0).toUpperCase() + period.slice(1)}
@@ -180,17 +184,26 @@ export default function Dashboard() {
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="glass-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)'
-          }}>
+          <Card
+            className="glass-card"
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                  <p
+                    className="text-sm font-medium"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     Chore Completion
                   </p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                  <p
+                    className="text-2xl font-bold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     {choreCompletionRate.toFixed(1)}%
                   </p>
                   <div className="flex items-center space-x-1 mt-2">
@@ -207,17 +220,26 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)'
-          }}>
+          <Card
+            className="glass-card"
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                  <p
+                    className="text-sm font-medium"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     Monthly Spending
                   </p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                  <p
+                    className="text-2xl font-bold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     ${totalExpenseAmount.toFixed(0)}
                   </p>
                   <div className="flex items-center space-x-1 mt-2">
@@ -234,17 +256,26 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)'
-          }}>
+          <Card
+            className="glass-card"
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                  <p
+                    className="text-sm font-medium"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     Active Members
                   </p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                  <p
+                    className="text-2xl font-bold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     {(household as any).members?.length || 0}
                   </p>
                   <div className="flex items-center space-x-1 mt-2">
@@ -261,17 +292,26 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)'
-          }}>
+          <Card
+            className="glass-card"
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                  <p
+                    className="text-sm font-medium"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     Upcoming Events
                   </p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                  <p
+                    className="text-2xl font-bold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     {upcomingEvents.length}
                   </p>
                   <div className="flex items-center space-x-1 mt-2">
@@ -290,12 +330,18 @@ export default function Dashboard() {
         </div>
 
         {/* Member Performance */}
-        <Card className="glass-card" style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)'
-        }}>
+        <Card
+          className="glass-card"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+          }}
+        >
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2" style={{ color: 'var(--text-primary)' }}>
+            <CardTitle
+              className="flex items-center space-x-2"
+              style={{ color: "var(--text-primary)" }}
+            >
               <Award className="w-5 h-5 text-primary" />
               <span>Member Performance</span>
             </CardTitle>
@@ -306,13 +352,17 @@ export default function Dashboard() {
                 <div
                   key={member.userId}
                   className="flex items-center justify-between p-4 rounded-2xl"
-                  style={{ background: 'var(--surface-secondary)' }}
+                  style={{ background: "var(--surface-secondary)" }}
                 >
                   <div className="flex items-center space-x-4">
                     <div className="relative">
                       <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-bold">
-                          {getProfileInitials(member.user.firstName, member.user.lastName, member.user.email)}
+                          {getProfileInitials(
+                            member.user.firstName,
+                            member.user.lastName,
+                            member.user.email,
+                          )}
                         </span>
                       </div>
                       {index === 0 && (
@@ -322,11 +372,17 @@ export default function Dashboard() {
                       )}
                     </div>
                     <div>
-                      <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      <h3
+                        className="font-semibold"
+                        style={{ color: "var(--text-primary)" }}
+                      >
                         {member.user.firstName ||
                           member.user.email?.split("@")[0]}
                       </h3>
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <p
+                        className="text-sm"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
                         {member.completedChores}/{member.totalChores} chores
                         completed
                       </p>
@@ -335,22 +391,40 @@ export default function Dashboard() {
 
                   <div className="flex items-center space-x-6">
                     <div className="text-center">
-                      <p className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+                      <p
+                        className="text-lg font-bold"
+                        style={{ color: "var(--text-primary)" }}
+                      >
                         {member.completionRate.toFixed(0)}%
                       </p>
-                      <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Completion Rate</p>
+                      <p
+                        className="text-xs"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Completion Rate
+                      </p>
                     </div>
                     <div className="text-center">
                       <p className="text-lg font-bold text-primary">
                         {member.streak}
                       </p>
-                      <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Best Streak</p>
+                      <p
+                        className="text-xs"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Best Streak
+                      </p>
                     </div>
                     <div className="text-center">
                       <p className="text-lg font-bold text-blue-600">
                         {member.messageCount}
                       </p>
-                      <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Messages</p>
+                      <p
+                        className="text-xs"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Messages
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -361,12 +435,18 @@ export default function Dashboard() {
 
         {/* Activity Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="glass-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)'
-          }}>
+          <Card
+            className="glass-card"
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
+          >
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2" style={{ color: 'var(--text-primary)' }}>
+              <CardTitle
+                className="flex items-center space-x-2"
+                style={{ color: "var(--text-primary)" }}
+              >
                 <Target className="w-5 h-5 text-primary" />
                 <span>Recent Achievements</span>
               </CardTitle>
@@ -379,13 +459,24 @@ export default function Dashboard() {
                       <CheckCircle className="w-4 h-4 text-emerald-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{chore.title}</p>
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <p
+                        className="font-medium"
+                        style={{ color: "var(--text-primary)" }}
+                      >
+                        {chore.title}
+                      </p>
+                      <p
+                        className="text-sm"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
                         Completed by{" "}
                         {chore.assignedUser?.firstName || "Unknown"}
                       </p>
                     </div>
-                    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                    <span
+                      className="text-xs"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
                       {new Date(
                         chore.completedAt || chore.updatedAt,
                       ).toLocaleDateString()}
@@ -396,12 +487,18 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)'
-          }}>
+          <Card
+            className="glass-card"
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
+          >
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2" style={{ color: 'var(--text-primary)' }}>
+              <CardTitle
+                className="flex items-center space-x-2"
+                style={{ color: "var(--text-primary)" }}
+              >
                 <Clock className="w-5 h-5 text-primary" />
                 <span>Upcoming Events</span>
               </CardTitle>
@@ -418,10 +515,16 @@ export default function Dashboard() {
                         <Calendar className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                        <p
+                          className="font-medium"
+                          style={{ color: "var(--text-primary)" }}
+                        >
                           {event.title}
                         </p>
-                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        <p
+                          className="text-sm"
+                          style={{ color: "var(--text-secondary)" }}
+                        >
                           {new Date(event.startDate).toLocaleDateString()} at{" "}
                           {new Date(event.startDate).toLocaleTimeString([], {
                             hour: "2-digit",
@@ -433,8 +536,13 @@ export default function Dashboard() {
                   ))
                 ) : (
                   <div className="text-center py-8">
-                    <Calendar className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--text-secondary)' }} />
-                    <p style={{ color: 'var(--text-secondary)' }}>No upcoming events</p>
+                    <Calendar
+                      className="w-12 h-12 mx-auto mb-3"
+                      style={{ color: "var(--text-secondary)" }}
+                    />
+                    <p style={{ color: "var(--text-secondary)" }}>
+                      No upcoming events
+                    </p>
                   </div>
                 )}
               </div>
@@ -443,12 +551,18 @@ export default function Dashboard() {
         </div>
 
         {/* Progress Insights */}
-        <Card className="glass-card" style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)'
-        }}>
+        <Card
+          className="glass-card"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+          }}
+        >
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2" style={{ color: 'var(--text-primary)' }}>
+            <CardTitle
+              className="flex items-center space-x-2"
+              style={{ color: "var(--text-primary)" }}
+            >
               <BarChart3 className="w-5 h-5 text-primary" />
               <span>Household Insights</span>
             </CardTitle>
@@ -459,10 +573,16 @@ export default function Dashboard() {
                 <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>
+                <h3
+                  className="font-bold text-lg mb-2"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   Productivity Up
                 </h3>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--text-secondary)" }}
+                >
                   Chore completion rate has improved by 12% this week. Keep up
                   the great teamwork!
                 </p>
@@ -472,10 +592,16 @@ export default function Dashboard() {
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
                   <DollarSign className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>
+                <h3
+                  className="font-bold text-lg mb-2"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   Budget Friendly
                 </h3>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--text-secondary)" }}
+                >
                   Monthly expenses are 8% lower than last month. Excellent
                   financial management!
                 </p>
@@ -485,10 +611,16 @@ export default function Dashboard() {
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>
+                <h3
+                  className="font-bold text-lg mb-2"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   Team Engaged
                 </h3>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--text-secondary)" }}
+                >
                   All household members are actively participating. Great
                   community spirit!
                 </p>

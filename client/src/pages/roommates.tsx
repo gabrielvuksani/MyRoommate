@@ -132,8 +132,8 @@ export default function Roommates() {
       <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
         <div className="page-header">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <BackButton to="/" />
+            <div className="flex items-center space-x-4">
+              <BackButton to="/" className="bg-transparent" />
               <div>
                 <h1 className="page-title">Find Your Roommates</h1>
                 <p className="page-subtitle">Discover your perfect living situation</p>
@@ -141,9 +141,9 @@ export default function Roommates() {
             </div>
             <button
               onClick={() => setShowPostForm(true)}
-              className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05]"
+              className="w-12 h-12 bg-[var(--surface-secondary)] rounded-full flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05]"
             >
-              <Plus size={24} className="text-white" />
+              <Plus size={20} className="text-white" />
             </button>
           </div>
         </div>

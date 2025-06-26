@@ -28,7 +28,7 @@ export default function BackButton({ onClick, to = "/", className = "" }: BackBu
       }}
       aria-label="Go back"
     >
-      <ArrowLeft size={18} />
+      <ArrowLeft size={20} />
     </button>
   );
 }
