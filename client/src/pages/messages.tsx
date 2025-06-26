@@ -16,6 +16,7 @@ export default function Messages() {
   const [isTyping, setIsTyping] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
 
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const { user } = useAuth();
@@ -80,9 +81,7 @@ export default function Messages() {
         
         requestAnimationFrame(() => {
           setTimeout(() => {
-            if (shouldAutoScroll) {
-              scrollToBottom();
-            }
+            scrollToBottom();
           }, 25);
         });
       } else if (data.type === "pong") {
@@ -100,7 +99,7 @@ export default function Messages() {
           }, 3000);
           
           requestAnimationFrame(() => {
-            setTimeout(scrollToBottom, 50);
+            setTimeout(() => scrollToBottom(), 50);
           });
         }
       } else if (data.type === "user_stopped_typing") {
@@ -113,30 +112,17 @@ export default function Messages() {
     householdId: household?.id,
   });
 
-  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
-
+  // Simplified scroll system
   const scrollToBottom = () => {
-    if (shouldAutoScroll) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+    setTimeout(() => {
+      messagesContainerRef.current?.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: "smooth"
+      });
+    }, 100);
   };
 
-  // Auto-scroll detection
-  useEffect(() => {
-    const container = document.querySelector('.messages-container');
-    if (!container) return;
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-      setShouldAutoScroll(isNearBottom);
-    };
-
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Handle header scroll effect
+  // Handle header scroll effect only
   useEffect(() => {
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 0);
@@ -146,42 +132,19 @@ export default function Messages() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Auto-scroll when messages change
+  // Always scroll to bottom when messages change or on load
   useEffect(() => {
     if (messages && messages.length > 0) {
-      // For conversations with few messages (≤5), scroll to top
-      if (messages.length <= 5) {
-        window.scrollTo(0, 0);
-      } else {
-        // For longer conversations, maintain auto-scroll behavior
-        if (shouldAutoScroll) {
-          setTimeout(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-          }, 100);
-        }
-      }
+      scrollToBottom();
     }
-  }, [messages, shouldAutoScroll]);
+  }, [messages]);
 
-  // Auto-scroll on page load
+  // Initial scroll to bottom on page load
   useEffect(() => {
-    if (!isLoading && messages) {
-      // Determine scroll behavior based on message count
-      if (messages.length <= 5) {
-        // For new/short conversations, scroll to top
-        setTimeout(() => {
-          window.scrollTo(0, 0);
-        }, 100);
-      } else {
-        // For longer conversations, scroll to bottom
-        setTimeout(() => {
-          if (shouldAutoScroll) {
-            scrollToBottom();
-          }
-        }, 200);
-      }
+    if (!isLoading) {
+      scrollToBottom();
     }
-  }, [isLoading, messages, shouldAutoScroll]);
+  }, [isLoading]);
 
   const handleTyping = (value: string) => {
     setNewMessage(value);
@@ -247,9 +210,7 @@ export default function Messages() {
       
       // Auto-scroll to new message
       setTimeout(() => {
-        if (shouldAutoScroll) {
-          scrollToBottom();
-        }
+        scrollToBottom();
       }, 100);
     },
     onError: (error) => {
@@ -304,42 +265,48 @@ export default function Messages() {
   }
 
   return (
-    <div className="page-container page-transition">
-      {/* visionOS Header */}
+    <div className="h-screen flex flex-col page-transition">
+      {/* Fixed Header */}
       <div 
-        className={`floating-header ${headerScrolled ? "scrolled" : ""}`}
+        className="fixed top-0 left-0 right-0 z-50 border-b border-white/20"
         style={{
           background: 'rgba(255, 255, 255, 0.6)',
           backdropFilter: 'blur(20px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
         }}
       >
-        <div className="page-header bg-[transparent]">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="page-title">Messages</h1>
-              <p className="page-subtitle">Chat with your household</p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className={`w-2 h-2 rounded-full ${
-                connectionStatus === 'connected' ? 'bg-green-500' : 
-                connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse' : 
-                'bg-red-500'
-              }`}></div>
-              <span className="text-xs text-gray-500 font-medium">
-                {connectionStatus === 'connected' ? 'You are Online' : 
-                 connectionStatus === 'connecting' ? 'Connecting...' : 
-                 'You are Offline'}
-              </span>
+        <div className="max-w-3xl mx-auto">
+          <div className="page-header bg-transparent">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="page-title">Messages</h1>
+                <p className="page-subtitle">Chat with your household</p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  connectionStatus === 'connected' ? 'bg-green-500' : 
+                  connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse' : 
+                  'bg-red-500'
+                }`}></div>
+                <span className="text-xs text-gray-500 font-medium">
+                  {connectionStatus === 'connected' ? 'You are Online' : 
+                   connectionStatus === 'connecting' ? 'Connecting...' : 
+                   'You are Offline'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      {/* Messages Container */}
-      <div className="pt-36 pb-40">
+
+      {/* Scrollable Messages Container */}
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto"
+        style={{ paddingTop: '140px', paddingBottom: '180px' }}
+      >
         <div className="max-w-3xl mx-auto px-6">
-          <div className="messages-container space-y-4">
+          <div className="space-y-4 min-h-full">
             {isLoading ? (
               <div className="flex justify-center py-8">
                 <div className="w-6 h-6 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
@@ -380,22 +347,18 @@ export default function Messages() {
                 ))}
                 
                 {/* Typing indicators */}
-                {typingUsers.length > 0 && messages && messages.length > 5 && (
+                {typingUsers.length > 0 && (
                   <div className="flex items-center space-x-3">
                     <div className="flex-shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium shadow-sm">
-                        {typingUsers[0][0]}
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center ring-2 ring-white shadow-lg">
+                        <span className="text-white text-xs font-semibold">
+                          {typingUsers.length > 1 ? `${typingUsers.length}` : typingUsers[0]?.[0]?.toUpperCase()}
+                        </span>
                       </div>
                     </div>
-                    <div className="glass-card p-3 rounded-2xl max-w-xs">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600 font-medium">
-                          {typingUsers.length === 1 
-                            ? `${typingUsers[0]} is typing`
-                            : `${typingUsers.slice(0, -1).join(', ')} and ${typingUsers[typingUsers.length - 1]} are typing`
-                          }
-                        </span>
-                        <div className="flex space-x-1">
+                    <div className="flex-1">
+                      <div className="glass-message-bubble received max-w-xs px-4 py-3 rounded-3xl shadow-lg">
+                        <div className="flex items-center space-x-1">
                           <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce"></div>
                           <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                           <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
@@ -405,8 +368,6 @@ export default function Messages() {
                   </div>
                 )}
                 
-                {/* Scroll buffer to prevent content being hidden behind input */}
-                <div className="h-32" />
                 <div ref={messagesEndRef} />
               </div>
             )}
