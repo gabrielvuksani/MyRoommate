@@ -22,6 +22,9 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
+    // Scroll to top on page load
+    window.scrollTo(0, 0);
+    
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 20);
     };

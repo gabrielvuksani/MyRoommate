@@ -124,6 +124,7 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Fixed message bubble tails for received messages to match user message quality
 - ✓ Applied consistent glass morphism styling and positioning to all message tails
 - ✓ Purged all database records for fresh deployment testing environment
+- ✓ Added scroll-to-top functionality to dashboard page completing scroll behavior across all pages
 
 **June 25, 2025 (Earlier):**
 - ✓ Completed delete functionality implementation across all three core pages
