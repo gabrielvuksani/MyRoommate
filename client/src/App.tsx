@@ -25,7 +25,7 @@ function Router() {
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
     enabled: isAuthenticated,
-  });
+  }) as { data: any };
 
 
 

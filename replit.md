@@ -146,6 +146,7 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Standardized all onboarding card heights (min-h-[580px]) for seamless step navigation experience
 - ✓ Fixed step 3 spacing inconsistencies with consistent p-8 padding for all buttons and enhanced form spacing
 - ✓ Improved step 3 legibility with better structure: increased input heights to h-14, enhanced label margins, and proper conditional form spacing
+- ✓ Enhanced non-selected button spacing in step 3 with increased left padding (pl-12) for more professional appearance
 
 **June 26, 2025 (Earlier):**
 - ✓ Fixed calendar selected date visibility with explicit blue background and white text styling
