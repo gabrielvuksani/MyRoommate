@@ -112,6 +112,8 @@ export default function Profile() {
     try {
       // Invalidate all queries to refresh data
       await queryClient.invalidateQueries();
+      // Refresh the page after all other operations complete
+      window.location.reload();
     } finally {
       setIsRefreshing(false);
     }

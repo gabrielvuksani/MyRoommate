@@ -1,57 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Plus, 
   Search, 
   Filter, 
   Home, 
   Users, 
-  Star,
-  Calendar,
-  DollarSign,
+  ArrowLeft,
+  RefreshCw,
   MapPin,
-  Building,
-  Bed
 } from "lucide-react";
-import RoommateListingCard from "./roommate-listing-card";
+import RoommateListingCard from "@/components/roommate-listing-card";
 import { apiRequest } from "@/lib/queryClient";
 import { insertRoommateListingSchema } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useLocation } from "wouter";
 
-interface RoommateMarketplaceProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export default function RoommateMarketplace({ isOpen, onOpenChange }: RoommateMarketplaceProps) {
+export default function RoommateMarketplace() {
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("browse");
   const [searchCity, setSearchCity] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [headerScrolled, setHeaderScrolled] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // Fetch roommate listings
-  const { data: listings = [], isLoading } = useQuery({
+  const { data: listings = [], isLoading, refetch: refetchListings } = useQuery({
     queryKey: ['/api/roommate-listings'],
-    enabled: isOpen,
   });
 
   // Fetch user's listings
-  const { data: myListings = [] } = useQuery({
+  const { data: myListings = [], refetch: refetchMyListings } = useQuery({
     queryKey: ['/api/roommate-listings/my'],
-    enabled: isOpen && !!user,
+    enabled: !!user,
   });
 
   const form = useForm({
@@ -106,161 +109,192 @@ export default function RoommateMarketplace({ isOpen, onOpenChange }: RoommateMa
     }
   };
 
+  const handleRefresh = async () => {
+    await Promise.all([
+      refetchListings(),
+      refetchMyListings(),
+    ]);
+    // Refresh the page after all other operations complete
+    window.location.reload();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl h-[90vh] p-0 overflow-hidden bg-white/95 backdrop-blur-xl border-0 shadow-2xl">
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <DialogHeader className="px-6 py-4 border-b border-gray-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+      {/* Floating Header */}
+      <div className={`sticky top-0 z-40 transition-all duration-300 ${
+        headerScrolled 
+          ? 'bg-white/95 backdrop-blur-xl border-b border-gray-100 shadow-sm' 
+          : 'bg-transparent'
+      }`}>
+        <div className="max-w-md mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLocation("/")}
+                className="p-2 hover:bg-gray-100 rounded-xl"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
+              </Button>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <DialogTitle className="text-xl font-semibold text-[#1a1a1a]">
-                    Roommate Marketplace
-                  </DialogTitle>
-                  <p className="text-sm text-gray-600">Find your perfect roommate match</p>
+                  <h1 className="font-semibold text-[#1a1a1a] text-[22px]">Roommate Marketplace</h1>
                 </div>
               </div>
-              
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRefresh}
+                className="p-2 hover:bg-gray-100 rounded-xl"
+              >
+                <RefreshCw className="w-4 h-4 text-gray-600" />
+              </Button>
               <Button
                 onClick={() => setShowCreateForm(true)}
+                size="sm"
                 className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 border-0 shadow-lg"
               >
-                <Plus className="w-4 h-4 mr-2" />
-                Post Listing
+                <Plus className="w-4 h-4 mr-1" />
+                Post
               </Button>
             </div>
-          </DialogHeader>
-
-          {/* Content */}
-          <div className="flex-1 overflow-hidden">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-              <TabsList className="grid w-full grid-cols-2 mx-6 mt-4 bg-gray-100/50 backdrop-blur-sm">
-                <TabsTrigger value="browse" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                  <Search className="w-4 h-4 mr-2" />
-                  Browse Listings
-                </TabsTrigger>
-                <TabsTrigger value="my-listings" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                  <Home className="w-4 h-4 mr-2" />
-                  My Listings ({myListings.length})
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="browse" className="flex-1 p-6 pt-4 overflow-hidden">
-                <div className="flex flex-col h-full">
-                  {/* Search and Filters */}
-                  <div className="flex gap-4 mb-6">
-                    <div className="flex-1">
-                      <Input
-                        placeholder="Search by city..."
-                        value={searchCity}
-                        onChange={(e) => setSearchCity(e.target.value)}
-                        className="bg-white/50 backdrop-blur-sm border-gray-200"
-                      />
-                    </div>
-                    <Button variant="outline" className="bg-white/50 backdrop-blur-sm">
-                      <Filter className="w-4 h-4 mr-2" />
-                      Filters
-                    </Button>
-                  </div>
-
-                  {/* Listings Grid */}
-                  <div className="flex-1 overflow-auto">
-                    {isLoading ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {[...Array(6)].map((_, i) => (
-                          <Card key={i} className="glass-card animate-pulse">
-                            <CardContent className="p-0">
-                              <div className="h-48 bg-gray-200 rounded-t-lg"></div>
-                              <div className="p-4 space-y-3">
-                                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                                <div className="h-3 bg-gray-200 rounded w-full"></div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : Array.isArray(filteredListings) && filteredListings.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredListings.map((listing: any) => (
-                          <RoommateListingCard
-                            key={listing.id}
-                            listing={listing}
-                            onContact={handleContact}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full text-center">
-                        <Users className="w-16 h-16 text-gray-300 mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-600 mb-2">No listings found</h3>
-                        <p className="text-gray-500 mb-4">
-                          {searchCity ? `No roommate listings found in "${searchCity}"` : "No roommate listings available yet"}
-                        </p>
-                        <Button onClick={() => setShowCreateForm(true)}>
-                          <Plus className="w-4 h-4 mr-2" />
-                          Post the first listing
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="my-listings" className="flex-1 p-6 pt-4 overflow-hidden">
-                <div className="flex flex-col h-full">
-                  {Array.isArray(myListings) && myListings.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto">
-                      {myListings.map((listing: any) => (
-                        <RoommateListingCard key={listing.id} listing={listing} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-center">
-                      <Home className="w-16 h-16 text-gray-300 mb-4" />
-                      <h3 className="text-lg font-semibold text-gray-600 mb-2">No listings yet</h3>
-                      <p className="text-gray-500 mb-4">Create your first roommate listing to get started</p>
-                      <Button onClick={() => setShowCreateForm(true)}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Create Listing
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
           </div>
         </div>
-      </DialogContent>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-md mx-auto px-6 pt-6 pb-24">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100/50 backdrop-blur-sm">
+            <TabsTrigger value="browse" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <Search className="w-4 h-4 mr-2" />
+              Browse ({Array.isArray(listings) ? listings.length : 0})
+            </TabsTrigger>
+            <TabsTrigger value="my-listings" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <Home className="w-4 h-4 mr-2" />
+              My Listings ({Array.isArray(myListings) ? myListings.length : 0})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="browse" className="space-y-6">
+            {/* Search and Filters */}
+            <div className="flex gap-3">
+              <div className="flex-1 relative">
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search by city..."
+                  value={searchCity}
+                  onChange={(e) => setSearchCity(e.target.value)}
+                  className="pl-10 bg-white/50 backdrop-blur-sm border-gray-200"
+                />
+              </div>
+              <Button variant="outline" className="bg-white/50 backdrop-blur-sm">
+                <Filter className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Listings Grid */}
+            {isLoading ? (
+              <div className="space-y-4">
+                {[...Array(4)].map((_, i) => (
+                  <Card key={i} className="glass-card animate-pulse">
+                    <CardContent className="p-0">
+                      <div className="h-48 bg-gray-200 rounded-t-lg"></div>
+                      <div className="p-4 space-y-3">
+                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        <div className="h-3 bg-gray-200 rounded w-full"></div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : Array.isArray(filteredListings) && filteredListings.length > 0 ? (
+              <div className="space-y-4">
+                {filteredListings.map((listing: any) => (
+                  <RoommateListingCard
+                    key={listing.id}
+                    listing={listing}
+                    onContact={handleContact}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card className="glass-card">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-indigo-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings found</h3>
+                  <p className="text-gray-600 mb-4">
+                    {searchCity ? `No roommate listings found in "${searchCity}"` : "No roommate listings available yet"}
+                  </p>
+                  <Button onClick={() => setShowCreateForm(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Post the first listing
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="my-listings" className="space-y-6">
+            {Array.isArray(myListings) && myListings.length > 0 ? (
+              <div className="space-y-4">
+                {myListings.map((listing: any) => (
+                  <RoommateListingCard key={listing.id} listing={listing} />
+                ))}
+              </div>
+            ) : (
+              <Card className="glass-card">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Home className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings yet</h3>
+                  <p className="text-gray-600 mb-4">Create your first roommate listing to get started</p>
+                  <Button onClick={() => setShowCreateForm(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Listing
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
 
       {/* Create Listing Form Dialog */}
       <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-auto bg-white/95 backdrop-blur-xl border-0 shadow-2xl">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-auto bg-white/95 backdrop-blur-xl border-0 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold text-[#1a1a1a]">Create Roommate Listing</DialogTitle>
           </DialogHeader>
           
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>Listing Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Beautiful room in downtown apartment" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Listing Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Beautiful room in downtown apartment" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={form.control}
                   name="rent"
@@ -293,15 +327,17 @@ export default function RoommateMarketplace({ isOpen, onOpenChange }: RoommateMa
                     </FormItem>
                   )}
                 />
+              </div>
 
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={form.control}
                   name="location"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Address/Location</FormLabel>
+                      <FormLabel>Location</FormLabel>
                       <FormControl>
-                        <Input placeholder="123 Main St, Downtown" {...field} />
+                        <Input placeholder="Downtown" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -321,7 +357,9 @@ export default function RoommateMarketplace({ isOpen, onOpenChange }: RoommateMa
                     </FormItem>
                   )}
                 />
+              </div>
 
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={form.control}
                   name="roomType"
@@ -378,8 +416,8 @@ export default function RoommateMarketplace({ isOpen, onOpenChange }: RoommateMa
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Describe the room, amenities, and what you're looking for in a roommate..."
-                        className="h-24"
+                        placeholder="Describe the room and what you're looking for..."
+                        className="h-20"
                         {...field}
                       />
                     </FormControl>
@@ -396,7 +434,7 @@ export default function RoommateMarketplace({ isOpen, onOpenChange }: RoommateMa
                     <FormLabel>Amenities (comma-separated)</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="WiFi, Parking, Laundry, Pool, Gym"
+                        placeholder="WiFi, Parking, Laundry, Pool"
                         {...field}
                       />
                     </FormControl>
@@ -419,24 +457,6 @@ export default function RoommateMarketplace({ isOpen, onOpenChange }: RoommateMa
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="preferences"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Roommate Preferences (optional)</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Quiet, clean, non-smoker, student, professional..."
-                        className="h-20"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <div className="flex justify-end space-x-3 pt-4">
                 <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
                   Cancel
@@ -453,6 +473,6 @@ export default function RoommateMarketplace({ isOpen, onOpenChange }: RoommateMa
           </Form>
         </DialogContent>
       </Dialog>
-    </Dialog>
+    </div>
   );
 }

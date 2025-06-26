@@ -22,14 +22,12 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { getProfileInitials } from "@/lib/nameUtils";
-import RoommateMarketplace from "@/components/roommate-marketplace";
 import RoommateListingCard from "@/components/roommate-listing-card";
 
 export default function Home() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [headerScrolled, setHeaderScrolled] = useState(false);
-  const [showMarketplace, setShowMarketplace] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -598,7 +596,7 @@ export default function Home() {
               </div>
             </div>
             <Button
-              onClick={() => setShowMarketplace(true)}
+              onClick={() => setLocation("/roommates")}
               variant="outline"
               className="bg-white/60 backdrop-blur-sm border-gray-200 hover:bg-white/80"
             >
@@ -631,7 +629,7 @@ export default function Home() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings yet</h3>
                 <p className="text-gray-600 mb-4">Be the first to post a roommate listing in your area</p>
                 <Button
-                  onClick={() => setShowMarketplace(true)}
+                  onClick={() => setLocation("/roommates")}
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -644,7 +642,7 @@ export default function Home() {
           {featuredListings.length > 3 && (
             <div className="text-center">
               <Button
-                onClick={() => setShowMarketplace(true)}
+                onClick={() => setLocation("/roommates")}
                 variant="outline"
                 className="bg-white/60 backdrop-blur-sm border-gray-200 hover:bg-white/80"
               >
@@ -656,11 +654,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Roommate Marketplace Modal */}
-      <RoommateMarketplace
-        isOpen={showMarketplace}
-        onOpenChange={setShowMarketplace}
-      />
+
     </div>
   );
 }
