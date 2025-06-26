@@ -639,7 +639,7 @@
   left: 0;
   right: 0;
   z-index: 50;
-  background: rgba(247, 248, 250, 0.0);
+  background: transparent;
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
   transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -650,24 +650,26 @@
 
 .floating-header.scrolled {
   background: linear-gradient(145deg, 
-    rgba(255, 255, 255, 0.8) 0%, 
-    rgba(255, 255, 255, 0.6) 100%);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    rgba(255, 255, 255, 0.65) 0%, 
+    rgba(255, 255, 255, 0.45) 100%);
+  backdrop-filter: blur(25px) saturate(1.9) brightness(1.05);
+  -webkit-backdrop-filter: blur(25px) saturate(1.9) brightness(1.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.4) inset;
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.02) inset;
 }
 
 .dark .floating-header.scrolled {
   background: linear-gradient(145deg, 
-    rgba(28, 28, 30, 0.9) 0%, 
-    rgba(44, 44, 46, 0.8) 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    rgba(28, 28, 30, 0.75) 0%, 
+    rgba(44, 44, 46, 0.65) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.15) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.25) inset;
 }
 
 .floating-header .header-content {
