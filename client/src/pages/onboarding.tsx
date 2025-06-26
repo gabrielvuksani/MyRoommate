@@ -468,86 +468,88 @@ export default function Onboarding() {
         {step === 4 && (
           <Card className="glass-card text-center page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-6 flex flex-col justify-between h-full">
-            <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
-              <CheckCircle size={32} className="text-white" />
-            </div>
-            <h1 className="font-bold text-[22px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>Ready to Go!</h1>
-            
-            {householdData.action === 'create' ? (
-              <div className="mb-8">
-                <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  You're about to create "<strong style={{ color: 'var(--text-primary)' }}>{householdData.name}</strong>". 
-                  You'll get an invite code to share with your roommates.
-                </p>
-              </div>
-            ) : householdData.action === 'join' ? (
-              <div className="mb-8">
-                <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  You're about to join a household using code <strong style={{ color: 'var(--text-primary)' }} className="font-mono tracking-wider">{householdData.inviteCode}</strong>.
-                </p>
-              </div>
-            ) : (
-              <div className="mb-8">
-                <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  Your profile is ready! You can now browse roommate listings and connect with potential roommates.
-                </p>
-              </div>
-            )}
+              <div className="flex-1 flex flex-col justify-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
+                  <CheckCircle size={32} className="text-white" />
+                </div>
+                <h1 className="font-bold text-[22px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>Ready to Go!</h1>
+                
+                {householdData.action === 'create' ? (
+                  <div className="mb-8">
+                    <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      You're about to create "<strong style={{ color: 'var(--text-primary)' }}>{householdData.name}</strong>". 
+                      You'll get an invite code to share with your roommates.
+                    </p>
+                  </div>
+                ) : householdData.action === 'join' ? (
+                  <div className="mb-8">
+                    <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      You're about to join a household using code <strong style={{ color: 'var(--text-primary)' }} className="font-mono tracking-wider">{householdData.inviteCode}</strong>.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mb-8">
+                    <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      Your profile is ready! You can now browse roommate listings and connect with potential roommates.
+                    </p>
+                  </div>
+                )}
 
-            {errorMessage && (
-              <div className="mb-6 glass-card bg-red-50/90 dark:bg-red-900/20 border-red-200/50 dark:border-red-800/50 shadow-lg shadow-red-500/20 page-enter">
-                <div className="p-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-red-800 dark:text-red-200">Unable to Join Household</p>
-                      <p className="text-sm text-red-700 dark:text-red-300 mt-1">{errorMessage}</p>
+                {errorMessage && (
+                  <div className="mb-6 glass-card bg-red-50/90 dark:bg-red-900/20 border-red-200/50 dark:border-red-800/50 shadow-lg shadow-red-500/20 page-enter">
+                    <div className="p-4">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-red-800 dark:text-red-200">Unable to Join Household</p>
+                          <p className="text-sm text-red-700 dark:text-red-300 mt-1">{errorMessage}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
-            )}
 
-            <div className="flex space-x-3">
-              <Button
-                onClick={() => setStep(step - 1)}
-                className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all"
-                style={{
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                Back
-              </Button>
-              {householdData.action === 'browse' ? (
+              <div className="flex space-x-3 mt-8">
                 <Button
-                  onClick={() => setLocation("/roommates")}
-                  className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white font-semibold rounded-2xl shadow-lg shadow-purple-500/25 transition-all duration-200 hover:scale-[1.02]"
+                  onClick={() => setStep(step - 1)}
+                  className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all"
+                  style={{
+                    background: 'var(--surface-secondary)',
+                    color: 'var(--text-secondary)'
+                  }}
                 >
-                  Browse Roommates
+                  Back
                 </Button>
-              ) : (
-                <Button
-                  onClick={handleFinish}
-                  disabled={createHouseholdMutation.isPending || joinHouseholdMutation.isPending}
-                  className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
-                >
-                  {createHouseholdMutation.isPending || joinHouseholdMutation.isPending ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Setting up...</span>
-                    </div>
-                  ) : (
-                    householdData.action === 'create' ? "Create Household" : "Join Household"
-                  )
-                }
-              </Button>
-              )}
-            </div>
+                {householdData.action === 'browse' ? (
+                  <Button
+                    onClick={() => setLocation("/roommates")}
+                    className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white font-semibold rounded-2xl shadow-lg shadow-purple-500/25 transition-all duration-200 hover:scale-[1.02]"
+                  >
+                    Browse Roommates
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleFinish}
+                    disabled={createHouseholdMutation.isPending || joinHouseholdMutation.isPending}
+                    className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
+                  >
+                    {createHouseholdMutation.isPending || joinHouseholdMutation.isPending ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Setting up...</span>
+                      </div>
+                    ) : (
+                      householdData.action === 'create' ? "Create Household" : "Join Household"
+                    )
+                  }
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         )}
