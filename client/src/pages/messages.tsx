@@ -37,6 +37,11 @@ export default function Messages() {
         console.log('WebSocket connection confirmed:', data);
         return;
       }
+      if (data.type === 'message_error') {
+        console.error('Message error:', data.error);
+        // Retry the last message if needed
+        return;
+      }
       if (data.type === "new_message") {
         // Immediately update the messages in the cache for real-time display
         queryClient.setQueryData(["/api/messages"], (old: any) => {

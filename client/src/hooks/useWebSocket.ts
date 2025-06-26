@@ -99,9 +99,16 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
 
   const sendMessage = (message: any) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify(message));
+      try {
+        const messageStr = JSON.stringify(message);
+        ws.current.send(messageStr);
+        console.log('Message sent successfully:', message.type);
+      } catch (error) {
+        console.error('Error sending WebSocket message:', error);
+      }
     } else {
-      console.warn('WebSocket not ready, queuing message');
+      console.warn('WebSocket not ready, state:', ws.current?.readyState);
+      // Message will be lost but WebSocket will auto-reconnect via useEffect
     }
   };
 

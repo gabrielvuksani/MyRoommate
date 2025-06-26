@@ -391,7 +391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Message routes
+  // Message routes - Optimized for real-time performance
   app.get('/api/messages', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -400,7 +400,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "No household found" });
       }
       
-      const messages = await storage.getMessages(membership.household.id);
+      // Add cache headers for optimal performance
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
+      
+      const limit = parseInt(req.query.limit as string) || 50;
+      const messages = await storage.getMessages(membership.household.id, limit);
       res.json(messages);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -527,37 +535,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const startTime = Date.now();
           const { content, householdId: msgHouseholdId, userId: msgUserId, linkedTo, linkedType } = message;
           
-          // Get cached user for ultra-fast message creation
-          const cachedUser = userCache.get(msgUserId);
-          
-          const newMessage = await storage.createMessage({
-            content,
-            householdId: msgHouseholdId,
-            userId: msgUserId,
-            linkedTo,
-            linkedType,
-          }, cachedUser);
-          
-          // Optimized household-based broadcasting
-          const householdClientSet = householdClients.get(msgHouseholdId);
-          if (householdClientSet) {
-            const broadcastData = JSON.stringify({
-              type: 'new_message',
-              message: newMessage,
-            });
+          try {
+            // Get cached user for ultra-fast message creation
+            const cachedUser = userCache.get(msgUserId);
             
-            householdClientSet.forEach((client: any) => {
-              if (client.readyState === WebSocket.OPEN) {
-                client.send(broadcastData);
-              }
-            });
-          }
-          
-          // Performance tracking
-          messageCount++;
-          totalProcessingTime += Date.now() - startTime;
-          if (messageCount % 10 === 0) {
-            console.log(`💬 Chat Performance: ${messageCount} messages, avg ${(totalProcessingTime/messageCount).toFixed(2)}ms`);
+            const newMessage = await storage.createMessage({
+              content,
+              householdId: msgHouseholdId,
+              userId: msgUserId,
+              linkedTo,
+              linkedType,
+            }, cachedUser);
+            
+            // Optimized household-based broadcasting with error resilience
+            const householdClientSet = householdClients.get(msgHouseholdId);
+            if (householdClientSet) {
+              const broadcastData = JSON.stringify({
+                type: 'new_message',
+                message: newMessage,
+              });
+              
+              // Clean up dead connections and broadcast to live ones
+              const deadConnections = new Set();
+              householdClientSet.forEach((client: any) => {
+                try {
+                  if (client.readyState === WebSocket.OPEN) {
+                    client.send(broadcastData);
+                  } else {
+                    deadConnections.add(client);
+                  }
+                } catch (error) {
+                  console.error('Error broadcasting to client:', error);
+                  deadConnections.add(client);
+                }
+              });
+              
+              // Remove dead connections
+              deadConnections.forEach(conn => householdClientSet.delete(conn));
+            }
+            
+            // Performance tracking
+            messageCount++;
+            totalProcessingTime += Date.now() - startTime;
+            if (messageCount % 10 === 0) {
+              console.log(`Chat Performance: ${messageCount} messages, avg ${(totalProcessingTime/messageCount).toFixed(2)}ms`);
+            }
+          } catch (error) {
+            console.error('Error processing message:', error);
+            // Send error back to sender
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'message_error',
+                error: 'Failed to send message'
+              }));
+            }
           }
         }
         
@@ -623,17 +654,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
     
     ws.on('close', () => {
+      console.log('WebSocket client disconnected', { userId, householdId });
+      
+      // Comprehensive cleanup for production stability
       if (userId) {
         clientsById.delete(userId);
-        
-        // Remove from household client set
-        if (householdId) {
-          const householdSet = householdClients.get(householdId);
-          if (householdSet) {
-            householdSet.delete(ws);
-            if (householdSet.size === 0) {
-              householdClients.delete(householdId);
-            }
+      }
+      
+      // Remove from household client set with error handling
+      if (householdId) {
+        const householdSet = householdClients.get(householdId);
+        if (householdSet) {
+          householdSet.delete(ws);
+          if (householdSet.size === 0) {
+            householdClients.delete(householdId);
           }
         }
       }
