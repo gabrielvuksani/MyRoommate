@@ -122,5 +122,5 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
     }
   };
 
-  return { sendMessage };
+  return { sendMessage, websocket: ws.current };
 }
