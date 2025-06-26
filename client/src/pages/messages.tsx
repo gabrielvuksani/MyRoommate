@@ -91,37 +91,60 @@ export default function Messages() {
     householdId: household?.id,
   });
 
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+
   const scrollToBottom = () => {
-    // For users with few messages, scroll more conservatively to avoid showing empty space
-    if (messages.length <= 3) {
-      // Scroll to show the last message properly without going into padding
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-    } else {
-      // For longer conversations, use normal scroll behavior
+    if (shouldAutoScroll) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   };
 
+  // Check if user is near bottom of messages
+  const isNearBottom = () => {
+    const threshold = 150;
+    return (
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - threshold
+    );
+  };
+
+  // Auto-scroll on new messages
   useEffect(() => {
-    // Only auto-scroll if there are enough messages or typing indicators
-    if (messages.length > 3 || typingUsers.length > 0) {
+    if (messages.length > 0 && shouldAutoScroll) {
       scrollToBottom();
     }
-  }, [messages, typingUsers]);
+  }, [messages, shouldAutoScroll]);
 
-  // Scroll to bottom when messages finish loading - only for longer conversations
+  // Initial scroll to bottom when messages load
   useEffect(() => {
-    if (!isLoading && messages.length > 3) {
-      setTimeout(scrollToBottom, 200);
+    if (!isLoading && messages.length > 0) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+      }, 100);
     }
-  }, [isLoading, messages.length]);
+  }, [isLoading]);
+
+  // Auto-scroll when typing indicators appear
+  useEffect(() => {
+    if (typingUsers.length > 0 && shouldAutoScroll) {
+      scrollToBottom();
+    }
+  }, [typingUsers, shouldAutoScroll]);
 
   useEffect(() => {
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 10);
+      
+      // If user scrolls up significantly, disable auto-scroll
+      if (!isNearBottom()) {
+        setShouldAutoScroll(false);
+      } else {
+        // If user scrolls back to bottom, re-enable auto-scroll
+        setShouldAutoScroll(true);
+      }
     };
-    window.addEventListener("scroll", handleScroll);
     
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -260,6 +283,8 @@ export default function Messages() {
       userId: user.id,
     });
 
+    // Enable auto-scroll and scroll to bottom when user sends a message
+    setShouldAutoScroll(true);
     setTimeout(scrollToBottom, 50);
   };
 
@@ -379,6 +404,9 @@ export default function Messages() {
                     </div>
                   </div>
                 )}
+                
+                {/* Scroll buffer to prevent content being hidden behind input */}
+                <div className="h-32" />
                 <div ref={messagesEndRef} />
               </div>
             )}

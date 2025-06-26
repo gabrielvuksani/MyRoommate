@@ -111,6 +111,12 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Completely redesigned messages page scrolling system for all conversation scenarios
+- ✓ Implemented intelligent auto-scroll detection that respects user manual scrolling
+- ✓ Added scroll buffer spacing to prevent messages from being hidden behind input field
+- ✓ Fixed scroll behavior for single messages, short conversations, and long message threads
+- ✓ Enhanced auto-scroll re-enablement when users scroll back to bottom of messages
+- ✓ Optimized scroll-to-bottom functionality for new message delivery and typing indicators
 - ✓ Enhanced WebSocket real-time messaging system for production deployment
 - ✓ Added comprehensive connection status monitoring and error handling
 - ✓ Implemented visual connection indicators (Online/Connecting/Offline) in messages page
