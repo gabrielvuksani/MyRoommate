@@ -87,15 +87,15 @@ export default function Messages() {
       } else if (data.type === "pong") {
         console.log('WebSocket pong received - connection healthy');
       } else if (data.type === "user_typing") {
-        if (data.userId !== user?.id) {
+        if ((data as any).userId !== (user as any)?.id) {
           setTypingUsers(prev => {
-            if (!prev.includes(data.userName)) {
-              return [...prev, data.userName];
+            if (!prev.includes((data as any).userName)) {
+              return [...prev, (data as any).userName];
             }
             return prev;
           });
           setTimeout(() => {
-            setTypingUsers(prev => prev.filter(name => name !== data.userName));
+            setTypingUsers(prev => prev.filter(name => name !== (data as any).userName));
           }, 3000);
           
           requestAnimationFrame(() => {
@@ -103,13 +103,13 @@ export default function Messages() {
           });
         }
       } else if (data.type === "user_stopped_typing") {
-        if (data.userId !== user?.id) {
-          setTypingUsers(prev => prev.filter(name => name !== data.userName));
+        if ((data as any).userId !== (user as any)?.id) {
+          setTypingUsers(prev => prev.filter(name => name !== (data as any).userName));
         }
       }
     },
-    userId: user?.id,
-    householdId: household?.id,
+    userId: (user as any)?.id,
+    householdId: (household as any)?.id,
   });
 
   // Simplified scroll system
@@ -151,14 +151,14 @@ export default function Messages() {
     
     if (!household || !user) return;
     
-    const userName = formatDisplayName(user.firstName, user.lastName, user.email);
+    const userName = formatDisplayName((user as any).firstName, (user as any).lastName, (user as any).email);
     
     if (!isTyping) {
       setIsTyping(true);
       sendMessage?.({
         type: "user_typing",
-        householdId: household.id,
-        userId: user.id,
+        householdId: (household as any).id,
+        userId: (user as any).id,
         userName,
       });
     }
@@ -174,8 +174,8 @@ export default function Messages() {
         setIsTyping(false);
         sendMessage?.({
           type: "user_stopped_typing",
-          householdId: household.id,
-          userId: user.id,
+          householdId: (household as any).id,
+          userId: (user as any).id,
           userName,
         });
       }
@@ -189,8 +189,8 @@ export default function Messages() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content,
-          householdId: household?.id,
-          userId: user?.id,
+          householdId: (household as any)?.id,
+          userId: (user as any)?.id,
         }),
       });
       if (!response.ok) throw new Error('Failed to send message');
@@ -232,9 +232,9 @@ export default function Messages() {
       setIsTyping(false);
       sendMessage?.({
         type: "user_stopped_typing",
-        householdId: household.id,
-        userId: user.id,
-        userName: formatDisplayName(user.firstName, user.lastName, user.email),
+        householdId: (household as any).id,
+        userId: (user as any).id,
+        userName: formatDisplayName((user as any).firstName, (user as any).lastName, (user as any).email),
       });
     }
 
@@ -268,10 +268,9 @@ export default function Messages() {
     <div className="h-screen flex flex-col page-transition">
       {/* Fixed Header */}
       <div 
-        className="fixed top-0 left-0 right-0 z-50 border-b"
+        className="fixed top-0 left-0 right-0 z-50"
         style={{
-          backgroundColor: 'var(--header-bg)',
-          borderColor: 'var(--border-color)',
+          background: 'transparent',
           backdropFilter: 'blur(20px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
         }}
@@ -343,7 +342,7 @@ export default function Messages() {
                   <MessageBubble 
                     key={message.id} 
                     message={message} 
-                    currentUserId={user?.id} 
+                    currentUserId={(user as any)?.id} 
                   />
                 ))}
                 

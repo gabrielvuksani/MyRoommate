@@ -142,7 +142,7 @@ export default function Calendar() {
   };
 
   const getDayEvents = (day: number) => {
-    return events.filter((event: any) => {
+    return (events as any[])?.filter((event: any) => {
       const eventDate = new Date(event.startDate);
       return eventDate.getDate() === day && 
              eventDate.getMonth() === currentMonth && 
