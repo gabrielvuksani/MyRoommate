@@ -152,14 +152,14 @@ export default function RoommateMarketplace() {
                 variant="ghost"
                 size="sm"
                 onClick={handleRefresh}
-                className="p-2 bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg hover:bg-white/80 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
+                className="p-2 hover:bg-gray-100 rounded-xl"
               >
-                <RefreshCw className="w-4 h-4 text-gray-700" />
+                <RefreshCw className="w-4 h-4 text-gray-600" />
               </Button>
               <Button
                 onClick={() => setShowCreateForm(true)}
                 size="sm"
-                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 border-0 shadow-xl backdrop-blur-sm text-white rounded-xl px-4 py-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-2xl"
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 border-0 shadow-lg"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 Post
@@ -172,12 +172,12 @@ export default function RoommateMarketplace() {
       {/* Content */}
       <div className="max-w-md mx-auto px-6 pt-6 pb-24">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-white/40 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-1">
-            <TabsTrigger value="browse" className="data-[state=active]:bg-white/80 data-[state=active]:shadow-xl data-[state=active]:backdrop-blur-sm rounded-lg transition-all duration-200 hover:bg-white/60">
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100/50 backdrop-blur-sm">
+            <TabsTrigger value="browse" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
               <Search className="w-4 h-4 mr-2" />
               Browse ({Array.isArray(listings) ? listings.length : 0})
             </TabsTrigger>
-            <TabsTrigger value="my-listings" className="data-[state=active]:bg-white/80 data-[state=active]:shadow-xl data-[state=active]:backdrop-blur-sm rounded-lg transition-all duration-200 hover:bg-white/60">
+            <TabsTrigger value="my-listings" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
               <Home className="w-4 h-4 mr-2" />
               My Listings ({Array.isArray(myListings) ? myListings.length : 0})
             </TabsTrigger>
@@ -187,16 +187,16 @@ export default function RoommateMarketplace() {
             {/* Search and Filters */}
             <div className="flex gap-3">
               <div className="flex-1 relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                   placeholder="Search by city..."
                   value={searchCity}
                   onChange={(e) => setSearchCity(e.target.value)}
-                  className="pl-10 bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg focus:bg-white/80 focus:shadow-xl transition-all duration-200"
+                  className="pl-10 bg-white/50 backdrop-blur-sm border-gray-200"
                 />
               </div>
-              <Button variant="outline" className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg hover:bg-white/80 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] p-3">
-                <Filter className="w-4 h-4 text-gray-700" />
+              <Button variant="outline" className="bg-white/50 backdrop-blur-sm">
+                <Filter className="w-4 h-4" />
               </Button>
             </div>
 
@@ -210,7 +210,7 @@ export default function RoommateMarketplace() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowCreateForm(false)}
-                      className="w-8 h-8 p-0 bg-white/60 backdrop-blur-xl border border-white/20 rounded-lg shadow-lg hover:bg-white/80 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] text-gray-700"
+                      className="text-gray-500 hover:text-gray-700"
                     >
                       ✕
                     </Button>
@@ -396,18 +396,13 @@ export default function RoommateMarketplace() {
                       />
 
                       <div className="flex justify-end space-x-3 pt-4">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={() => setShowCreateForm(false)}
-                          className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg hover:bg-white/80 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] text-gray-700"
-                        >
+                        <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
                           Cancel
                         </Button>
                         <Button 
                           type="submit" 
                           disabled={createListingMutation.isPending}
-                          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 border-0 shadow-xl backdrop-blur-sm text-white rounded-xl px-6 py-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-2xl disabled:opacity-70 disabled:cursor-not-allowed"
+                          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
                         >
                           {createListingMutation.isPending ? "Creating..." : "Create Listing"}
                         </Button>
