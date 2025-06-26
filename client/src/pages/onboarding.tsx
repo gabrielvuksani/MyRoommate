@@ -266,24 +266,24 @@ export default function Onboarding() {
         {step === 3 && (
           <Card className="glass-card page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-6 flex flex-col justify-between h-full">
-            <div className="text-center mb-6">
+            <div className="text-center mb-8">
               <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-violet-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/25">
                 <Users size={32} className="text-white" />
               </div>
               <h1 className="font-bold text-[22px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>Choose Your Path</h1>
-              <p className="text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>What would you like to do next?</p>
+              <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>What would you like to do next?</p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 mb-8">
               <button
                 onClick={() => {
                   setErrorMessage('');
                   setHouseholdData({ ...householdData, action: 'create' });
                 }}
-                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
+                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 p-8 ${
                   householdData.action === 'create' 
-                    ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25 p-6' 
-                    : 'glass-card hover:scale-[1.02] p-8'
+                    ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
+                    : 'glass-card hover:scale-[1.02]'
                 }`}
                 style={householdData.action !== 'create' ? {
                   background: 'var(--surface-secondary)',
@@ -304,10 +304,10 @@ export default function Onboarding() {
                   setErrorMessage('');
                   setHouseholdData({ ...householdData, action: 'join' });
                 }}
-                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
+                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 p-8 ${
                   householdData.action === 'join' 
-                    ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25 p-6' 
-                    : 'glass-card hover:scale-[1.02] p-8'
+                    ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
+                    : 'glass-card hover:scale-[1.02]'
                 }`}
                 style={householdData.action !== 'join' ? {
                   background: 'var(--surface-secondary)',
@@ -328,10 +328,10 @@ export default function Onboarding() {
                   setErrorMessage('');
                   setHouseholdData({ ...householdData, action: 'browse' });
                 }}
-                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
+                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 p-8 ${
                   householdData.action === 'browse' 
-                    ? 'bg-gradient-to-br from-purple-400 to-violet-500 text-white shadow-lg shadow-purple-500/25 p-6' 
-                    : 'glass-card hover:scale-[1.02] p-8'
+                    ? 'bg-gradient-to-br from-purple-400 to-violet-500 text-white shadow-lg shadow-purple-500/25' 
+                    : 'glass-card hover:scale-[1.02]'
                 }`}
                 style={householdData.action !== 'browse' ? {
                   background: 'var(--surface-secondary)',
@@ -349,9 +349,9 @@ export default function Onboarding() {
             </div>
 
             {householdData.action === 'create' && (
-              <div className="space-y-4 page-enter">
+              <div className="space-y-6 page-enter pt-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+                  <label className="block text-sm font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
                     Household Name
                   </label>
                   <Input
@@ -361,7 +361,7 @@ export default function Onboarding() {
                       setErrorMessage('');
                       setHouseholdData({ ...householdData, name: e.target.value });
                     }}
-                    className="w-full h-12 rounded-xl border-0 backdrop-blur-sm shadow-sm"
+                    className="w-full h-14 rounded-xl border-0 backdrop-blur-sm shadow-sm"
                     style={{ 
                       background: 'var(--surface-secondary)',
                       color: 'var(--text-primary)'
@@ -372,9 +372,9 @@ export default function Onboarding() {
             )}
 
             {householdData.action === 'join' && (
-              <div className="space-y-4 page-enter">
+              <div className="space-y-6 page-enter pt-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+                  <label className="block text-sm font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
                     Invite Code
                   </label>
                   <Input
@@ -385,13 +385,13 @@ export default function Onboarding() {
                       setHouseholdData({ ...householdData, inviteCode: e.target.value.toUpperCase() });
                     }}
                     maxLength={8}
-                    className="w-full h-12 rounded-xl border-0 backdrop-blur-sm shadow-sm text-center tracking-wider font-mono text-lg"
+                    className="w-full h-14 rounded-xl border-0 backdrop-blur-sm shadow-sm text-center tracking-wider font-mono text-lg"
                     style={{ 
                       background: 'var(--surface-secondary)',
                       color: 'var(--text-primary)'
                     }}
                   />
-                  <p className="text-xs mt-2 text-center" style={{ color: 'var(--text-secondary)' }}>
+                  <p className="text-xs mt-3 text-center" style={{ color: 'var(--text-secondary)' }}>
                     Ask your roommate for the household invite code
                   </p>
                 </div>
@@ -399,13 +399,15 @@ export default function Onboarding() {
             )}
 
             {householdData.action === 'browse' && (
-              <div className="text-center page-enter py-8">
-                <p className="text-lg mb-6" style={{ color: 'var(--text-primary)' }}>
-                  Perfect! Your profile is ready.
-                </p>
-                <p className="text-base" style={{ color: 'var(--text-secondary)' }}>
-                  You can browse roommate listings and create your own when ready.
-                </p>
+              <div className="text-center page-enter py-8 pt-4">
+                <div className="space-y-4">
+                  <p className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
+                    Perfect! Your profile is ready.
+                  </p>
+                  <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    You can browse roommate listings and create your own when ready.
+                  </p>
+                </div>
               </div>
             )}
 
