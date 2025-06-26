@@ -130,7 +130,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="pt-40 px-6 space-y-6">
+        <div className="pt-48 px-6 space-y-6">
           {/* My Activity Section */}
           {(myListings as any[])?.length > 0 && (
             <div className="space-y-4">
