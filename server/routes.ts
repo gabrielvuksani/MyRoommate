@@ -506,8 +506,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           clientsById.set(userId, ws);
           
           // Store client metadata for targeted broadcasting
-          (ws as any)._userId = userId;
-          (ws as any)._householdId = householdId;
+          ws.userId = userId;
+          ws.householdId = householdId;
           
           // Add to household client set for fast broadcasting
           if (!householdClients.has(householdId)) {
@@ -538,7 +538,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (message.type === 'send_message') {
           const startTime = Date.now();
-          const { content, householdId: msgHouseholdId, userId: msgUserId, messageId } = message;
+          const { content, householdId: msgHouseholdId, userId: msgUserId, tempId } = message;
           
           try {
             // Get cached user for instant message creation
@@ -546,7 +546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // INSTANT BROADCAST - Send immediately before database save
             const tempMessage = {
-              id: messageId || `temp-${Date.now()}`,
+              id: tempId || `temp-${Date.now()}`,
               content,
               householdId: msgHouseholdId,
               userId: msgUserId,
@@ -557,20 +557,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
               linkedType: null,
             };
 
-            // Instant broadcast to all household members
+            // Instant broadcast to all household members (except sender)
             const householdClientSet = householdClients.get(msgHouseholdId);
             if (householdClientSet && householdClientSet.size > 0) {
               const instantBroadcast = JSON.stringify({
                 type: 'instant_message',
                 message: tempMessage,
+                fromUserId: msgUserId
               });
               
-              // Send immediately to all connected clients
+              // Send immediately to all connected clients except the sender
               const deadConnections = new Set();
               householdClientSet.forEach((client: WebSocket) => {
                 try {
                   if (client.readyState === WebSocket.OPEN) {
-                    client.send(instantBroadcast);
+                    // Don't send back to the sender since they have optimistic update
+                    const clientUserId = (client as any).userId;
+                    if (clientUserId !== msgUserId) {
+                      client.send(instantBroadcast);
+                    }
                   } else {
                     deadConnections.add(client);
                   }
@@ -594,11 +599,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   linkedType: null,
                 }, cachedUser);
 
-                // Send confirmation with real message ID
+                // Send confirmation to all clients with real message data
                 if (householdClientSet && householdClientSet.size > 0) {
                   const confirmBroadcast = JSON.stringify({
                     type: 'message_confirmed',
-                    tempId: messageId,
+                    tempId: tempId,
                     message: savedMessage,
                   });
                   
@@ -614,6 +619,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               } catch (dbError) {
                 console.error('Background DB save failed:', dbError);
+                
+                // Send error notification to all clients
+                if (householdClientSet && householdClientSet.size > 0) {
+                  const errorBroadcast = JSON.stringify({
+                    type: 'message_error',
+                    tempId: tempId,
+                    error: 'Failed to save message'
+                  });
+                  
+                  householdClientSet.forEach((client: WebSocket) => {
+                    try {
+                      if (client.readyState === WebSocket.OPEN) {
+                        client.send(errorBroadcast);
+                      }
+                    } catch (error) {
+                      // Ignore error notification failures
+                    }
+                  });
+                }
               }
             });
             

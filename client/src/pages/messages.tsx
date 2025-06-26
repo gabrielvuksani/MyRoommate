@@ -265,9 +265,10 @@ export default function Messages() {
       });
     }
 
-    // Immediate local update for instant UI response
-    const immediateMessage = {
-      id: `temp-${Date.now()}`,
+    // Create optimistic message with visual indicator
+    const tempId = `temp-${Date.now()}-${Math.random()}`;
+    const optimisticMessage = {
+      id: tempId,
       content: messageContent,
       householdId: household.id,
       userId: user.id,
@@ -276,45 +277,49 @@ export default function Messages() {
       type: null,
       linkedTo: null,
       linkedType: null,
+      sending: true, // Flag to show this is being sent
     };
 
-    // Show message instantly in UI
-    queryClient.setQueryData(["/api/messages"], (old: any) => [
-      ...(old || []),
-      immediateMessage,
-    ]);
-
-    // Clear input immediately for better UX
-    setNewMessage("");
-    scrollToBottom();
-
-    // Send via WebSocket with immediate broadcasting
-    sendMessage({
-      type: "send_message",
-      content: messageContent,
-      householdId: household.id,
-      userId: user.id,
-      messageId: immediateMessage.id
+    // INSTANTLY show message in UI
+    queryClient.setQueryData(["/api/messages"], (old: any) => {
+      const existingMessages = old || [];
+      return [...existingMessages, optimisticMessage];
     });
 
-    // Fallback to HTTP if WebSocket fails (but don't wait)
+    // Clear input and scroll immediately
+    setNewMessage("");
+    setTimeout(scrollToBottom, 10);
+
+    // Send via WebSocket immediately
+    if (sendMessage) {
+      sendMessage({
+        type: "send_message",
+        content: messageContent,
+        householdId: household.id,
+        userId: user.id,
+        tempId: tempId
+      });
+    }
+
+    // Also send via HTTP as backup
     createMessageMutation.mutate(
       { content: messageContent },
       {
-        onSuccess: (response) => {
-          // Replace temp message with real one
+        onSuccess: (realMessage) => {
+          // Replace optimistic message with real one
           queryClient.setQueryData(["/api/messages"], (old: any) => {
-            if (!old) return [response];
+            if (!old) return [realMessage];
             return old.map((msg: any) => 
-              msg.id === immediateMessage.id ? response : msg
+              msg.id === tempId ? { ...realMessage, sending: false } : msg
             );
           });
         },
-        onError: () => {
-          // Remove failed message
+        onError: (error) => {
+          console.error('Message send failed:', error);
+          // Remove failed optimistic message
           queryClient.setQueryData(["/api/messages"], (old: any) => {
             if (!old) return [];
-            return old.filter((msg: any) => msg.id !== immediateMessage.id);
+            return old.filter((msg: any) => msg.id !== tempId);
           });
         }
       }
