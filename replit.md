@@ -115,12 +115,13 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Systematically replaced all back button implementations across dashboard, profile, roommates, settings, and roommate-marketplace pages
 - ✓ Fixed onboarding dark mode support by updating all input fields and buttons to use CSS variables
 - ✓ Enhanced bottom navigation to automatically hide when user has no household
-- ✓ Added "Find a Roommate" card below household setup for users without households
-- ✓ Fixed calendar date selector dark mode styling with proper CSS variable implementation
-- ✓ Updated dashboard UI spacing and time period filter layout for consistency
-- ✓ Completed comprehensive back button streamlining across entire application
-- ✓ Applied consistent theming support throughout onboarding flow
-- ✓ Enhanced user experience for household-less users with roommate marketplace access
+- ✓ Added spacing between "Create or Join household" and "Find a Roommate" cards for better visual hierarchy
+- ✓ Redesigned onboarding user flow to support three distinct paths: household creation, household joining, and roommate browsing
+- ✓ Implemented profile-first approach allowing users to create profiles without immediate household commitment
+- ✓ Enhanced onboarding step 3 with three clear path options: Create Household, Join Household, Find Roommates
+- ✓ Updated button logic and navigation to handle users who want to browse roommates without joining households
+- ✓ Applied consistent theming support and dark mode compatibility throughout redesigned onboarding flow
+- ✓ Enhanced user experience for household-less users with dedicated roommate marketplace access path
 
 **June 26, 2025 (Earlier):**
 - ✓ Fixed dark mode styling for expense cards with proper CSS variable usage

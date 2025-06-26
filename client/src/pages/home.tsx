@@ -81,7 +81,7 @@ export default function Home() {
             <p className="page-subtitle">Let's get you set up</p>
           </div>
         </div>
-        <div className="page-content">
+        <div className="page-content space-y-6">
           <Card className="glass-card">
             <CardContent className="p-8 text-center">
               <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center mx-auto mb-6">

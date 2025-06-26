@@ -83,7 +83,8 @@ export default function Profile() {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
       queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
       queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
-      setLocation("/onboarding");
+      queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
+      setLocation("/");
     },
     onError: (error: any) => {
       console.error("Failed to leave household:", error);
