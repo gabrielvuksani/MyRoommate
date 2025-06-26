@@ -141,8 +141,8 @@ export default function Roommates() {
                 onChange={(e) => setSearchCity(e.target.value)}
                 className="pl-10 input-modern"
                 style={{
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
+                  background: 'var(--surface-secondary)',
+                  border: '1px solid var(--border)',
                   color: 'var(--text-primary)'
                 }}
               />
@@ -178,8 +178,8 @@ export default function Roommates() {
                   onChange={(e) => setNewListing({ ...newListing, title: e.target.value })}
                   className="input-modern"
                   style={{
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
+                    background: 'var(--surface-secondary)',
+                    border: '1px solid var(--border)',
                     color: 'var(--text-primary)'
                   }}
                 />
@@ -190,8 +190,8 @@ export default function Roommates() {
                   onChange={(e) => setNewListing({ ...newListing, description: e.target.value })}
                   className="w-full p-3 rounded-xl resize-none h-24"
                   style={{
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
+                    background: 'var(--surface-secondary)',
+                    border: '1px solid var(--border)',
                     color: 'var(--text-primary)'
                   }}
                 />
@@ -204,8 +204,8 @@ export default function Roommates() {
                     onChange={(e) => setNewListing({ ...newListing, rent: e.target.value })}
                     className="input-modern"
                     style={{
-                      background: 'var(--bg-secondary)',
-                      border: '1px solid var(--border-color)',
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border)',
                       color: 'var(--text-primary)'
                     }}
                   />
@@ -216,8 +216,8 @@ export default function Roommates() {
                     onChange={(e) => setNewListing({ ...newListing, location: e.target.value })}
                     className="input-modern"
                     style={{
-                      background: 'var(--bg-secondary)',
-                      border: '1px solid var(--border-color)',
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border)',
                       color: 'var(--text-primary)'
                     }}
                   />
@@ -230,8 +230,8 @@ export default function Roommates() {
                   onChange={(e) => setNewListing({ ...newListing, contactInfo: e.target.value })}
                   className="input-modern"
                   style={{
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
+                    background: 'var(--surface-secondary)',
+                    border: '1px solid var(--border)',
                     color: 'var(--text-primary)'
                   }}
                 />

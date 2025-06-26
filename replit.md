@@ -118,6 +118,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Updated expense title and amount colors to use --text-primary for better dark mode readability
 - ✓ Added proper borders to expense filter tabs in dark mode using CSS variables
 - ✓ Enhanced filter button styling with transparent borders and improved contrast
+- ✓ Fixed roommate listing cards to use CSS variables for proper dark mode styling
+- ✓ Updated post listing form inputs to use consistent surface-secondary backgrounds
+- ✓ Applied proper text and border colors throughout roommate marketplace
+- ✓ Added auto-capitalization to expense card titles (first letter only)
 - ✓ Maintained light mode appearance while ensuring full dark mode compatibility
 - ✓ Converted roommate marketplace from modal dialog to inline form card interface
 - ✓ Enhanced refresh functionality across profile and marketplace pages to reload page after data refresh

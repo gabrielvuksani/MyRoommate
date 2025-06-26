@@ -17,7 +17,10 @@ export default function RoommateListingCard({ listing, onContact, compact = fals
   };
 
   return (
-    <Card className={`glass-card overflow-hidden transition-all duration-200 hover:shadow-lg ${compact ? 'h-auto' : 'h-full'}`}>
+    <Card className={`glass-card overflow-hidden transition-all duration-200 hover:shadow-lg ${compact ? 'h-auto' : 'h-full'}`} style={{
+      background: 'var(--surface)',
+      border: '1px solid var(--border)'
+    }}>
       <CardContent className="p-0">
         {/* Featured Badge */}
         {listing.featured && (
@@ -45,7 +48,10 @@ export default function RoommateListingCard({ listing, onContact, compact = fals
           
           {/* Rent Badge */}
           <div className="absolute bottom-3 left-3">
-            <Badge className="bg-white/90 text-gray-900 border-0 shadow-lg backdrop-blur-sm">
+            <Badge className="border-0 shadow-lg backdrop-blur-sm" style={{
+              background: 'var(--surface)',
+              color: 'var(--text-primary)'
+            }}>
               <DollarSign className="w-3 h-3 mr-1" />
               {formatRent(listing.rent)}/mo
             </Badge>
@@ -55,10 +61,10 @@ export default function RoommateListingCard({ listing, onContact, compact = fals
         <div className="p-4 space-y-3">
           {/* Title and Location */}
           <div className="space-y-2">
-            <h3 className="font-semibold text-[#1a1a1a] text-lg line-clamp-1">
+            <h3 className="font-semibold text-lg line-clamp-1" style={{ color: 'var(--text-primary)' }}>
               {listing.title}
             </h3>
-            <div className="flex items-center text-gray-600 text-sm">
+            <div className="flex items-center text-sm" style={{ color: 'var(--text-secondary)' }}>
               <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
               <span className="line-clamp-1">{listing.location}, {listing.city}</span>
             </div>
@@ -76,24 +82,24 @@ export default function RoommateListingCard({ listing, onContact, compact = fals
 
           {/* Description */}
           {!compact && listing.description && (
-            <p className="text-gray-600 text-sm line-clamp-2">
+            <p className="text-sm line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
               {listing.description}
             </p>
           )}
 
           {/* Available Date */}
-          <div className="flex items-center text-gray-600 text-sm">
+          <div className="flex items-center text-sm" style={{ color: 'var(--text-secondary)' }}>
             <Calendar className="w-4 h-4 mr-1 flex-shrink-0" />
             <span>Available {format(new Date(listing.availableFrom), 'MMM d, yyyy')}</span>
           </div>
 
           {/* Creator Info and Contact */}
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+          <div className="flex items-center justify-between pt-2" style={{ borderTop: '1px solid var(--border)' }}>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white text-xs font-semibold">
                 {getProfileInitials(listing.creator?.firstName, listing.creator?.lastName, listing.creator?.email)}
               </div>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 {formatDisplayName(listing.creator?.firstName, listing.creator?.lastName, "Host")}
               </span>
             </div>
@@ -114,12 +120,18 @@ export default function RoommateListingCard({ listing, onContact, compact = fals
             <div className="pt-2">
               <div className="flex flex-wrap gap-1">
                 {listing.amenities.slice(0, 3).map((amenity: string, index: number) => (
-                  <Badge key={index} variant="outline" className="text-xs text-gray-600">
+                  <Badge key={index} variant="outline" className="text-xs" style={{
+                    color: 'var(--text-secondary)',
+                    borderColor: 'var(--border)'
+                  }}>
                     {amenity}
                   </Badge>
                 ))}
                 {listing.amenities.length > 3 && (
-                  <Badge variant="outline" className="text-xs text-gray-600">
+                  <Badge variant="outline" className="text-xs" style={{
+                    color: 'var(--text-secondary)',
+                    borderColor: 'var(--border)'
+                  }}>
                     +{listing.amenities.length - 3} more
                   </Badge>
                 )}

@@ -64,7 +64,9 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
             <span className="text-white text-lg">{getCategoryIcon(expense.category)}</span>
           </div>
           <div>
-            <p className="text-body font-semibold" style={{ color: 'var(--text-primary)' }}>{expense.title}</p>
+            <p className="text-body font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {expense.title.charAt(0).toUpperCase() + expense.title.slice(1)}
+            </p>
             <p className="text-footnote" style={{ color: 'var(--text-secondary)' }}>
               Paid by {expense.paidByUser?.firstName || expense.paidByUser?.email?.split('@')[0] || 'Unknown'}
             </p>
