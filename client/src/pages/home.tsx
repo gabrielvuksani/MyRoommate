@@ -101,6 +101,31 @@ export default function Home() {
               </button>
             </CardContent>
           </Card>
+
+          <Card className="glass-card">
+            <CardContent className="p-8 text-center">
+              <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6" style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' }}>
+                <Users size={32} className="text-white" />
+              </div>
+              <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Find a Roommate
+              </h2>
+              <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>
+                Browse available roommates and living situations in your area
+              </p>
+              <button
+                onClick={() => setLocation("/roommates")}
+                className="px-8 py-4 rounded-xl font-semibold btn-animated shadow-lg hover:shadow-xl transition-all"
+                style={{ 
+                  background: 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border)'
+                }}
+              >
+                Browse Listings
+              </button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );

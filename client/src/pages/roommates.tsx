@@ -12,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Users, Plus, Search, MapPin, Clock, Star, Heart } from "lucide-react";
+import { Users, Plus, Search, MapPin, Clock, Star, Heart } from "lucide-react";
+import BackButton from "../components/back-button";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import RoommateListingCard from "@/components/roommate-listing-card";
@@ -129,14 +130,7 @@ export default function Roommates() {
         <div className="page-header">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setLocation("/")}
-                style={{ color: 'var(--text-primary)' }}
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
+              <BackButton to="/" />
               <div>
                 <h1 className="page-title">Find Roommates</h1>
                 <p className="page-subtitle">Discover your perfect living situation</p>

@@ -197,25 +197,33 @@ export default function Onboarding() {
 
             <div className="space-y-4 mb-8">
               <div>
-                <label className="block text-sm font-semibold text-[#1a1a1a] mb-3">
+                <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
                   First Name
                 </label>
                 <Input
                   placeholder="Enter your first name"
                   value={userData.firstName}
                   onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
-                  className="w-full h-12 rounded-xl border-0 bg-white/70 backdrop-blur-sm shadow-sm"
+                  className="w-full h-12 rounded-xl border-0 backdrop-blur-sm shadow-sm"
+                  style={{ 
+                    background: 'var(--surface-secondary)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-[#1a1a1a] mb-3">
+                <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
                   Last Name
                 </label>
                 <Input
                   placeholder="Enter your last name"
                   value={userData.lastName}
                   onChange={(e) => setUserData({ ...userData, lastName: e.target.value })}
-                  className="w-full h-12 rounded-xl border-0 bg-white/70 backdrop-blur-sm shadow-sm"
+                  className="w-full h-12 rounded-xl border-0 backdrop-blur-sm shadow-sm"
+                  style={{ 
+                    background: 'var(--surface-secondary)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
               </div>
             </div>
@@ -223,7 +231,11 @@ export default function Onboarding() {
             <div className="flex space-x-3">
               <Button
                 onClick={() => setStep(step - 1)}
-                className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-2xl shadow-sm"
+                className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all"
+                style={{
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
               >
                 Back
               </Button>
@@ -300,7 +312,11 @@ export default function Onboarding() {
                       placeholder="e.g. Maple Street House"
                       value={householdData.name}
                       onChange={(e) => setHouseholdData({ ...householdData, name: e.target.value })}
-                      className="w-full h-12 rounded-xl border-0 bg-white/70 backdrop-blur-sm shadow-sm"
+                      className="w-full h-12 rounded-xl border-0 backdrop-blur-sm shadow-sm"
+                      style={{ 
+                        background: 'var(--surface-secondary)',
+                        color: 'var(--text-primary)'
+                      }}
                     />
                   </div>
                 </div>
@@ -320,7 +336,11 @@ export default function Onboarding() {
                         setHouseholdData({ ...householdData, inviteCode: e.target.value.toUpperCase() });
                       }}
                       maxLength={8}
-                      className="w-full h-12 rounded-xl border-0 bg-white/70 backdrop-blur-sm shadow-sm text-center tracking-wider font-mono text-lg"
+                      className="w-full h-12 rounded-xl border-0 backdrop-blur-sm shadow-sm text-center tracking-wider font-mono text-lg"
+                      style={{ 
+                        background: 'var(--surface-secondary)',
+                        color: 'var(--text-primary)'
+                      }}
                     />
                     <p className="text-xs text-gray-500 mt-2 text-center">
                       Ask your roommate for the household invite code
@@ -333,7 +353,11 @@ export default function Onboarding() {
             <div className="flex space-x-3 pt-[10px] pb-[10px]">
               <Button
                 onClick={() => setStep(step - 1)}
-                className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-2xl shadow-sm"
+                className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all"
+                style={{
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
               >
                 Back
               </Button>
@@ -397,7 +421,11 @@ export default function Onboarding() {
             <div className="flex space-x-3">
               <Button
                 onClick={() => setStep(step - 1)}
-                className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-2xl shadow-sm"
+                className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all"
+                style={{
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
               >
                 Back
               </Button>

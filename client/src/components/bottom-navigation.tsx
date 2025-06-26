@@ -1,8 +1,19 @@
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Home, CheckSquare, DollarSign, Calendar, MessageCircle, BarChart3 } from "lucide-react";
 
 export default function BottomNavigation() {
   const [location, setLocation] = useLocation();
+  
+  // Check if user has a household
+  const { data: household } = useQuery({
+    queryKey: ['/api/households/current'],
+  });
+
+  // Don't render navigation if user has no household
+  if (!household) {
+    return null;
+  }
 
   const tabs = [
     { id: 'home', path: '/', label: 'Home', Icon: Home },

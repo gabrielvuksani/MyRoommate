@@ -14,12 +14,13 @@ import {
   Filter, 
   Home, 
   Users, 
-  ArrowLeft,
+
   RefreshCw,
   MapPin,
 } from "lucide-react";
 import RoommateListingCard from "@/components/roommate-listing-card";
 import { apiRequest } from "@/lib/queryClient";
+import BackButton from "../components/back-button";
 import { insertRoommateListingSchema } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 import { useForm } from "react-hook-form";
@@ -134,18 +135,7 @@ export default function RoommateMarketplace() {
         <div className="max-w-md mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setLocation("/")}
-                className="p-2 rounded-xl transition-all duration-200 hover:bg-opacity-10"
-                style={{ 
-                  background: 'transparent',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
+              <BackButton to="/" />
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
                   <Users className="w-4 h-4 text-white" />

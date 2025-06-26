@@ -10,9 +10,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, ArrowLeft, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun } from "lucide-react";
+import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun } from "lucide-react";
 import { getProfileInitials } from "@/lib/nameUtils";
 import { useTheme } from "@/lib/ThemeProvider";
+import BackButton from "../components/back-button";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -141,16 +142,7 @@ export default function Profile() {
       <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
         <div className="page-header">
           <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setLocation("/")}
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
-              style={{
-                background: 'var(--surface-secondary)',
-                color: 'var(--text-primary)'
-              }}
-            >
-              <ArrowLeft size={18} />
-            </button>
+            <BackButton to="/" />
             <div>
               <h1 className="page-title">Settings</h1>
               <p className="page-subtitle">

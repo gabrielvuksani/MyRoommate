@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { Copy, LogOut, Users, Home, ArrowLeft } from "lucide-react";
+import { Copy, LogOut, Users, Home } from "lucide-react";
+import BackButton from "../components/back-button";
 import { getProfileInitials } from "@/lib/nameUtils";
 
 import { useLocation } from "wouter";
@@ -57,12 +58,7 @@ export default function Settings() {
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
           <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => setLocation('/')}
-              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all"
-            >
-              <ArrowLeft size={18} />
-            </button>
+            <BackButton to="/" />
             <div>
               <h1 className="page-title">Settings</h1>
               <p className="page-subtitle">App & household settings</p>

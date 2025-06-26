@@ -12,10 +12,11 @@ import {
   Award,
   Clock,
   BarChart3,
-  ArrowLeft,
+
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { getProfileInitials } from "@/lib/nameUtils";
+import BackButton from "../components/back-button";
 
 export default function Dashboard() {
   const [headerScrolled, setHeaderScrolled] = useState(false);
@@ -63,17 +64,7 @@ export default function Dashboard() {
         <div className="floating-header">
           <div className="page-header">
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setLocation("/")}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all btn-animated"
-                style={{
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-primary)'
-                }}
-                aria-label="Go back"
-              >
-                <ArrowLeft size={18} />
-              </button>
+              <BackButton to="/" />
               <div>
                 <h1 className="page-title">Dashboard</h1>
                 <p className="page-subtitle">
@@ -152,17 +143,7 @@ export default function Dashboard() {
       <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
         <div className="page-header">
           <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setLocation("/")}
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-all btn-animated"
-              style={{
-                background: 'var(--surface-secondary)',
-                color: 'var(--text-primary)'
-              }}
-              aria-label="Go back"
-            >
-              <ArrowLeft size={18} />
-            </button>
+            <BackButton to="/" />
             <div>
               <h1 className="page-title">Performance Dashboard</h1>
               <p className="page-subtitle">

@@ -111,15 +111,16 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
-- ✓ Fixed critical profile page error by adding missing useTheme hook imports and functions
-- ✓ Added missing Moon and Sun icons for dark mode toggle functionality
-- ✓ Connected theme toggle functionality properly in profile page
-- → Currently fixing dashboard page dark mode styling with CSS variables
-- ✓ Updated dashboard metric cards to use CSS variables instead of hardcoded colors
-- ✓ Enhanced member performance cards with proper theme support
-- ✓ Applied CSS variables to activity overview sections
-- ✓ Fixed back button styling consistency in dashboard page
-- → Completing TypeScript compilation error fixes for dashboard page
+- ✓ Created reusable BackButton component for app-wide consistency
+- ✓ Systematically replaced all back button implementations across dashboard, profile, roommates, settings, and roommate-marketplace pages
+- ✓ Fixed onboarding dark mode support by updating all input fields and buttons to use CSS variables
+- ✓ Enhanced bottom navigation to automatically hide when user has no household
+- ✓ Added "Find a Roommate" card below household setup for users without households
+- ✓ Fixed calendar date selector dark mode styling with proper CSS variable implementation
+- ✓ Updated dashboard UI spacing and time period filter layout for consistency
+- ✓ Completed comprehensive back button streamlining across entire application
+- ✓ Applied consistent theming support throughout onboarding flow
+- ✓ Enhanced user experience for household-less users with roommate marketplace access
 
 **June 26, 2025 (Earlier):**
 - ✓ Fixed dark mode styling for expense cards with proper CSS variable usage
