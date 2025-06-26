@@ -122,6 +122,9 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Updated post listing form inputs to use consistent surface-secondary backgrounds
 - ✓ Applied proper text and border colors throughout roommate marketplace
 - ✓ Added auto-capitalization to expense card titles (first letter only)
+- ✓ Fixed search input placeholder overlap by adjusting padding and z-index
+- ✓ Updated roommate page headers to match consistent design pattern across app
+- ✓ Applied proper floating header with scroll detection and visionOS styling
 - ✓ Maintained light mode appearance while ensuring full dark mode compatibility
 - ✓ Converted roommate marketplace from modal dialog to inline form card interface
 - ✓ Enhanced refresh functionality across profile and marketplace pages to reload page after data refresh

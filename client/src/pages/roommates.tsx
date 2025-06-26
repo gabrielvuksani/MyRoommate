@@ -12,11 +12,18 @@ export default function Roommates() {
   const [location, setLocation] = useLocation();
   const [showPostForm, setShowPostForm] = useState(false);
   const [searchCity, setSearchCity] = useState("");
+  const [headerScrolled, setHeaderScrolled] = useState(false);
   const queryClient = useQueryClient();
 
   // Auto scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const { data: listings = [], isLoading } = useQuery({
@@ -30,7 +37,6 @@ export default function Roommates() {
 
   const { data: myListings = [] } = useQuery({
     queryKey: ["/api/roommate-listings/my"],
-    queryFn: () => apiRequest("/api/roommate-listings/my"),
   });
 
   const listingsArray = Array.isArray(listings) ? listings : [];
@@ -94,10 +100,10 @@ export default function Roommates() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-      {/* Floating Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-[20px] border-b border-gray-200/30">
-        <div className="max-w-md mx-auto px-6 py-4">
+    <div className="page-container page-transition">
+      {/* visionOS Header */}
+      <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
+        <div className="page-header">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Button
@@ -109,9 +115,8 @@ export default function Roommates() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div>
-                <h1 className="font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>
-                  Find Roommates
-                </h1>
+                <h1 className="page-title">Find Roommates</h1>
+                <p className="page-subtitle">Discover your perfect living situation</p>
               </div>
             </div>
             <Button
@@ -126,24 +131,25 @@ export default function Roommates() {
         </div>
       </div>
 
-      <div className="pt-32 px-6 space-y-6">
+      <div className="pt-36 px-6 space-y-6">
         {/* Search Bar */}
         <Card className="glass-card" style={{
           background: 'var(--surface)',
-          border: '1px solid var(--border-color)'
+          border: '1px solid var(--border)'
         }}>
           <CardContent className="p-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 z-10" style={{ color: 'var(--text-secondary)' }} />
               <Input
                 placeholder="Search by city..."
                 value={searchCity}
                 onChange={(e) => setSearchCity(e.target.value)}
-                className="pl-10 input-modern"
+                className="pl-12 input-modern"
                 style={{
                   background: 'var(--surface-secondary)',
                   border: '1px solid var(--border)',
-                  color: 'var(--text-primary)'
+                  color: 'var(--text-primary)',
+                  paddingLeft: '3rem'
                 }}
               />
             </div>
