@@ -372,13 +372,14 @@ export default function Calendar() {
                         : ''
                     }`}
                     style={{
-                      backgroundColor: isSelected ? 'var(--accent-blue)' : 
-                                     isToday ? 'var(--blue-light)' :
-                                     hasEvents ? 'var(--bg-secondary)' : 'transparent',
-                      color: isSelected ? 'white' :
-                             isToday ? 'var(--accent-blue)' :
+                      backgroundColor: isSelected ? '#3B82F6' : 
+                                     isToday ? 'rgba(59, 130, 246, 0.1)' :
+                                     hasEvents ? 'var(--surface-secondary)' : 'transparent',
+                      color: isSelected ? '#ffffff' :
+                             isToday ? '#3B82F6' :
                              hasEvents ? 'var(--text-primary)' : 'var(--text-secondary)',
-                      borderColor: isToday ? 'var(--accent-blue)' : 'transparent'
+                      borderColor: isToday ? '#3B82F6' : 'transparent',
+                      fontWeight: isSelected ? '600' : isToday ? '600' : '500'
                     }}
                   >
                     <span className="text-sm">{day}</span>
