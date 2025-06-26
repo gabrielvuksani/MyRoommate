@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import MessageBubble from "@/components/message-bubble";
@@ -296,18 +297,21 @@ export default function Messages() {
                     {quickMessages.map((quick, index) => {
                       const IconComponent = quick.icon;
                       return (
-                        <button
-                          key={index}
-                          onClick={() => handleQuickMessage(quick.text)}
-                          className="glass-card p-4 hover:scale-[1.02] transition-all duration-200 group"
-                        >
-                          <div className={`w-10 h-10 bg-gradient-to-br ${quick.color} rounded-2xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform duration-200 shadow-md`}>
-                            <IconComponent size={18} className="text-white" />
-                          </div>
-                          <p className="text-xs text-gray-700 font-medium text-center leading-tight">
-                            {quick.text}
-                          </p>
-                        </button>
+                        <Card key={index} className="glass-card">
+                          <CardContent className="p-6">
+                            <button
+                              onClick={() => handleQuickMessage(quick.text)}
+                              className="w-full hover:scale-[1.02] transition-all duration-200 group"
+                            >
+                              <div className={`w-10 h-10 bg-gradient-to-br ${quick.color} rounded-2xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform duration-200 shadow-md`}>
+                                <IconComponent size={18} className="text-white" />
+                              </div>
+                              <p className="text-xs text-gray-700 font-medium text-center leading-tight">
+                                {quick.text}
+                              </p>
+                            </button>
+                          </CardContent>
+                        </Card>
                       );
                     })}
                   </div>
