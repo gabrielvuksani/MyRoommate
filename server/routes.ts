@@ -372,6 +372,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete('/api/calendar-events/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+      
+      // Verify user has access to delete this calendar event
+      const membership = await storage.getUserHousehold(userId);
+      if (!membership) {
+        return res.status(404).json({ message: "No household found" });
+      }
+      
+      await storage.deleteCalendarEvent(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting calendar event:", error);
+      res.status(500).json({ message: "Failed to delete calendar event" });
+    }
+  });
+
   // Message routes
   app.get('/api/messages', isAuthenticated, async (req: any, res) => {
     try {

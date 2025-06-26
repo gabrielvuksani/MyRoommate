@@ -110,7 +110,16 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 
 ## Recent Changes
 
-**June 25, 2025 (Latest):**
+**June 26, 2025 (Latest):**
+- ✓ Fixed expense deletion functionality by adding missing backend DELETE endpoint
+- ✓ Added proper deleteExpense method to storage interface and database implementation
+- ✓ Fixed calendar event deletion with missing backend endpoint and frontend response handling
+- ✓ Implemented cascading deletion for expense splits to maintain database integrity
+- ✓ Corrected frontend mutation response handling for all delete operations
+- ✓ Fixed messages page scroll behavior bug for new users with few messages
+- ✓ Enhanced delete functionality across all three core pages (chores, expenses, calendar)
+
+**June 25, 2025 (Earlier):**
 - ✓ Completed delete functionality implementation across all three core pages
 - ✓ Added delete buttons to ChoreBoard component with proper mutation handling
 - ✓ Enhanced ExpenseCard component with delete functionality and API integration

@@ -67,11 +67,10 @@ export default function Calendar() {
 
   const deleteEventMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await apiRequest("DELETE", `/api/calendar-events/${id}`);
-      return response.json();
+      await apiRequest("DELETE", `/api/calendar-events/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/calendar-events"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
     },
     onError: (error) => {
       console.error('Error deleting event:', error);
