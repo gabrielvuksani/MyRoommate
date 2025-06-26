@@ -167,36 +167,40 @@ export default function Home() {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card 
-              className="glass-card cursor-pointer transition-all hover:transform hover:scale-[1.02]"
-              onClick={() => setLocation("/onboarding")}
-            >
+            <Card className="glass-card">
               <CardContent className="p-6 text-center animate-fade-in">
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <HomeIcon className="text-white" size={20} />
-                </div>
-                <p className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Create or Join Household
-                </p>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Start managing shared living</p>
+                <button
+                  onClick={() => setLocation("/onboarding")}
+                  className="w-full transition-all"
+                >
+                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <HomeIcon className="text-white" size={20} />
+                  </div>
+                  <p className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                    Create or Join Household
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Start managing shared living</p>
+                </button>
               </CardContent>
             </Card>
 
-            <Card 
-              className="glass-card cursor-pointer transition-all hover:transform hover:scale-[1.02]"
-              onClick={() => setLocation("/roommates")}
-            >
+            <Card className="glass-card">
               <CardContent 
                 className="p-6 text-center animate-fade-in"
                 style={{ animationDelay: "100ms" }}
               >
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Plus className="text-white" size={20} />
-                </div>
-                <p className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Post Your Listing
-                </p>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Find roommates nearby</p>
+                <button
+                  onClick={() => setLocation("/roommates")}
+                  className="w-full transition-all"
+                >
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Plus className="text-white" size={20} />
+                  </div>
+                  <p className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                    Post Your Listing
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Find roommates nearby</p>
+                </button>
               </CardContent>
             </Card>
           </div>
@@ -451,9 +455,13 @@ export default function Home() {
                 {/* Today's Schedule */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Today's Events */}
-                  <div
+                  <button
                     onClick={() => setLocation("/calendar")}
-                    className="glass-card rounded-xl p-4 w-full text-left transition-all cursor-pointer hover:transform hover:scale-[1.02]"
+                    className="rounded-xl p-4 w-full text-left transition-colors"
+                    style={{ 
+                      background: 'var(--surface-secondary)',
+                      borderColor: 'var(--border)'
+                    }}
                   >
                     <h4 className="font-semibold mb-3 flex items-center" style={{ color: 'var(--text-primary)' }}>
                       <Calendar className="w-4 h-4 mr-2 text-blue-600" />
@@ -503,12 +511,16 @@ export default function Home() {
                         );
                       })()}
                     </div>
-                  </div>
+                  </button>
 
                   {/* Priority Chores */}
-                  <div
+                  <button
                     onClick={() => setLocation("/chores")}
-                    className="glass-card rounded-xl p-4 w-full text-left transition-all cursor-pointer hover:transform hover:scale-[1.02]"
+                    className="rounded-xl p-4 w-full text-left transition-colors"
+                    style={{ 
+                      background: 'var(--surface-secondary)',
+                      borderColor: 'var(--border)'
+                    }}
                   >
                     <h4 className="font-semibold mb-3 flex items-center" style={{ color: 'var(--text-primary)' }}>
                       <CheckSquare className="w-4 h-4 mr-2 text-emerald-600" />
@@ -556,7 +568,7 @@ export default function Home() {
                         );
                       })()}
                     </div>
-                  </div>
+                  </button>
                 </div>
               </div>
             </CardContent>

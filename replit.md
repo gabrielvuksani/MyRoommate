@@ -111,16 +111,13 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
-- ✓ Fixed calendar selected date styling by removing conflicting CSS classes and using proper inline styles
+- ✓ Fixed calendar selected date styling with proper light/dark mode color inversion
 - ✓ Removed all inner card hover effects (btn-animated) from stats cards, action cards, and schedule sections
 - ✓ Completely redesigned liquid glass system to eliminate staticky appearance in light mode
 - ✓ Simplified glass-card backgrounds with cleaner transparency and reduced visual noise
 - ✓ Enhanced floating header with authentic liquid glass backdrop and improved shadow layering
 - ✓ Applied minimalistic approach while maintaining visionOS design language throughout
 - ✓ Achieved fluid, non-staticky glass morphism across both light and dark themes
-- ✓ Made entire cards clickable instead of just buttons inside for better UX (non-household and household users)
-- ✓ Redesigned bottom navigation with visionOS liquid glass aesthetic, removing blue colors
-- ✓ Applied hover design as active state in tab navigation with proper glass morphism effects
 - ✓ Enhanced "View All" button styling to match household member interface design patterns
 - ✓ Enhanced refresh button with dynamic data display and home page redirect functionality
 
