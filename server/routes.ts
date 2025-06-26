@@ -538,55 +538,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (message.type === 'send_message') {
           const startTime = Date.now();
-          const { content, householdId: msgHouseholdId, userId: msgUserId, linkedTo, linkedType } = message;
+          const { content, householdId: msgHouseholdId, userId: msgUserId, messageId } = message;
           
           try {
-            // Get cached user for ultra-fast message creation
+            // Get cached user for instant message creation
             const cachedUser = userCache.get(msgUserId);
             
-            const newMessage = await storage.createMessage({
+            // INSTANT BROADCAST - Send immediately before database save
+            const tempMessage = {
+              id: messageId || `temp-${Date.now()}`,
               content,
               householdId: msgHouseholdId,
               userId: msgUserId,
-              linkedTo,
-              linkedType,
-            }, cachedUser);
-            
-            // Optimized household-based broadcasting with error resilience
+              createdAt: new Date(),
+              user: cachedUser || { id: msgUserId, firstName: 'User', lastName: null, email: null },
+              type: null,
+              linkedTo: null,
+              linkedType: null,
+            };
+
+            // Instant broadcast to all household members
             const householdClientSet = householdClients.get(msgHouseholdId);
-            if (householdClientSet) {
-              const broadcastData = JSON.stringify({
-                type: 'new_message',
-                message: newMessage,
+            if (householdClientSet && householdClientSet.size > 0) {
+              const instantBroadcast = JSON.stringify({
+                type: 'instant_message',
+                message: tempMessage,
               });
               
-              // Clean up dead connections and broadcast to live ones
+              // Send immediately to all connected clients
               const deadConnections = new Set();
-              householdClientSet.forEach((client: any) => {
+              householdClientSet.forEach((client: WebSocket) => {
                 try {
                   if (client.readyState === WebSocket.OPEN) {
-                    client.send(broadcastData);
+                    client.send(instantBroadcast);
                   } else {
                     deadConnections.add(client);
                   }
                 } catch (error) {
-                  console.error('Error broadcasting to client:', error);
                   deadConnections.add(client);
                 }
               });
               
-              // Remove dead connections
+              // Clean up dead connections
               deadConnections.forEach(conn => householdClientSet.delete(conn));
             }
+
+            // Save to database asynchronously
+            setImmediate(async () => {
+              try {
+                const savedMessage = await storage.createMessage({
+                  content,
+                  householdId: msgHouseholdId,
+                  userId: msgUserId,
+                  linkedTo: null,
+                  linkedType: null,
+                }, cachedUser);
+
+                // Send confirmation with real message ID
+                if (householdClientSet && householdClientSet.size > 0) {
+                  const confirmBroadcast = JSON.stringify({
+                    type: 'message_confirmed',
+                    tempId: messageId,
+                    message: savedMessage,
+                  });
+                  
+                  householdClientSet.forEach((client: WebSocket) => {
+                    try {
+                      if (client.readyState === WebSocket.OPEN) {
+                        client.send(confirmBroadcast);
+                      }
+                    } catch (error) {
+                      // Ignore confirmation errors
+                    }
+                  });
+                }
+              } catch (dbError) {
+                console.error('Background DB save failed:', dbError);
+              }
+            });
             
             // Performance tracking
             messageCount++;
-            totalProcessingTime += Date.now() - startTime;
-            if (messageCount % 10 === 0) {
-              console.log(`Chat Performance: ${messageCount} messages, avg ${(totalProcessingTime/messageCount).toFixed(2)}ms`);
-            }
+            const processingTime = Date.now() - startTime;
+            totalProcessingTime += processingTime;
+            
+            console.log(`Instant message broadcast: ${processingTime}ms`);
+            
           } catch (error) {
-            console.error('Error processing message:', error);
+            console.error('Error processing instant message:', error);
             // Send error back to sender
             if (ws.readyState === WebSocket.OPEN) {
               ws.send(JSON.stringify({
