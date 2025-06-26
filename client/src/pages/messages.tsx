@@ -343,9 +343,9 @@ export default function Messages() {
                 'bg-red-500'
               }`}></div>
               <span className="text-xs text-gray-500 font-medium">
-                {connectionStatus === 'connected' ? 'Online' : 
+                {connectionStatus === 'connected' ? 'You are Online' : 
                  connectionStatus === 'connecting' ? 'Connecting...' : 
-                 'Offline'}
+                 'You are Offline'}
               </span>
             </div>
           </div>
