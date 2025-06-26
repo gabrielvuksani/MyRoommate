@@ -8,13 +8,11 @@ import { apiRequest } from "@/lib/queryClient";
 
 import { useLocation } from "wouter";
 import { CheckCircle, Users, Home, ArrowRight, User } from "lucide-react";
-import Confetti from "@/components/confetti";
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
-  const [showConfetti, setShowConfetti] = useState(false);
 
   // Scroll to top when page loads
   useEffect(() => {
@@ -40,8 +38,7 @@ export default function Onboarding() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
-      setShowConfetti(true);
-      setTimeout(() => setLocation('/'), 2000);
+      setLocation('/');
     },
   });
 
@@ -51,8 +48,7 @@ export default function Onboarding() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
-      setShowConfetti(true);
-      setTimeout(() => setLocation('/'), 2000);
+      setLocation('/');
     },
   });
 
@@ -369,10 +365,7 @@ export default function Onboarding() {
         </div>
       </div>
 
-      <Confetti 
-        active={showConfetti} 
-        onComplete={() => setShowConfetti(false)} 
-      />
+
     </div>
   );
 }

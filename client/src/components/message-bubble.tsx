@@ -1,4 +1,4 @@
-import { formatDisplayName } from "@/lib/nameUtils";
+import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 
 interface MessageBubbleProps {
   message: any;
@@ -39,7 +39,7 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
             </span>
             <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
               <span className="text-white text-xs font-bold">
-                {message.user?.firstName?.[0] || message.user?.email?.[0] || 'Y'}
+                {getProfileInitials(message.user?.firstName, message.user?.lastName, message.user?.email)}
               </span>
             </div>
           </div>
@@ -68,7 +68,7 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
     );
   }
 
-  const userInitial = message.user?.firstName?.[0] || message.user?.email?.[0] || '?';
+  const userInitials = getProfileInitials(message.user?.firstName, message.user?.lastName, message.user?.email);
   const userName = formatDisplayName(message.user?.firstName, message.user?.lastName, message.user?.email?.split('@')[0] || 'Unknown');
 
   return (
@@ -76,7 +76,7 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
       <div className="flex flex-col items-start max-w-xs">
         <div className="flex items-center space-x-3 mb-2">
           <div className="w-7 h-7 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
-            <span className="text-white text-xs font-bold">{userInitial}</span>
+            <span className="text-white text-xs font-bold">{userInitials}</span>
           </div>
           <span className="text-xs text-gray-600 font-semibold">
             {userName}

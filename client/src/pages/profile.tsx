@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, ArrowLeft, Edit3, Copy, UserMinus } from "lucide-react";
+import { getProfileInitials } from "@/lib/nameUtils";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -145,9 +146,9 @@ export default function Profile() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4 flex-1 min-w-0">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
-                    {user.firstName?.[0] || user.email?.[0] || "?"}
+                    {getProfileInitials(user.firstName, user.lastName, user.email)}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">

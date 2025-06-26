@@ -117,14 +117,19 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Enhanced onboarding flow with blue gradient User icon and proper validation
 - ✓ Standardized all onboarding card sizes with consistent 20x20 icon containers
 - ✓ Unified typography, spacing, and button styling across all onboarding steps
-- ✓ Added animated confetti burst on successful onboarding completion
-- ✓ Created physics-based confetti animation with 80 colorful pieces and gravity effects
-- ✓ Implemented 2-second delay before redirecting to home page for celebration effect
 - ✓ Added app-wide last name initial formatting system (e.g., "Vuksani" → "V.")
 - ✓ Created formatDisplayName utility function for consistent name formatting
 - ✓ Updated message bubbles to show "FirstName L." format for all users
 - ✓ Applied last name initial formatting throughout chat and messaging system
 - ✓ Enhanced onboarding with smooth visual consistency and premium feel
+- ✓ Completely removed non-functional confetti system from entire codebase
+- ✓ Deleted confetti component file and all related imports and references
+- ✓ Enhanced profile picture functionality with iOS Contacts-style initials display
+- ✓ Created getProfileInitials utility function for proper two-letter initial formatting
+- ✓ Updated message bubble avatars to use enhanced profile initials system
+- ✓ Applied iOS Contacts-style profile pictures throughout entire application
+- ✓ Enhanced profile page avatar with emerald-cyan gradient and proper initials
+- ✓ Standardized avatar styling across all components for visual consistency
 - ✓ Updated messages page scrolling to auto-scroll to top for conversations with ≤5 messages
 - ✓ Maintained bottom-scroll behavior for longer conversations (>5 messages)
 - ✓ Created intelligent transition between top-scroll and bottom-scroll modes based on message count

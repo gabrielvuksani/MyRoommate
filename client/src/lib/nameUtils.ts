@@ -29,3 +29,17 @@ export function formatShortName(firstName: string | null, lastName: string | nul
   
   return 'User';
 }
+
+export function getProfileInitials(firstName: string | null, lastName: string | null, email?: string | null): string {
+  // For profile pictures, show both initials when available, similar to iOS Contacts
+  if (firstName && lastName) {
+    return `${firstName[0]}${lastName[0]}`.toUpperCase();
+  }
+  if (firstName) {
+    return firstName.slice(0, 2).toUpperCase();
+  }
+  if (email) {
+    return email.slice(0, 2).toUpperCase();
+  }
+  return '??';
+}

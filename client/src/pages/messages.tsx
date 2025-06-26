@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import MessageBubble from "@/components/message-bubble";
+import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
 
 export default function Messages() {
