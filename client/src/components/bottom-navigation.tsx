@@ -1,4 +1,4 @@
-import { Home, Calendar, DollarSign, MessageSquare, User } from "lucide-react";
+import { Home, Calendar, DollarSign, MessageSquare, User, CheckSquare } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
@@ -21,7 +21,7 @@ export default function BottomNavigation() {
 
   const tabs = [
     { id: 'home', path: '/', label: 'Home', Icon: Home },
-    { id: 'chores', path: '/chores', label: 'Chores', Icon: Calendar },
+    { id: 'chores', path: '/chores', label: 'Chores', Icon: CheckSquare },
     { id: 'expenses', path: '/expenses', label: 'Expenses', Icon: DollarSign },
     { id: 'calendar', path: '/calendar', label: 'Calendar', Icon: Calendar },
     { id: 'chat', path: '/messages', label: 'Chat', Icon: MessageSquare },

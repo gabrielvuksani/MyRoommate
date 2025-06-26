@@ -764,8 +764,8 @@ export default function Home() {
                 color: 'var(--text-secondary)'
               }}
             >
-              <Search className="w-4 h-4" />
               <span className="text-sm font-medium">View All</span>
+              <ArrowRight size={14} />
             </button>
           </div>
 
