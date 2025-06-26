@@ -31,12 +31,11 @@ export default function BottomNavigation() {
     const activeIndex = tabs.findIndex(tab => tab.path === location);
     if (activeIndex === -1) return;
     
-    // Calculate exact tab positioning for perfect alignment
+    // Calculate precise tab positioning with centering
     const containerWidth = navigationRef.current.offsetWidth;
     const tabWidth = containerWidth / tabs.length;
-    const indicatorWidth = tabWidth - 16; // Full width minus padding
-    const indicatorOffset = 8; // 8px padding from container edge
-    const translateX = activeIndex * tabWidth + indicatorOffset;
+    const indicatorWidth = tabWidth - 16; // Account for padding
+    const translateX = activeIndex * tabWidth + 8; // Add 8px for centering
     
     navigationRef.current.style.setProperty('--indicator-translate', `${translateX}px`);
     navigationRef.current.style.setProperty('--indicator-width', `${indicatorWidth}px`);
@@ -47,8 +46,7 @@ export default function BottomNavigation() {
       const newContainerWidth = navigationRef.current.offsetWidth;
       const newTabWidth = newContainerWidth / tabs.length;
       const newIndicatorWidth = newTabWidth - 16;
-      const newIndicatorOffset = 8;
-      const newTranslateX = activeIndex * newTabWidth + newIndicatorOffset;
+      const newTranslateX = activeIndex * newTabWidth + 8;
       navigationRef.current.style.setProperty('--indicator-translate', `${newTranslateX}px`);
       navigationRef.current.style.setProperty('--indicator-width', `${newIndicatorWidth}px`);
     };
@@ -62,11 +60,11 @@ export default function BottomNavigation() {
       ref={navigationRef}
       className="tab-navigation" 
       style={{
-        '--indicator-translate': '8px',
-        '--indicator-width': 'calc(20% - 16px)', // Full tab width minus padding
+        '--indicator-translate': '0px',
+        '--indicator-width': 'calc(20% - 16px)',
       } as React.CSSProperties}
     >
-      <div className="flex items-center w-full">
+      <div className="flex items-center justify-center w-full">
         {tabs.map(({ id, path, label, Icon }) => {
           const isActive = location === path;
           
@@ -74,10 +72,9 @@ export default function BottomNavigation() {
             <button
               key={id}
               onClick={() => setLocation(path)}
-              className={`tab-item flex flex-col items-center justify-center ${
+              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 ${
                 isActive ? 'active' : 'inactive'
               }`}
-              style={{ width: `${100 / tabs.length}%` }}
             >
               <Icon size={18} className="flex-shrink-0" />
               <span className="text-xs mt-0.5 font-medium truncate">{label}</span>
