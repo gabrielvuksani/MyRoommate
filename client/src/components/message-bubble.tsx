@@ -75,7 +75,7 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
     <div className="flex justify-start mb-4 animate-fade-in">
       <div className="flex flex-col items-start max-w-xs">
         <div className="flex items-center space-x-3 mb-2">
-          <div className="w-7 h-7 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
+          <div className="w-7 h-7 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
             <span className="text-white text-xs font-bold">{userInitials}</span>
           </div>
           <span className="text-xs text-gray-600 font-semibold">

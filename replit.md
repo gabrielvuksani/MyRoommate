@@ -130,6 +130,12 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Applied iOS Contacts-style profile pictures throughout entire application
 - ✓ Enhanced profile page avatar with emerald-cyan gradient and proper initials
 - ✓ Standardized avatar styling across all components for visual consistency
+- ✓ Streamlined profile pictures site-wide with consistent color differentiation
+- ✓ Current user avatars: emerald-cyan gradient, other users: blue gradient
+- ✓ Fixed messages app scrolling to prevent header overlap with message content
+- ✓ Added 160px scroll offset to account for floating header height
+- ✓ Implemented timeout for initial home page load scrolling after onboarding
+- ✓ Added 500ms delay to ensure proper scroll-to-top behavior on page transitions
 - ✓ Updated messages page scrolling to auto-scroll to top for conversations with ≤5 messages
 - ✓ Maintained bottom-scroll behavior for longer conversations (>5 messages)
 - ✓ Created intelligent transition between top-scroll and bottom-scroll modes based on message count

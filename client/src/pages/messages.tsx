@@ -101,7 +101,8 @@ export default function Messages() {
   };
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Account for header height (144px) plus some padding
+    window.scrollTo({ top: 160, behavior: "smooth" });
   };
 
   // Check if user is near bottom of messages
@@ -131,7 +132,8 @@ export default function Messages() {
     if (!isLoading && messages.length > 0) {
       setTimeout(() => {
         if (messages.length <= 5) {
-          window.scrollTo({ top: 0, behavior: "auto" });
+          // For few messages, position just below header to avoid overlap
+          window.scrollTo({ top: 160, behavior: "auto" });
         } else {
           messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
         }

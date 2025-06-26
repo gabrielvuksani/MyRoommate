@@ -43,8 +43,13 @@ export default function Home() {
   });
 
   useEffect(() => {
-    // Scroll to top when page loads
+    // Scroll to top when page loads with timeout for initial load
     window.scrollTo(0, 0);
+    
+    // Additional timeout to ensure proper scrolling after onboarding
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 500);
 
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 10);
