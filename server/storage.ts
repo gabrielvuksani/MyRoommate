@@ -54,6 +54,7 @@ export interface IStorage {
   createExpense(expense: InsertExpense, splits: InsertExpenseSplit[]): Promise<Expense>;
   getExpenses(householdId: string): Promise<(Expense & { paidByUser: User; splits: (ExpenseSplit & { user: User })[] })[]>;
   updateExpenseSplit(id: string, settled: boolean): Promise<ExpenseSplit>;
+  deleteExpense(id: string): Promise<void>;
   getUserBalance(householdId: string, userId: string): Promise<{ totalOwed: number; totalOwing: number }>;
   
   // Calendar operations
@@ -271,6 +272,13 @@ export class DatabaseStorage implements IStorage {
       .where(eq(expenseSplits.id, id))
       .returning();
     return updated;
+  }
+
+  async deleteExpense(id: string): Promise<void> {
+    // Delete all splits for this expense first (foreign key constraint)
+    await db.delete(expenseSplits).where(eq(expenseSplits.expenseId, id));
+    // Then delete the expense itself
+    await db.delete(expenses).where(eq(expenses.id, id));
   }
 
   async getUserBalance(householdId: string, userId: string): Promise<{ totalOwed: number; totalOwing: number }> {

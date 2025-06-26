@@ -273,6 +273,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete('/api/expenses/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+      
+      // Verify user has access to delete this expense
+      const membership = await storage.getUserHousehold(userId);
+      if (!membership) {
+        return res.status(404).json({ message: "No household found" });
+      }
+      
+      await storage.deleteExpense(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      res.status(500).json({ message: "Failed to delete expense" });
+    }
+  });
+
   app.patch('/api/expense-splits/:id', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;

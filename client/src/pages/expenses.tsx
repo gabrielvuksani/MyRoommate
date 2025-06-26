@@ -118,8 +118,7 @@ export default function Expenses() {
 
   const deleteExpenseMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await apiRequest("DELETE", `/api/expenses/${id}`);
-      return response.json();
+      await apiRequest("DELETE", `/api/expenses/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
