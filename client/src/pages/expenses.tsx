@@ -146,7 +146,7 @@ export default function Expenses() {
     newExpense.paidBy.trim().length > 0;
 
   // Filter expenses based on active tab
-  const filteredExpenses = expenses.filter((expense: any) => {
+  const filteredExpenses = (expenses as any).filter((expense: any) => {
     if (activeTab === "all") return true;
     
     const hasUnsettledSplits = expense.splits?.some((split: any) => !split.settled);

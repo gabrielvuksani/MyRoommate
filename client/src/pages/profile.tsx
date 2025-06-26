@@ -112,6 +112,10 @@ export default function Profile() {
     try {
       // Invalidate all queries to refresh data
       await queryClient.invalidateQueries();
+      // Refresh the entire app after data refresh
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } finally {
       setIsRefreshing(false);
     }
@@ -188,8 +192,8 @@ export default function Profile() {
                   <Button
                     onClick={() => {
                       setEditName({
-                        firstName: user.firstName || "",
-                        lastName: user.lastName || "",
+                        firstName: (user as any).firstName || "",
+                        lastName: (user as any).lastName || "",
                       });
                     }}
                     className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
@@ -463,16 +467,29 @@ export default function Profile() {
           <CardContent className="p-6">
             <div className="space-y-3">
               <Button
+                onClick={toggleTheme}
+                className="w-full py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all"
+                style={{
+                  background: theme === 'dark' ? 'linear-gradient(135deg, #FCD34D, #F59E0B)' : 'linear-gradient(135deg, #1F2937, #374151)',
+                  color: theme === 'dark' ? '#1F2937' : '#F9FAFB'
+                }}
+              >
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                <span>
+                  {theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                </span>
+              </Button>
+              <Button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
                 className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-blue-700 disabled:opacity-50"
               >
                 <RefreshCw size={20} className={isRefreshing ? "animate-spin" : ""} />
                 <span>
-                  {isRefreshing ? "Refreshing..." : "Refresh Data"}
+                  {isRefreshing ? "Refreshing..." : "Refresh App"}
                 </span>
               </Button>
-              {household && (
+              {(household as any) && (
                 <Button
                   onClick={() => leaveHouseholdMutation.mutate()}
                   disabled={leaveHouseholdMutation.isPending}

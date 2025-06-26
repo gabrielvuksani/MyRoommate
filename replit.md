@@ -111,6 +111,17 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Implemented consistent back button design app-wide with dark mode support
+- ✓ Added surface-blur CSS variable for proper floating header transparency
+- ✓ Enhanced profile page refresh button to reload entire app after data refresh
+- ✓ Added dark mode toggle to profile page with proper visibility in both themes
+- ✓ Applied consistent back button styling across all pages (roommates, dashboard, settings, calendar, chores, expenses, messages)
+- ✓ Fixed dashboard page dark mode styling with CSS variables for all components
+- ✓ Updated all floating headers to use consistent glass morphism design with proper theme support
+- ✓ Enhanced hover effects with scale animations for all back buttons
+- ✓ Fixed remaining TypeScript compilation errors with proper type assertions
+
+**June 26, 2025 (Earlier):**
 - ✓ Fixed dark mode styling for expense cards with proper CSS variable usage
 - ✓ Updated expense split rows to use --surface-secondary instead of hardcoded gray backgrounds
 - ✓ Enhanced button styling with transparent backgrounds that work in both themes
