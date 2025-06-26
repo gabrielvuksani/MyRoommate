@@ -22,11 +22,11 @@ export default function Messages() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: household } = useQuery<{ id: string; name: string }>({
+  const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
   });
 
-  const { data: serverMessages = [], isLoading } = useQuery<any[]>({
+  const { data: serverMessages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household,
     refetchInterval: 3000, // Poll every 3 seconds for consistent performance
@@ -151,7 +151,7 @@ export default function Messages() {
     
     if (!household || !user) return;
     
-    const userName = formatDisplayName(user.firstName, user.lastName, user.email || undefined);
+    const userName = formatDisplayName(user.firstName, user.lastName, user.email);
     
     if (!isTyping) {
       setIsTyping(true);

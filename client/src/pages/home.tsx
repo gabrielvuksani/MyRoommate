@@ -748,11 +748,12 @@ export default function Home() {
         <div className="mt-12 border-t pt-8" style={{ borderColor: 'var(--border-color)' }}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                 <Users className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h2 className="font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>Find Roommates</h2>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Discover your perfect roommate match</p>
               </div>
             </div>
             <button
