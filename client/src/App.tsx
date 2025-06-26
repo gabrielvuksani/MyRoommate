@@ -13,7 +13,7 @@ import Chores from "@/pages/chores";
 import Expenses from "@/pages/expenses";
 import Calendar from "@/pages/calendar";
 import Messages from "@/pages/messages";
-import Settings from "@/pages/settings";
+
 import Profile from "@/pages/profile";
 import Onboarding from "@/pages/onboarding";
 import Dashboard from "@/pages/dashboard";
@@ -53,7 +53,7 @@ function Router() {
     
             <Route path="/profile" component={Profile} />
             <Route path="/dashboard" component={Dashboard} />
-            <Route path="/settings" component={Settings} />
+
             <Route path="/roommates" component={Roommates} />
           </>
         )}

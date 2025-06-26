@@ -93,7 +93,7 @@ export default function Home() {
               </div>
               {/* Profile Avatar */}
               <button
-                onClick={() => setLocation("/settings")}
+                onClick={() => setLocation("/profile")}
                 className="w-12 h-12 rounded-full flex items-center justify-center text-white font-medium text-lg btn-animated"
                 style={{
                   background: 'linear-gradient(135deg, #10B981 0%, #06B6D4 100%)',
@@ -123,57 +123,59 @@ export default function Home() {
                   />
                 ))}
               </div>
-              <button
-                onClick={() => setLocation("/roommates")}
-                className="w-full h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-medium shadow-lg transition-all btn-animated hover:scale-[1.02]"
-              >
-                Manage All Listings
-              </button>
+              <Card className="glass-card">
+                <CardContent className="p-4 text-center">
+                  <button
+                    onClick={() => setLocation("/roommates")}
+                    className="w-full transition-all btn-animated"
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+                      <ArrowRight className="text-white" size={16} />
+                    </div>
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                      Manage All Listings
+                    </p>
+                  </button>
+                </CardContent>
+              </Card>
             </div>
           )}
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="glass-card">
-              <CardContent className="p-6">
+              <CardContent className="p-6 text-center animate-fade-in">
                 <button
                   onClick={() => setLocation("/onboarding")}
-                  className="w-full text-left transition-all btn-animated hover:scale-[1.02]"
+                  className="w-full transition-all btn-animated"
                 >
-                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                    <HomeIcon size={24} className="text-white" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <HomeIcon className="text-white" size={20} />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  <p className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
                     Create or Join Household
-                  </h3>
-                  <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                    Start managing your shared living space
                   </p>
-                  <div className="w-full h-11 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center text-white font-medium shadow-lg">
-                    Get Started
-                  </div>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Start managing shared living</p>
                 </button>
               </CardContent>
             </Card>
 
             <Card className="glass-card">
-              <CardContent className="p-6">
+              <CardContent 
+                className="p-6 text-center animate-fade-in"
+                style={{ animationDelay: "100ms" }}
+              >
                 <button
                   onClick={() => setLocation("/roommates")}
-                  className="w-full text-left transition-all btn-animated hover:scale-[1.02]"
+                  className="w-full transition-all btn-animated"
                 >
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                    <Plus size={24} className="text-white" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Plus className="text-white" size={20} />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  <p className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
                     Post Your Listing
-                  </h3>
-                  <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                    Find roommates or advertise your space
                   </p>
-                  <div className="w-full h-11 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white font-medium shadow-lg">
-                    Create Listing
-                  </div>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Find roommates nearby</p>
                 </button>
               </CardContent>
             </Card>
@@ -219,9 +221,14 @@ export default function Home() {
                   </p>
                   <button
                     onClick={() => setLocation("/roommates")}
-                    className="h-11 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center text-white font-medium shadow-lg transition-all btn-animated hover:scale-[1.02] px-6"
+                    className="transition-all btn-animated"
                   >
-                    Browse Marketplace
+                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-2">
+                      <ArrowRight className="text-white" size={16} />
+                    </div>
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                      Browse Marketplace
+                    </p>
                   </button>
                 </CardContent>
               </Card>
