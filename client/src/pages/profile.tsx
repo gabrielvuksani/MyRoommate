@@ -144,7 +144,7 @@ export default function Profile() {
             <div>
               <h1 className="page-title">Settings</h1>
               <p className="page-subtitle">
-                Manage your account profile & app settings
+                Manage your account & app settings
               </p>
             </div>
           </div>
