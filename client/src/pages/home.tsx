@@ -78,44 +78,37 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Unified header logic
-  const firstName = (user as any)?.firstName || (user as any)?.email?.split("@")[0] || "there";
-  const currentHour = new Date().getHours();
-  const greeting =
-    currentHour < 12
-      ? "Good morning"
-      : currentHour < 17
-        ? "Good afternoon"
-        : "Good evening";
-
   if (!household) {
     return (
-      <div className="page-container page-transition">
-        {/* Unified Header */}
+      <div className="pt-40 px-6 space-y-6 animate-page-enter">
+        {/* Personalized Header */}
         <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
           <div className="page-header">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <div>
                 <h1 className="page-title">
-                  {greeting}, <span className="truncate">{firstName}</span>
+                  Welcome back{user?.firstName ? `, ${user.firstName}` : ''}
                 </h1>
-                <p className="page-subtitle truncate">Ready to find your perfect living situation?</p>
+                <p className="page-subtitle">Ready to find your perfect living situation?</p>
               </div>
+              {/* Profile Avatar */}
               <button
                 onClick={() => setLocation("/settings")}
-                className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
+                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-medium text-lg btn-animated"
+                style={{
+                  background: 'linear-gradient(135deg, #10B981 0%, #06B6D4 100%)',
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                }}
               >
-                <span className="text-white font-bold text-lg">
-                  {getProfileInitials((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email)}
-                </span>
+                {getProfileInitials(user?.firstName, user?.lastName, user?.email)}
               </button>
             </div>
           </div>
         </div>
 
-        <div className="pt-40 px-6 space-y-6">
+        <div className="page-content space-y-6">
           {/* My Activity Section */}
-          {Array.isArray(myListings) && myListings.length > 0 && (
+          {myListings && myListings.length > 0 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
                 Your Listings
@@ -141,21 +134,21 @@ export default function Home() {
           )}
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="glass-card">
-              <CardContent className="p-8">
-                <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center mb-6">
-                  <HomeIcon size={32} className="text-white" />
+              <CardContent className="p-6">
+                <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-4">
+                  <HomeIcon size={24} className="text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
                   Create or Join Household
                 </h3>
-                <p className="text-base mb-6" style={{ color: 'var(--text-secondary)' }}>
-                  Start managing your shared living space with roommates
+                <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+                  Start managing your shared living space
                 </p>
                 <Button
                   onClick={() => setLocation("/onboarding")}
-                  className="w-full bg-primary text-white py-3 text-base font-semibold"
+                  className="w-full bg-primary text-white"
                 >
                   Get Started
                 </Button>
@@ -163,19 +156,19 @@ export default function Home() {
             </Card>
 
             <Card className="glass-card">
-              <CardContent className="p-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center mb-6">
-                  <Plus size={32} className="text-white" />
+              <CardContent className="p-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4">
+                  <Plus size={24} className="text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
                   Post Your Listing
                 </h3>
-                <p className="text-base mb-6" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                   Find roommates or advertise your space
                 </p>
                 <Button
                   onClick={() => setLocation("/roommates")}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 text-base font-semibold"
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white"
                 >
                   Create Listing
                 </Button>
@@ -198,7 +191,7 @@ export default function Home() {
               </Button>
             </div>
             
-            {Array.isArray(featuredListings) && featuredListings.length > 0 ? (
+            {featuredListings && featuredListings.length > 0 ? (
               <div className="space-y-4">
                 {featuredListings.slice(0, 3).map((listing: any) => (
                   <RoommateListingCard
@@ -233,7 +226,7 @@ export default function Home() {
           </div>
 
           {/* Quick Stats */}
-          {Array.isArray(myListings) && myListings.length > 0 && (
+          {myListings && myListings.length > 0 && (
             <Card className="glass-card">
               <CardContent className="p-6">
                 <h4 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
@@ -250,7 +243,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                      {Array.isArray(featuredListings) ? featuredListings.length : 0}
+                      {featuredListings.length}
                     </p>
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                       Available Matches
@@ -268,6 +261,15 @@ export default function Home() {
   const activeChores = (chores as any[])?.filter((chore: any) => chore.status !== "done") || [];
   const recentMessages = (messages as any[])?.slice().reverse().slice(0, 3) || [];
   const netBalance = ((balance as any)?.totalOwed || 0) - ((balance as any)?.totalOwing || 0);
+  const firstName = (user as any)?.firstName || (user as any)?.email?.split("@")[0] || "there";
+
+  const currentHour = new Date().getHours();
+  const greeting =
+    currentHour < 12
+      ? "Good morning"
+      : currentHour < 17
+        ? "Good afternoon"
+        : "Good evening";
 
   const nextChore = activeChores.sort((a: any, b: any) => {
     if (!a.dueDate && !b.dueDate) return 0;
