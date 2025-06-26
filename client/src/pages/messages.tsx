@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { apiRequest } from "@/lib/queryClient";
 import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
@@ -28,20 +27,6 @@ export default function Messages() {
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household,
-  });
-
-  const createMessageMutation = useMutation({
-    mutationFn: async ({ content }: { content: string }) => {
-      const response = await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
-      });
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
-    },
   });
 
   const { sendMessage } = useWebSocket({
@@ -265,10 +250,9 @@ export default function Messages() {
       });
     }
 
-    // Create optimistic message with visual indicator
-    const tempId = `temp-${Date.now()}-${Math.random()}`;
+    // Optimistic update - show message immediately
     const optimisticMessage = {
-      id: tempId,
+      id: `temp-${Date.now()}`,
       content: messageContent,
       householdId: household.id,
       userId: user.id,
@@ -277,53 +261,23 @@ export default function Messages() {
       type: null,
       linkedTo: null,
       linkedType: null,
-      sending: true, // Flag to show this is being sent
     };
 
-    // INSTANTLY show message in UI
-    queryClient.setQueryData(["/api/messages"], (old: any) => {
-      const existingMessages = old || [];
-      return [...existingMessages, optimisticMessage];
+    queryClient.setQueryData(["/api/messages"], (old: any) => [
+      ...(old || []),
+      optimisticMessage,
+    ]);
+
+    // Send via WebSocket
+    sendMessage({
+      type: "send_message",
+      content: messageContent,
+      householdId: household.id,
+      userId: user.id,
     });
 
-    // Clear input and scroll immediately
     setNewMessage("");
-    setTimeout(scrollToBottom, 10);
-
-    // Send via WebSocket immediately
-    if (sendMessage) {
-      sendMessage({
-        type: "send_message",
-        content: messageContent,
-        householdId: household.id,
-        userId: user.id,
-        tempId: tempId
-      });
-    }
-
-    // Also send via HTTP as backup
-    createMessageMutation.mutate(
-      { content: messageContent },
-      {
-        onSuccess: (realMessage) => {
-          // Replace optimistic message with real one
-          queryClient.setQueryData(["/api/messages"], (old: any) => {
-            if (!old) return [realMessage];
-            return old.map((msg: any) => 
-              msg.id === tempId ? { ...realMessage, sending: false } : msg
-            );
-          });
-        },
-        onError: (error) => {
-          console.error('Message send failed:', error);
-          // Remove failed optimistic message
-          queryClient.setQueryData(["/api/messages"], (old: any) => {
-            if (!old) return [];
-            return old.filter((msg: any) => msg.id !== tempId);
-          });
-        }
-      }
-    );
+    setTimeout(scrollToBottom, 50);
   };
 
   const quickMessages = [

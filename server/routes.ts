@@ -506,8 +506,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           clientsById.set(userId, ws);
           
           // Store client metadata for targeted broadcasting
-          ws.userId = userId;
-          ws.householdId = householdId;
+          (ws as any)._userId = userId;
+          (ws as any)._householdId = householdId;
           
           // Add to household client set for fast broadcasting
           if (!householdClients.has(householdId)) {
@@ -538,118 +538,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (message.type === 'send_message') {
           const startTime = Date.now();
-          const { content, householdId: msgHouseholdId, userId: msgUserId, tempId } = message;
+          const { content, householdId: msgHouseholdId, userId: msgUserId, linkedTo, linkedType } = message;
           
           try {
-            // Get cached user for instant message creation
+            // Get cached user for ultra-fast message creation
             const cachedUser = userCache.get(msgUserId);
             
-            // INSTANT BROADCAST - Send immediately before database save
-            const tempMessage = {
-              id: tempId || `temp-${Date.now()}`,
+            const newMessage = await storage.createMessage({
               content,
               householdId: msgHouseholdId,
               userId: msgUserId,
-              createdAt: new Date(),
-              user: cachedUser || { id: msgUserId, firstName: 'User', lastName: null, email: null },
-              type: null,
-              linkedTo: null,
-              linkedType: null,
-            };
-
-            // Instant broadcast to all household members (except sender)
+              linkedTo,
+              linkedType,
+            }, cachedUser);
+            
+            // Optimized household-based broadcasting with error resilience
             const householdClientSet = householdClients.get(msgHouseholdId);
-            if (householdClientSet && householdClientSet.size > 0) {
-              const instantBroadcast = JSON.stringify({
-                type: 'instant_message',
-                message: tempMessage,
-                fromUserId: msgUserId
+            if (householdClientSet) {
+              const broadcastData = JSON.stringify({
+                type: 'new_message',
+                message: newMessage,
               });
               
-              // Send immediately to all connected clients except the sender
+              // Clean up dead connections and broadcast to live ones
               const deadConnections = new Set();
-              householdClientSet.forEach((client: WebSocket) => {
+              householdClientSet.forEach((client: any) => {
                 try {
                   if (client.readyState === WebSocket.OPEN) {
-                    // Don't send back to the sender since they have optimistic update
-                    const clientUserId = (client as any).userId;
-                    if (clientUserId !== msgUserId) {
-                      client.send(instantBroadcast);
-                    }
+                    client.send(broadcastData);
                   } else {
                     deadConnections.add(client);
                   }
                 } catch (error) {
+                  console.error('Error broadcasting to client:', error);
                   deadConnections.add(client);
                 }
               });
               
-              // Clean up dead connections
+              // Remove dead connections
               deadConnections.forEach(conn => householdClientSet.delete(conn));
             }
-
-            // Save to database asynchronously
-            setImmediate(async () => {
-              try {
-                const savedMessage = await storage.createMessage({
-                  content,
-                  householdId: msgHouseholdId,
-                  userId: msgUserId,
-                  linkedTo: null,
-                  linkedType: null,
-                }, cachedUser);
-
-                // Send confirmation to all clients with real message data
-                if (householdClientSet && householdClientSet.size > 0) {
-                  const confirmBroadcast = JSON.stringify({
-                    type: 'message_confirmed',
-                    tempId: tempId,
-                    message: savedMessage,
-                  });
-                  
-                  householdClientSet.forEach((client: WebSocket) => {
-                    try {
-                      if (client.readyState === WebSocket.OPEN) {
-                        client.send(confirmBroadcast);
-                      }
-                    } catch (error) {
-                      // Ignore confirmation errors
-                    }
-                  });
-                }
-              } catch (dbError) {
-                console.error('Background DB save failed:', dbError);
-                
-                // Send error notification to all clients
-                if (householdClientSet && householdClientSet.size > 0) {
-                  const errorBroadcast = JSON.stringify({
-                    type: 'message_error',
-                    tempId: tempId,
-                    error: 'Failed to save message'
-                  });
-                  
-                  householdClientSet.forEach((client: WebSocket) => {
-                    try {
-                      if (client.readyState === WebSocket.OPEN) {
-                        client.send(errorBroadcast);
-                      }
-                    } catch (error) {
-                      // Ignore error notification failures
-                    }
-                  });
-                }
-              }
-            });
             
             // Performance tracking
             messageCount++;
-            const processingTime = Date.now() - startTime;
-            totalProcessingTime += processingTime;
-            
-            console.log(`Instant message broadcast: ${processingTime}ms`);
-            
+            totalProcessingTime += Date.now() - startTime;
+            if (messageCount % 10 === 0) {
+              console.log(`Chat Performance: ${messageCount} messages, avg ${(totalProcessingTime/messageCount).toFixed(2)}ms`);
+            }
           } catch (error) {
-            console.error('Error processing instant message:', error);
+            console.error('Error processing message:', error);
             // Send error back to sender
             if (ws.readyState === WebSocket.OPEN) {
               ws.send(JSON.stringify({
