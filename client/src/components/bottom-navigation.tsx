@@ -31,7 +31,8 @@ export default function BottomNavigation() {
     const activeIndex = tabs.findIndex(tab => tab.path === location);
     if (activeIndex === -1) return;
     
-    const translateX = activeIndex * 20; // 20% per tab
+    // Calculate exact position for 5 tabs (100% / 5 = 20% per tab)
+    const translateX = activeIndex * (100 / tabs.length);
     navigationRef.current.style.setProperty('--indicator-translate', `${translateX}%`);
   }, [location, tabs]);
 
@@ -41,9 +42,10 @@ export default function BottomNavigation() {
       className="tab-navigation" 
       style={{
         '--indicator-translate': '0%',
+        position: 'relative'
       } as React.CSSProperties}
     >
-      <div className="flex items-center justify-center w-full">
+      <div className="flex items-center justify-center w-full relative">
         {tabs.map(({ id, path, label, Icon }) => {
           const isActive = location === path;
           

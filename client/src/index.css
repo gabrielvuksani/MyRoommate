@@ -413,31 +413,33 @@
 .tab-navigation::before {
   content: '';
   position: absolute;
-  top: 8px;
-  bottom: 8px;
-  left: 8px;
-  width: calc(20% - 4px);
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(20% - 8px);
   background: linear-gradient(145deg, 
     rgba(255, 255, 255, 0.95) 0%, 
     rgba(255, 255, 255, 0.85) 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 16px;
+  backdrop-filter: blur(20px) saturate(1.8) brightness(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8) brightness(1.1);
+  border-radius: 20px;
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.12),
+    0 4px 20px rgba(0, 0, 0, 0.15),
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
     0 -1px 0 rgba(0, 0, 0, 0.05) inset;
   transform: translateX(var(--indicator-translate, 0%));
-  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 0.5s cubic-bezier(0.26, 0.08, 0.25, 1);
   z-index: 1;
 }
 
 .dark .tab-navigation::before {
   background: linear-gradient(145deg, 
-    rgba(58, 58, 60, 0.9) 0%, 
-    rgba(72, 72, 74, 0.8) 100%);
+    rgba(58, 58, 60, 0.95) 0%, 
+    rgba(72, 72, 74, 0.85) 100%);
+  backdrop-filter: blur(20px) saturate(1.8) brightness(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8) brightness(1.1);
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.3),
+    0 4px 20px rgba(0, 0, 0, 0.4),
     0 1px 0 rgba(255, 255, 255, 0.2) inset,
     0 -1px 0 rgba(0, 0, 0, 0.3) inset;
 }
