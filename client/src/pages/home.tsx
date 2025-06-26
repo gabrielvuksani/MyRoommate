@@ -77,148 +77,53 @@ export default function Home() {
       <div className="pt-40 px-6 space-y-6 animate-page-enter">
         <div className="floating-header">
           <div className="page-header">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="page-title">
-                  Welcome back, {(user as any)?.firstName || 'there'}!
-                </h1>
-                <p className="page-subtitle">Ready to find your perfect living situation?</p>
-              </div>
-              <button
-                onClick={() => setLocation("/settings")}
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg"
-                style={{
-                  background: 'linear-gradient(135deg, #10B981 0%, #06B6D4 100%)',
-                  boxShadow: '0 8px 32px rgba(16, 185, 129, 0.3)'
-                }}
-              >
-                {getProfileInitials((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email)}
-              </button>
-            </div>
+            <h1 className="page-title">Welcome</h1>
+            <p className="page-subtitle">Let's get you set up</p>
           </div>
         </div>
-
         <div className="page-content space-y-6">
-          {/* User Profile Summary */}
           <Card className="glass-card">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div 
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-white font-bold text-xl"
-                  style={{
-                    background: 'linear-gradient(135deg, #10B981 0%, #06B6D4 100%)',
-                    boxShadow: '0 8px 32px rgba(16, 185, 129, 0.2)'
-                  }}
-                >
-                  {getProfileInitials((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email)}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>
-                    {user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user?.email}
-                  </h3>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                    {user?.email}
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setLocation("/settings")}
-                  className="px-4 py-2"
-                >
-                  Edit Profile
-                </Button>
+            <CardContent className="p-8 text-center">
+              <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <HomeIcon size={32} className="text-white" />
               </div>
+              <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Create or Join a Household
+              </h2>
+              <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>
+                Start managing your shared living space with roommates
+              </p>
+              <button
+                onClick={() => setLocation("/onboarding")}
+                className="bg-primary text-white px-8 py-4 rounded-xl font-semibold btn-animated shadow-lg hover:shadow-xl transition-all"
+              >
+                Get Started
+              </button>
             </CardContent>
           </Card>
 
-          {/* Action Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="glass-card cursor-pointer btn-animated" onClick={() => setLocation("/roommates")}>
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                  <Search size={24} className="text-white" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Find Roommates
-                </h3>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Browse verified roommate listings in your area
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="glass-card cursor-pointer btn-animated" onClick={() => setLocation("/onboarding")}>
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                  <HomeIcon size={24} className="text-white" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Join Household
-                </h3>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Create or join an existing household with roommates
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Featured Roommate Listings */}
-          {featuredListings && featuredListings.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>
-                  Featured Listings
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setLocation("/roommates")}
-                  className="text-blue-600"
-                >
-                  View All <ArrowRight size={16} className="ml-1" />
-                </Button>
-              </div>
-              <div className="space-y-3">
-                {featuredListings.slice(0, 2).map((listing: any) => (
-                  <RoommateListingCard 
-                    key={listing.id} 
-                    listing={listing} 
-                    compact={true}
-                    onContact={(listing) => setLocation(`/roommates/${listing.id}`)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Quick Actions */}
           <Card className="glass-card">
-            <CardContent className="p-6">
-              <h3 className="font-semibold text-lg mb-4" style={{ color: 'var(--text-primary)' }}>
-                Quick Actions
-              </h3>
-              <div className="space-y-3">
-                <button
-                  onClick={() => setLocation("/roommate-marketplace?action=post")}
-                  className="w-full flex items-center justify-between p-4 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-pink-600 rounded-xl flex items-center justify-center">
-                      <Plus size={20} className="text-white" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-medium" style={{ color: 'var(--text-primary)' }}>
-                        Post Listing
-                      </p>
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        Find roommates for your place
-                      </p>
-                    </div>
-                  </div>
-                  <ArrowRight size={20} style={{ color: 'var(--text-secondary)' }} />
-                </button>
+            <CardContent className="p-8 text-center">
+              <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6" style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' }}>
+                <Users size={32} className="text-white" />
               </div>
+              <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Find a Roommate
+              </h2>
+              <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>
+                Browse available roommates and living situations in your area
+              </p>
+              <button
+                onClick={() => setLocation("/roommates")}
+                className="px-8 py-4 rounded-xl font-semibold btn-animated shadow-lg hover:shadow-xl transition-all"
+                style={{ 
+                  background: 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border)'
+                }}
+              >
+                Browse Listings
+              </button>
             </CardContent>
           </Card>
         </div>
