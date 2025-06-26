@@ -325,23 +325,6 @@ export default function Onboarding() {
                     <p className="text-xs text-gray-500 mt-2 text-center">
                       Ask your roommate for the household invite code
                     </p>
-                    {errorMessage && (
-                      <div className="mt-4 glass-card bg-red-50/90 border-red-200/50 shadow-lg shadow-red-500/20 page-enter">
-                        <div className="p-4">
-                          <div className="flex items-start space-x-3">
-                            <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                              </svg>
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-semibold text-red-800">Invalid Invite Code</p>
-                              <p className="text-sm text-red-700 mt-1">{errorMessage}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
@@ -390,6 +373,24 @@ export default function Onboarding() {
                 <p className="text-gray-600 text-base leading-relaxed">
                   You're about to join a household using code <strong className="text-[#1a1a1a] font-mono tracking-wider">{householdData.inviteCode}</strong>.
                 </p>
+              </div>
+            )}
+
+            {errorMessage && (
+              <div className="mb-6 glass-card bg-red-50/90 border-red-200/50 shadow-lg shadow-red-500/20 page-enter">
+                <div className="p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-red-800">Unable to Join Household</p>
+                      <p className="text-sm text-red-700 mt-1">{errorMessage}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
