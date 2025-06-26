@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbars globally */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+*::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* Chrome/Safari/Webkit */
+}
+
 /* visionOS-inspired Design System - Light Mode */
 :root {
   --primary: #007AFF;
@@ -404,8 +415,8 @@
   position: absolute;
   top: 8px;
   bottom: 8px;
-  left: 0;
-  width: var(--indicator-width, calc(20% - 16px));
+  left: 8px;
+  width: calc(20% - 4px);
   background: linear-gradient(145deg, 
     rgba(255, 255, 255, 0.95) 0%, 
     rgba(255, 255, 255, 0.85) 100%);
@@ -416,7 +427,7 @@
     0 4px 16px rgba(0, 0, 0, 0.12),
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
     0 -1px 0 rgba(0, 0, 0, 0.05) inset;
-  transform: translateX(var(--indicator-translate, 0px));
+  transform: translateX(var(--indicator-translate, 0%));
   transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   z-index: 1;
 }
@@ -612,24 +623,28 @@
 
 .floating-header.scrolled {
   background: linear-gradient(145deg, 
-    rgba(255, 255, 255, 0.8) 0%, 
-    rgba(255, 255, 255, 0.6) 100%);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    rgba(255, 255, 255, 0.6) 0%, 
+    rgba(255, 255, 255, 0.45) 100%);
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.4) inset;
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.02) inset;
 }
 
 .dark .floating-header.scrolled {
   background: linear-gradient(145deg, 
-    rgba(28, 28, 30, 0.9) 0%, 
-    rgba(44, 44, 46, 0.8) 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    rgba(28, 28, 30, 0.85) 0%, 
+    rgba(44, 44, 46, 0.75) 100%);
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.2) inset;
 }
 
 .floating-header .header-content {

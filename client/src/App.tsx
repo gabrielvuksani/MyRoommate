@@ -18,6 +18,7 @@ import Profile from "@/pages/profile";
 import Onboarding from "@/pages/onboarding";
 import Dashboard from "@/pages/dashboard";
 import Roommates from "@/pages/roommates";
+import RoommateMarketplace from "@/pages/roommate-marketplace";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
@@ -52,8 +53,9 @@ function Router() {
             <Route path="/messages" component={Messages} />
     
             <Route path="/profile" component={Profile} />
+            <Route path="/settings" component={Profile} />
             <Route path="/dashboard" component={Dashboard} />
-
+            <Route path="/roommate-marketplace" component={RoommateMarketplace} />
             <Route path="/roommates" component={Roommates} />
           </>
         )}

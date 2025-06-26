@@ -389,8 +389,8 @@ export default function Messages() {
                   placeholder="Type a message..."
                   value={newMessage}
                   onChange={(e) => handleTyping(e.target.value)}
-                  className="w-full bg-transparent border-none text-sm focus:outline-none focus:ring-0 p-0"
-                  style={{ color: 'var(--text-primary)' }}
+                  className="w-full bg-transparent border-none text-sm focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
+                  style={{ color: 'var(--text-primary)', outline: 'none', boxShadow: 'none' }}
                 />
               </div>
               <Button

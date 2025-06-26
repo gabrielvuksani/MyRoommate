@@ -111,9 +111,14 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Fixed tab bar sliding indicator alignment by reverting to simple percentage-based positioning
+- ✓ Completely removed settings page and redirected all settings routes to unified profile page
+- ✓ Enhanced floating header with authentic visionOS liquid glass treatment matching tab bar quality
+- ✓ Added global scrollbar hiding across entire application for clean aesthetic
+- ✓ Removed all input focus outlines from message input field for seamless user experience
+- ✓ Achieved complete liquid glass design consistency between headers and navigation components
 - ✓ Fixed calendar selected date visibility with explicit blue background and white text styling
 - ✓ Refined card hover effects to be more subtle with reduced shadow spread and scaling
-- ✓ Enhanced floating header liquid glass treatment to match tab bar quality and design consistency
 - ✓ Implemented smooth visionOS-style tab transitions with morphing pseudo-element animations
 - ✓ Added elastic cubic-bezier transitions for authentic iOS 26 liquid design elements
 - ✓ Improved overall glass morphism cohesion across header, cards, and navigation components
