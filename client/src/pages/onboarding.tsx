@@ -330,7 +330,7 @@ export default function Onboarding() {
               )}
             </div>
 
-            <div className="flex space-x-3">
+            <div className="flex space-x-3 pt-[5px] pb-[5px]">
               <Button
                 onClick={() => setStep(step - 1)}
                 className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-2xl shadow-sm"
