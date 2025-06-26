@@ -368,7 +368,7 @@ export default function Expenses() {
         {/* Expense Filter Tabs */}
         <div 
           className="flex space-x-1 p-1 rounded-xl" 
-          style={{ backgroundColor: 'var(--bg-secondary)' }}
+          style={{ backgroundColor: 'var(--surface-secondary)' }}
         >
           {(["all", "unsettled", "settled"] as const).map((tab) => (
             <button
@@ -380,8 +380,9 @@ export default function Expenses() {
                   : ""
               }`}
               style={{
-                backgroundColor: activeTab === tab ? 'var(--bg-primary)' : 'transparent',
-                color: activeTab === tab ? 'var(--accent-blue)' : 'var(--text-secondary)'
+                backgroundColor: activeTab === tab ? 'var(--surface)' : 'transparent',
+                border: activeTab === tab ? '1px solid var(--border)' : '1px solid transparent',
+                color: activeTab === tab ? 'var(--primary)' : 'var(--text-secondary)'
               }}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
