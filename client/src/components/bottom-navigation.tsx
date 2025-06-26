@@ -31,11 +31,11 @@ export default function BottomNavigation() {
     const activeIndex = tabs.findIndex(tab => tab.path === location);
     if (activeIndex === -1) return;
     
-    // Calculate precise tab positioning to match hover state
+    // Calculate precise tab positioning with centering
     const containerWidth = navigationRef.current.offsetWidth;
     const tabWidth = containerWidth / tabs.length;
-    const indicatorWidth = tabWidth * 0.7; // Match hover state width
-    const translateX = activeIndex * tabWidth + (tabWidth - indicatorWidth) / 2; // Center within tab
+    const indicatorWidth = tabWidth - 16; // Account for padding
+    const translateX = activeIndex * tabWidth + 8; // Add 8px for centering
     
     navigationRef.current.style.setProperty('--indicator-translate', `${translateX}px`);
     navigationRef.current.style.setProperty('--indicator-width', `${indicatorWidth}px`);
@@ -45,8 +45,8 @@ export default function BottomNavigation() {
       if (!navigationRef.current) return;
       const newContainerWidth = navigationRef.current.offsetWidth;
       const newTabWidth = newContainerWidth / tabs.length;
-      const newIndicatorWidth = newTabWidth * 0.7;
-      const newTranslateX = activeIndex * newTabWidth + (newTabWidth - newIndicatorWidth) / 2;
+      const newIndicatorWidth = newTabWidth - 16;
+      const newTranslateX = activeIndex * newTabWidth + 8;
       navigationRef.current.style.setProperty('--indicator-translate', `${newTranslateX}px`);
       navigationRef.current.style.setProperty('--indicator-width', `${newIndicatorWidth}px`);
     };
