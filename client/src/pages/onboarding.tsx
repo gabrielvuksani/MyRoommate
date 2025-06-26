@@ -425,17 +425,11 @@ export default function Onboarding() {
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === step 
-                  ? 'bg-gradient-to-r from-emerald-400 to-cyan-400 w-8 shadow-sm' 
-                  : 'bg-white/60 w-2'
-              }`}
+              className="h-2 rounded-full transition-all duration-300 w-2 bg-[#000000]"
             />
           ))}
         </div>
       </div>
-
-
     </div>
   );
 }
