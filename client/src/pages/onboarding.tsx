@@ -558,11 +558,8 @@ export default function Onboarding() {
               className={`h-2 rounded-full transition-all duration-300 ${
                 i === step
                   ? "w-8 bg-gradient-to-r from-emerald-500 to-cyan-500"
-                  : "w-2"
+                  : "w-2 bg-gray-400 dark:bg-gray-500"
               }`}
-              style={i !== step ? {
-                background: 'var(--border)'
-              } : {}}
             />
           ))}
         </div>
