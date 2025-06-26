@@ -118,7 +118,7 @@ export default function Messages() {
   useEffect(() => {
     if (messages.length > 0 && shouldAutoScroll) {
       if (messages.length <= 5) {
-        // For 5 or fewer messages, scroll to top
+        // For 5 or fewer messages, scroll to top with header offset
         scrollToTop();
       } else {
         // For more than 5 messages, scroll to bottom
@@ -129,17 +129,25 @@ export default function Messages() {
 
   // Initial scroll behavior when messages load
   useEffect(() => {
-    if (!isLoading && messages.length > 0) {
+    if (!isLoading) {
       setTimeout(() => {
         if (messages.length <= 5) {
           // For few messages, position just below header to avoid overlap
           window.scrollTo({ top: 160, behavior: "auto" });
-        } else {
+        } else if (messages.length > 5) {
           messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
         }
       }, 100);
     }
-  }, [isLoading]);
+  }, [isLoading, messages.length]);
+
+  // Always ensure proper scroll position on page load
+  useEffect(() => {
+    // Handle initial page load with immediate scroll adjustment
+    if (messages.length <= 5) {
+      window.scrollTo({ top: 160, behavior: "auto" });
+    }
+  }, []);
 
   // Auto-scroll when typing indicators appear (only for longer conversations)
   useEffect(() => {

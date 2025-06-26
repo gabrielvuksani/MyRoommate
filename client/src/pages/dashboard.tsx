@@ -15,6 +15,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { getProfileInitials } from "@/lib/nameUtils";
 
 export default function Dashboard() {
   const [headerScrolled, setHeaderScrolled] = useState(false);
@@ -297,10 +298,9 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center space-x-4">
                     <div className="relative">
-                      <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full flex items-center justify-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-bold">
-                          {member.user.firstName?.[0] ||
-                            member.user.email?.[0]?.toUpperCase()}
+                          {getProfileInitials(member.user.firstName, member.user.lastName, member.user.email)}
                         </span>
                       </div>
                       {index === 0 && (

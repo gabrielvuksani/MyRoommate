@@ -16,6 +16,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
+import { getProfileInitials } from "@/lib/nameUtils";
 
 export default function Home() {
   const { user } = useAuth();
@@ -516,10 +517,9 @@ export default function Home() {
                         key={message.id}
                         className="flex items-start space-x-3"
                       >
-                        <div className="w-10 h-10 bg-ios-gray rounded-2xl flex items-center justify-center flex-shrink-0">
-                          <span className="text-primary text-sm font-medium">
-                            {message.user.firstName?.[0] ||
-                              message.user.email?.[0]}
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                          <span className="text-white text-sm font-bold">
+                            {getProfileInitials(message.user.firstName, message.user.lastName, message.user.email)}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
