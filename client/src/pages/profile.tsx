@@ -10,10 +10,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { useTheme } from "@/lib/ThemeProvider";
-import { LogOut, ArrowLeft, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun } from "lucide-react";
+import { LogOut, ArrowLeft, Edit3, Copy, UserMinus, RefreshCw } from "lucide-react";
 import { getProfileInitials } from "@/lib/nameUtils";
-import { Switch } from "@/components/ui/switch";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -21,7 +19,6 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Profile() {
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
 
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -115,8 +112,6 @@ export default function Profile() {
     try {
       // Invalidate all queries to refresh data
       await queryClient.invalidateQueries();
-      // Refresh the page after all other operations complete
-      window.location.reload();
     } finally {
       setIsRefreshing(false);
     }
@@ -168,14 +163,14 @@ export default function Profile() {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-2xl font-bold truncate" style={{ color: 'var(--text-primary)' }}>
+                  <h2 className="text-2xl font-bold text-gray-900 truncate">
                     {user.firstName && user.lastName
                       ? `${user.firstName} ${user.lastName}`
                       : user.firstName ||
                         user.email?.split("@")[0] ||
                         "Unknown User"}
                   </h2>
-                  <p className="truncate" style={{ color: 'var(--text-secondary)' }} title={user.email}>
+                  <p className="text-gray-600 truncate" title={user.email}>
                     {user.email}
                   </p>
                 </div>
@@ -190,17 +185,14 @@ export default function Profile() {
                         lastName: user.lastName || "",
                       });
                     }}
-                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
-                    style={{ backgroundColor: 'var(--bg-secondary)' }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
+                    className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all p-0 flex-shrink-0"
                   >
-                    <Edit3 size={16} style={{ color: 'var(--text-secondary)' }} />
+                    <Edit3 size={16} className="text-gray-600" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader className="px-6 pt-6 pb-6">
-                    <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                    <DialogTitle className="text-xl font-bold text-gray-900">
                       Edit Name
                     </DialogTitle>
                   </DialogHeader>
@@ -240,50 +232,26 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Display Settings */}
-        <Card className="smart-card">
-          <CardContent className="p-6">
-            <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
-              Display Settings
-            </h3>
-            <div className="flex justify-between items-center py-3">
-              <div className="flex items-center space-x-3">
-                {theme === 'dark' ? (
-                  <Moon className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
-                ) : (
-                  <Sun className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
-                )}
-                <span style={{ color: 'var(--text-secondary)' }}>Dark Mode</span>
-              </div>
-              <Switch
-                checked={theme === 'dark'}
-                onCheckedChange={toggleTheme}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Account Details */}
         <Card className="smart-card">
           <CardContent className="p-6">
-            <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">
               Account details
             </h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                <span style={{ color: 'var(--text-secondary)' }} className="flex-shrink-0">User ID</span>
+              <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                <span className="text-gray-600 flex-shrink-0">User ID</span>
                 <span
-                  className="font-mono text-sm truncate ml-4"
-                  style={{ color: 'var(--text-primary)' }}
-                  title={user?.id}
+                  className="text-gray-900 font-mono text-sm truncate ml-4"
+                  title={user.id}
                 >
-                  {user?.id}
+                  {user.id}
                 </span>
               </div>
               <div className="flex justify-between items-center py-3">
-                <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
-                <span style={{ color: 'var(--text-primary)' }}>
-                  {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                <span className="text-gray-600">Member since</span>
+                <span className="text-gray-900">
+                  {new Date(user.createdAt).toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -294,17 +262,16 @@ export default function Profile() {
         {household && (
           <Card className="smart-card">
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 Household Information
               </h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                  <span style={{ color: 'var(--text-secondary)' }} className="flex-shrink-0">Name</span>
+                <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                  <span className="text-gray-600 flex-shrink-0">Name</span>
                   <div className="flex items-center space-x-2">
                     <span
-                      className="font-semibold truncate"
-                      style={{ color: 'var(--text-primary)' }}
-                      title={household?.name}
+                      className="text-gray-900 font-semibold truncate"
+                      title={household.name}
                     >
                       {household.name}
                     </span>
@@ -314,17 +281,14 @@ export default function Profile() {
                           onClick={() => {
                             setEditHouseholdName(household?.name || "");
                           }}
-                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
-                          style={{ backgroundColor: 'var(--bg-secondary)' }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
+                          className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all p-0 flex-shrink-0"
                         >
-                          <Edit3 size={16} style={{ color: 'var(--text-secondary)' }} />
+                          <Edit3 size={16} className="text-gray-600" />
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader className="px-6 pt-6 pb-6">
-                          <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                          <DialogTitle className="text-xl font-bold text-gray-900">
                             Edit Household Name
                           </DialogTitle>
                         </DialogHeader>
@@ -352,44 +316,38 @@ export default function Profile() {
                     </Dialog>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Invite Code</span>
+                <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                  <span className="text-gray-600">Invite Code</span>
                   <div className="flex items-center space-x-3">
-                    <span className="font-mono text-sm px-2 py-1 rounded" style={{ 
-                      color: 'var(--text-primary)', 
-                      backgroundColor: 'var(--bg-secondary)' 
-                    }}>
+                    <span className="text-gray-900 font-mono text-sm bg-gray-100 px-2 py-1 rounded">
                       {household.inviteCode}
                     </span>
                     <button
                       onClick={copyInviteCode}
-                      className="p-2 rounded-lg btn-animated"
-                      style={{ backgroundColor: 'var(--bg-secondary)' }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
+                      className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg btn-animated"
                     >
-                      <Copy size={14} style={{ color: 'var(--text-secondary)' }} />
+                      <Copy size={14} />
                     </button>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Members</span>
-                  <span style={{ color: 'var(--text-primary)' }}>
+                <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                  <span className="text-gray-600">Members</span>
+                  <span className="text-gray-900">
                     {household.members?.length || 0}
                   </span>
                 </div>
                 {household.rentAmount && (
-                  <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Monthly Rent</span>
-                    <span style={{ color: 'var(--text-primary)' }}>
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                    <span className="text-gray-600">Monthly Rent</span>
+                    <span className="text-gray-900">
                       ${household.rentAmount}
                     </span>
                   </div>
                 )}
                 {household.rentDueDay && (
                   <div className="flex justify-between items-center py-3">
-                    <span style={{ color: 'var(--text-secondary)' }}>Rent Due Day</span>
-                    <span style={{ color: 'var(--text-primary)' }}>
+                    <span className="text-gray-600">Rent Due Day</span>
+                    <span className="text-gray-900">
                       {household.rentDueDay}
                     </span>
                   </div>
@@ -403,15 +361,14 @@ export default function Profile() {
         {household?.members && (
           <Card className="smart-card">
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 Household Members
               </h3>
               <div className="space-y-3">
                 {household.members.map((member: any) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between py-3 last:border-b-0"
-                    style={{ borderBottom: '1px solid var(--border-color)' }}
+                    className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0"
                   >
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -422,23 +379,20 @@ export default function Profile() {
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                        <p className="text-gray-900 font-medium truncate">
                           {member.user.firstName && member.user.lastName
                             ? `${member.user.firstName} ${member.user.lastName}`
                             : member.user.firstName ||
                               member.user.email?.split("@")[0] ||
                               "Unknown"}
                         </p>
-                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        <p className="text-sm text-gray-600">
                           {member.role === "admin" ? "Administrator" : "Member"}
                         </p>
                       </div>
                     </div>
                     {member.role && (
-                      <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{ 
-                        color: 'var(--text-secondary)', 
-                        backgroundColor: 'var(--bg-secondary)' 
-                      }}>
+                      <span className="text-sm text-gray-600 capitalize px-2 py-1 bg-gray-100 rounded flex-shrink-0">
                         {member.role}
                       </span>
                     )}

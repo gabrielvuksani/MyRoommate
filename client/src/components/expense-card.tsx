@@ -86,14 +86,27 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
             ) : onDeleteExpense ? (
               <button
                 onClick={() => onDeleteExpense(expense.id)}
-                className="px-2 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors"
+                className="px-2 py-1 rounded-lg text-xs font-medium transition-colors"
+                style={{
+                  background: 'rgba(255, 59, 48, 0.1)',
+                  color: '#FF3B30'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 59, 48, 0.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)';
+                }}
               >
                 Delete
               </button>
             ) : null}
           </div>
           {!isFullySettled && (
-            <span className="px-2 py-1 rounded-lg text-xs font-medium bg-amber-100 text-amber-700">
+            <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+              background: 'rgba(255, 159, 10, 0.1)',
+              color: '#FF9F0A'
+            }}>
               {`${totalSettled}/${totalSplits} settled`}
             </span>
           )}
@@ -103,28 +116,37 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
       {/* Split Details */}
       <div className="space-y-2">
         {splits.map((split: any) => (
-          <div key={split.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
-            <span className="text-sm text-gray-700">
+          <div key={split.id} className="flex items-center justify-between py-2 px-3 rounded-lg" style={{
+            background: 'var(--surface-secondary)'
+          }}>
+            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>
               {split.user?.firstName || split.user?.email?.split('@')[0] || 'Unknown'}
             </span>
             <div className="flex items-center space-x-3">
-              <span className="text-sm font-medium">${parseFloat(split.amount).toFixed(2)}</span>
+              <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>${parseFloat(split.amount).toFixed(2)}</span>
               {showSettlement && onSettleExpense && (
                 <button
                   onClick={() => onSettleExpense({ splitId: split.id, settled: !split.settled })}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    split.settled
-                      ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                  }`}
+                  className="px-3 py-1 rounded-lg text-xs font-medium transition-colors"
+                  style={{
+                    background: split.settled ? 'rgba(48, 209, 88, 0.1)' : 'rgba(0, 122, 255, 0.1)',
+                    color: split.settled ? '#30D158' : '#007AFF'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = split.settled ? 'rgba(48, 209, 88, 0.2)' : 'rgba(0, 122, 255, 0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = split.settled ? 'rgba(48, 209, 88, 0.1)' : 'rgba(0, 122, 255, 0.1)';
+                  }}
                 >
                   {split.settled ? 'Settled' : 'Settle'}
                 </button>
               )}
               {!showSettlement && (
-                <span className={`px-2 py-1 rounded text-xs ${
-                  split.settled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                }`}>
+                <span className="px-2 py-1 rounded text-xs" style={{
+                  background: split.settled ? 'rgba(48, 209, 88, 0.1)' : 'var(--surface-secondary)',
+                  color: split.settled ? '#30D158' : 'var(--text-secondary)'
+                }}>
                   {split.settled ? 'Settled' : 'Pending'}
                 </span>
               )}
