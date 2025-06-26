@@ -64,9 +64,29 @@ export default function Onboarding() {
     },
     onError: (error: any) => {
       console.error("Frontend: Join mutation error:", error);
-      if (error?.message === "Invalid invite code") {
+      
+      // Parse error message from different formats
+      let errorText = "";
+      if (error?.message) {
+        // Extract from "404: {"message":"Invalid invite code"}" format
+        const match = error.message.match(/\d+:\s*(.+)/);
+        if (match) {
+          try {
+            const parsedError = JSON.parse(match[1]);
+            errorText = parsedError.message || parsedError.error || error.message;
+          } catch {
+            errorText = match[1];
+          }
+        } else {
+          errorText = error.message;
+        }
+      } else {
+        errorText = "Unable to join household. Please try again.";
+      }
+      
+      if (errorText.includes("Invalid invite code") || errorText.includes("Invalid")) {
         setErrorMessage("Invite code not found. Please check the code and try again.");
-      } else if (error?.message === "You are already a member of this household") {
+      } else if (errorText.includes("already a member")) {
         setErrorMessage("You're already a member of this household.");
       } else {
         setErrorMessage("Unable to join household. Please try again.");
@@ -306,14 +326,19 @@ export default function Onboarding() {
                       Ask your roommate for the household invite code
                     </p>
                     {errorMessage && (
-                      <div className="mt-4 p-4 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-2xl shadow-lg shadow-red-500/10 page-enter">
-                        <div className="flex items-center justify-center space-x-2">
-                          <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                      <div className="mt-4 glass-card bg-red-50/90 border-red-200/50 shadow-lg shadow-red-500/20 page-enter">
+                        <div className="p-4">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-semibold text-red-800">Invalid Invite Code</p>
+                              <p className="text-sm text-red-700 mt-1">{errorMessage}</p>
+                            </div>
                           </div>
-                          <p className="text-sm font-medium text-red-700">{errorMessage}</p>
                         </div>
                       </div>
                     )}
