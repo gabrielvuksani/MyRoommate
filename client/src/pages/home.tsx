@@ -584,9 +584,10 @@ export default function Home() {
             </h2>
             <button
               onClick={() => setLocation("/dashboard")}
-              className="text-sm text-primary font-medium transition-colors hover:text-primary/80"
+              className="text-sm text-primary font-medium transition-colors hover:text-primary/80 flex items-center gap-1"
             >
               View All
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -753,7 +754,7 @@ export default function Home() {
               </div>
               <div>
                 <h2 className="font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>Find Roommates</h2>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Discover your perfect roommate match</p>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Discover your roommate match</p>
               </div>
             </div>
             <button
