@@ -10,8 +10,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, ArrowLeft, Edit3, Copy, UserMinus, RefreshCw } from "lucide-react";
+import { LogOut, ArrowLeft, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun } from "lucide-react";
 import { getProfileInitials } from "@/lib/nameUtils";
+import { useTheme } from "@/lib/ThemeProvider";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -19,6 +20,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Profile() {
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
