@@ -111,6 +111,9 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Centered "Ready to Go!" onboarding step 4 contents in the middle of the card with proper flexbox layout
+- ✓ Fixed roommate listing cards to display at full width matching priority and activity cards
+- ✓ Removed grid layout constraints and applied consistent vertical stacking with space-y-4
 - ✓ Fixed "Ready to Go!" onboarding step 4 UI layout issues with proper flexbox structure and spacing
 - ✓ Enhanced roommate listing cards with colored badges for better light/dark mode visibility
 - ✓ Updated contact buttons with gradient styling and proper click event handling

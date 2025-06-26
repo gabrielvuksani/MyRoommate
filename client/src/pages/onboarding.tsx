@@ -467,36 +467,32 @@ export default function Onboarding() {
         {/* Step 4: Confirmation */}
         {step === 4 && (
           <Card className="glass-card text-center page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-6 flex flex-col justify-between h-full">
-              <div className="flex-1 flex flex-col justify-center">
+            <CardContent className="p-6 flex flex-col h-full">
+              <div className="flex-1 flex flex-col justify-center items-center">
                 <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
                   <CheckCircle size={32} className="text-white" />
                 </div>
-                <h1 className="font-bold text-[22px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>Ready to Go!</h1>
+                <h1 className="font-bold text-[22px] leading-tight mb-6" style={{ color: 'var(--text-primary)' }}>Ready to Go!</h1>
                 
-                {householdData.action === 'create' ? (
-                  <div className="mb-8">
-                    <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                <div className="max-w-sm mx-auto">
+                  {householdData.action === 'create' ? (
+                    <p className="text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>
                       You're about to create "<strong style={{ color: 'var(--text-primary)' }}>{householdData.name}</strong>". 
                       You'll get an invite code to share with your roommates.
                     </p>
-                  </div>
-                ) : householdData.action === 'join' ? (
-                  <div className="mb-8">
-                    <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  ) : householdData.action === 'join' ? (
+                    <p className="text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>
                       You're about to join a household using code <strong style={{ color: 'var(--text-primary)' }} className="font-mono tracking-wider">{householdData.inviteCode}</strong>.
                     </p>
-                  </div>
-                ) : (
-                  <div className="mb-8">
-                    <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  ) : (
+                    <p className="text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>
                       Your profile is ready! You can now browse roommate listings and connect with potential roommates.
                     </p>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {errorMessage && (
-                  <div className="mb-6 glass-card bg-red-50/90 dark:bg-red-900/20 border-red-200/50 dark:border-red-800/50 shadow-lg shadow-red-500/20 page-enter">
+                  <div className="mb-6 glass-card bg-red-50/90 dark:bg-red-900/20 border-red-200/50 dark:border-red-800/50 shadow-lg shadow-red-500/20 page-enter max-w-sm mx-auto w-full">
                     <div className="p-4">
                       <div className="flex items-start space-x-3">
                         <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -514,7 +510,7 @@ export default function Onboarding() {
                 )}
               </div>
 
-              <div className="flex space-x-3 mt-8">
+              <div className="flex space-x-3">
                 <Button
                   onClick={() => setStep(step - 1)}
                   className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all"
