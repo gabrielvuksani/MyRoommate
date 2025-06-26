@@ -60,28 +60,26 @@ export default function BottomNavigation() {
       ref={navigationRef}
       className="tab-navigation" 
       style={{
-        '--indicator-translate': '8px',
-        '--indicator-width': 'calc(20% - 16px)',
+        '--indicator-translate': '0px',
+        '--indicator-width': '20%',
       } as React.CSSProperties}
     >
-      <div className="flex items-center justify-center w-full">
-        {tabs.map(({ id, path, label, Icon }) => {
-          const isActive = location === path;
-          
-          return (
-            <button
-              key={id}
-              onClick={() => setLocation(path)}
-              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 ${
-                isActive ? 'active' : 'inactive'
-              }`}
-            >
-              <Icon size={18} className="flex-shrink-0" />
-              <span className="text-xs mt-0.5 font-medium truncate">{label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {tabs.map(({ id, path, label, Icon }) => {
+        const isActive = location === path;
+        
+        return (
+          <button
+            key={id}
+            onClick={() => setLocation(path)}
+            className={`tab-item ${
+              isActive ? 'active' : 'inactive'
+            }`}
+          >
+            <Icon size={18} className="flex-shrink-0" />
+            <span className="text-xs font-medium truncate">{label}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }
