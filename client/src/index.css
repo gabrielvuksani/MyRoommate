@@ -167,21 +167,12 @@
 }
 
 .floating-header.scrolled {
-  background: rgba(255, 255, 255, 0.65);
+  background: var(--surface-glass);
   backdrop-filter: blur(20px) saturate(1.8);
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.8) inset;
-}
-
-.dark .floating-header.scrolled {
-  background: rgba(28, 28, 30, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-soft),
+              0 0 0 1px rgba(255, 255, 255, 0.08) inset;
 }
 
 .floating-header .page-header {
@@ -785,20 +776,13 @@
 }
 
 .calendar-day.selected {
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--primary);
+  background: var(--primary);
+  color: var(--text-inverse);
   box-shadow: var(--shadow-medium);
-  border: 2px solid var(--primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transform: scale(1.05);
-  font-weight: 600;
-}
-
-.dark .calendar-day.selected {
-  background: var(--primary);
-  color: var(--text-inverse);
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .calendar-day.has-events::after {
@@ -901,25 +885,31 @@ body {
 
 /* visionOS Liquid Glass Cards */
 .glass-card {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 16px;
+  background: linear-gradient(145deg, 
+    rgba(255, 255, 255, 0.7) 0%, 
+    rgba(255, 255, 255, 0.55) 100%);
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
   box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.7) inset;
-  transition: all 0.3s ease;
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.02) inset;
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
   position: relative;
   overflow: hidden;
 }
 
 .dark .glass-card {
-  background: rgba(28, 28, 30, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(145deg, 
+    rgba(28, 28, 30, 0.85) 0%, 
+    rgba(44, 44, 46, 0.75) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.2) inset;
 }
 
 .glass-card::before {
@@ -931,7 +921,7 @@ body {
   height: 1px;
   background: linear-gradient(90deg, 
     transparent, 
-    rgba(255, 255, 255, 0.9), 
+    rgba(255, 255, 255, 0.8), 
     transparent);
   pointer-events: none;
 }
@@ -939,21 +929,23 @@ body {
 .dark .glass-card::before {
   background: linear-gradient(90deg, 
     transparent, 
-    rgba(255, 255, 255, 0.2), 
+    rgba(255, 255, 255, 0.3), 
     transparent);
 }
 
 .glass-card:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.01);
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    0 12px 48px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.04) inset;
 }
 
 .dark .glass-card:hover {
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    0 1px 0 rgba(255, 255, 255, 0.15) inset;
+    0 12px 48px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.15) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.3) inset;
 }
 
 /* Button Components */

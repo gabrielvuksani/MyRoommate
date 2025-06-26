@@ -171,7 +171,7 @@ export default function Home() {
               <CardContent className="p-6 text-center animate-fade-in">
                 <button
                   onClick={() => setLocation("/onboarding")}
-                  className="w-full transition-all"
+                  className="w-full transition-all btn-animated"
                 >
                   <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <HomeIcon className="text-white" size={20} />
@@ -191,7 +191,7 @@ export default function Home() {
               >
                 <button
                   onClick={() => setLocation("/roommates")}
-                  className="w-full transition-all"
+                  className="w-full transition-all btn-animated"
                 >
                   <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Plus className="text-white" size={20} />
@@ -316,7 +316,7 @@ export default function Home() {
             <CardContent className="p-6 text-center animate-fade-in">
               <button
                 onClick={() => setLocation("/chores")}
-                className="w-full transition-all"
+                className="w-full transition-all btn-animated"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <CheckSquare className="text-white" size={20} />
@@ -336,7 +336,7 @@ export default function Home() {
             >
               <button
                 onClick={() => setLocation("/expenses")}
-                className="w-full transition-all"
+                className="w-full transition-all btn-animated"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <DollarSign className="text-white" size={20} />
@@ -363,7 +363,7 @@ export default function Home() {
             >
               <button
                 onClick={() => setLocation("/calendar")}
-                className="w-full transition-all"
+                className="w-full transition-all btn-animated"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Calendar className="text-white" size={20} />
@@ -383,7 +383,7 @@ export default function Home() {
             >
               <button
                 onClick={() => setLocation("/messages")}
-                className="w-full transition-all"
+                className="w-full transition-all btn-animated"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <MessageCircle className="text-white" size={20} />
@@ -457,7 +457,7 @@ export default function Home() {
                   {/* Today's Events */}
                   <button
                     onClick={() => setLocation("/calendar")}
-                    className="rounded-xl p-4 w-full text-left transition-colors"
+                    className="rounded-xl p-4 w-full text-left transition-colors btn-animated"
                     style={{ 
                       background: 'var(--surface-secondary)',
                       borderColor: 'var(--border)'
@@ -516,7 +516,7 @@ export default function Home() {
                   {/* Priority Chores */}
                   <button
                     onClick={() => setLocation("/chores")}
-                    className="rounded-xl p-4 w-full text-left transition-colors"
+                    className="rounded-xl p-4 w-full text-left transition-colors btn-animated"
                     style={{ 
                       background: 'var(--surface-secondary)',
                       borderColor: 'var(--border)'
