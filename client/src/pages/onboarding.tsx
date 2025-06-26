@@ -306,8 +306,15 @@ export default function Onboarding() {
                       Ask your roommate for the household invite code
                     </p>
                     {errorMessage && (
-                      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl">
-                        <p className="text-sm text-red-600 text-center">{errorMessage}</p>
+                      <div className="mt-4 p-4 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-2xl shadow-lg shadow-red-500/10 page-enter">
+                        <div className="flex items-center justify-center space-x-2">
+                          <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </div>
+                          <p className="text-sm font-medium text-red-700">{errorMessage}</p>
+                        </div>
                       </div>
                     )}
                   </div>
