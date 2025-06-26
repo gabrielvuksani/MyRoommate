@@ -219,9 +219,47 @@ export default function Messages() {
     }, 2000);
   };
 
+  const sendMessageMutation = useMutation({
+    mutationFn: async (content: string) => {
+      const response = await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content,
+          householdId: household?.id,
+          userId: user?.id,
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to send message');
+      return response.json();
+    },
+    onSuccess: (newMessage) => {
+      console.log('Message sent successfully:', newMessage.id);
+      
+      // Force immediate refresh to show the new message
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      
+      // Send via WebSocket for other clients
+      sendMessage?.({
+        type: "new_message",
+        message: newMessage,
+      });
+      
+      // Auto-scroll to new message
+      setTimeout(() => {
+        if (shouldAutoScroll) {
+          scrollToBottom();
+        }
+      }, 100);
+    },
+    onError: (error) => {
+      console.error("Failed to send message:", error);
+    },
+  });
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !household || !user) return;
+    if (!newMessage.trim() || !household || !user || sendMessageMutation.isPending) return;
 
     const messageContent = newMessage.trim();
     
@@ -242,42 +280,8 @@ export default function Messages() {
     // Clear input immediately for better UX
     setNewMessage("");
 
-    try {
-      // Send message and get immediate response
-      const response = await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content: messageContent,
-          householdId: household.id,
-          userId: user.id,
-        }),
-      });
-
-      if (response.ok) {
-        const newMessage = await response.json();
-        console.log('Message sent successfully:', newMessage.id);
-        
-        // Immediately update the query cache with the new message
-        queryClient.setQueryData(["/api/messages"], (old: any) => {
-          const currentMessages = Array.isArray(old) ? old : [];
-          return [...currentMessages, newMessage];
-        });
-
-        // Send via WebSocket for other clients
-        sendMessage?.({
-          type: "new_message",
-          message: newMessage,
-        });
-      } else {
-        throw new Error('Failed to send message');
-        setNewMessage(messageContent); // Restore input on error
-      }
-
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      setNewMessage(messageContent); // Restore input for retry
-    }
+    // Send the message
+    sendMessageMutation.mutate(messageContent);
   };
 
   const conversationStarters = [
