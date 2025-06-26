@@ -1,6 +1,6 @@
 // Utility functions for formatting names consistently across the app
 
-export function formatDisplayName(firstName: string | null, lastName: string | null, fallback?: string): string {
+export function formatDisplayName(firstName: string | null, lastName: string | null, fallback?: string | null): string {
   if (!firstName && !lastName) {
     return fallback || '';
   }

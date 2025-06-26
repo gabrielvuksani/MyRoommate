@@ -22,7 +22,7 @@ import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
-  const { data: household } = useQuery({
+  const { data: household } = useQuery<{ id: string; name: string }>({
     queryKey: ["/api/households/current"],
     enabled: isAuthenticated,
   });
