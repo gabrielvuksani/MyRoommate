@@ -8,6 +8,7 @@ import { apiRequest } from "@/lib/queryClient";
 
 import { useLocation } from "wouter";
 import { CheckCircle, Users, Home, ArrowRight, User, Search } from "lucide-react";
+import BackButton from "@/components/back-button";
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
@@ -22,8 +23,8 @@ export default function Onboarding() {
   const queryClient = useQueryClient();
   
   const [userData, setUserData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
+    firstName: (user as any)?.firstName || '',
+    lastName: (user as any)?.lastName || '',
   });
   
   const [householdData, setHouseholdData] = useState({
@@ -125,7 +126,7 @@ export default function Onboarding() {
     }
   };
 
-  const firstName = userData.firstName || user?.firstName || user?.email?.split('@')[0] || 'there';
+  const firstName = userData.firstName || (user as any)?.firstName || (user as any)?.email?.split('@')[0] || 'there';
 
   return (
     <div className="min-h-screen page-container flex items-center justify-center p-6">
@@ -133,15 +134,18 @@ export default function Onboarding() {
         
         {/* Step 1: Welcome */}
         {step === 1 && (
-          <Card className="glass-card text-center page-enter">
+          <Card className="glass-card text-center page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-6">
+            <div className="flex justify-start mb-4">
+              <BackButton to="/" />
+            </div>
             <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
               <Home size={32} className="text-white" />
             </div>
-            <h1 className="font-bold text-[#1a1a1a] text-[24px] leading-tight mb-3">
+            <h1 className="font-bold text-[22px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>
               Welcome to MyRoommate, {firstName}!
             </h1>
-            <p className="text-gray-600 text-base leading-relaxed mb-8">
+            <p className="text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>
               Let's get you set up to start managing your shared living space effortlessly.
             </p>
             
@@ -150,25 +154,25 @@ export default function Onboarding() {
                 <div className="w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
                   <CheckCircle size={14} className="text-white" />
                 </div>
-                <span className="text-sm text-gray-700 font-medium">Track chores and tasks</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Track chores and tasks</span>
               </div>
               <div className="flex items-center space-x-3 text-left">
                 <div className="w-6 h-6 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
                   <CheckCircle size={14} className="text-white" />
                 </div>
-                <span className="text-sm text-gray-700 font-medium">Split bills and expenses</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Split bills and expenses</span>
               </div>
               <div className="flex items-center space-x-3 text-left">
                 <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
                   <CheckCircle size={14} className="text-white" />
                 </div>
-                <span className="text-sm text-gray-700 font-medium">Share calendar events</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Share calendar events</span>
               </div>
               <div className="flex items-center space-x-3 text-left">
                 <div className="w-6 h-6 bg-gradient-to-br from-pink-400 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
                   <CheckCircle size={14} className="text-white" />
                 </div>
-                <span className="text-sm text-gray-700 font-medium">Chat with roommates</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Chat with roommates</span>
               </div>
             </div>
 
@@ -185,14 +189,14 @@ export default function Onboarding() {
 
         {/* Step 2: Name Selection */}
         {step === 2 && (
-          <Card className="glass-card page-enter">
+          <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-6">
             <div className="text-center mb-6">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/25">
                 <User size={32} className="text-white" />
               </div>
-              <h1 className="font-bold text-[#1a1a1a] text-[24px] leading-tight mb-3">What should we call you?</h1>
-              <p className="text-gray-600 text-base leading-relaxed mb-8">Choose how you'd like to appear to your roommates</p>
+              <h1 className="font-bold text-[22px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>What should we call you?</h1>
+              <p className="text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>Choose how you'd like to appear to your roommates</p>
             </div>
 
             <div className="space-y-4 mb-8">
@@ -260,13 +264,13 @@ export default function Onboarding() {
 
         {/* Step 3: Household Setup */}
         {step === 3 && (
-          <Card className="glass-card page-enter">
+          <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-6">
             <div className="text-center mb-6">
               <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-violet-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/25">
                 <Users size={32} className="text-white" />
               </div>
-              <h1 className="font-bold text-[24px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>Choose Your Path</h1>
+              <h1 className="font-bold text-[22px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>Choose Your Path</h1>
               <p className="text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>What would you like to do next?</p>
             </div>
 
@@ -276,11 +280,15 @@ export default function Onboarding() {
                   setErrorMessage('');
                   setHouseholdData({ ...householdData, action: 'create' });
                 }}
-                className={`w-full p-6 rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
+                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
                   householdData.action === 'create' 
-                    ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
-                    : 'glass-card hover:scale-[1.02]'
+                    ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25 p-6' 
+                    : 'glass-card hover:scale-[1.02] p-6'
                 }`}
+                style={householdData.action !== 'create' ? {
+                  background: 'var(--surface)',
+                  color: 'var(--text-primary)'
+                } : {}}
               >
                 <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
                   <Home size={24} />
@@ -296,11 +304,15 @@ export default function Onboarding() {
                   setErrorMessage('');
                   setHouseholdData({ ...householdData, action: 'join' });
                 }}
-                className={`w-full p-6 rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
+                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
                   householdData.action === 'join' 
-                    ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
-                    : 'glass-card hover:scale-[1.02]'
+                    ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25 p-6' 
+                    : 'glass-card hover:scale-[1.02] p-6'
                 }`}
+                style={householdData.action !== 'join' ? {
+                  background: 'var(--surface)',
+                  color: 'var(--text-primary)'
+                } : {}}
               >
                 <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
                   <Users size={24} />
@@ -316,11 +328,15 @@ export default function Onboarding() {
                   setErrorMessage('');
                   setHouseholdData({ ...householdData, action: 'browse' });
                 }}
-                className={`w-full p-6 rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
+                className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 ${
                   householdData.action === 'browse' 
-                    ? 'bg-gradient-to-br from-purple-400 to-violet-500 text-white shadow-lg shadow-purple-500/25' 
-                    : 'glass-card hover:scale-[1.02]'
+                    ? 'bg-gradient-to-br from-purple-400 to-violet-500 text-white shadow-lg shadow-purple-500/25 p-6' 
+                    : 'glass-card hover:scale-[1.02] p-6'
                 }`}
+                style={householdData.action !== 'browse' ? {
+                  background: 'var(--surface)',
+                  color: 'var(--text-primary)'
+                } : {}}
               >
                 <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
                   <Search size={24} />
@@ -448,17 +464,17 @@ export default function Onboarding() {
 
         {/* Step 4: Confirmation */}
         {step === 4 && (
-          <Card className="glass-card text-center page-enter">
+          <Card className="glass-card text-center page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-6">
             <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
               <CheckCircle size={32} className="text-white" />
             </div>
-            <h1 className="font-bold text-[24px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>Ready to Go!</h1>
+            <h1 className="font-bold text-[22px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>Ready to Go!</h1>
             
             {householdData.action === 'create' ? (
               <div className="mb-8">
                 <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  You're about to create "<strong className="text-[#1a1a1a]">{householdData.name}</strong>". 
+                  You're about to create "<strong style={{ color: 'var(--text-primary)' }}>{householdData.name}</strong>". 
                   You'll get an invite code to share with your roommates.
                 </p>
               </div>
@@ -477,7 +493,7 @@ export default function Onboarding() {
             )}
 
             {errorMessage && (
-              <div className="mb-6 glass-card bg-red-50/90 border-red-200/50 shadow-lg shadow-red-500/20 page-enter">
+              <div className="mb-6 glass-card bg-red-50/90 dark:bg-red-900/20 border-red-200/50 dark:border-red-800/50 shadow-lg shadow-red-500/20 page-enter">
                 <div className="p-4">
                   <div className="flex items-start space-x-3">
                     <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -486,8 +502,8 @@ export default function Onboarding() {
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-red-800">Unable to Join Household</p>
-                      <p className="text-sm text-red-700 mt-1">{errorMessage}</p>
+                      <p className="text-sm font-semibold text-red-800 dark:text-red-200">Unable to Join Household</p>
+                      <p className="text-sm text-red-700 dark:text-red-300 mt-1">{errorMessage}</p>
                     </div>
                   </div>
                 </div>

@@ -131,10 +131,10 @@ export default function Home() {
     );
   }
 
-  const activeChores = chores.filter((chore: any) => chore.status !== "done");
-  const recentMessages = messages.slice().reverse().slice(0, 3);
-  const netBalance = (balance?.totalOwed || 0) - (balance?.totalOwing || 0);
-  const firstName = user.firstName || user.email?.split("@")[0] || "there";
+  const activeChores = (chores as any[])?.filter((chore: any) => chore.status !== "done") || [];
+  const recentMessages = (messages as any[])?.slice().reverse().slice(0, 3) || [];
+  const netBalance = ((balance as any)?.totalOwed || 0) - ((balance as any)?.totalOwing || 0);
+  const firstName = (user as any)?.firstName || (user as any)?.email?.split("@")[0] || "there";
 
   const currentHour = new Date().getHours();
   const greeting =
@@ -151,11 +151,11 @@ export default function Home() {
     return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   })[0];
 
-  const todayEvents = calendarEvents.filter((event: any) => {
+  const todayEvents = (calendarEvents as any[])?.filter((event: any) => {
     const eventDate = new Date(event.startDate).toDateString();
     const today = new Date().toDateString();
     return eventDate === today;
-  });
+  }) || [];
 
   return (
     <div className="page-container page-transition">
@@ -167,14 +167,14 @@ export default function Home() {
               <h1 className="page-title">
                 {greeting}, <span className="truncate">{firstName}</span>
               </h1>
-              <p className="page-subtitle truncate">{household.name}</p>
+              <p className="page-subtitle truncate">{(household as any)?.name}</p>
             </div>
             <button
               onClick={() => setLocation("/profile")}
               className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
             >
               <span className="text-white font-bold text-lg">
-                {getProfileInitials(user.firstName, user.lastName, user.email)}
+                {getProfileInitials((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email)}
               </span>
             </button>
           </div>
@@ -290,15 +290,15 @@ export default function Home() {
                   <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                     {(() => {
                       const today = new Date();
-                      const todayEvents = calendarEvents.filter(
+                      const todayEvents = (calendarEvents as any[])?.filter(
                         (event: any) => {
                           const eventDate = new Date(event.startDate);
                           return (
                             eventDate.toDateString() === today.toDateString()
                           );
                         },
-                      );
-                      const urgentChores = chores.filter((chore: any) => {
+                      ) || [];
+                      const urgentChores = (chores as any[])?.filter((chore: any) => {
                         if (chore.status === "done" || !chore.dueDate)
                           return false;
                         const dueDate = new Date(chore.dueDate);
@@ -342,8 +342,8 @@ export default function Home() {
                     <div className="space-y-2">
                       {(() => {
                         const today = new Date();
-                        const todayEvents = calendarEvents
-                          .filter((event: any) => {
+                        const todayEvents = (calendarEvents as any[])
+                          ?.filter((event: any) => {
                             const eventDate = new Date(event.startDate);
                             return (
                               eventDate.toDateString() === today.toDateString()
@@ -401,8 +401,8 @@ export default function Home() {
                     <div className="space-y-2">
                       {(() => {
                         const today = new Date();
-                        const priorityChores = chores
-                          .filter((chore: any) => chore.status !== "done")
+                        const priorityChores = (chores as any[])
+                          ?.filter((chore: any) => chore.status !== "done")
                           .sort((a: any, b: any) => {
                             const aUrgent = a.dueDate
                               ? new Date(a.dueDate).getTime() - today.getTime()
@@ -463,20 +463,20 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {(() => {
-              const completedChores = chores.filter(
+              const completedChores = (chores as any[])?.filter(
                 (c: any) => c.status === "done",
-              );
-              const totalChores = chores.length;
+              ) || [];
+              const totalChores = (chores as any[])?.length || 0;
               const completionRate =
                 totalChores > 0
                   ? (completedChores.length / totalChores) * 100
                   : 0;
 
               const memberPerformance =
-                household?.members?.map((member: any) => {
-                  const memberChores = chores.filter(
+                (household as any)?.members?.map((member: any) => {
+                  const memberChores = (chores as any[])?.filter(
                     (c: any) => c.assignedTo === member.userId,
-                  );
+                  ) || [];
                   const completedMemberChores = memberChores.filter(
                     (c: any) => c.status === "done",
                   );
@@ -491,7 +491,7 @@ export default function Home() {
                 }) || [];
 
               const topPerformer = memberPerformance.sort(
-                (a, b) => b.completionRate - a.completionRate,
+                (a: any, b: any) => b.completionRate - a.completionRate,
               )[0];
 
               return (

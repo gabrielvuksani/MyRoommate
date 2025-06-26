@@ -1,3 +1,4 @@
+import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,7 +59,7 @@ export default function Expenses() {
     enabled: !!household,
   });
 
-  const { data: balance } = useQuery({
+  const { data: balance } = useQuery<{ totalOwed: number; totalOwing: number }>({
     queryKey: ["/api/balance"],
     enabled: !!household,
   });
@@ -167,7 +168,7 @@ export default function Expenses() {
     },
   });
 
-  const netBalance = ((balance as any)?.totalOwed || 0) - ((balance as any)?.totalOwing || 0);
+  const netBalance = (balance?.totalOwed || 0) - (balance?.totalOwing || 0);
 
   if (isLoading) {
     return (
@@ -340,23 +341,23 @@ export default function Expenses() {
             </div>
             {balance && (
               <div className="space-y-2">
-                {(balance as any).totalOwed > 0 && (
+                {balance.totalOwed > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-ios-body" style={{ color: 'var(--text-primary)' }}>
                       Total owed to you
                     </span>
                     <span className="text-ios-body font-medium" style={{ color: '#30D158' }}>
-                      ${(balance as any).totalOwed.toFixed(2)}
+                      ${balance.totalOwed.toFixed(2)}
                     </span>
                   </div>
                 )}
-                {(balance as any).totalOwing > 0 && (
+                {balance.totalOwing > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-ios-body" style={{ color: 'var(--text-primary)' }}>
                       Total you owe
                     </span>
                     <span className="text-ios-body font-medium" style={{ color: '#FF453A' }}>
-                      ${(balance as any).totalOwing.toFixed(2)}
+                      ${balance.totalOwing.toFixed(2)}
                     </span>
                   </div>
                 )}

@@ -32,8 +32,8 @@ export default function Settings() {
   }, []);
 
   const handleCopyInviteCode = () => {
-    if (household?.inviteCode) {
-      navigator.clipboard.writeText(household.inviteCode);
+    if ((household as any)?.inviteCode) {
+      navigator.clipboard.writeText((household as any).inviteCode);
     }
   };
 
@@ -75,9 +75,9 @@ export default function Settings() {
                 <Home size={20} className="text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">{household.name}</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{(household as any)?.name}</h2>
                 <p className="text-sm text-gray-600">
-                  {household.members?.length || 0} member{household.members?.length !== 1 ? 's' : ''}
+                  {(household as any)?.members?.length || 0} member{(household as any)?.members?.length !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
@@ -89,7 +89,7 @@ export default function Settings() {
                   <p className="text-xs text-gray-600">Share with new roommates</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm font-mono text-gray-900">{household.inviteCode}</span>
+                  <span className="text-sm font-mono text-gray-900">{(household as any)?.inviteCode}</span>
                   <button
                     onClick={handleCopyInviteCode}
                     className="p-2 rounded-lg hover:bg-gray-200 transition-colors btn-animated"
@@ -111,7 +111,7 @@ export default function Settings() {
             </div>
             
             <div className="space-y-3">
-              {household.members?.map((member: any) => (
+              {(household as any)?.members?.map((member: any) => (
                 <div key={member.id} className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
                     <span className="text-white text-xs font-bold">
@@ -126,7 +126,7 @@ export default function Settings() {
                       {member.role === 'admin' ? 'Admin' : 'Member'} • Joined {new Date(member.joinedAt).toLocaleDateString()}
                     </p>
                   </div>
-                  {member.userId === user?.id && (
+                  {member.userId === (user as any)?.id && (
                     <span className="text-xs text-primary font-medium">You</span>
                   )}
                 </div>

@@ -511,67 +511,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRoommateListings(city?: string, featured?: boolean): Promise<(RoommateListing & { creator: User })[]> {
-    // If no listings exist, create some demo data
-    const existingListings = await db.select().from(roommateListings).limit(1);
-    
-    if (existingListings.length === 0) {
-      // Create demo listings
-      const demoListings = [
-        {
-          title: "Cozy Studio in Downtown",
-          description: "Modern studio apartment with great city views. Perfect for a young professional. Includes all utilities and high-speed internet.",
-          rent: 1200,
-          location: "San Francisco, CA",
-          roomType: "studio" as const,
-          availableFrom: new Date("2024-02-01"),
-          preferences: "Non-smoker, clean, quiet",
-          contactInfo: "sarah.demo@email.com",
-          featured: true,
-          createdBy: "demo-user-1"
-        },
-        {
-          title: "Shared House Near Campus",
-          description: "Friendly house with 3 other students. Large kitchen, backyard, and close to university. Looking for someone clean and social.",
-          rent: 800,
-          location: "Berkeley, CA",
-          roomType: "shared" as const,
-          availableFrom: new Date("2024-01-15"),
-          preferences: "Student preferred, social, non-smoker",
-          contactInfo: "alex.demo@email.com",
-          featured: false,
-          createdBy: "demo-user-2"
-        },
-        {
-          title: "Private Room in Tech Hub",
-          description: "Private bedroom with private bathroom in modern apartment. Great for tech workers, fast internet, gym in building.",
-          rent: 1500,
-          location: "Palo Alto, CA",
-          roomType: "private" as const,
-          availableFrom: new Date("2024-02-15"),
-          preferences: "Working professional, clean, respectful",
-          contactInfo: "mike.demo@email.com",
-          featured: true,
-          createdBy: "demo-user-3"
-        },
-        {
-          title: "Spacious Room in Family Home",
-          description: "Large room in quiet family neighborhood. Kitchen access, parking included. Perfect for graduate student or young professional.",
-          rent: 900,
-          location: "San Jose, CA",
-          roomType: "private" as const,
-          availableFrom: new Date("2024-01-01"),
-          preferences: "Graduate student or professional, quiet, responsible",
-          contactInfo: "jenny.demo@email.com",
-          featured: false,
-          createdBy: "demo-user-4"
-        }
-      ];
-
-      // Insert demo listings one by one
-      for (const listing of demoListings) {
-        await db.insert(roommateListings).values(listing);
-      }
-    }
+    // No demo data insertion to avoid foreign key constraint issues
 
     const conditions = [eq(roommateListings.isActive, true)];
     
@@ -584,56 +524,34 @@ export class DatabaseStorage implements IStorage {
     }
 
     const result = await db
-      .select({
-        id: roommateListings.id,
-        title: roommateListings.title,
-        description: roommateListings.description,
-        rent: roommateListings.rent,
-        location: roommateListings.location,
-        availableFrom: roommateListings.availableFrom,
-        roomType: roommateListings.roomType,
-        preferences: roommateListings.preferences,
-        contactInfo: roommateListings.contactInfo,
-        featured: roommateListings.featured,
-        createdAt: roommateListings.createdAt,
-        createdBy: roommateListings.createdBy,
-        creator: {
-          id: users.id,
-          email: users.email,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          profileImageUrl: users.profileImageUrl,
-          createdAt: users.createdAt,
-          updatedAt: users.updatedAt,
-        },
-      })
+      .select()
       .from(roommateListings)
       .leftJoin(users, eq(roommateListings.createdBy, users.id))
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(roommateListings.featured), desc(roommateListings.createdAt));
     
     return result.map(row => ({
-      id: row.listing.id,
-      title: row.listing.title,
-      description: row.listing.description,
-      rent: row.listing.rent,
-      location: row.listing.location,
-      availableFrom: row.listing.availableFrom,
-      roomType: row.listing.roomType,
-      preferences: row.listing.preferences,
-      contactInfo: row.listing.contactInfo,
-      isActive: true,
-      featured: row.listing.featured || false,
-      createdBy: row.listing.createdBy,
-      createdAt: row.listing.createdAt,
-      updatedAt: row.listing.updatedAt,
-      creator: row.creator || {
-        id: row.listing.createdBy,
+      id: row.roommate_listings.id,
+      title: row.roommate_listings.title,
+      description: row.roommate_listings.description,
+      rent: row.roommate_listings.rent,
+      location: row.roommate_listings.location,
+      availableFrom: row.roommate_listings.availableFrom,
+      roomType: row.roommate_listings.roomType,
+      preferences: row.roommate_listings.preferences,
+      contactInfo: row.roommate_listings.contactInfo,
+      isActive: row.roommate_listings.isActive,
+      featured: row.roommate_listings.featured,
+      createdBy: row.roommate_listings.createdBy,
+      createdAt: row.roommate_listings.createdAt,
+      updatedAt: row.roommate_listings.updatedAt,
+      creator: row.users || {
+        id: row.roommate_listings.createdBy || "unknown",
         firstName: "Anonymous",
-        lastName: "User",
-        email: row.listing.contactInfo || "contact@email.com",
-        createdAt: row.listing.createdAt,
-        updatedAt: row.listing.updatedAt,
+        lastName: "User", 
+        email: row.roommate_listings.contactInfo || "contact@email.com",
+        createdAt: row.roommate_listings.createdAt,
+        updatedAt: row.roommate_listings.updatedAt,
         profileImageUrl: null,
       }
     }));
