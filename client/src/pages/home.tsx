@@ -171,7 +171,7 @@ export default function Home() {
               <CardContent className="p-6 text-center animate-fade-in">
                 <button
                   onClick={() => setLocation("/onboarding")}
-                  className="w-full transition-all btn-animated"
+                  className="w-full transition-all"
                 >
                   <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <HomeIcon className="text-white" size={20} />
@@ -191,7 +191,7 @@ export default function Home() {
               >
                 <button
                   onClick={() => setLocation("/roommates")}
-                  className="w-full transition-all btn-animated"
+                  className="w-full transition-all"
                 >
                   <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Plus className="text-white" size={20} />
@@ -584,10 +584,9 @@ export default function Home() {
             </h2>
             <button
               onClick={() => setLocation("/dashboard")}
-              className="text-sm text-primary font-medium transition-colors hover:text-primary/80 flex items-center gap-1"
+              className="text-sm text-primary font-medium transition-colors hover:text-primary/80 btn-animated"
             >
               View All
-              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -676,7 +675,7 @@ export default function Home() {
               </h2>
               <button
                 onClick={() => setLocation("/messages")}
-                className="text-sm text-primary font-medium transition-colors"
+                className="text-sm text-primary font-medium transition-colors btn-animated"
               >
                 View All
               </button>
@@ -759,7 +758,7 @@ export default function Home() {
             </div>
             <button
               onClick={() => setLocation("/roommates")}
-              className="text-sm text-primary font-medium transition-colors"
+              className="text-sm text-primary font-medium transition-colors btn-animated"
             >
               View All
             </button>

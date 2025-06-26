@@ -134,8 +134,8 @@ export default function Onboarding() {
         
         {/* Step 1: Welcome */}
         {step === 1 && (
-          <Card className="glass-card text-center page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-6">
+          <Card className="glass-card text-center page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
+            <CardContent className="p-6 flex flex-col justify-between h-full">
             <div className="flex justify-start mb-4">
               <BackButton to="/" />
             </div>
@@ -189,8 +189,8 @@ export default function Onboarding() {
 
         {/* Step 2: Name Selection */}
         {step === 2 && (
-          <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-6">
+          <Card className="glass-card page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
+            <CardContent className="p-6 flex flex-col justify-between h-full">
             <div className="text-center mb-6">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/25">
                 <User size={32} className="text-white" />
@@ -264,8 +264,8 @@ export default function Onboarding() {
 
         {/* Step 3: Household Setup */}
         {step === 3 && (
-          <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-6">
+          <Card className="glass-card page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
+            <CardContent className="p-6 flex flex-col justify-between h-full">
             <div className="text-center mb-6">
               <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-violet-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/25">
                 <Users size={32} className="text-white" />
@@ -274,7 +274,7 @@ export default function Onboarding() {
               <p className="text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>What would you like to do next?</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <button
                 onClick={() => {
                   setErrorMessage('');
@@ -286,7 +286,7 @@ export default function Onboarding() {
                     : 'glass-card hover:scale-[1.02] p-6'
                 }`}
                 style={householdData.action !== 'create' ? {
-                  background: 'var(--surface)',
+                  background: 'var(--surface-secondary)',
                   color: 'var(--text-primary)'
                 } : {}}
               >
@@ -310,7 +310,7 @@ export default function Onboarding() {
                     : 'glass-card hover:scale-[1.02] p-6'
                 }`}
                 style={householdData.action !== 'join' ? {
-                  background: 'var(--surface)',
+                  background: 'var(--surface-secondary)',
                   color: 'var(--text-primary)'
                 } : {}}
               >
@@ -334,7 +334,7 @@ export default function Onboarding() {
                     : 'glass-card hover:scale-[1.02] p-6'
                 }`}
                 style={householdData.action !== 'browse' ? {
-                  background: 'var(--surface)',
+                  background: 'var(--surface-secondary)',
                   color: 'var(--text-primary)'
                 } : {}}
               >
@@ -464,8 +464,8 @@ export default function Onboarding() {
 
         {/* Step 4: Confirmation */}
         {step === 4 && (
-          <Card className="glass-card text-center page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-6">
+          <Card className="glass-card text-center page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
+            <CardContent className="p-6 flex flex-col justify-between h-full">
             <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
               <CheckCircle size={32} className="text-white" />
             </div>
@@ -558,8 +558,11 @@ export default function Onboarding() {
               className={`h-2 rounded-full transition-all duration-300 ${
                 i === step
                   ? "w-8 bg-gradient-to-r from-emerald-500 to-cyan-500"
-                  : "w-2 bg-black/30"
+                  : "w-2"
               }`}
+              style={i !== step ? {
+                background: 'var(--border)'
+              } : {}}
             />
           ))}
         </div>

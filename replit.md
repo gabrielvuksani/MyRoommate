@@ -141,6 +141,9 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Fixed "Leave household" functionality by resolving cache invalidation issues
 - ✓ Updated query client staleTime from Infinity to 5 minutes for proper data staleness
 - ✓ Enhanced leave household mutation with complete cache clearing and page reload for reliable state management
+- ✓ Improved onboarding page UX with increased spacing between non-selected options in step 3 (space-y-6)
+- ✓ Fixed step indicator dots to work properly with light/dark modes using CSS variables instead of hardcoded colors
+- ✓ Standardized all onboarding card heights (min-h-[580px]) for seamless step navigation experience
 
 **June 26, 2025 (Earlier):**
 - ✓ Fixed calendar selected date visibility with explicit blue background and white text styling
