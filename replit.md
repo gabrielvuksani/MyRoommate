@@ -135,6 +135,8 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Reverted chores tab icon from Calendar back to CheckSquare to differentiate from calendar tab
 - ✓ Fixed Find Roommates "View All" button to match other secondary buttons (removed Search icon, added ArrowRight)
 - ✓ Fixed calendar header button shadows to match home page styling (added shadow-lg, transition-all, hover:scale-[1.05])
+- ✓ Fixed calendar page scroll behavior by removing duplicate useEffect hook that was causing conflicts
+- ✓ Corrected Find Roommates "View All" button to match Featured Listings section style exactly (simple text-primary style)
 
 **June 26, 2025 (Earlier):**
 - ✓ Fixed calendar selected date visibility with explicit blue background and white text styling

@@ -150,18 +150,6 @@ export default function Calendar() {
     });
   };
 
-  useEffect(() => {
-    // Scroll to top when page loads
-    window.scrollTo(0, 0);
-    
-    const handleScroll = () => {
-      setHeaderScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
