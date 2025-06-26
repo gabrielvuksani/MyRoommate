@@ -32,6 +32,8 @@ export default function Onboarding() {
     action: 'create' // 'create' or 'join'
   });
 
+  const [errorMessage, setErrorMessage] = useState('');
+
   const createHouseholdMutation = useMutation({
     mutationFn: async (data: any) => {
       return apiRequest("POST", "/api/households", data);
@@ -60,8 +62,15 @@ export default function Onboarding() {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       setLocation('/');
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Frontend: Join mutation error:", error);
+      if (error?.message === "Invalid invite code") {
+        setErrorMessage("Invite code not found. Please check the code and try again.");
+      } else if (error?.message === "You are already a member of this household") {
+        setErrorMessage("You're already a member of this household.");
+      } else {
+        setErrorMessage("Unable to join household. Please try again.");
+      }
     }
   });
 
@@ -88,6 +97,7 @@ export default function Onboarding() {
   };
 
   const handleFinish = () => {
+    setErrorMessage(''); // Clear any previous errors
     if (householdData.action === 'create') {
       createHouseholdMutation.mutate({ name: householdData.name });
     } else {
@@ -231,7 +241,10 @@ export default function Onboarding() {
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => setHouseholdData({ ...householdData, action: 'create' })}
+                  onClick={() => {
+                    setErrorMessage(''); // Clear errors when switching modes
+                    setHouseholdData({ ...householdData, action: 'create' });
+                  }}
                   className={`h-20 rounded-2xl flex flex-col items-center justify-center space-y-2 transition-all duration-200 ${
                     householdData.action === 'create' 
                       ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
@@ -242,7 +255,10 @@ export default function Onboarding() {
                   <span className="text-sm font-medium">Create New</span>
                 </button>
                 <button
-                  onClick={() => setHouseholdData({ ...householdData, action: 'join' })}
+                  onClick={() => {
+                    setErrorMessage(''); // Clear errors when switching modes
+                    setHouseholdData({ ...householdData, action: 'join' });
+                  }}
                   className={`h-20 rounded-2xl flex flex-col items-center justify-center space-y-2 transition-all duration-200 ${
                     householdData.action === 'join' 
                       ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
@@ -279,13 +295,21 @@ export default function Onboarding() {
                     <Input
                       placeholder="Enter 8-character code"
                       value={householdData.inviteCode}
-                      onChange={(e) => setHouseholdData({ ...householdData, inviteCode: e.target.value.toUpperCase() })}
+                      onChange={(e) => {
+                        setErrorMessage(''); // Clear errors when typing
+                        setHouseholdData({ ...householdData, inviteCode: e.target.value.toUpperCase() });
+                      }}
                       maxLength={8}
                       className="w-full h-12 rounded-xl border-0 bg-white/70 backdrop-blur-sm shadow-sm text-center tracking-wider font-mono text-lg"
                     />
                     <p className="text-xs text-gray-500 mt-2 text-center">
                       Ask your roommate for the household invite code
                     </p>
+                    {errorMessage && (
+                      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl">
+                        <p className="text-sm text-red-600 text-center">{errorMessage}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

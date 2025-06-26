@@ -165,6 +165,9 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Added automatic household switching when joining new households
 - ✓ Enhanced database logging and debugging for household operations
 - ✓ Added comprehensive frontend error tracking for join/create mutations
+- ✓ Added warning messages for invalid invite codes in onboarding process
+- ✓ Enhanced error handling with visual feedback for wrong/invalid invite codes
+- ✓ Implemented automatic error clearing when users switch modes or type in input fields
 - ✓ Updated messages page scrolling to auto-scroll to top for conversations with ≤5 messages
 - ✓ Maintained bottom-scroll behavior for longer conversations (>5 messages)
 - ✓ Created intelligent transition between top-scroll and bottom-scroll modes based on message count
