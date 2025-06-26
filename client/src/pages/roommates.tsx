@@ -3,6 +3,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ArrowLeft, Users, Plus, Search, MapPin, Clock, Star, Heart } from "lucide-react";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -52,7 +61,14 @@ export default function Roommates() {
     location: "",
     availableFrom: "",
     roomType: "private",
+    housingType: "apartment",
+    bedrooms: "2",
+    bathrooms: "1",
+    amenities: [] as string[],
+    utilitiesIncluded: [] as string[],
     preferences: "",
+    petPolicy: "no-pets",
+    smokingPolicy: "no-smoking",
     contactInfo: "",
     featured: false
   });
@@ -81,7 +97,14 @@ export default function Roommates() {
         location: "",
         availableFrom: "",
         roomType: "private",
+        housingType: "apartment",
+        bedrooms: "2",
+        bathrooms: "1",
+        amenities: [],
+        utilitiesIncluded: [],
         preferences: "",
+        petPolicy: "no-pets",
+        smokingPolicy: "no-smoking",
         contactInfo: "",
         featured: false
       });
@@ -131,7 +154,7 @@ export default function Roommates() {
         </div>
       </div>
 
-      <div className="pt-44 px-6 space-y-6">
+      <div className="pt-48 px-6 space-y-6">
         {/* Search Bar */}
         <Card className="glass-card" style={{
           background: 'var(--surface)',
@@ -217,10 +240,168 @@ export default function Roommates() {
                   />
                   
                   <Input
-                    placeholder="Location"
-                    value={newListing.location}
-                    onChange={(e) => setNewListing({ ...newListing, location: e.target.value })}
+                    placeholder="Available date"
+                    type="date"
+                    value={newListing.availableFrom}
+                    onChange={(e) => setNewListing({ ...newListing, availableFrom: e.target.value })}
                     className="input-modern"
+                    style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text-primary)'
+                    }}
+                  />
+                </div>
+
+                <Input
+                  placeholder="Location (e.g., Downtown Toronto, ON)"
+                  value={newListing.location}
+                  onChange={(e) => setNewListing({ ...newListing, location: e.target.value })}
+                  className="input-modern"
+                  style={{
+                    background: 'var(--surface-secondary)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--text-secondary)' }}>
+                      Property Type
+                    </label>
+                    <Select
+                      value={newListing.housingType}
+                      onValueChange={(value) => setNewListing({ ...newListing, housingType: value })}
+                    >
+                      <SelectTrigger style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="apartment">Apartment</SelectItem>
+                        <SelectItem value="house">House</SelectItem>
+                        <SelectItem value="condo">Condo</SelectItem>
+                        <SelectItem value="townhouse">Townhouse</SelectItem>
+                        <SelectItem value="basement">Basement</SelectItem>
+                        <SelectItem value="studio">Studio</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--text-secondary)' }}>
+                      Bedrooms
+                    </label>
+                    <Select
+                      value={newListing.bedrooms}
+                      onValueChange={(value) => setNewListing({ ...newListing, bedrooms: value })}
+                    >
+                      <SelectTrigger style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 BR</SelectItem>
+                        <SelectItem value="2">2 BR</SelectItem>
+                        <SelectItem value="3">3 BR</SelectItem>
+                        <SelectItem value="4">4 BR</SelectItem>
+                        <SelectItem value="5">5+ BR</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--text-secondary)' }}>
+                      Bathrooms
+                    </label>
+                    <Select
+                      value={newListing.bathrooms}
+                      onValueChange={(value) => setNewListing({ ...newListing, bathrooms: value })}
+                    >
+                      <SelectTrigger style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 Bath</SelectItem>
+                        <SelectItem value="1.5">1.5 Bath</SelectItem>
+                        <SelectItem value="2">2 Bath</SelectItem>
+                        <SelectItem value="2.5">2.5 Bath</SelectItem>
+                        <SelectItem value="3">3+ Bath</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--text-secondary)' }}>
+                      Room Type
+                    </label>
+                    <Select
+                      value={newListing.roomType}
+                      onValueChange={(value) => setNewListing({ ...newListing, roomType: value })}
+                    >
+                      <SelectTrigger style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="private">Private Room</SelectItem>
+                        <SelectItem value="shared">Shared Room</SelectItem>
+                        <SelectItem value="entire">Entire Place</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--text-secondary)' }}>
+                      Pet Policy
+                    </label>
+                    <Select
+                      value={newListing.petPolicy}
+                      onValueChange={(value) => setNewListing({ ...newListing, petPolicy: value })}
+                    >
+                      <SelectTrigger style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="no-pets">No Pets</SelectItem>
+                        <SelectItem value="cats">Cats OK</SelectItem>
+                        <SelectItem value="dogs">Dogs OK</SelectItem>
+                        <SelectItem value="cats-dogs">Cats & Dogs OK</SelectItem>
+                        <SelectItem value="negotiable">Negotiable</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--text-secondary)' }}>
+                    Roommate Preferences
+                  </label>
+                  <textarea
+                    placeholder="Describe your ideal roommate (age, lifestyle, interests, etc.)"
+                    value={newListing.preferences}
+                    onChange={(e) => setNewListing({ ...newListing, preferences: e.target.value })}
+                    className="w-full p-3 rounded-xl resize-none h-20"
                     style={{
                       background: 'var(--surface-secondary)',
                       border: '1px solid var(--border)',

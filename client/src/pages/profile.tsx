@@ -102,8 +102,8 @@ export default function Profile() {
   };
 
   const copyInviteCode = () => {
-    if (household?.inviteCode) {
-      navigator.clipboard.writeText(household.inviteCode);
+    if ((household as any)?.inviteCode) {
+      navigator.clipboard.writeText((household as any).inviteCode);
     }
   };
 
@@ -137,7 +137,11 @@ export default function Profile() {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setLocation("/")}
-              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all"
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
+              style={{
+                background: 'var(--surface-secondary)',
+                color: 'var(--text-primary)'
+              }}
             >
               <ArrowLeft size={18} />
             </button>
@@ -153,25 +157,28 @@ export default function Profile() {
 
       <div className="pt-36 px-6 space-y-6">
         {/* Profile Header */}
-        <Card className="smart-card">
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)'
+        }}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4 flex-1 min-w-0">
                 <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
-                    {getProfileInitials(user.firstName, user.lastName, user.email)}
+                    {getProfileInitials((user as any).firstName, (user as any).lastName, (user as any).email)}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-2xl font-bold text-gray-900 truncate">
-                    {user.firstName && user.lastName
-                      ? `${user.firstName} ${user.lastName}`
-                      : user.firstName ||
-                        user.email?.split("@")[0] ||
+                  <h2 className="text-2xl font-bold truncate" style={{ color: 'var(--text-primary)' }}>
+                    {(user as any).firstName && (user as any).lastName
+                      ? `${(user as any).firstName} ${(user as any).lastName}`
+                      : (user as any).firstName ||
+                        (user as any).email?.split("@")[0] ||
                         "Unknown User"}
                   </h2>
-                  <p className="text-gray-600 truncate" title={user.email}>
-                    {user.email}
+                  <p className="truncate" style={{ color: 'var(--text-secondary)' }} title={(user as any).email}>
+                    {(user as any).email}
                   </p>
                 </div>
               </div>
@@ -185,14 +192,18 @@ export default function Profile() {
                         lastName: user.lastName || "",
                       });
                     }}
-                    className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all p-0 flex-shrink-0"
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
+                    style={{
+                      background: 'var(--surface-secondary)',
+                      color: 'var(--text-secondary)'
+                    }}
                   >
-                    <Edit3 size={16} className="text-gray-600" />
+                    <Edit3 size={16} />
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader className="px-6 pt-6 pb-6">
-                    <DialogTitle className="text-xl font-bold text-gray-900">
+                    <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                       Edit Name
                     </DialogTitle>
                   </DialogHeader>
@@ -203,7 +214,12 @@ export default function Profile() {
                       onChange={(e) =>
                         setEditName({ ...editName, firstName: e.target.value })
                       }
-                      className="w-full p-4 border border-gray-200 rounded-xl"
+                      className="w-full p-4 rounded-xl"
+                      style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}
                     />
                     <Input
                       placeholder="Last name"
@@ -211,7 +227,12 @@ export default function Profile() {
                       onChange={(e) =>
                         setEditName({ ...editName, lastName: e.target.value })
                       }
-                      className="w-full p-4 border border-gray-200 rounded-xl"
+                      className="w-full p-4 rounded-xl"
+                      style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}
                     />
                     <Button
                       onClick={handleUpdateName}
@@ -233,25 +254,29 @@ export default function Profile() {
         </Card>
 
         {/* Account Details */}
-        <Card className="smart-card">
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)'
+        }}>
           <CardContent className="p-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
               Account details
             </h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                <span className="text-gray-600 flex-shrink-0">User ID</span>
+              <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>User ID</span>
                 <span
-                  className="text-gray-900 font-mono text-sm truncate ml-4"
-                  title={user.id}
+                  className="font-mono text-sm truncate ml-4"
+                  style={{ color: 'var(--text-primary)' }}
+                  title={(user as any).id}
                 >
-                  {user.id}
+                  {(user as any).id}
                 </span>
               </div>
               <div className="flex justify-between items-center py-3">
-                <span className="text-gray-600">Member since</span>
-                <span className="text-gray-900">
-                  {new Date(user.createdAt).toLocaleDateString()}
+                <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
+                <span style={{ color: 'var(--text-primary)' }}>
+                  {new Date((user as any).createdAt).toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -260,35 +285,43 @@ export default function Profile() {
 
         {/* Household Information */}
         {household && (
-          <Card className="smart-card">
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)'
+          }}>
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
                 Household Information
               </h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-gray-600 flex-shrink-0">Name</span>
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>Name</span>
                   <div className="flex items-center space-x-2">
                     <span
-                      className="text-gray-900 font-semibold truncate"
-                      title={household.name}
+                      className="font-semibold truncate"
+                      style={{ color: 'var(--text-primary)' }}
+                      title={(household as any).name}
                     >
-                      {household.name}
+                      {(household as any).name}
                     </span>
                     <Dialog open={isHouseholdEditOpen} onOpenChange={setIsHouseholdEditOpen}>
                       <DialogTrigger asChild>
                         <Button
                           onClick={() => {
-                            setEditHouseholdName(household?.name || "");
+                            setEditHouseholdName((household as any)?.name || "");
                           }}
-                          className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all p-0 flex-shrink-0"
+                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
+                          style={{
+                            background: 'var(--surface-secondary)',
+                            color: 'var(--text-secondary)'
+                          }}
                         >
-                          <Edit3 size={16} className="text-gray-600" />
+                          <Edit3 size={16} />
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader className="px-6 pt-6 pb-6">
-                          <DialogTitle className="text-xl font-bold text-gray-900">
+                          <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                             Edit Household Name
                           </DialogTitle>
                         </DialogHeader>
@@ -297,7 +330,12 @@ export default function Profile() {
                             placeholder="Household name"
                             value={editHouseholdName}
                             onChange={(e) => setEditHouseholdName(e.target.value)}
-                            className="w-full p-4 border border-gray-200 rounded-xl"
+                            className="w-full p-4 rounded-xl"
+                            style={{
+                              background: 'var(--surface-secondary)',
+                              border: '1px solid var(--border)',
+                              color: 'var(--text-primary)'
+                            }}
                           />
                           <Button
                             onClick={handleUpdateHouseholdName}
@@ -316,39 +354,46 @@ export default function Profile() {
                     </Dialog>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-gray-600">Invite Code</span>
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Invite Code</span>
                   <div className="flex items-center space-x-3">
-                    <span className="text-gray-900 font-mono text-sm bg-gray-100 px-2 py-1 rounded">
-                      {household.inviteCode}
+                    <span className="font-mono text-sm px-2 py-1 rounded" style={{
+                      color: 'var(--text-primary)',
+                      background: 'var(--surface-secondary)'
+                    }}>
+                      {(household as any).inviteCode}
                     </span>
                     <button
                       onClick={copyInviteCode}
-                      className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg btn-animated"
+                      className="p-2 rounded-lg btn-animated"
+                      style={{
+                        background: 'var(--surface-secondary)',
+                        color: 'var(--text-secondary)'
+                      }}
                     >
                       <Copy size={14} />
                     </button>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-gray-600">Members</span>
-                  <span className="text-gray-900">
-                    {household.members?.length || 0}
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Members</span>
+                  <span style={{ color: 'var(--text-primary)' }}>
+                    {(household as any).members?.length || 0}
                   </span>
                 </div>
-                {household.rentAmount && (
-                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                    <span className="text-gray-600">Monthly Rent</span>
-                    <span className="text-gray-900">
-                      ${household.rentAmount}
+                {(household as any).rentAmount && (
+                  <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Monthly Rent</span>
+                    <span style={{ color: 'var(--text-primary)' }}>
+                      ${(household as any).rentAmount}
                     </span>
                   </div>
                 )}
-                {household.rentDueDay && (
+                {(household as any).rentDueDay && (
                   <div className="flex justify-between items-center py-3">
-                    <span className="text-gray-600">Rent Due Day</span>
-                    <span className="text-gray-900">
-                      {household.rentDueDay}
+                    <span style={{ color: 'var(--text-secondary)' }}>Rent Due Day</span>
+                    <span style={{ color: 'var(--text-primary)' }}>
+                      {(household as any).rentDueDay}
                     </span>
                   </div>
                 )}
@@ -358,41 +403,48 @@ export default function Profile() {
         )}
 
         {/* Household Members */}
-        {household?.members && (
-          <Card className="smart-card">
+        {(household as any)?.members && (
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)'
+          }}>
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
                 Household Members
               </h3>
               <div className="space-y-3">
-                {household.members.map((member: any) => (
+                {(household as any).members.map((member: any) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0"
+                    className="flex items-center justify-between py-3 last:border-b-0"
+                    style={{ borderBottom: '1px solid var(--border)' }}
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                        <span className="text-primary font-semibold text-sm">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white font-semibold text-sm">
                           {member.user.firstName?.[0] ||
                             member.user.email?.[0] ||
                             "?"}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-gray-900 font-medium truncate">
+                        <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>
                           {member.user.firstName && member.user.lastName
                             ? `${member.user.firstName} ${member.user.lastName}`
                             : member.user.firstName ||
                               member.user.email?.split("@")[0] ||
                               "Unknown"}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {member.role === "admin" ? "Administrator" : "Member"}
                         </p>
                       </div>
                     </div>
                     {member.role && (
-                      <span className="text-sm text-gray-600 capitalize px-2 py-1 bg-gray-100 rounded flex-shrink-0">
+                      <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{
+                        color: 'var(--text-secondary)',
+                        background: 'var(--surface-secondary)'
+                      }}>
                         {member.role}
                       </span>
                     )}
@@ -404,7 +456,10 @@ export default function Profile() {
         )}
 
         {/* Actions */}
-        <Card className="smart-card">
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)'
+        }}>
           <CardContent className="p-6">
             <div className="space-y-3">
               <Button

@@ -69,18 +69,18 @@ export default function Expenses() {
       const totalAmount = parseFloat(expenseData.amount);
       
       if (expenseData.splitType === "equal") {
-        const amountPerPerson = (totalAmount / household.members.length).toFixed(2);
-        splits = household.members.map((member: any) => ({
+        const amountPerPerson = (totalAmount / (household as any).members.length).toFixed(2);
+        splits = (household as any).members.map((member: any) => ({
           userId: member.userId,
           amount: amountPerPerson,
         }));
       } else if (expenseData.splitType === "custom") {
-        splits = household.members.map((member: any) => ({
+        splits = (household as any).members.map((member: any) => ({
           userId: member.userId,
           amount: expenseData.customSplits[member.userId] || "0",
         }));
       } else if (expenseData.splitType === "percentage") {
-        splits = household.members.map((member: any) => {
+        splits = (household as any).members.map((member: any) => {
           const percentage = parseFloat(expenseData.customSplits[member.userId] || "0") / 100;
           return {
             userId: member.userId,
@@ -167,7 +167,7 @@ export default function Expenses() {
     },
   });
 
-  const netBalance = (balance?.totalOwed || 0) - (balance?.totalOwing || 0);
+  const netBalance = ((balance as any)?.totalOwed || 0) - ((balance as any)?.totalOwing || 0);
 
   if (isLoading) {
     return (
@@ -237,7 +237,7 @@ export default function Expenses() {
                       <SelectValue placeholder="Paid by..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {household?.members?.map((member: any) => (
+                      {(household as any)?.members?.map((member: any) => (
                         <SelectItem key={member.userId} value={member.userId}>
                           {member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'}
                         </SelectItem>
@@ -267,7 +267,7 @@ export default function Expenses() {
                       <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
                         {newExpense.splitType === "percentage" ? "Percentage Split" : "Custom Amount Split"}
                       </div>
-                      {household?.members?.map((member: any) => (
+                      {(household as any)?.members?.map((member: any) => (
                         <div key={member.userId} className="flex items-center space-x-3">
                           <span className="text-sm w-20 truncate">
                             {member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'}
@@ -340,23 +340,23 @@ export default function Expenses() {
             </div>
             {balance && (
               <div className="space-y-2">
-                {balance.totalOwed > 0 && (
+                {(balance as any).totalOwed > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-ios-body" style={{ color: 'var(--text-primary)' }}>
                       Total owed to you
                     </span>
                     <span className="text-ios-body font-medium" style={{ color: '#30D158' }}>
-                      ${balance.totalOwed.toFixed(2)}
+                      ${(balance as any).totalOwed.toFixed(2)}
                     </span>
                   </div>
                 )}
-                {balance.totalOwing > 0 && (
+                {(balance as any).totalOwing > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-ios-body" style={{ color: 'var(--text-primary)' }}>
                       Total you owe
                     </span>
                     <span className="text-ios-body font-medium" style={{ color: '#FF453A' }}>
-                      ${balance.totalOwing.toFixed(2)}
+                      ${(balance as any).totalOwing.toFixed(2)}
                     </span>
                   </div>
                 )}
