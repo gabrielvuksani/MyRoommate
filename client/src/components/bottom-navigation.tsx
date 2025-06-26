@@ -1,9 +1,11 @@
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { Home, CheckSquare, DollarSign, Calendar, MessageCircle, BarChart3 } from "lucide-react";
 
 export default function BottomNavigation() {
   const [location, setLocation] = useLocation();
+  const navigationRef = useRef<HTMLElement>(null);
   
   // Check if user has a household
   const { data: household } = useQuery({
@@ -23,13 +25,45 @@ export default function BottomNavigation() {
     { id: 'messages', path: '/messages', label: 'Chat', Icon: MessageCircle },
   ];
 
+  useEffect(() => {
+    if (!navigationRef.current) return;
+    
+    const activeIndex = tabs.findIndex(tab => tab.path === location);
+    if (activeIndex === -1) return;
+    
+    // Calculate precise tab positioning with centering
+    const containerWidth = navigationRef.current.offsetWidth;
+    const tabWidth = containerWidth / tabs.length;
+    const indicatorWidth = tabWidth - 16; // Account for padding
+    const translateX = activeIndex * tabWidth + 8; // Add 8px for centering
+    
+    navigationRef.current.style.setProperty('--indicator-translate', `${translateX}px`);
+    navigationRef.current.style.setProperty('--indicator-width', `${indicatorWidth}px`);
+    
+    // Also need to handle resize events
+    const handleResize = () => {
+      if (!navigationRef.current) return;
+      const newContainerWidth = navigationRef.current.offsetWidth;
+      const newTabWidth = newContainerWidth / tabs.length;
+      const newIndicatorWidth = newTabWidth - 16;
+      const newTranslateX = activeIndex * newTabWidth + 8;
+      navigationRef.current.style.setProperty('--indicator-translate', `${newTranslateX}px`);
+      navigationRef.current.style.setProperty('--indicator-width', `${newIndicatorWidth}px`);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [location, tabs]);
+
   return (
-    <nav className="tab-navigation" style={{
-      background: 'var(--nav-bg)',
-      backdropFilter: 'blur(12px) saturate(1.8)',
-      WebkitBackdropFilter: 'blur(12px) saturate(1.8)',
-      borderTop: '1px solid var(--border-color)',
-    }}>
+    <nav 
+      ref={navigationRef}
+      className="tab-navigation" 
+      style={{
+        '--indicator-translate': '0px',
+        '--indicator-width': 'calc(20% - 16px)',
+      } as React.CSSProperties}
+    >
       <div className="flex items-center justify-center w-full">
         {tabs.map(({ id, path, label, Icon }) => {
           const isActive = location === path;
@@ -39,7 +73,7 @@ export default function BottomNavigation() {
               key={id}
               onClick={() => setLocation(path)}
               className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 ${
-                isActive ? 'active animate-scale-in' : 'inactive'
+                isActive ? 'active' : 'inactive'
               }`}
             >
               <Icon size={18} className="flex-shrink-0" />

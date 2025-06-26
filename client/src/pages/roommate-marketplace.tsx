@@ -120,7 +120,7 @@ export default function RoommateMarketplace() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
+    <div className="min-h-screen page-transition" style={{ background: 'var(--background)' }}>
       {/* Floating Header */}
       <div className={`sticky top-0 z-40 transition-all duration-300 ${
         headerScrolled 

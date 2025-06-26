@@ -18,9 +18,9 @@
   --surface-overlay: rgba(255, 255, 255, 0.85);
   --surface-glass: rgba(255, 255, 255, 0.6);
   
-  --text-primary: #1A1A1A;
-  --text-secondary: #6B7280;
-  --text-tertiary: #9CA3AF;
+  --text-primary: #1C1C1E;
+  --text-secondary: #8E8E93;
+  --text-tertiary: #C7C7CC;
   --text-inverse: #FFFFFF;
   
   --border: rgba(0, 0, 0, 0.06);
@@ -44,15 +44,15 @@
   --success: #32D74B;
   
   --background: #000000;
-  --surface: rgba(28, 28, 30, 0.95);
-  --surface-secondary: rgba(44, 44, 46, 0.8);
+  --surface: rgba(28, 28, 30, 0.8);
+  --surface-secondary: rgba(44, 44, 46, 0.85);
   --surface-overlay: rgba(58, 58, 60, 0.9);
   --surface-glass: rgba(28, 28, 30, 0.7);
   
   --text-primary: #FFFFFF;
-  --text-secondary: #AEAEB2;
+  --text-secondary: #EBEBF5;
   --text-tertiary: #8E8E93;
-  --text-inverse: #1A1A1A;
+  --text-inverse: #1C1C1E;
   
   --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.12);
@@ -399,60 +399,50 @@
     0 1px 0 rgba(255, 255, 255, 0.1) inset;
 }
 
-.tab-item {
-  border-radius: 16px;
-  padding: 12px 8px;
-  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  position: relative;
-  overflow: hidden;
-  min-width: 0;
-  flex: 1;
-}
-
-.tab-item::before {
+.tab-navigation::before {
   content: '';
   position: absolute;
-  top: 0;
+  top: 8px;
+  bottom: 8px;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: var(--indicator-width, calc(20% - 16px));
   background: linear-gradient(145deg, 
     rgba(255, 255, 255, 0.95) 0%, 
     rgba(255, 255, 255, 0.85) 100%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 16px;
-  opacity: 0;
-  transform: scale(0.8);
-  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  z-index: -1;
-}
-
-.dark .tab-item::before {
-  background: linear-gradient(145deg, 
-    rgba(58, 58, 60, 0.9) 0%, 
-    rgba(72, 72, 74, 0.8) 100%);
-}
-
-.tab-item.active::before {
-  opacity: 1;
-  transform: scale(1);
   box-shadow: 
     0 4px 16px rgba(0, 0, 0, 0.12),
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
     0 -1px 0 rgba(0, 0, 0, 0.05) inset;
+  transform: translateX(var(--indicator-translate, 0px));
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 1;
 }
 
-.dark .tab-item.active::before {
+.dark .tab-navigation::before {
+  background: linear-gradient(145deg, 
+    rgba(58, 58, 60, 0.9) 0%, 
+    rgba(72, 72, 74, 0.8) 100%);
   box-shadow: 
     0 4px 16px rgba(0, 0, 0, 0.3),
     0 1px 0 rgba(255, 255, 255, 0.2) inset,
     0 -1px 0 rgba(0, 0, 0, 0.3) inset;
 }
 
+.tab-item {
+  border-radius: 16px;
+  padding: 12px 8px;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  min-width: 0;
+  flex: 1;
+  z-index: 2;
+}
+
 .tab-item.active {
-  color: #1a1a1a;
-  transform: scale(1.05);
+  color: var(--text-primary);
 }
 
 .dark .tab-item.active {
@@ -461,7 +451,6 @@
 
 .tab-item.inactive {
   color: var(--text-secondary);
-  transform: scale(1);
 }
 
 /* Modern Modal */

@@ -563,7 +563,7 @@ export default function Home() {
                           ))
                         ) : (
                           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            No pending chores available
+                            No pending chores
                           </p>
                         );
                       })()}
