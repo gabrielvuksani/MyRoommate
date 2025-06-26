@@ -111,6 +111,14 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Removed all settings page references and redirected to profile page
+- ✓ Deleted settings.tsx file as functionality was merged into profile page  
+- ✓ Added route redirect from /settings to Profile component
+- ✓ Hidden scrollbars throughout the app for cleaner design
+- ✓ Fixed tab centering without changing tab bar size or design
+- ✓ Reverted tab positioning calculations to original working method
+
+**June 26, 2025 (Earlier):**
 - ✓ Fixed calendar selected date visibility with explicit blue background and white text styling
 - ✓ Refined card hover effects to be more subtle with reduced shadow spread and scaling
 - ✓ Enhanced floating header liquid glass treatment to match tab bar quality and design consistency

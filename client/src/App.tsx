@@ -52,6 +52,7 @@ function Router() {
             <Route path="/messages" component={Messages} />
     
             <Route path="/profile" component={Profile} />
+            <Route path="/settings" component={Profile} />
             <Route path="/dashboard" component={Dashboard} />
 
             <Route path="/roommates" component={Roommates} />
