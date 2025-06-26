@@ -111,6 +111,11 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Converted roommate marketplace from modal dialog to inline form card interface
+- ✓ Enhanced refresh functionality across profile and marketplace pages to reload page after data refresh
+- ✓ Removed old modal component file and cleaned up all Dialog references
+- ✓ Applied consistent visionOS liquid glass design to inline post listing form
+- ✓ Improved marketplace UX with seamless form integration directly on page
 - ✓ Added name selection as step 2 in onboarding process
 - ✓ Expanded onboarding from 3 to 4 steps with dedicated name collection
 - ✓ Integrated user name updates via existing PATCH /api/auth/user endpoint
