@@ -73,19 +73,24 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
     const isOverdue = chore.dueDate && new Date(chore.dueDate) < new Date() && chore.status !== 'done';
     
     return (
-      <div className="border border-gray-200 rounded-xl p-4 bg-white hover:shadow-sm transition-shadow">
+      <div className="rounded-xl p-4 hover:shadow-sm transition-shadow" style={{
+        border: '1px solid var(--border-color)',
+        background: 'var(--surface)'
+      }}>
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
-            <h3 className="text-body font-semibold text-primary mb-1">{chore.title}</h3>
+            <h3 className="text-body font-semibold mb-1" style={{ color: 'var(--primary)' }}>{chore.title}</h3>
             {chore.description && (
-              <p className="text-footnote text-secondary mb-2">{chore.description}</p>
+              <p className="text-footnote mb-2" style={{ color: 'var(--text-secondary)' }}>{chore.description}</p>
             )}
-            <div className="flex items-center gap-2 text-footnote text-secondary">
+            <div className="flex items-center gap-2 text-footnote" style={{ color: 'var(--text-secondary)' }}>
               <span>{chore.assignedUser?.firstName || chore.assignedUser?.email?.split('@')[0] || 'Unassigned'}</span>
               {chore.dueDate && (
                 <>
                   <span>•</span>
-                  <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
+                  <span className={isOverdue ? 'font-medium' : ''} style={{
+                    color: isOverdue ? '#FF453A' : 'var(--text-secondary)'
+                  }}>
                     Due {new Date(chore.dueDate).toLocaleDateString()}
                   </span>
                 </>
@@ -95,16 +100,28 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
           
           <div className="flex flex-col items-end space-y-2">
             {chore.priority && (
-              <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getPriorityColor(chore.priority)}`}>
+              <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+                background: chore.priority === 'urgent' ? 'rgba(255, 69, 58, 0.1)' :
+                           chore.priority === 'high' ? 'rgba(255, 159, 10, 0.1)' :
+                           chore.priority === 'medium' ? 'rgba(0, 122, 255, 0.1)' :
+                           'var(--surface-secondary)',
+                color: chore.priority === 'urgent' ? '#FF453A' :
+                      chore.priority === 'high' ? '#FF9F0A' :
+                      chore.priority === 'medium' ? 'var(--primary)' :
+                      'var(--text-secondary)'
+              }}>
                 {getPriorityIcon(chore.priority)} {chore.priority?.charAt(0).toUpperCase() + chore.priority?.slice(1)}
               </span>
             )}
             
-            <div className={`px-2 py-1 rounded-lg text-xs font-medium ${
-              chore.status === 'done' ? 'bg-green-100 text-green-700' :
-              chore.status === 'doing' ? 'bg-orange-100 text-orange-700' :
-              'bg-blue-100 text-blue-700'
-            }`}>
+            <div className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+              background: chore.status === 'todo' ? 'rgba(0, 122, 255, 0.1)' :
+                         chore.status === 'doing' ? 'rgba(255, 159, 10, 0.1)' :
+                         'rgba(48, 209, 88, 0.1)',
+              color: chore.status === 'todo' ? 'var(--primary)' :
+                    chore.status === 'doing' ? '#FF9F0A' :
+                    '#30D158'
+            }}>
               {chore.status === 'todo' ? 'To Do' : 
                chore.status === 'doing' ? 'In Progress' : 'Completed'}
             </div>
@@ -113,7 +130,10 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
 
         {isOverdue && (
           <div className="mb-3">
-            <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg text-xs font-medium">
+            <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+              background: 'rgba(255, 69, 58, 0.1)',
+              color: '#FF453A'
+            }}>
               ⚠️ Overdue
             </span>
           </div>
@@ -121,7 +141,10 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
 
         {chore.status === 'done' && chore.streak > 0 && (
           <div className="mb-3">
-            <span className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
+            <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+              background: 'rgba(48, 209, 88, 0.1)',
+              color: '#30D158'
+            }}>
               🔥 {chore.streak} day streak
             </span>
           </div>
@@ -131,7 +154,17 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
           {chore.status === 'todo' && (
             <button
               onClick={() => onUpdateChore(chore.id, { status: 'doing' })}
-              className="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-xs font-medium transition-colors"
+              className="px-3 py-1 rounded-lg text-xs font-medium transition-colors"
+              style={{
+                background: 'rgba(0, 122, 255, 0.1)',
+                color: 'var(--primary)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(0, 122, 255, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(0, 122, 255, 0.1)';
+              }}
             >
               Start
             </button>
@@ -142,7 +175,17 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                 status: 'done', 
                 completedAt: new Date().toISOString()
               })}
-              className="px-3 py-1 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg text-xs font-medium transition-colors"
+              className="px-3 py-1 rounded-lg text-xs font-medium transition-colors"
+              style={{
+                background: 'rgba(48, 209, 88, 0.1)',
+                color: '#30D158'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(48, 209, 88, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(48, 209, 88, 0.1)';
+              }}
             >
               Complete
             </button>
@@ -153,14 +196,34 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                 status: 'todo', 
                 completedAt: null 
               })}
-              className="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-xs font-medium transition-colors"
+              className="px-3 py-1 rounded-lg text-xs font-medium transition-colors"
+              style={{
+                background: 'rgba(0, 122, 255, 0.1)',
+                color: 'var(--primary)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(0, 122, 255, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(0, 122, 255, 0.1)';
+              }}
             >
               Reopen
             </button>
           )}
           <button
             onClick={() => onDeleteChore(chore.id)}
-            className="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors"
+            className="px-3 py-1 rounded-lg text-xs font-medium transition-colors"
+            style={{
+              background: 'rgba(255, 69, 58, 0.1)',
+              color: '#FF453A'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 69, 58, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 69, 58, 0.1)';
+            }}
           >
             Delete
           </button>
@@ -177,15 +240,28 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
       {/* To-Do Column */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-headline font-semibold text-primary">To Do</h3>
-          <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{
+              background: 'rgba(0, 122, 255, 0.1)',
+              border: '2px solid var(--primary)'
+            }}>
+              <div className="w-2 h-2 rounded-full" style={{ background: 'var(--primary)' }}></div>
+            </div>
+            <h3 className="text-headline font-semibold" style={{ color: 'var(--text-primary)' }}>To Do</h3>
+          </div>
+          <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+            background: 'rgba(0, 122, 255, 0.1)',
+            color: 'var(--primary)'
+          }}>
             {todoChores.length}
           </span>
         </div>
         <div className="space-y-3">
           {todoChores.length === 0 ? (
-            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
-              <p className="text-secondary">No pending chores</p>
+            <div className="border-2 border-dashed rounded-xl p-6 text-center" style={{
+              borderColor: 'var(--border-color)'
+            }}>
+              <p style={{ color: 'var(--text-secondary)' }}>No pending chores</p>
             </div>
           ) : (
             todoChores.map(chore => <ChoreCard key={chore.id} chore={chore} />)
@@ -196,15 +272,28 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
       {/* In Progress Column */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-headline font-semibold text-primary">In Progress</h3>
-          <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-lg text-xs font-medium">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{
+              background: 'rgba(255, 159, 10, 0.1)',
+              border: '2px solid #FF9F0A'
+            }}>
+              <div className="w-2 h-2 rounded-full" style={{ background: '#FF9F0A' }}></div>
+            </div>
+            <h3 className="text-headline font-semibold" style={{ color: 'var(--text-primary)' }}>In Progress</h3>
+          </div>
+          <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+            background: 'rgba(255, 159, 10, 0.1)',
+            color: '#FF9F0A'
+          }}>
             {doingChores.length}
           </span>
         </div>
         <div className="space-y-3">
           {doingChores.length === 0 ? (
-            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
-              <p className="text-secondary">No chores in progress</p>
+            <div className="border-2 border-dashed rounded-xl p-6 text-center" style={{
+              borderColor: 'var(--border-color)'
+            }}>
+              <p style={{ color: 'var(--text-secondary)' }}>No chores in progress</p>
             </div>
           ) : (
             doingChores.map(chore => <ChoreCard key={chore.id} chore={chore} />)
@@ -215,15 +304,28 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
       {/* Done Column */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-headline font-semibold text-primary">Completed</h3>
-          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{
+              background: 'rgba(48, 209, 88, 0.1)',
+              border: '2px solid #30D158'
+            }}>
+              <div className="w-2 h-2 rounded-full" style={{ background: '#30D158' }}></div>
+            </div>
+            <h3 className="text-headline font-semibold" style={{ color: 'var(--text-primary)' }}>Completed</h3>
+          </div>
+          <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+            background: 'rgba(48, 209, 88, 0.1)',
+            color: '#30D158'
+          }}>
             {doneChores.length}
           </span>
         </div>
         <div className="space-y-3">
           {doneChores.length === 0 ? (
-            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
-              <p className="text-secondary">No completed chores</p>
+            <div className="border-2 border-dashed rounded-xl p-6 text-center" style={{
+              borderColor: 'var(--border-color)'
+            }}>
+              <p style={{ color: 'var(--text-secondary)' }}>No completed chores</p>
             </div>
           ) : (
             doneChores.map(chore => <ChoreCard key={chore.id} chore={chore} />)

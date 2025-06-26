@@ -48,27 +48,39 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
   const isFullySettled = totalSplits > 0 && totalSettled === totalSplits;
 
   return (
-    <div className="border border-gray-200 rounded-xl p-4 bg-white">
+    <div className="rounded-xl p-4" style={{
+      border: '1px solid var(--border-color)',
+      background: 'var(--surface)'
+    }}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center space-x-3">
-          <div className={`w-12 h-12 ${getCategoryColor(expense.category)} rounded-xl flex items-center justify-center`}>
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{
+            background: expense.category === 'groceries' || expense.category === 'food' ? '#30D158' :
+                       expense.category === 'utilities' ? 'var(--primary)' :
+                       expense.category === 'rent' ? '#AF52DE' :
+                       expense.category === 'entertainment' ? '#FF9F0A' :
+                       'var(--text-secondary)'
+          }}>
             <span className="text-white text-lg">{getCategoryIcon(expense.category)}</span>
           </div>
           <div>
-            <p className="text-body font-semibold text-primary">{expense.title}</p>
-            <p className="text-footnote text-secondary">
+            <p className="text-body font-semibold" style={{ color: 'var(--primary)' }}>{expense.title}</p>
+            <p className="text-footnote" style={{ color: 'var(--text-secondary)' }}>
               Paid by {expense.paidByUser?.firstName || expense.paidByUser?.email?.split('@')[0] || 'Unknown'}
             </p>
-            <p className="text-footnote text-secondary">
+            <p className="text-footnote" style={{ color: 'var(--text-secondary)' }}>
               {new Date(expense.createdAt).toLocaleDateString()}
             </p>
           </div>
         </div>
         <div className="text-right">
           <div className="flex items-center justify-end space-x-2 mb-2">
-            <p className="text-title-3 font-bold text-primary">${parseFloat(expense.amount).toFixed(2)}</p>
+            <p className="text-title-3 font-bold" style={{ color: 'var(--primary)' }}>${parseFloat(expense.amount).toFixed(2)}</p>
             {isFullySettled ? (
-              <span className="px-2 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-medium">
+              <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+                background: 'rgba(48, 209, 88, 0.1)',
+                color: '#30D158'
+              }}>
                 Settled
               </span>
             ) : onDeleteExpense ? (

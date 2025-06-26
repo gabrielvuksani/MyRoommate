@@ -182,25 +182,39 @@ export default function Chores() {
                     required
                   />
                   <Select value={newChore.recurrence} onValueChange={(value) => setNewChore({ ...newChore, recurrence: value })}>
-                    <SelectTrigger className="input-modern">
+                    <SelectTrigger className="input-modern" style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)'
+                    }}>
                       <SelectValue placeholder="Recurrence..." />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="daily">Daily</SelectItem>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectContent style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border-color)'
+                    }}>
+                      <SelectItem value="daily" style={{ color: 'var(--text-primary)' }}>Daily</SelectItem>
+                      <SelectItem value="weekly" style={{ color: 'var(--text-primary)' }}>Weekly</SelectItem>
+                      <SelectItem value="monthly" style={{ color: 'var(--text-primary)' }}>Monthly</SelectItem>
                     </SelectContent>
                   </Select>
                   
                   <Select value={newChore.priority} onValueChange={(value) => setNewChore({ ...newChore, priority: value })}>
-                    <SelectTrigger className="input-modern">
+                    <SelectTrigger className="input-modern" style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)'
+                    }}>
                       <SelectValue placeholder="Priority..." />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low Priority</SelectItem>
-                      <SelectItem value="medium">Medium Priority</SelectItem>
-                      <SelectItem value="high">High Priority</SelectItem>
-                      <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectContent style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border-color)'
+                    }}>
+                      <SelectItem value="low" style={{ color: 'var(--text-primary)' }}>Low Priority</SelectItem>
+                      <SelectItem value="medium" style={{ color: 'var(--text-primary)' }}>Medium Priority</SelectItem>
+                      <SelectItem value="high" style={{ color: 'var(--text-primary)' }}>High Priority</SelectItem>
+                      <SelectItem value="urgent" style={{ color: 'var(--text-primary)' }}>Urgent</SelectItem>
                     </SelectContent>
                   </Select>
                   <button
@@ -219,11 +233,16 @@ export default function Chores() {
       <div className="pt-32 px-6 space-y-6">
         {/* Today's Focus */}
         {Array.isArray(chores) && chores.length > 0 && (
-          <Card className="glass-card border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <Card className="glass-card" style={{ 
+            border: '1px solid var(--border-color)',
+            background: 'var(--surface-secondary)'
+          }}>
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-semibold">🎯</span>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{
+                  background: 'var(--surface-overlay)'
+                }}>
+                  <span className="font-semibold" style={{ color: 'var(--primary)' }}>🎯</span>
                 </div>
                 <h2 className="font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>Today's Focus</h2>
               </div>
@@ -248,14 +267,17 @@ export default function Chores() {
                 }
                 
                 return (
-                  <div className="border border-gray-200 rounded-xl p-4 bg-white hover:shadow-sm transition-shadow">
+                  <div className="rounded-xl p-4 hover:shadow-sm transition-shadow" style={{
+                    border: '1px solid var(--border-color)',
+                    background: 'var(--surface)'
+                  }}>
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <h3 className="text-body font-semibold text-primary mb-1">{priorityChore.title}</h3>
+                        <h3 className="text-body font-semibold mb-1" style={{ color: 'var(--primary)' }}>{priorityChore.title}</h3>
                         {priorityChore.description && (
-                          <p className="text-footnote text-secondary mb-2">{priorityChore.description}</p>
+                          <p className="text-footnote mb-2" style={{ color: 'var(--text-secondary)' }}>{priorityChore.description}</p>
                         )}
-                        <div className="flex items-center gap-2 text-footnote text-secondary">
+                        <div className="flex items-center gap-2 text-footnote" style={{ color: 'var(--text-secondary)' }}>
                           <span>{priorityChore.assignedUser?.firstName || priorityChore.assignedUser?.email?.split('@')[0] || 'Unassigned'}</span>
                           {priorityChore.dueDate && (
                             <>
@@ -270,19 +292,26 @@ export default function Chores() {
                       
                       <div className="flex flex-col items-end space-y-2">
                         {priorityChore.priority && (
-                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                            priorityChore.priority === 'urgent' ? 'bg-red-100 text-red-700' :
-                            priorityChore.priority === 'high' ? 'bg-orange-100 text-orange-700' :
-                            priorityChore.priority === 'medium' ? 'bg-blue-100 text-blue-700' :
-                            'bg-gray-100 text-gray-600'
-                          }`}>
+                          <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+                            background: priorityChore.priority === 'urgent' ? 'rgba(255, 69, 58, 0.1)' :
+                                       priorityChore.priority === 'high' ? 'rgba(255, 159, 10, 0.1)' :
+                                       priorityChore.priority === 'medium' ? 'rgba(0, 122, 255, 0.1)' :
+                                       'var(--surface-secondary)',
+                            color: priorityChore.priority === 'urgent' ? '#FF453A' :
+                                  priorityChore.priority === 'high' ? '#FF9F0A' :
+                                  priorityChore.priority === 'medium' ? 'var(--primary)' :
+                                  'var(--text-secondary)'
+                          }}>
                             {priorityChore.priority === 'urgent' ? '🔥' :
                              priorityChore.priority === 'high' ? '⚡' :
                              priorityChore.priority === 'medium' ? '📌' : '📝'} {priorityChore.priority.charAt(0).toUpperCase() + priorityChore.priority.slice(1)}
                           </span>
                         )}
                         
-                        <div className="px-2 py-1 rounded-lg text-xs font-medium bg-blue-100 text-blue-700">
+                        <div className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+                          background: 'rgba(0, 122, 255, 0.1)',
+                          color: 'var(--primary)'
+                        }}>
                           To Do
                         </div>
                       </div>
@@ -290,7 +319,10 @@ export default function Chores() {
 
                     {priorityChore.dueDate && new Date(priorityChore.dueDate) < new Date() && (
                       <div className="mb-3">
-                        <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg text-xs font-medium">
+                        <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+                          background: 'rgba(255, 69, 58, 0.1)',
+                          color: '#FF453A'
+                        }}>
                           ⚠️ Overdue
                         </span>
                       </div>
@@ -313,27 +345,36 @@ export default function Chores() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-3 gap-4">
-          <Card className="glass-card">
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border-color)'
+          }}>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600 mb-1">
+              <div className="text-2xl font-bold mb-1" style={{ color: 'var(--primary)' }}>
                 {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'todo' || !c.status).length : 0}
               </div>
               <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>To Do</div>
             </CardContent>
           </Card>
           
-          <Card className="glass-card">
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border-color)'
+          }}>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600 mb-1">
+              <div className="text-2xl font-bold mb-1" style={{ color: '#FF9F0A' }}>
                 {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'doing').length : 0}
               </div>
               <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>In Progress</div>
             </CardContent>
           </Card>
           
-          <Card className="glass-card">
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border-color)'
+          }}>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600 mb-1">
+              <div className="text-2xl font-bold mb-1" style={{ color: '#30D158' }}>
                 {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'done').length : 0}
               </div>
               <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Done</div>
@@ -342,7 +383,10 @@ export default function Chores() {
         </div>
 
         {/* All Chores */}
-        <Card className="glass-card">
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border-color)'
+        }}>
           <CardContent className="p-6">
             <h2 className="text-headline font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>All Chores</h2>
             <ChoreBoard chores={Array.isArray(chores) ? chores : []} onUpdateChore={handleUpdateChore} onDeleteChore={handleDeleteChore} />
