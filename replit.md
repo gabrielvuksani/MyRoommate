@@ -161,6 +161,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Implemented heartbeat mechanism with 30-second ping/pong for connection keepalive
 - ✓ Improved WebSocket reconnection logic with fast reconnect for unexpected closures
 - ✓ Added server-side ping/pong handling for robust deployment environment support
+- ✓ Fixed household joining functionality for deployment with enhanced error handling
+- ✓ Added automatic household switching when joining new households
+- ✓ Enhanced database logging and debugging for household operations
+- ✓ Added comprehensive frontend error tracking for join/create mutations
 - ✓ Updated messages page scrolling to auto-scroll to top for conversations with ≤5 messages
 - ✓ Maintained bottom-scroll behavior for longer conversations (>5 messages)
 - ✓ Created intelligent transition between top-scroll and bottom-scroll modes based on message count

@@ -44,12 +44,25 @@ export default function Onboarding() {
 
   const joinHouseholdMutation = useMutation({
     mutationFn: async (inviteCode: string) => {
-      return apiRequest("POST", "/api/households/join", { inviteCode });
+      console.log("Frontend: Attempting to join household with code:", inviteCode);
+      try {
+        const result = await apiRequest("POST", "/api/households/join", { inviteCode });
+        console.log("Frontend: Join household success:", result);
+        return result;
+      } catch (error) {
+        console.error("Frontend: Join household error:", error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Frontend: Join mutation success, invalidating queries");
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       setLocation('/');
     },
+    onError: (error) => {
+      console.error("Frontend: Join mutation error:", error);
+    }
   });
 
   const updateUserMutation = useMutation({

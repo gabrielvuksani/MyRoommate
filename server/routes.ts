@@ -88,10 +88,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Invalid invite code" });
       }
       
-      // Check if user is already a member
+      // Check if user is already a member of ANY household (leave first)
       const existingMembership = await storage.getUserHousehold(userId);
-      if (existingMembership && existingMembership.household.id === household.id) {
-        return res.status(400).json({ message: "You are already a member of this household" });
+      if (existingMembership) {
+        if (existingMembership.household.id === household.id) {
+          return res.status(400).json({ message: "You are already a member of this household" });
+        }
+        // Leave current household before joining new one
+        await storage.leaveHousehold(userId);
+        console.log("User left previous household before joining new one");
       }
       
       const member = await storage.joinHousehold(household.id, userId);

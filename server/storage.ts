@@ -122,11 +122,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async joinHousehold(householdId: string, userId: string): Promise<HouseholdMember> {
-    const [member] = await db
-      .insert(householdMembers)
-      .values({ householdId, userId })
-      .returning();
-    return member;
+    try {
+      console.log("Attempting to join household:", { householdId, userId });
+      
+      const [member] = await db
+        .insert(householdMembers)
+        .values({ 
+          householdId, 
+          userId,
+          role: 'member',
+          joinedAt: new Date()
+        })
+        .returning();
+      
+      console.log("Successfully joined household:", member);
+      return member;
+    } catch (error) {
+      console.error("Database error joining household:", error);
+      throw error;
+    }
   }
 
   async leaveHousehold(userId: string): Promise<void> {
