@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +15,7 @@ export default function Messages() {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
+  const [optimisticMessages, setOptimisticMessages] = useState<any[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const { user } = useAuth();
@@ -24,13 +25,21 @@ export default function Messages() {
     queryKey: ["/api/households/current"],
   });
 
-  const { data: messages = [], isLoading } = useQuery({
+  const { data: serverMessages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household,
     refetchInterval: 3000, // Poll every 3 seconds for consistent performance
     refetchIntervalInBackground: true,
     staleTime: 500,
   });
+
+  // Combine server messages with optimistic messages, removing duplicates
+  const messages = useMemo(() => {
+    const serverIds = new Set(Array.isArray(serverMessages) ? serverMessages.map((m: any) => m.id) : []);
+    const pendingOptimistic = optimisticMessages.filter(m => !serverIds.has(m.id));
+    const combined = [...(Array.isArray(serverMessages) ? serverMessages : []), ...pendingOptimistic];
+    return combined.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  }, [serverMessages, optimisticMessages]);
 
   const { sendMessage } = useWebSocket({
     onConnect: () => {
@@ -265,18 +274,9 @@ export default function Messages() {
       },
     };
 
-    // Immediately add optimistic message to cache
-    queryClient.setQueryData(["/api/messages"], (old: any) => {
-      const currentMessages = Array.isArray(old) ? old : [];
-      console.log('Adding optimistic message to cache:', tempId);
-      return [...currentMessages, optimisticMessage];
-    });
-
-    // Force immediate UI update
-    queryClient.invalidateQueries({ 
-      queryKey: ["/api/messages"],
-      refetchType: 'none' // Don't refetch, just update UI
-    });
+    // Add optimistic message to local state for immediate display
+    setOptimisticMessages(prev => [...prev, optimisticMessage]);
+    console.log('Adding optimistic message:', tempId);
 
     // Clear input immediately for better UX
     setNewMessage("");
@@ -295,37 +295,28 @@ export default function Messages() {
 
       if (response.ok) {
         const realMessage = await response.json();
-        console.log('Message sent successfully, replacing optimistic:', tempId, 'with', realMessage.id);
+        console.log('Message sent successfully, removing optimistic:', tempId);
         
-        // Replace optimistic message with real one
-        queryClient.setQueryData(["/api/messages"], (old: any) => {
-          const currentMessages = Array.isArray(old) ? old : [];
-          const updatedMessages = currentMessages.map((msg: any) => 
-            msg.id === tempId ? realMessage : msg
-          );
-          return updatedMessages;
-        });
+        // Remove optimistic message - server data will be picked up by polling
+        setOptimisticMessages(prev => prev.filter(m => m.id !== tempId));
 
         // Send via WebSocket for other clients
-        sendMessage?.({
-          type: "new_message",
-          tempId,
-          message: realMessage,
-        });
+        if (websocket && websocket.readyState === WebSocket.OPEN) {
+          websocket.send(JSON.stringify({
+            type: "new_message",
+            tempId,
+            message: realMessage,
+          }));
+        }
       } else {
         throw new Error('Failed to send message');
       }
 
     } catch (error) {
       console.error("Failed to send message:", error);
-      // Remove failed optimistic message
-      queryClient.setQueryData(["/api/messages"], (old: any) => {
-        const currentMessages = Array.isArray(old) ? old : [];
-        return currentMessages.filter((msg: any) => msg.id !== tempId);
-      });
-      
-      // Show the message back in input for retry
-      setNewMessage(messageContent);
+      // Remove failed optimistic message and restore input for retry
+      setOptimisticMessages(prev => prev.filter(m => m.id !== tempId));
+      setNewMessage(content);
     }
   };
 
