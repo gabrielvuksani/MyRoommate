@@ -384,7 +384,7 @@ export default function Home() {
                           ))
                         ) : (
                           <p className="text-sm text-gray-600">
-                            No pending chores
+                            No pending chores available
                           </p>
                         );
                       })()}
