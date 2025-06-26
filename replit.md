@@ -204,6 +204,9 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Applied consistent glass morphism styling and positioning to all message tails
 - ✓ Purged all database records for fresh deployment testing environment
 - ✓ Added scroll-to-top functionality to dashboard page completing scroll behavior across all pages
+- ✓ Fixed step indicators in onboarding to show black circles for inactive steps and gradient rectangles for current step
+- ✓ Enhanced error message display to appear in "Ready to Go!" step where household joining actually happens
+- ✓ Improved error parsing to handle API response format with proper inline glass morphism design
 
 **June 25, 2025 (Earlier):**
 - ✓ Completed delete functionality implementation across all three core pages
