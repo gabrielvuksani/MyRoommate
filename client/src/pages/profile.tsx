@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, ArrowLeft, Edit3, Copy, UserMinus } from "lucide-react";
+import { LogOut, ArrowLeft, Edit3, Copy, UserMinus, RefreshCw } from "lucide-react";
 import { getProfileInitials } from "@/lib/nameUtils";
 
 import { useLocation } from "wouter";
@@ -26,6 +26,7 @@ export default function Profile() {
   const [isHouseholdEditOpen, setIsHouseholdEditOpen] = useState(false);
   const [editHouseholdName, setEditHouseholdName] = useState("");
   const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -103,6 +104,16 @@ export default function Profile() {
   const copyInviteCode = () => {
     if (household?.inviteCode) {
       navigator.clipboard.writeText(household.inviteCode);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      // Invalidate all queries to refresh data
+      await queryClient.invalidateQueries();
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -396,6 +407,16 @@ export default function Profile() {
         <Card className="smart-card">
           <CardContent className="p-6">
             <div className="space-y-3">
+              <Button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-blue-700 disabled:opacity-50"
+              >
+                <RefreshCw size={20} className={isRefreshing ? "animate-spin" : ""} />
+                <span>
+                  {isRefreshing ? "Refreshing..." : "Refresh Data"}
+                </span>
+              </Button>
               {household && (
                 <Button
                   onClick={() => leaveHouseholdMutation.mutate()}
