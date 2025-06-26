@@ -295,7 +295,7 @@ export default function Onboarding() {
                 </div>
                 <div className="text-left">
                   <h3 className="font-semibold text-lg">Create Household</h3>
-                  <p className="text-sm opacity-80">Start managing shared living with roommates</p>
+                  <p className="text-sm opacity-80">Start managing shared living</p>
                 </div>
               </button>
 
