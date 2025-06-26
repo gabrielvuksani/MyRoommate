@@ -31,9 +31,10 @@ export default function BottomNavigation() {
     const activeIndex = tabs.findIndex(tab => tab.path === location);
     if (activeIndex === -1) return;
     
-    // Calculate exact position for 5 tabs (100% / 5 = 20% per tab)
-    const translateX = activeIndex * (100 / tabs.length);
-    navigationRef.current.style.setProperty('--indicator-translate', `${translateX}%`);
+    // Calculate position for sliding indicator (each tab is 20% wide for 5 tabs)
+    const translateX = activeIndex * 20; // 0%, 20%, 40%, 60%, 80%
+    console.log(`Tab ${activeIndex}: ${location} → ${translateX}%`);
+    navigationRef.current.style.setProperty('--indicator-position', `${translateX}%`);
   }, [location, tabs]);
 
   return (
@@ -41,11 +42,10 @@ export default function BottomNavigation() {
       ref={navigationRef}
       className="tab-navigation" 
       style={{
-        '--indicator-translate': '0%',
-        position: 'relative'
+        '--indicator-position': '0%',
       } as React.CSSProperties}
     >
-      <div className="flex items-center justify-center w-full relative">
+      <div className="flex items-center justify-center w-full">
         {tabs.map(({ id, path, label, Icon }) => {
           const isActive = location === path;
           

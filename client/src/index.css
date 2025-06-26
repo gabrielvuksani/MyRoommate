@@ -398,6 +398,8 @@
   z-index: 40;
   display: flex;
   justify-content: center;
+  overflow: hidden;
+  position: relative;
 }
 
 .dark .tab-navigation {
@@ -410,7 +412,7 @@
     0 1px 0 rgba(255, 255, 255, 0.1) inset;
 }
 
-.tab-navigation::before {
+.tab-navigation::after {
   content: '';
   position: absolute;
   top: 4px;
@@ -427,12 +429,12 @@
     0 4px 20px rgba(0, 0, 0, 0.15),
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
     0 -1px 0 rgba(0, 0, 0, 0.05) inset;
-  transform: translateX(var(--indicator-translate, 0%));
-  transition: transform 0.5s cubic-bezier(0.26, 0.08, 0.25, 1);
+  transform: translateX(var(--indicator-position, 0%));
+  transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
   z-index: 1;
 }
 
-.dark .tab-navigation::before {
+.dark .tab-navigation::after {
   background: linear-gradient(145deg, 
     rgba(58, 58, 60, 0.95) 0%, 
     rgba(72, 72, 74, 0.85) 100%);
