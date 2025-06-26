@@ -420,7 +420,7 @@
   position: absolute;
   top: 8px;
   bottom: 8px;
-  width: calc(20% - 4px);
+  width: calc((100% - 16px) / 5);
   background: linear-gradient(145deg, 
     rgba(255, 255, 255, 0.95) 0%, 
     rgba(255, 255, 255, 0.85) 100%);
@@ -431,7 +431,7 @@
     0 4px 16px rgba(0, 0, 0, 0.12),
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
     0 -1px 0 rgba(0, 0, 0, 0.05) inset;
-  left: calc(2px + var(--indicator-translate, 0) * 20%);
+  left: calc(8px + var(--indicator-translate, 0) * ((100% - 16px) / 5));
   transition: left 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   z-index: 1;
 }
