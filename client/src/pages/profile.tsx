@@ -22,6 +22,8 @@ export default function Profile() {
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState({ firstName: "", lastName: "" });
+  const [isEditingHousehold, setIsEditingHousehold] = useState(false);
+  const [householdName, setHouseholdName] = useState("");
   const [headerScrolled, setHeaderScrolled] = useState(false);
 
   const { data: household } = useQuery({
@@ -53,6 +55,19 @@ export default function Profile() {
     },
   });
 
+  const updateHouseholdNameMutation = useMutation({
+    mutationFn: async (name: string) => {
+      return await apiRequest("PATCH", "/api/households/current", { name });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+      setIsEditingHousehold(false);
+    },
+    onError: (error: any) => {
+      console.error("Failed to update household name:", error);
+    },
+  });
+
   const leaveHouseholdMutation = useMutation({
     mutationFn: async () => {
       return await apiRequest("POST", "/api/households/leave", {});
@@ -73,6 +88,21 @@ export default function Profile() {
   const handleUpdateName = () => {
     if (!editName.firstName.trim()) return;
     updateNameMutation.mutate(editName);
+  };
+
+  const handleUpdateHouseholdName = () => {
+    if (!householdName.trim()) return;
+    updateHouseholdNameMutation.mutate(householdName);
+  };
+
+  const startEditingHousehold = () => {
+    setHouseholdName(household?.name || "");
+    setIsEditingHousehold(true);
+  };
+
+  const cancelEditingHousehold = () => {
+    setIsEditingHousehold(false);
+    setHouseholdName("");
   };
 
   const logout = () => {
@@ -236,12 +266,57 @@ export default function Profile() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
                   <span className="text-gray-600 flex-shrink-0">Name</span>
-                  <span
-                    className="text-gray-900 font-semibold truncate ml-4"
-                    title={household.name}
-                  >
-                    {household.name}
-                  </span>
+                  {isEditingHousehold ? (
+                    <div className="flex items-center space-x-2 flex-1 ml-4">
+                      <Input
+                        value={householdName}
+                        onChange={(e) => setHouseholdName(e.target.value)}
+                        className="text-sm"
+                        placeholder="Enter household name"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleUpdateHouseholdName();
+                          } else if (e.key === "Escape") {
+                            cancelEditingHousehold();
+                          }
+                        }}
+                        autoFocus
+                      />
+                      <div className="flex space-x-1">
+                        <Button
+                          onClick={handleUpdateHouseholdName}
+                          disabled={updateHouseholdNameMutation.isPending || !householdName.trim()}
+                          size="sm"
+                          className="h-8 px-2 bg-emerald-500 hover:bg-emerald-600 text-white"
+                        >
+                          {updateHouseholdNameMutation.isPending ? "..." : "Save"}
+                        </Button>
+                        <Button
+                          onClick={cancelEditingHousehold}
+                          size="sm"
+                          variant="outline"
+                          className="h-8 px-2"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <span
+                        className="text-gray-900 font-semibold truncate"
+                        title={household.name}
+                      >
+                        {household.name}
+                      </span>
+                      <button
+                        onClick={startEditingHousehold}
+                        className="p-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded btn-animated"
+                      >
+                        <Edit3 size={12} />
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
                   <span className="text-gray-600">Invite Code</span>

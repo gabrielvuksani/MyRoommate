@@ -113,6 +113,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch('/api/households/current', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { name } = req.body;
+      
+      if (!name || !name.trim()) {
+        return res.status(400).json({ message: "Household name is required" });
+      }
+      
+      const membership = await storage.getUserHousehold(userId);
+      if (!membership) {
+        return res.status(404).json({ message: "No household found" });
+      }
+      
+      const updatedHousehold = await storage.updateHousehold(membership.household.id, { name: name.trim() });
+      res.json(updatedHousehold);
+    } catch (error) {
+      console.error("Error updating household:", error);
+      res.status(500).json({ message: "Failed to update household" });
+    }
+  });
+
   app.get('/api/households/current', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;

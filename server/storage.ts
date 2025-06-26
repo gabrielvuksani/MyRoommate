@@ -38,6 +38,7 @@ export interface IStorage {
   createHousehold(household: InsertHousehold & { inviteCode: string }): Promise<Household>;
   getHousehold(id: string): Promise<Household | undefined>;
   getHouseholdByInviteCode(code: string): Promise<Household | undefined>;
+  updateHousehold(id: string, updates: Partial<InsertHousehold>): Promise<Household>;
   joinHousehold(householdId: string, userId: string): Promise<HouseholdMember>;
   leaveHousehold(userId: string): Promise<void>;
   getHouseholdMembers(householdId: string): Promise<(HouseholdMember & { user: User })[]>;
@@ -107,6 +108,15 @@ export class DatabaseStorage implements IStorage {
     console.log("Storage: Looking up household with invite code:", code);
     const [household] = await db.select().from(households).where(eq(households.inviteCode, code));
     console.log("Storage: Household found:", household ? `ID: ${household.id}, Name: ${household.name}` : "Not found");
+    return household;
+  }
+
+  async updateHousehold(id: string, updates: Partial<InsertHousehold>): Promise<Household> {
+    const [household] = await db
+      .update(households)
+      .set(updates)
+      .where(eq(households.id, id))
+      .returning();
     return household;
   }
 

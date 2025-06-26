@@ -139,6 +139,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Applied exact card design pattern from home/chores/expenses pages (glass-card with p-6 CardContent)
 - ✓ Standardized all card components to use proper semantic structure and spacing
 - ✓ Removed background gradient from onboarding page to match app-wide consistency
+- ✓ Added household name editing capability to profile page with inline editing interface
+- ✓ Implemented PATCH /api/households/current backend endpoint for household updates
+- ✓ Added updateHousehold method to storage interface and database implementation
+- ✓ Created intuitive edit interface with save/cancel buttons and keyboard shortcuts
 - ✓ Enhanced bottom navigation transparency (0.25 opacity) to show more background content
 - ✓ Completely redesigned message bubbles with visionOS/iMessage/Airbnb design fusion
 - ✓ Your messages: emerald-cyan gradients with custom tails and glass overlay effects
