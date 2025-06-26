@@ -10,8 +10,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, ArrowLeft, Edit3, Copy, UserMinus, RefreshCw } from "lucide-react";
+import { useTheme } from "@/lib/ThemeProvider";
+import { LogOut, ArrowLeft, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun } from "lucide-react";
 import { getProfileInitials } from "@/lib/nameUtils";
+import { Switch } from "@/components/ui/switch";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -19,6 +21,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Profile() {
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -234,26 +237,50 @@ export default function Profile() {
           </CardContent>
         </Card>
 
+        {/* Display Settings */}
+        <Card className="smart-card">
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+              Display Settings
+            </h3>
+            <div className="flex justify-between items-center py-3">
+              <div className="flex items-center space-x-3">
+                {theme === 'dark' ? (
+                  <Moon className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
+                ) : (
+                  <Sun className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
+                )}
+                <span style={{ color: 'var(--text-secondary)' }}>Dark Mode</span>
+              </div>
+              <Switch
+                checked={theme === 'dark'}
+                onCheckedChange={toggleTheme}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Account Details */}
         <Card className="smart-card">
           <CardContent className="p-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
               Account details
             </h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                <span className="text-gray-600 flex-shrink-0">User ID</span>
+              <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                <span style={{ color: 'var(--text-secondary)' }} className="flex-shrink-0">User ID</span>
                 <span
-                  className="text-gray-900 font-mono text-sm truncate ml-4"
-                  title={user.id}
+                  className="font-mono text-sm truncate ml-4"
+                  style={{ color: 'var(--text-primary)' }}
+                  title={user?.id}
                 >
-                  {user.id}
+                  {user?.id}
                 </span>
               </div>
               <div className="flex justify-between items-center py-3">
-                <span className="text-gray-600">Member since</span>
-                <span className="text-gray-900">
-                  {new Date(user.createdAt).toLocaleDateString()}
+                <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
+                <span style={{ color: 'var(--text-primary)' }}>
+                  {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                 </span>
               </div>
             </div>
@@ -264,16 +291,17 @@ export default function Profile() {
         {household && (
           <Card className="smart-card">
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
                 Household Information
               </h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-gray-600 flex-shrink-0">Name</span>
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ color: 'var(--text-secondary)' }} className="flex-shrink-0">Name</span>
                   <div className="flex items-center space-x-2">
                     <span
-                      className="text-gray-900 font-semibold truncate"
-                      title={household.name}
+                      className="font-semibold truncate"
+                      style={{ color: 'var(--text-primary)' }}
+                      title={household?.name}
                     >
                       {household.name}
                     </span>

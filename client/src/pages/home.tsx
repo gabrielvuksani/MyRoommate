@@ -87,10 +87,10 @@ export default function Home() {
               <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center mx-auto mb-6">
                 <HomeIcon size={32} className="text-white" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
                 Create or Join a Household
               </h2>
-              <p className="text-gray-600 mb-8">
+              <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>
                 Start managing your shared living space with roommates
               </p>
               <button
@@ -168,10 +168,10 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <CheckSquare className="text-white" size={20} />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {activeChores.length}
                 </p>
-                <p className="text-sm text-gray-600">Active chores</p>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Active chores</p>
               </button>
             </CardContent>
           </Card>
@@ -188,10 +188,10 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <DollarSign className="text-white" size={20} />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   ${Math.abs(netBalance).toFixed(0)}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                   {netBalance > 0
                     ? "Owed to you"
                     : netBalance < 0
@@ -215,10 +215,10 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Calendar className="text-white" size={20} />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {todayEvents.length}
                 </p>
-                <p className="text-sm text-gray-600">Today's events</p>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Today's events</p>
               </button>
             </CardContent>
           </Card>
@@ -235,10 +235,10 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <MessageCircle className="text-white" size={20} />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {recentMessages.length}
                 </p>
-                <p className="text-sm text-gray-600">New messages</p>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>New messages</p>
               </button>
             </CardContent>
           </Card>
@@ -246,7 +246,7 @@ export default function Home() {
 
         {/* AI-Powered Today's Priority */}
         <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <h2 className="text-xl font-bold mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
             <Target className="w-5 h-5 mr-2 text-primary" />
             Today's Priority
             <span className="ml-2 px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full">
@@ -257,12 +257,12 @@ export default function Home() {
             <CardContent className="p-6">
               <div className="space-y-4">
                 {/* AI Analysis */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
+                <div className="rounded-xl p-4" style={{ background: 'var(--surface-overlay)' }}>
+                  <h3 className="font-semibold mb-2 flex items-center" style={{ color: 'var(--text-primary)' }}>
                     <Brain className="w-4 h-4 mr-2 text-purple-600" />
                     Smart Recommendations
                   </h3>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                     {(() => {
                       const today = new Date();
                       const todayEvents = calendarEvents.filter(
@@ -304,9 +304,13 @@ export default function Home() {
                   {/* Today's Events */}
                   <button
                     onClick={() => setLocation("/calendar")}
-                    className="bg-gray-50 rounded-xl p-4 w-full text-left hover:bg-gray-100 transition-colors btn-animated"
+                    className="rounded-xl p-4 w-full text-left transition-colors btn-animated"
+                    style={{ 
+                      background: 'var(--surface-secondary)',
+                      borderColor: 'var(--border)'
+                    }}
                   >
-                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                    <h4 className="font-semibold mb-3 flex items-center" style={{ color: 'var(--text-primary)' }}>
                       <Calendar className="w-4 h-4 mr-2 text-blue-600" />
                       Today's Events
                     </h4>
@@ -335,10 +339,10 @@ export default function Home() {
                                 }}
                               ></div>
                               <div className="flex-1">
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                                   {event.title}
                                 </p>
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                                   {new Date(event.startDate).toLocaleTimeString(
                                     [],
                                     { hour: "2-digit", minute: "2-digit" },

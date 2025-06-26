@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* visionOS-inspired Design System */
+/* visionOS-inspired Design System - Light Mode */
 :root {
   --primary: #007AFF;
   --primary-light: #4DA3FF;
@@ -31,7 +31,41 @@
   --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-strong: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-glow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+/* visionOS-inspired Design System - Dark Mode */
+.dark {
+  --primary: #0A84FF;
+  --primary-light: #409CFF;
+  --secondary: #5E5CE6;
+  --accent: #30D158;
+  --warning: #FF9F0A;
+  --destructive: #FF453A;
+  --success: #32D74B;
   
+  --background: #000000;
+  --surface: rgba(28, 28, 30, 0.95);
+  --surface-secondary: rgba(44, 44, 46, 0.8);
+  --surface-overlay: rgba(58, 58, 60, 0.9);
+  --surface-glass: rgba(28, 28, 30, 0.7);
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: #AEAEB2;
+  --text-tertiary: #8E8E93;
+  --text-inverse: #1A1A1A;
+  
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-strong: 0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 0 3px rgba(10, 132, 255, 0.2);
+}
+
+/* Shared Variables (Both Light & Dark) */
+:root, .dark {
   --radius-xs: 8px;
   --radius-sm: 12px;
   --radius-md: 16px;
@@ -86,19 +120,19 @@
 .text-warning { color: var(--warning); }
 .text-destructive { color: var(--destructive); }
 
-/* Airbnb-style Smart Cards */
+/* visionOS-style Smart Cards - Adaptive for Dark Mode */
 .smart-card {
-  background: #FFFFFF;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-medium);
   transition: all 300ms ease-in-out;
   position: relative;
   overflow: hidden;
-  border: none;
+  border: 1px solid var(--border);
 }
 
 .smart-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-strong);
   transform: translateY(-2px);
 }
 
@@ -107,15 +141,15 @@
 }
 
 .empty-state-card {
-  background: #FAFAFA;
+  background: var(--surface-secondary);
   border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  border: 1px dashed #E0E0E0;
+  box-shadow: var(--shadow-soft);
+  border: 1px dashed var(--border-strong);
   transition: all 300ms ease-in-out;
 }
 
 .empty-state-card:hover {
-  background: #F5F5F5;
+  background: var(--surface-overlay);
   border-color: var(--primary);
 }
 
@@ -791,3 +825,84 @@
 .text-ios-subhead { @apply text-subhead; }
 .text-ios-footnote { @apply text-footnote; }
 .text-ios-caption { @apply text-caption; }
+
+/* Global Dark Mode Adaptations */
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Card Components Dark Mode */
+.smart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s ease;
+}
+
+.smart-card:hover {
+  box-shadow: var(--shadow-medium);
+}
+
+/* Glass Morphism Cards */
+.glass-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s ease;
+}
+
+/* Button Components */
+.btn-primary {
+  background: var(--primary);
+  color: var(--text-inverse);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary {
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+/* Form Elements */
+input, textarea, select {
+  background: var(--surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  transition: all 0.2s ease;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: var(--shadow-glow) !important;
+}
+
+label {
+  color: var(--text-secondary) !important;
+}
+
+/* Tabs */
+.tabs-list {
+  background: var(--surface-secondary) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.tabs-trigger {
+  color: var(--text-secondary) !important;
+  transition: all 0.2s ease;
+}
+
+.tabs-trigger[data-state="active"] {
+  background: var(--surface) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-soft) !important;
+}

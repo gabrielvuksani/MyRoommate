@@ -119,13 +119,18 @@ export default function RoommateMarketplace() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
       {/* Floating Header */}
       <div className={`sticky top-0 z-40 transition-all duration-300 ${
         headerScrolled 
-          ? 'bg-white/95 backdrop-blur-xl border-b border-gray-100 shadow-sm' 
-          : 'bg-transparent'
-      }`}>
+          ? 'shadow-sm' 
+          : ''
+      }`}
+      style={{
+        background: headerScrolled ? 'var(--surface-glass)' : 'transparent',
+        backdropFilter: headerScrolled ? 'blur(20px)' : 'none',
+        borderBottom: headerScrolled ? '1px solid var(--border)' : 'none'
+      }}>
         <div className="max-w-md mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -133,16 +138,20 @@ export default function RoommateMarketplace() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setLocation("/")}
-                className="p-2 hover:bg-gray-100 rounded-xl"
+                className="p-2 rounded-xl transition-all duration-200 hover:bg-opacity-10"
+                style={{ 
+                  background: 'transparent',
+                  color: 'var(--text-secondary)'
+                }}
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
+                <ArrowLeft className="w-5 h-5" />
               </Button>
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
                   <Users className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h1 className="font-semibold text-[#1a1a1a] text-[22px]">Roommate Marketplace</h1>
+                  <h1 className="font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>Roommate Marketplace</h1>
                 </div>
               </div>
             </div>
@@ -152,14 +161,18 @@ export default function RoommateMarketplace() {
                 variant="ghost"
                 size="sm"
                 onClick={handleRefresh}
-                className="p-2 hover:bg-gray-100 rounded-xl"
+                className="p-2 rounded-xl transition-all duration-200 hover:bg-opacity-10"
+                style={{ 
+                  background: 'transparent',
+                  color: 'var(--text-secondary)'
+                }}
               >
-                <RefreshCw className="w-4 h-4 text-gray-600" />
+                <RefreshCw className="w-4 h-4" />
               </Button>
               <Button
                 onClick={() => setShowCreateForm(true)}
                 size="sm"
-                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 border-0 shadow-lg"
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 border-0 shadow-lg transition-all duration-200"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 Post
@@ -172,12 +185,34 @@ export default function RoommateMarketplace() {
       {/* Content */}
       <div className="max-w-md mx-auto px-6 pt-6 pb-24">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-gray-100/50 backdrop-blur-sm">
-            <TabsTrigger value="browse" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+          <TabsList 
+            className="grid w-full grid-cols-2 backdrop-blur-sm"
+            style={{ 
+              background: 'var(--surface-secondary)',
+              border: '1px solid var(--border)'
+            }}
+          >
+            <TabsTrigger 
+              value="browse" 
+              className="transition-all duration-200"
+              style={{
+                color: activeTab === 'browse' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                background: activeTab === 'browse' ? 'var(--surface)' : 'transparent',
+                boxShadow: activeTab === 'browse' ? 'var(--shadow-soft)' : 'none'
+              }}
+            >
               <Search className="w-4 h-4 mr-2" />
               Browse ({Array.isArray(listings) ? listings.length : 0})
             </TabsTrigger>
-            <TabsTrigger value="my-listings" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger 
+              value="my-listings" 
+              className="transition-all duration-200"
+              style={{
+                color: activeTab === 'my-listings' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                background: activeTab === 'my-listings' ? 'var(--surface)' : 'transparent',
+                boxShadow: activeTab === 'my-listings' ? 'var(--shadow-soft)' : 'none'
+              }}
+            >
               <Home className="w-4 h-4 mr-2" />
               My Listings ({Array.isArray(myListings) ? myListings.length : 0})
             </TabsTrigger>
@@ -187,15 +222,31 @@ export default function RoommateMarketplace() {
             {/* Search and Filters */}
             <div className="flex gap-3">
               <div className="flex-1 relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <MapPin 
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" 
+                  style={{ color: 'var(--text-tertiary)' }}
+                />
                 <Input
                   placeholder="Search by city..."
                   value={searchCity}
                   onChange={(e) => setSearchCity(e.target.value)}
-                  className="pl-10 bg-white/50 backdrop-blur-sm border-gray-200"
+                  className="pl-10 backdrop-blur-sm transition-all duration-200"
+                  style={{
+                    background: 'var(--surface-glass)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
               </div>
-              <Button variant="outline" className="bg-white/50 backdrop-blur-sm">
+              <Button 
+                variant="outline" 
+                className="backdrop-blur-sm transition-all duration-200"
+                style={{
+                  background: 'var(--surface-glass)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-secondary)'
+                }}
+              >
                 <Filter className="w-4 h-4" />
               </Button>
             </div>
@@ -205,12 +256,13 @@ export default function RoommateMarketplace() {
               <Card className="glass-card">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-[#1a1a1a]">Create Roommate Listing</h3>
+                    <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Create Roommate Listing</h3>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowCreateForm(false)}
-                      className="text-gray-500 hover:text-gray-700"
+                      className="transition-all duration-200"
+                      style={{ color: 'var(--text-secondary)' }}
                     >
                       ✕
                     </Button>
