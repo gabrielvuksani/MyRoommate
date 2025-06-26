@@ -145,14 +145,14 @@ export default function Onboarding() {
           <Card className="glass-card page-enter">
             <CardContent className="p-6">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-blue-500/25">
-                <User size={24} className="text-white" />
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/25">
+                <User size={32} className="text-white" />
               </div>
-              <h2 className="font-bold text-[#1a1a1a] text-[20px] mb-2">What should we call you?</h2>
-              <p className="text-gray-600">Choose how you'd like to appear to your roommates</p>
+              <h1 className="font-bold text-[#1a1a1a] text-[24px] leading-tight mb-3">What should we call you?</h1>
+              <p className="text-gray-600 text-base leading-relaxed mb-8">Choose how you'd like to appear to your roommates</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mb-8">
               <div>
                 <label className="block text-sm font-semibold text-[#1a1a1a] mb-3">
                   First Name
@@ -177,17 +177,17 @@ export default function Onboarding() {
               </div>
             </div>
 
-            <div className="flex space-x-3 mt-8">
+            <div className="flex space-x-3">
               <Button
                 onClick={() => setStep(step - 1)}
-                className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-xl shadow-sm"
+                className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-2xl shadow-sm"
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
                 disabled={!userData.firstName.trim() || updateUserMutation.isPending}
-                className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50"
+                className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
               >
                 {updateUserMutation.isPending ? (
                   <div className="flex items-center space-x-2">
@@ -208,11 +208,11 @@ export default function Onboarding() {
           <Card className="glass-card page-enter">
             <CardContent className="p-6">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-violet-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-purple-500/25">
-                <Users size={24} className="text-white" />
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-violet-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/25">
+                <Users size={32} className="text-white" />
               </div>
-              <h2 className="font-bold text-[#1a1a1a] text-[20px] mb-2">Set Up Your Household</h2>
-              <p className="text-gray-600">Create a new household or join an existing one</p>
+              <h1 className="font-bold text-[#1a1a1a] text-[24px] leading-tight mb-3">Set Up Your Household</h1>
+              <p className="text-gray-600 text-base leading-relaxed mb-8">Create a new household or join an existing one</p>
             </div>
 
             <div className="space-y-6">
@@ -278,10 +278,10 @@ export default function Onboarding() {
               )}
             </div>
 
-            <div className="flex space-x-3 mt-8">
+            <div className="flex space-x-3">
               <Button
                 onClick={() => setStep(step - 1)}
-                className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-xl shadow-sm"
+                className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-2xl shadow-sm"
               >
                 Back
               </Button>
@@ -291,7 +291,7 @@ export default function Onboarding() {
                   (householdData.action === 'create' && !householdData.name.trim()) ||
                   (householdData.action === 'join' && householdData.inviteCode.length !== 8)
                 }
-                className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50"
+                className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
               >
                 Continue
               </Button>
@@ -304,21 +304,21 @@ export default function Onboarding() {
         {step === 4 && (
           <Card className="glass-card text-center page-enter">
             <CardContent className="p-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/25">
-              <CheckCircle size={24} className="text-white" />
+            <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
+              <CheckCircle size={32} className="text-white" />
             </div>
-            <h2 className="font-bold text-[#1a1a1a] text-[20px] mb-4">Ready to Go!</h2>
+            <h1 className="font-bold text-[#1a1a1a] text-[24px] leading-tight mb-3">Ready to Go!</h1>
             
             {householdData.action === 'create' ? (
-              <div>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+              <div className="mb-8">
+                <p className="text-gray-600 text-base leading-relaxed">
                   You're about to create "<strong className="text-[#1a1a1a]">{householdData.name}</strong>". 
                   You'll get an invite code to share with your roommates.
                 </p>
               </div>
             ) : (
-              <div>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+              <div className="mb-8">
+                <p className="text-gray-600 text-base leading-relaxed">
                   You're about to join a household using code <strong className="text-[#1a1a1a] font-mono tracking-wider">{householdData.inviteCode}</strong>.
                 </p>
               </div>
@@ -327,14 +327,14 @@ export default function Onboarding() {
             <div className="flex space-x-3">
               <Button
                 onClick={() => setStep(step - 1)}
-                className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-xl shadow-sm"
+                className="flex-1 h-12 bg-white/70 hover:bg-white/80 text-gray-700 border-0 rounded-2xl shadow-sm"
               >
                 Back
               </Button>
               <Button
                 onClick={handleFinish}
                 disabled={createHouseholdMutation.isPending || joinHouseholdMutation.isPending}
-                className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50"
+                className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
               >
                 {createHouseholdMutation.isPending || joinHouseholdMutation.isPending ? (
                   <div className="flex items-center space-x-2">
