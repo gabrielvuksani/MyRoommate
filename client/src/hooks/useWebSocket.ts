@@ -21,6 +21,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
     const wsUrl = `${protocol}//${host}/ws`;
     
     let reconnectTimeout: NodeJS.Timeout;
+    let heartbeatInterval: NodeJS.Timeout;
     let isManualClose = false;
 
     const connect = () => {
@@ -47,6 +48,13 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
         }
         
         onConnect?.();
+        
+        // Start heartbeat to keep connection alive in deployment
+        heartbeatInterval = setInterval(() => {
+          if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({ type: 'ping' }));
+          }
+        }, 30000); // Send ping every 30 seconds
       };
 
       ws.current.onmessage = (event) => {
@@ -58,15 +66,16 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
         }
       };
 
-      ws.current.onclose = () => {
-        console.log('WebSocket disconnected');
+      ws.current.onclose = (event) => {
+        console.log('WebSocket disconnected:', event.code, event.reason);
         connectionSent.current = false;
         onDisconnect?.();
 
         // Auto-reconnect unless manually closed
         if (!isManualClose) {
-          // Exponential backoff for reconnection
-          const delay = Math.min(1000 * Math.pow(2, connectionSent.current ? 0 : 1), 10000);
+          // Immediate reconnection for deployment reliability
+          const delay = event.code === 1006 ? 500 : 2000; // Fast reconnect for unexpected closures
+          console.log(`Reconnecting in ${delay}ms...`);
           reconnectTimeout = setTimeout(() => {
             connect();
           }, delay);
@@ -92,6 +101,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
     return () => {
       isManualClose = true;
       clearTimeout(reconnectTimeout);
+      clearInterval(heartbeatInterval);
       ws.current?.close();
       connectionSent.current = false;
     };

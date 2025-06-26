@@ -592,6 +592,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
+        // Handle ping/pong for connection keepalive
+        if (message.type === 'ping') {
+          ws.send(JSON.stringify({ type: 'pong' }));
+          return;
+        }
+        
         if (message.type === 'user_typing') {
           const { householdId: msgHouseholdId, userId: msgUserId, userName } = message;
           

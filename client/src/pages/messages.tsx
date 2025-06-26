@@ -64,6 +64,9 @@ export default function Messages() {
           return messages;
         });
         
+        // Force invalidate and refetch to ensure UI updates across all clients
+        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+        
         // Scroll to bottom when new message arrives
         setTimeout(scrollToBottom, 100);
       } else if (data.type === "user_typing") {
