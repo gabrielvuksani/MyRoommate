@@ -283,7 +283,7 @@ export default function Onboarding() {
                 className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 p-8 ${
                   householdData.action === 'create' 
                     ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
-                    : 'glass-card hover:scale-[1.02]'
+                    : 'hover:scale-[1.02]'
                 }`}
                 style={householdData.action !== 'create' ? {
                   background: 'var(--surface-secondary)',
@@ -307,7 +307,7 @@ export default function Onboarding() {
                 className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 p-8 ${
                   householdData.action === 'join' 
                     ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 text-white shadow-lg shadow-emerald-500/25' 
-                    : 'glass-card hover:scale-[1.02]'
+                    : 'hover:scale-[1.02]'
                 }`}
                 style={householdData.action !== 'join' ? {
                   background: 'var(--surface-secondary)',
@@ -331,7 +331,7 @@ export default function Onboarding() {
                 className={`w-full rounded-2xl flex items-center space-x-4 transition-all duration-200 p-8 ${
                   householdData.action === 'browse' 
                     ? 'bg-gradient-to-br from-purple-400 to-violet-500 text-white shadow-lg shadow-purple-500/25' 
-                    : 'glass-card hover:scale-[1.02]'
+                    : 'hover:scale-[1.02]'
                 }`}
                 style={householdData.action !== 'browse' ? {
                   background: 'var(--surface-secondary)',

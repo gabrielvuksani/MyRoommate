@@ -148,6 +148,8 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Improved step 3 legibility with better structure: increased input heights to h-14, enhanced label margins, and proper conditional form spacing
 - ✓ Fixed undefined CSS variables (--space-8) by adding essential spacing variables while preserving original visionOS aesthetic
 - ✓ Maintained all original liquid glass design elements and color schemes without visual changes
+- ✓ Fixed onboarding step 3 spacing issues by removing conflicting .glass-card class from non-selected buttons
+- ✓ Restored uniform button padding and appearance across all household selection options
 
 **June 26, 2025 (Earlier):**
 - ✓ Fixed calendar selected date visibility with explicit blue background and white text styling
