@@ -31,11 +31,11 @@ export default function BottomNavigation() {
     const activeIndex = tabs.findIndex(tab => tab.path === location);
     if (activeIndex === -1) return;
     
-    // Calculate precise tab positioning with centering
+    // Calculate precise tab positioning with perfect centering
     const containerWidth = navigationRef.current.offsetWidth;
     const tabWidth = containerWidth / tabs.length;
-    const indicatorWidth = tabWidth - 16; // Account for padding
-    const translateX = activeIndex * tabWidth + 8; // Add 8px for centering
+    const indicatorWidth = tabWidth - 16;
+    const translateX = activeIndex * tabWidth + (tabWidth - indicatorWidth) / 2;
     
     navigationRef.current.style.setProperty('--indicator-translate', `${translateX}px`);
     navigationRef.current.style.setProperty('--indicator-width', `${indicatorWidth}px`);
@@ -46,7 +46,7 @@ export default function BottomNavigation() {
       const newContainerWidth = navigationRef.current.offsetWidth;
       const newTabWidth = newContainerWidth / tabs.length;
       const newIndicatorWidth = newTabWidth - 16;
-      const newTranslateX = activeIndex * newTabWidth + 8;
+      const newTranslateX = activeIndex * newTabWidth + (newTabWidth - newIndicatorWidth) / 2;
       navigationRef.current.style.setProperty('--indicator-translate', `${newTranslateX}px`);
       navigationRef.current.style.setProperty('--indicator-width', `${newIndicatorWidth}px`);
     };
