@@ -363,7 +363,7 @@ export default function Home() {
             >
               <button
                 onClick={() => setLocation("/calendar")}
-                className="w-full transition-all btn-animated"
+                className="w-full transition-all"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Calendar className="text-white" size={20} />
@@ -383,7 +383,7 @@ export default function Home() {
             >
               <button
                 onClick={() => setLocation("/messages")}
-                className="w-full transition-all btn-animated"
+                className="w-full transition-all"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <MessageCircle className="text-white" size={20} />
