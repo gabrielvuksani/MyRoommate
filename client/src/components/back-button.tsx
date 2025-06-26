@@ -21,7 +21,7 @@ export default function BackButton({ onClick, to = "/", className = "" }: BackBu
   return (
     <button
       onClick={handleClick}
-      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all btn-animated ${className}`}
+      className={`m-1 w-10 h-10 rounded-full flex items-center justify-center transition-all btn-animated ${className}`}
       style={{
         background: 'var(--surface-secondary)',
         color: 'var(--text-primary)'
