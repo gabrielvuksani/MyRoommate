@@ -268,10 +268,9 @@ export default function Messages() {
     <div className="h-screen flex flex-col page-transition">
       {/* Fixed Header */}
       <div 
-        className="fixed top-0 left-0 right-0 z-50 border-b"
+        className="fixed top-0 left-0 right-0 z-50"
         style={{
           backgroundColor: 'var(--header-bg)',
-          borderColor: 'var(--border-color)',
           backdropFilter: 'blur(20px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
         }}
@@ -304,7 +303,7 @@ export default function Messages() {
       <div 
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto"
-        style={{ paddingTop: '140px', paddingBottom: '180px' }}
+        style={{ paddingTop: '140px', paddingBottom: '200px' }}
       >
         <div className="max-w-3xl mx-auto px-6">
           <div className="space-y-4 min-h-full">
@@ -389,8 +388,13 @@ export default function Messages() {
                   placeholder="Type a message..."
                   value={newMessage}
                   onChange={(e) => handleTyping(e.target.value)}
-                  className="w-full bg-transparent border-none text-sm focus:outline-none focus:ring-0 p-0"
-                  style={{ color: 'var(--text-primary)' }}
+                  className="w-full bg-transparent border-none text-sm focus:outline-none focus:ring-0 focus:border-0 shadow-none p-0"
+                  style={{ 
+                    color: 'var(--text-primary)',
+                    boxShadow: 'none',
+                    outline: 'none',
+                    border: 'none'
+                  }}
                 />
               </div>
               <Button

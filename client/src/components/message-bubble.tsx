@@ -27,14 +27,14 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
       <div className="flex justify-end mb-4 animate-fade-in">
         <div className="flex flex-col items-end max-w-xs">
           <div className="flex items-center space-x-3 mb-2">
-            <span className="text-xs text-gray-400 font-medium">
+            <span className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>
               {new Date(message.createdAt).toLocaleTimeString('en-US', { 
                 hour: 'numeric', 
                 minute: '2-digit',
                 hour12: true 
               })}
             </span>
-            <span className="text-xs text-gray-600 font-semibold">
+            <span className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
               {userName}
             </span>
             <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
@@ -78,10 +78,10 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
           <div className="w-7 h-7 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
             <span className="text-white text-xs font-bold">{userInitials}</span>
           </div>
-          <span className="text-xs text-gray-600 font-semibold">
+          <span className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
             {userName}
           </span>
-          <span className="text-xs text-gray-400 font-medium">
+          <span className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>
             {new Date(message.createdAt).toLocaleTimeString('en-US', { 
               hour: 'numeric', 
               minute: '2-digit',
