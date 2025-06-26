@@ -143,11 +143,15 @@ export default function Messages() {
 
   // Always ensure proper scroll position on page load
   useEffect(() => {
-    // Handle initial page load with immediate scroll adjustment
-    if (messages.length <= 5) {
+    // Handle initial page load with immediate scroll adjustment for new users
+    if (!isLoading && messages.length === 0) {
+      // For completely new conversations, scroll to top with header offset
+      window.scrollTo({ top: 160, behavior: "auto" });
+    } else if (!isLoading && messages.length <= 5) {
+      // For conversations with few messages, scroll to top with header offset
       window.scrollTo({ top: 160, behavior: "auto" });
     }
-  }, []);
+  }, [isLoading, messages.length]);
 
   // Auto-scroll when typing indicators appear (only for longer conversations)
   useEffect(() => {

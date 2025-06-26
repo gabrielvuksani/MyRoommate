@@ -137,7 +137,7 @@ export default function Home() {
               className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
             >
               <span className="text-white font-bold text-lg">
-                {firstName[0]?.toUpperCase() || "?"}
+                {getProfileInitials(user.firstName, user.lastName, user.email)}
               </span>
             </button>
           </div>

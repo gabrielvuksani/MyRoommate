@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Copy, LogOut, Users, Home, ArrowLeft } from "lucide-react";
+import { getProfileInitials } from "@/lib/nameUtils";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -116,9 +117,9 @@ export default function Settings() {
             <div className="space-y-3">
               {household.members?.map((member: any) => (
                 <div key={member.id} className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs font-medium">
-                      {member.user.firstName?.[0] || member.user.email?.[0] || '?'}
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">
+                      {getProfileInitials(member.user.firstName, member.user.lastName, member.user.email)}
                     </span>
                   </div>
                   <div className="flex-1">
