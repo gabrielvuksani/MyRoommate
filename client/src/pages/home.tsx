@@ -316,7 +316,7 @@ export default function Home() {
             <CardContent className="p-6 text-center animate-fade-in">
               <button
                 onClick={() => setLocation("/chores")}
-                className="w-full transition-all btn-animated"
+                className="w-full transition-all"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <CheckSquare className="text-white" size={20} />
@@ -336,7 +336,7 @@ export default function Home() {
             >
               <button
                 onClick={() => setLocation("/expenses")}
-                className="w-full transition-all btn-animated"
+                className="w-full transition-all"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <DollarSign className="text-white" size={20} />
@@ -363,7 +363,7 @@ export default function Home() {
             >
               <button
                 onClick={() => setLocation("/calendar")}
-                className="w-full transition-all btn-animated"
+                className="w-full transition-all"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Calendar className="text-white" size={20} />
@@ -383,7 +383,7 @@ export default function Home() {
             >
               <button
                 onClick={() => setLocation("/messages")}
-                className="w-full transition-all btn-animated"
+                className="w-full transition-all"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <MessageCircle className="text-white" size={20} />
@@ -407,7 +407,7 @@ export default function Home() {
             </span>
           </h2>
           <Card className="glass-card border-l-4 border-l-primary">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="space-y-4">
                 {/* AI Analysis */}
                 <div className="rounded-xl p-4" style={{ background: 'var(--surface-overlay)' }}>

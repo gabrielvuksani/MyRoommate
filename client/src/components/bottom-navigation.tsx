@@ -38,7 +38,7 @@ export default function BottomNavigation() {
             <button
               key={id}
               onClick={() => setLocation(path)}
-              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 nav-transition ${
+              className={`tab-item flex flex-col items-center justify-center min-w-0 flex-1 ${
                 isActive ? 'active animate-scale-in' : 'inactive'
               }`}
             >
