@@ -36,10 +36,10 @@ export function getProfileInitials(firstName: string | null, lastName: string | 
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
   }
   if (firstName) {
-    return firstName.slice(0, 2).toUpperCase();
+    return firstName[0].toUpperCase();
   }
   if (email) {
-    return email.slice(0, 2).toUpperCase();
+    return email[0].toUpperCase();
   }
-  return '??';
+  return '?';
 }

@@ -163,7 +163,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex space-x-2">
+          <div className="flex pt-[10px] space-x-2">
             {["week", "month", "all"].map((period) => (
               <button
                 key={period}
@@ -181,7 +181,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="pt-40 px-6 space-y-6">
+      <div className="pt-[205px] px-6 space-y-6">
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="glass-card">
