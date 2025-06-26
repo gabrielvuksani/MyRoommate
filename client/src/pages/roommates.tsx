@@ -131,7 +131,7 @@ export default function Roommates() {
         </div>
       </div>
 
-      <div className="pt-36 px-6 space-y-6">
+      <div className="pt-44 px-6 space-y-6">
         {/* Search Bar */}
         <Card className="glass-card" style={{
           background: 'var(--surface)',
