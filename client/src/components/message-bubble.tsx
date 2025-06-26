@@ -1,3 +1,5 @@
+import { formatDisplayName } from "@/lib/nameUtils";
+
 interface MessageBubbleProps {
   message: any;
   currentUserId?: string;
@@ -19,7 +21,7 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
   }
 
   if (isOwnMessage) {
-    const userName = message.user?.firstName || message.user?.email?.split('@')[0] || 'You';
+    const userName = formatDisplayName(message.user?.firstName, message.user?.lastName, message.user?.email?.split('@')[0] || 'You');
     
     return (
       <div className="flex justify-end mb-4 animate-fade-in">
@@ -67,7 +69,7 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
   }
 
   const userInitial = message.user?.firstName?.[0] || message.user?.email?.[0] || '?';
-  const userName = message.user?.firstName || message.user?.email?.split('@')[0] || 'Unknown';
+  const userName = formatDisplayName(message.user?.firstName, message.user?.lastName, message.user?.email?.split('@')[0] || 'Unknown');
 
   return (
     <div className="flex justify-start mb-4 animate-fade-in">
