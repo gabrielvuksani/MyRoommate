@@ -64,7 +64,7 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
             <span className="text-white text-lg">{getCategoryIcon(expense.category)}</span>
           </div>
           <div>
-            <p className="text-body font-semibold" style={{ color: 'var(--primary)' }}>{expense.title}</p>
+            <p className="text-body font-semibold" style={{ color: 'var(--text-primary)' }}>{expense.title}</p>
             <p className="text-footnote" style={{ color: 'var(--text-secondary)' }}>
               Paid by {expense.paidByUser?.firstName || expense.paidByUser?.email?.split('@')[0] || 'Unknown'}
             </p>
@@ -75,7 +75,7 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
         </div>
         <div className="text-right">
           <div className="flex items-center justify-end space-x-2 mb-2">
-            <p className="text-title-3 font-bold" style={{ color: 'var(--primary)' }}>${parseFloat(expense.amount).toFixed(2)}</p>
+            <p className="text-title-3 font-bold" style={{ color: 'var(--text-primary)' }}>${parseFloat(expense.amount).toFixed(2)}</p>
             {isFullySettled ? (
               <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
                 background: 'rgba(48, 209, 88, 0.1)',
