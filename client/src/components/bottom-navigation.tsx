@@ -31,8 +31,7 @@ export default function BottomNavigation() {
 
   useEffect(() => {
     if (navigationRef.current && activeIndex !== -1) {
-      const translateX = activeIndex * 20; // 20% for each tab
-      navigationRef.current.style.setProperty('--indicator-translate', `${translateX}%`);
+      navigationRef.current.style.setProperty('--indicator-translate', `${activeIndex}`);
     }
   }, [activeIndex]);
 
@@ -40,24 +39,22 @@ export default function BottomNavigation() {
     <div className="bottom-nav-container">
       <nav ref={navigationRef} className="bottom-nav">
         <div className="nav-indicator"></div>
-        <div className="nav-tabs">
-          {tabs.map(({ id, path, label, Icon }, index) => {
-            const isActive = location === path;
-            
-            return (
-              <button
-                key={id}
-                onClick={() => setLocation(path)}
-                className={`nav-tab ${isActive ? 'nav-tab-active' : ''}`}
-              >
-                <div className="nav-tab-content">
-                  <Icon size={18} />
-                  <span>{label}</span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+        {tabs.map(({ id, path, label, Icon }, index) => {
+          const isActive = location === path;
+          
+          return (
+            <button
+              key={id}
+              onClick={() => setLocation(path)}
+              className={`nav-tab ${isActive ? 'nav-tab-active' : ''}`}
+            >
+              <div className="nav-tab-content">
+                <Icon size={18} />
+                <span>{label}</span>
+              </div>
+            </button>
+          );
+        })}
       </nav>
     </div>
   );
