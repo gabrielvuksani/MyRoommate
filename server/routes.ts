@@ -474,7 +474,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   let messageCount = 0;
   let totalProcessingTime = 0;
   
+  console.log('WebSocket server initialized on path /ws');
+  
   wss.on('connection', (ws: any) => {
+    console.log('New WebSocket connection established');
     let userId: string | null = null;
     let householdId: string | null = null;
     
@@ -484,6 +487,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Cache user info on first connection
         if (message.type === 'connect' && message.userId && message.householdId) {
+          console.log(`WebSocket connect: userId=${message.userId}, householdId=${message.householdId}`);
           userId = message.userId;
           householdId = message.householdId;
           clientsById.set(userId, ws);
@@ -500,11 +504,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Cache user data for fast message creation
           if (!userCache.has(userId)) {
-            const user = await storage.getUser(userId);
-            if (user) {
-              userCache.set(userId, user);
+            try {
+              const user = await storage.getUser(userId);
+              if (user) {
+                userCache.set(userId, user);
+                console.log(`User cached: ${userId}`);
+              }
+            } catch (error) {
+              console.error(`Error caching user ${userId}:`, error);
             }
           }
+          
+          // Send connection confirmation
+          ws.send(JSON.stringify({
+            type: 'connection_confirmed',
+            userId,
+            householdId
+          }));
         }
         
         if (message.type === 'send_message') {

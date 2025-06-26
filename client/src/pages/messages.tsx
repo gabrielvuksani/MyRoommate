@@ -13,6 +13,7 @@ export default function Messages() {
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const { user } = useAuth();
@@ -28,7 +29,14 @@ export default function Messages() {
   });
 
   const { sendMessage } = useWebSocket({
+    onConnect: () => setConnectionStatus('connected'),
+    onDisconnect: () => setConnectionStatus('disconnected'),
     onMessage: (data) => {
+      if (data.type === 'connection_confirmed') {
+        setConnectionStatus('connected');
+        console.log('WebSocket connection confirmed:', data);
+        return;
+      }
       if (data.type === "new_message") {
         // Immediately update the messages in the cache for real-time display
         queryClient.setQueryData(["/api/messages"], (old: any) => {
@@ -275,6 +283,18 @@ export default function Messages() {
             <div>
               <h1 className="page-title">Messages</h1>
               <p className="page-subtitle">Chat with your household</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className={`w-2 h-2 rounded-full ${
+                connectionStatus === 'connected' ? 'bg-green-500' : 
+                connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse' : 
+                'bg-red-500'
+              }`}></div>
+              <span className="text-xs text-gray-500 font-medium">
+                {connectionStatus === 'connected' ? 'Online' : 
+                 connectionStatus === 'connecting' ? 'Connecting...' : 
+                 'Offline'}
+              </span>
             </div>
           </div>
         </div>

@@ -16,7 +16,9 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
     if (!userId || !householdId) return;
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    // Handle both development and production environments
+    const host = window.location.host;
+    const wsUrl = `${protocol}//${host}/ws`;
     
     let reconnectTimeout: NodeJS.Timeout;
     let isManualClose = false;
@@ -29,16 +31,18 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
       ws.current = new WebSocket(wsUrl);
 
       ws.current.onopen = () => {
-        console.log('WebSocket connected');
+        console.log('WebSocket connected to:', wsUrl);
         connectionSent.current = false;
         
         // Send connection info for user caching
         if (userId && householdId && !connectionSent.current) {
-          ws.current?.send(JSON.stringify({
+          const connectMessage = {
             type: 'connect',
             userId,
             householdId,
-          }));
+          };
+          console.log('Sending connect message:', connectMessage);
+          ws.current?.send(JSON.stringify(connectMessage));
           connectionSent.current = true;
         }
         
@@ -61,14 +65,25 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
 
         // Auto-reconnect unless manually closed
         if (!isManualClose) {
+          // Exponential backoff for reconnection
+          const delay = Math.min(1000 * Math.pow(2, connectionSent.current ? 0 : 1), 10000);
           reconnectTimeout = setTimeout(() => {
             connect();
-          }, 1000);
+          }, delay);
         }
       };
 
       ws.current.onerror = (error) => {
         console.error('WebSocket error:', error);
+        console.error('WebSocket URL:', wsUrl);
+        console.error('Connection details:', { 
+          protocol, 
+          host, 
+          readyState: ws.current?.readyState,
+          userId,
+          householdId 
+        });
+        onDisconnect?.();
       };
     };
 
