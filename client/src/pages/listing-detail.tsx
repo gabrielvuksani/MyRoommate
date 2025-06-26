@@ -110,12 +110,12 @@ export default function ListingDetail() {
           ? "floating-header-blur border-b"
           : "floating-header"
       }`}>
-        <div className="max-w-3xl mx-auto px-6 py-6 flex items-center justify-between">
+        <div className="flex items-center h-20 px-6">
           <BackButton to="/roommates" />
-          <h1 className="font-semibold text-[#1a1a1a] dark:text-white text-[22px]">
+          <h1 className="flex-1 text-center font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>
             Listing Details
           </h1>
-          <div className="w-10" /> {/* Spacer for centering */}
+          <div className="w-10" />
         </div>
       </div>
 

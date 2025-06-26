@@ -60,6 +60,7 @@ export default function Roommates() {
     description: "",
     rent: "",
     location: "",
+    city: "",
     availableFrom: "",
     roomType: "private",
     housingType: "apartment",
@@ -96,6 +97,7 @@ export default function Roommates() {
         description: "",
         rent: "",
         location: "",
+        city: "",
         availableFrom: "",
         roomType: "private",
         housingType: "apartment",
@@ -114,12 +116,13 @@ export default function Roommates() {
   });
 
   const handleCreateListing = () => {
-    if (!newListing.title || !newListing.rent || !newListing.location) return;
+    if (!newListing.title || !newListing.rent || !newListing.location || !newListing.city) return;
     
     createListingMutation.mutate({
       ...newListing,
       rent: parseFloat(newListing.rent),
-      availableFrom: newListing.availableFrom ? new Date(newListing.availableFrom) : new Date()
+      availableFrom: newListing.availableFrom ? new Date(newListing.availableFrom) : new Date(),
+      amenities: newListing.amenities
     });
   };
 
@@ -132,7 +135,7 @@ export default function Roommates() {
             <div className="flex items-center space-x-3">
               <BackButton to="/" />
               <div>
-                <h1 className="page-title">Find Roommates</h1>
+                <h1 className="page-title">Find Your Roommates</h1>
                 <p className="page-subtitle">Discover your perfect living situation</p>
               </div>
             </div>
@@ -247,17 +250,31 @@ export default function Roommates() {
                   />
                 </div>
 
-                <Input
-                  placeholder="Location (e.g., Downtown Toronto, ON)"
-                  value={newListing.location}
-                  onChange={(e) => setNewListing({ ...newListing, location: e.target.value })}
-                  className="input-modern"
-                  style={{
-                    background: 'var(--surface-secondary)',
-                    border: '1px solid var(--border)',
-                    color: 'var(--text-primary)'
-                  }}
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    placeholder="Location (e.g., Downtown)"
+                    value={newListing.location}
+                    onChange={(e) => setNewListing({ ...newListing, location: e.target.value })}
+                    className="input-modern"
+                    style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text-primary)'
+                    }}
+                  />
+                  
+                  <Input
+                    placeholder="City (e.g., San Francisco)"
+                    value={newListing.city}
+                    onChange={(e) => setNewListing({ ...newListing, city: e.target.value })}
+                    className="input-modern"
+                    style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text-primary)'
+                    }}
+                  />
+                </div>
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
@@ -385,6 +402,26 @@ export default function Roommates() {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--text-secondary)' }}>
+                    Amenities
+                  </label>
+                  <Input
+                    placeholder="e.g., WiFi, Parking, Gym, Pool, Laundry (comma-separated)"
+                    value={newListing.amenities.join(', ')}
+                    onChange={(e) => setNewListing({ 
+                      ...newListing, 
+                      amenities: e.target.value.split(',').map(a => a.trim()).filter(Boolean) 
+                    })}
+                    className="input-modern"
+                    style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text-primary)'
+                    }}
+                  />
                 </div>
 
                 <div>
