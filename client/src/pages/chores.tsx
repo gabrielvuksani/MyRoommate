@@ -19,7 +19,7 @@ export default function Chores() {
     title: '',
     description: '',
     assignedTo: '',
-    dueDate: '',
+    dueDate: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
     recurrence: '',
     priority: 'medium',
   });
@@ -61,7 +61,7 @@ export default function Chores() {
         title: '',
         description: '',
         assignedTo: '',
-        dueDate: '',
+        dueDate: new Date().toISOString().split('T')[0], // Reset to today's date
         recurrence: '',
         priority: 'medium',
       });
@@ -174,7 +174,7 @@ export default function Chores() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <input aria-placeholder="Due Date*" placeholder="Due date *" 
+                  <input 
                     type="date"
                     value={newChore.dueDate}
                     onChange={(e) => setNewChore({ ...newChore, dueDate: e.target.value })}

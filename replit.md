@@ -143,6 +143,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Implemented PATCH /api/households/current backend endpoint for household updates
 - ✓ Added updateHousehold method to storage interface and database implementation
 - ✓ Created intuitive edit interface with save/cancel buttons and keyboard shortcuts
+- ✓ Updated household name editing to follow exact same Dialog modal pattern as user name editing
+- ✓ Replaced inline editing with consistent modal interface and button styling
+- ✓ Applied same form input styling, save button behavior, and state management patterns
+- ✓ Enhanced create chore dialog to automatically select today's date as default value
 - ✓ Enhanced bottom navigation transparency (0.25 opacity) to show more background content
 - ✓ Completely redesigned message bubbles with visionOS/iMessage/Airbnb design fusion
 - ✓ Your messages: emerald-cyan gradients with custom tails and glass overlay effects
