@@ -91,16 +91,22 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
           className="relative group"
           style={{
             background: 'rgba(255, 255, 255, 0.85)',
-            borderRadius: '24px 24px 24px 8px',
+            borderRadius: '24px 24px 24px 6px',
             padding: '14px 18px',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
             backdropFilter: 'blur(20px) saturate(1.8)',
             border: '1px solid rgba(255, 255, 255, 0.3)',
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 rounded-[24px_24px_24px_8px] pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 rounded-[24px_24px_24px_6px] pointer-events-none"></div>
           <p className="text-gray-900 font-medium leading-relaxed relative z-10">{message.content}</p>
-          <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-white/85 rotate-45 transform origin-center shadow-sm backdrop-blur-sm"></div>
+          <div 
+            className="absolute bottom-0 left-0 w-2 h-2"
+            style={{
+              background: 'rgba(255, 255, 255, 0.85)',
+              backdropFilter: 'blur(20px) saturate(1.8)',
+            }}
+          ></div>
         </div>
       </div>
     </div>
