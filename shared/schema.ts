@@ -14,6 +14,7 @@ import {
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { nanoid } from "nanoid";
 
 // Session storage table for Replit Auth
 export const sessions = pgTable(
@@ -138,26 +139,21 @@ export const shoppingItems = pgTable("shopping_items", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Roommate listings table
 export const roommateListings = pgTable("roommate_listings", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  title: varchar("title", { length: 255 }).notNull(),
+  id: text("id").primaryKey().$defaultFn(() => nanoid()),
+  title: text("title").notNull(),
   description: text("description"),
-  rent: decimal("rent", { precision: 10, scale: 2 }).notNull(),
-  location: varchar("location", { length: 255 }).notNull(),
-  city: varchar("city", { length: 100 }).notNull(),
-  availableFrom: timestamp("available_from").notNull(),
-  roomType: varchar("room_type", { length: 50 }).notNull(), // "private", "shared", "studio"
-  housingType: varchar("housing_type", { length: 50 }).notNull(), // "apartment", "house", "condo", "dorm"
-  amenities: text("amenities").array(),
-  images: text("images").array(),
-  preferences: text("preferences"), // roommate preferences
-  contactInfo: varchar("contact_info", { length: 255 }),
-  isActive: boolean("is_active").default(true),
-  featured: boolean("featured").default(false),
-  createdBy: varchar("created_by").references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  rent: integer("rent").notNull(),
+  location: text("location").notNull(),
+  availableFrom: timestamp("available_from", { withTimezone: true }).notNull(),
+  roomType: text("room_type", { enum: ["private", "shared", "studio"] }).notNull(),
+  preferences: text("preferences"),
+  contactInfo: text("contact_info"),
+  isActive: boolean("is_active").default(true).notNull(),
+  featured: boolean("featured").default(false).notNull(),
+  createdBy: text("created_by").references(() => users.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
 // Relations

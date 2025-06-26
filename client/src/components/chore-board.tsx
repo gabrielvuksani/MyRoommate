@@ -240,15 +240,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
       {/* To-Do Column */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{
-              background: 'rgba(0, 122, 255, 0.1)',
-              border: '2px solid var(--primary)'
-            }}>
-              <div className="w-2 h-2 rounded-full" style={{ background: 'var(--primary)' }}></div>
-            </div>
-            <h3 className="text-headline font-semibold" style={{ color: 'var(--text-primary)' }}>To Do</h3>
-          </div>
+          <h3 className="text-headline font-semibold" style={{ color: 'var(--text-primary)' }}>To Do</h3>
           <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
             background: 'rgba(0, 122, 255, 0.1)',
             color: 'var(--primary)'
@@ -259,7 +251,8 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
         <div className="space-y-3">
           {todoChores.length === 0 ? (
             <div className="border-2 border-dashed rounded-xl p-6 text-center" style={{
-              borderColor: 'var(--border-color)'
+              borderColor: 'var(--border-color)',
+              opacity: '0.6'
             }}>
               <p style={{ color: 'var(--text-secondary)' }}>No pending chores</p>
             </div>
@@ -272,15 +265,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
       {/* In Progress Column */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{
-              background: 'rgba(255, 159, 10, 0.1)',
-              border: '2px solid #FF9F0A'
-            }}>
-              <div className="w-2 h-2 rounded-full" style={{ background: '#FF9F0A' }}></div>
-            </div>
-            <h3 className="text-headline font-semibold" style={{ color: 'var(--text-primary)' }}>In Progress</h3>
-          </div>
+          <h3 className="text-headline font-semibold" style={{ color: 'var(--text-primary)' }}>In Progress</h3>
           <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
             background: 'rgba(255, 159, 10, 0.1)',
             color: '#FF9F0A'
@@ -291,7 +276,8 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
         <div className="space-y-3">
           {doingChores.length === 0 ? (
             <div className="border-2 border-dashed rounded-xl p-6 text-center" style={{
-              borderColor: 'var(--border-color)'
+              borderColor: 'var(--border-color)',
+              opacity: '0.6'
             }}>
               <p style={{ color: 'var(--text-secondary)' }}>No chores in progress</p>
             </div>
@@ -304,15 +290,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
       {/* Done Column */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{
-              background: 'rgba(48, 209, 88, 0.1)',
-              border: '2px solid #30D158'
-            }}>
-              <div className="w-2 h-2 rounded-full" style={{ background: '#30D158' }}></div>
-            </div>
-            <h3 className="text-headline font-semibold" style={{ color: 'var(--text-primary)' }}>Completed</h3>
-          </div>
+          <h3 className="text-headline font-semibold" style={{ color: 'var(--text-primary)' }}>Completed</h3>
           <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
             background: 'rgba(48, 209, 88, 0.1)',
             color: '#30D158'
@@ -323,7 +301,8 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
         <div className="space-y-3">
           {doneChores.length === 0 ? (
             <div className="border-2 border-dashed rounded-xl p-6 text-center" style={{
-              borderColor: 'var(--border-color)'
+              borderColor: 'var(--border-color)',
+              opacity: '0.6'
             }}>
               <p style={{ color: 'var(--text-secondary)' }}>No completed chores</p>
             </div>

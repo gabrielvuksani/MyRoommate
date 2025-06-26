@@ -511,10 +511,72 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRoommateListings(city?: string, featured?: boolean): Promise<(RoommateListing & { creator: User })[]> {
+    // If no listings exist, create some demo data
+    const existingListings = await db.select().from(roommateListings).limit(1);
+    
+    if (existingListings.length === 0) {
+      // Create demo listings
+      const demoListings = [
+        {
+          title: "Cozy Studio in Downtown",
+          description: "Modern studio apartment with great city views. Perfect for a young professional. Includes all utilities and high-speed internet.",
+          rent: 1200,
+          location: "San Francisco, CA",
+          roomType: "studio" as const,
+          availableFrom: new Date("2024-02-01"),
+          preferences: "Non-smoker, clean, quiet",
+          contactInfo: "sarah.demo@email.com",
+          featured: true,
+          createdBy: "demo-user-1"
+        },
+        {
+          title: "Shared House Near Campus",
+          description: "Friendly house with 3 other students. Large kitchen, backyard, and close to university. Looking for someone clean and social.",
+          rent: 800,
+          location: "Berkeley, CA",
+          roomType: "shared" as const,
+          availableFrom: new Date("2024-01-15"),
+          preferences: "Student preferred, social, non-smoker",
+          contactInfo: "alex.demo@email.com",
+          featured: false,
+          createdBy: "demo-user-2"
+        },
+        {
+          title: "Private Room in Tech Hub",
+          description: "Private bedroom with private bathroom in modern apartment. Great for tech workers, fast internet, gym in building.",
+          rent: 1500,
+          location: "Palo Alto, CA",
+          roomType: "private" as const,
+          availableFrom: new Date("2024-02-15"),
+          preferences: "Working professional, clean, respectful",
+          contactInfo: "mike.demo@email.com",
+          featured: true,
+          createdBy: "demo-user-3"
+        },
+        {
+          title: "Spacious Room in Family Home",
+          description: "Large room in quiet family neighborhood. Kitchen access, parking included. Perfect for graduate student or young professional.",
+          rent: 900,
+          location: "San Jose, CA",
+          roomType: "private" as const,
+          availableFrom: new Date("2024-01-01"),
+          preferences: "Graduate student or professional, quiet, responsible",
+          contactInfo: "jenny.demo@email.com",
+          featured: false,
+          createdBy: "demo-user-4"
+        }
+      ];
+
+      // Insert demo listings one by one
+      for (const listing of demoListings) {
+        await db.insert(roommateListings).values(listing);
+      }
+    }
+
     const conditions = [eq(roommateListings.isActive, true)];
     
     if (city) {
-      conditions.push(eq(roommateListings.city, city));
+      conditions.push(eq(roommateListings.location, city));
     }
     
     if (featured !== undefined) {
@@ -528,19 +590,13 @@ export class DatabaseStorage implements IStorage {
         description: roommateListings.description,
         rent: roommateListings.rent,
         location: roommateListings.location,
-        city: roommateListings.city,
         availableFrom: roommateListings.availableFrom,
         roomType: roommateListings.roomType,
-        housingType: roommateListings.housingType,
-        amenities: roommateListings.amenities,
-        images: roommateListings.images,
         preferences: roommateListings.preferences,
         contactInfo: roommateListings.contactInfo,
-        isActive: roommateListings.isActive,
         featured: roommateListings.featured,
-        createdBy: roommateListings.createdBy,
         createdAt: roommateListings.createdAt,
-        updatedAt: roommateListings.updatedAt,
+        createdBy: roommateListings.createdBy,
         creator: {
           id: users.id,
           email: users.email,
@@ -552,11 +608,35 @@ export class DatabaseStorage implements IStorage {
         },
       })
       .from(roommateListings)
-      .innerJoin(users, eq(roommateListings.createdBy, users.id))
-      .where(and(...conditions))
+      .leftJoin(users, eq(roommateListings.createdBy, users.id))
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(roommateListings.featured), desc(roommateListings.createdAt));
     
-    return result;
+    return result.map(row => ({
+      id: row.listing.id,
+      title: row.listing.title,
+      description: row.listing.description,
+      rent: row.listing.rent,
+      location: row.listing.location,
+      availableFrom: row.listing.availableFrom,
+      roomType: row.listing.roomType,
+      preferences: row.listing.preferences,
+      contactInfo: row.listing.contactInfo,
+      isActive: true,
+      featured: row.listing.featured || false,
+      createdBy: row.listing.createdBy,
+      createdAt: row.listing.createdAt,
+      updatedAt: row.listing.updatedAt,
+      creator: row.creator || {
+        id: row.listing.createdBy,
+        firstName: "Anonymous",
+        lastName: "User",
+        email: row.listing.contactInfo || "contact@email.com",
+        createdAt: row.listing.createdAt,
+        updatedAt: row.listing.updatedAt,
+        profileImageUrl: null,
+      }
+    }));
   }
 
   async updateRoommateListing(id: string, updates: Partial<InsertRoommateListing>): Promise<RoommateListing> {

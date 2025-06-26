@@ -592,7 +592,7 @@ export default function Home() {
         </div>
 
         {/* Roommate Marketplace Section */}
-        <div className="mt-12 border-t border-gray-100 pt-8">
+        <div className="mt-12 border-t pt-8" style={{ borderColor: 'var(--border-color)' }}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
@@ -605,8 +605,7 @@ export default function Home() {
             </div>
             <Button
               onClick={() => setLocation("/roommates")}
-              variant="outline"
-              className="bg-white/60 backdrop-blur-sm border-gray-200 hover:bg-white/80"
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border-0"
             >
               <Search className="w-4 h-4 mr-2" />
               Browse All

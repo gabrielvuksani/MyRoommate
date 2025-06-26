@@ -322,15 +322,18 @@ export default function Expenses() {
 
       <div className="pt-32 px-6 space-y-6">
         {/* Balance Overview */}
-        <Card className="glass-card">
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border-color)'
+        }}>
           <CardContent className="p-6">
             <h2 className="text-headline font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
               Balance Overview
             </h2>
             <div className="text-center py-4">
-              <p
-                className={`text-title-1 font-bold ${netBalance >= 0 ? "text-success" : "text-destructive"}`}
-              >
+              <p className="text-title-1 font-bold" style={{
+                color: netBalance >= 0 ? '#30D158' : '#FF453A'
+              }}>
                 {netBalance >= 0 ? "+" : ""}${netBalance.toFixed(2)}
               </p>
               <p className="text-footnote" style={{ color: 'var(--text-secondary)' }}>Overall balance</p>
@@ -342,7 +345,7 @@ export default function Expenses() {
                     <span className="text-ios-body" style={{ color: 'var(--text-primary)' }}>
                       Total owed to you
                     </span>
-                    <span className="text-ios-body font-medium text-ios-green">
+                    <span className="text-ios-body font-medium" style={{ color: '#30D158' }}>
                       ${balance.totalOwed.toFixed(2)}
                     </span>
                   </div>
@@ -352,7 +355,7 @@ export default function Expenses() {
                     <span className="text-ios-body" style={{ color: 'var(--text-primary)' }}>
                       Total you owe
                     </span>
-                    <span className="text-ios-body font-medium text-ios-red">
+                    <span className="text-ios-body font-medium" style={{ color: '#FF453A' }}>
                       ${balance.totalOwing.toFixed(2)}
                     </span>
                   </div>
@@ -387,7 +390,10 @@ export default function Expenses() {
         </div>
 
         {/* Filtered Expenses */}
-        <Card className="glass-card">
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border-color)'
+        }}>
           <CardContent className="p-6">
             <h2 className="text-headline font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
               {activeTab === "all" ? "All Expenses" : 
