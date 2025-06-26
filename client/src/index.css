@@ -94,12 +94,6 @@
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
-  
-  /* Essential spacing variables for compatibility */
-  --space-2: 8px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-12: 48px;
 }
 
 /* Modern Typography */
