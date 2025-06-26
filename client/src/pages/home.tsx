@@ -12,6 +12,13 @@ import {
   BarChart3,
   Award,
   TrendingUp,
+  Mic,
+  Volume2,
+  Play,
+  Pause,
+  Receipt,
+  Users,
+  Split,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
@@ -564,6 +571,136 @@ export default function Home() {
               </Card>
             )}
           </div>
+        </div>
+
+        {/* Voice Message Transcription Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              <Volume2 className="w-5 h-5 mr-2 text-purple-500" />
+              Voice Messages
+            </h2>
+          </div>
+          <Card className="glass-card">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {/* Sample voice message */}
+                <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                    <Mic className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-gray-900">Alex</span>
+                      <span className="text-xs text-gray-500">2:30 PM</span>
+                    </div>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <button className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 transition-colors">
+                        <Play className="w-4 h-4" />
+                        <span className="text-sm">0:15</span>
+                      </button>
+                      <div className="flex-1 h-2 bg-purple-200 rounded-full overflow-hidden">
+                        <div className="w-1/3 h-full bg-purple-500 rounded-full"></div>
+                      </div>
+                    </div>
+                    <div className="bg-white/60 rounded-lg p-3 text-sm text-gray-700">
+                      <strong>Transcription:</strong> "Hey everyone, just picked up groceries for the week. The total was $127. Should we split this equally among all four of us?"
+                    </div>
+                  </div>
+                </div>
+
+                {/* Empty state for more voice messages */}
+                <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-xl">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                    <Mic className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-gray-600 mb-2">Voice messages appear here</p>
+                  <p className="text-sm text-gray-500">Send voice messages in chat for automatic transcription</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Interactive Expense Splitting Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              <Split className="w-5 h-5 mr-2 text-emerald-500" />
+              Quick Split
+            </h2>
+          </div>
+          <Card className="glass-card">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {/* Detected expense from voice message */}
+                <div className="bg-gradient-to-r from-emerald-50 to-cyan-50 rounded-xl p-4 border border-emerald-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <Receipt className="w-5 h-5 text-emerald-600" />
+                      <span className="font-medium text-gray-900">Detected Expense</span>
+                    </div>
+                    <span className="text-sm text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">From voice message</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">Amount</label>
+                      <div className="mt-1 text-2xl font-bold text-gray-900">$127.00</div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">Category</label>
+                      <div className="mt-1 text-lg text-gray-700">Groceries</div>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">Split with</label>
+                    <div className="flex items-center space-x-2">
+                      <Users className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm text-gray-600">4 household members</span>
+                      <span className="text-sm font-medium text-emerald-600 ml-auto">$31.75 each</span>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <button 
+                      onClick={() => setLocation("/expenses")}
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200"
+                    >
+                      Create Split
+                    </button>
+                    <button className="px-4 py-2 text-gray-600 hover:text-gray-700 transition-colors">
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick split buttons */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button 
+                    onClick={() => setLocation("/expenses")}
+                    className="p-4 border-2 border-dashed border-gray-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-200 text-center"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+                      <DollarSign className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Split Bill</span>
+                  </button>
+                  
+                  <button 
+                    onClick={() => setLocation("/messages")}
+                    className="p-4 border-2 border-dashed border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 text-center"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+                      <MessageCircle className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Chat Split</span>
+                  </button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

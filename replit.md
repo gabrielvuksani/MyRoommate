@@ -139,6 +139,11 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Applied exact card design pattern from home/chores/expenses pages (glass-card with p-6 CardContent)
 - ✓ Standardized all card components to use proper semantic structure and spacing
 - ✓ Removed background gradient from onboarding page to match app-wide consistency
+- ✓ Added voice message transcription section with visual playback controls and sample transcription
+- ✓ Implemented interactive expense splitting within chat context with detected expense from voice messages
+- ✓ Created Quick Split section with automatic expense detection and calculation features
+- ✓ Added voice message UI with play controls, progress bars, and transcription display
+- ✓ Enhanced home page with voice-to-expense workflow integration
 - ✓ Enhanced bottom navigation transparency (0.25 opacity) to show more background content
 - ✓ Completely redesigned message bubbles with visionOS/iMessage/Airbnb design fusion
 - ✓ Your messages: emerald-cyan gradients with custom tails and glass overlay effects
