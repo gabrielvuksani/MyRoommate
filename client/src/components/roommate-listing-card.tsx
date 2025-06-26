@@ -78,10 +78,10 @@ export default function RoommateListingCard({ listing, onContact, compact = fals
 
           {/* Type Badges */}
           <div className="flex gap-2 flex-wrap">
-            <Badge variant="secondary" className="text-xs">
+            <Badge className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-0">
               {listing.roomType}
             </Badge>
-            <Badge variant="secondary" className="text-xs">
+            <Badge className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0">
               {listing.housingType}
             </Badge>
           </div>
@@ -113,8 +113,11 @@ export default function RoommateListingCard({ listing, onContact, compact = fals
             {onContact && (
               <Button 
                 size="sm" 
-                onClick={() => onContact(listing)}
-                className="text-xs px-3 py-1 h-auto"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onContact(listing);
+                }}
+                className="text-xs px-4 py-1.5 h-auto bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0 shadow-sm"
               >
                 Contact
               </Button>

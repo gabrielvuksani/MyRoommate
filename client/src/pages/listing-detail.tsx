@@ -103,19 +103,19 @@ export default function ListingDetail() {
   };
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Floating Header */}
-      <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        headerScrolled
-          ? "floating-header-blur border-b"
-          : "floating-header"
-      }`}>
-        <div className="flex items-center h-20 px-6">
-          <BackButton to="/roommates" />
-          <h1 className="flex-1 text-center font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>
-            Listing Details
-          </h1>
-          <div className="w-10" />
+    <div className="min-h-screen pb-32">
+      {/* visionOS Header */}
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
+        <div className="page-header">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <BackButton to="/roommates" />
+              <div>
+                <h1 className="page-title">Listing Details</h1>
+                <p className="page-subtitle">Room information</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
