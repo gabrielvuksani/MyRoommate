@@ -77,14 +77,20 @@ export default function Profile() {
     mutationFn: async () => {
       return await apiRequest("POST", "/api/households/leave", {});
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
-      setLocation("/");
+    onSuccess: async () => {
+      // First remove all cached data completely
+      queryClient.removeQueries({ queryKey: ["/api/households/current"] });
+      queryClient.removeQueries({ queryKey: ["/api/chores"] });
+      queryClient.removeQueries({ queryKey: ["/api/expenses"] });
+      queryClient.removeQueries({ queryKey: ["/api/calendar"] });
+      queryClient.removeQueries({ queryKey: ["/api/messages"] });
+      queryClient.removeQueries({ queryKey: ["/api/balance"] });
+      
+      // Clear the entire query cache to ensure no stale data
+      queryClient.clear();
+      
+      // Force a page reload to ensure clean state
+      window.location.href = "/";
     },
     onError: (error: any) => {
       console.error("Failed to leave household:", error);

@@ -138,6 +138,9 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Fixed calendar page scroll behavior by removing duplicate useEffect hook that was causing conflicts
 - ✓ Corrected Find Roommates "View All" button to match Featured Listings section style exactly (simple text-primary style)
 - ✓ Added arrow icon to "View All" button in household member cards (Household Performance section) on homepage
+- ✓ Fixed "Leave household" functionality by resolving cache invalidation issues
+- ✓ Updated query client staleTime from Infinity to 5 minutes for proper data staleness
+- ✓ Enhanced leave household mutation with complete cache clearing and page reload for reliable state management
 
 **June 26, 2025 (Earlier):**
 - ✓ Fixed calendar selected date visibility with explicit blue background and white text styling
