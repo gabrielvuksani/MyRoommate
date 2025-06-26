@@ -27,7 +27,7 @@ export default function Messages() {
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household,
-    refetchInterval: connectionStatus === 'connected' ? 2000 : 1000,
+    refetchInterval: 3000, // Poll every 3 seconds for consistent performance
     refetchIntervalInBackground: true,
     staleTime: 500,
   });

@@ -221,6 +221,7 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Enhanced message cache management with proper array type checking and error recovery
 - ✓ Implemented immediate UI updates with refetchType: 'none' for better user experience
 - ✓ Added robust error handling for failed message sends with input restoration for retry
+- ✓ Updated message polling interval from 1-2 seconds to 3 seconds for better server performance
 
 **June 25, 2025 (Earlier):**
 - ✓ Completed delete functionality implementation across all three core pages
