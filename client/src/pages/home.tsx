@@ -211,13 +211,17 @@ export default function Home() {
               <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
                 Featured Listings
               </h3>
-              <Button
-                variant="ghost"
+              <button
                 onClick={() => setLocation("/roommates")}
-                className="text-primary"
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+                style={{ 
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
               >
-                View All <ArrowRight size={16} className="ml-1" />
-              </Button>
+                <span className="text-sm font-medium">View All</span>
+                <ArrowRight size={14} />
+              </button>
             </div>
             
             {featuredListings && featuredListings.length > 0 ? (

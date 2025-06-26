@@ -111,6 +111,17 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Enhanced "View All" button styling to match household member interface design patterns
+- ✓ Implemented comprehensive visionOS liquid glass design system across light and dark modes
+- ✓ Refined light mode color variables to reduce "staticky" appearance and achieve smooth glass morphism
+- ✓ Enhanced glass-card component with authentic liquid glass effects including backdrop blur, saturation, and inset highlights
+- ✓ Updated floating headers with liquid glass backdrop filters and enhanced visual depth
+- ✓ Improved tab navigation with unified liquid glass aesthetic and enhanced shadow systems
+- ✓ Added sophisticated button animations with backdrop blur, scaling, and shimmer effects
+- ✓ Achieved unified visionOS design language across all UI components while maintaining existing functionality
+- ✓ Enhanced refresh button with dynamic data display and home page redirect functionality
+
+**June 26, 2025 (Earlier):**
 - ✓ Created reusable BackButton component for app-wide consistency
 - ✓ Systematically replaced all back button implementations across dashboard, profile, roommates, settings, and roommate-marketplace pages
 - ✓ Fixed onboarding dark mode support by updating all input fields and buttons to use CSS variables
