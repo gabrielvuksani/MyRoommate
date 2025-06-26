@@ -31,10 +31,28 @@ export default function BottomNavigation() {
     const activeIndex = tabs.findIndex(tab => tab.path === location);
     if (activeIndex === -1) return;
     
-    // Calculate position for sliding indicator (each tab is 20% wide for 5 tabs)
-    const translateX = activeIndex * 20; // 0%, 20%, 40%, 60%, 80%
-    console.log(`Tab ${activeIndex}: ${location} → ${translateX}%`);
-    navigationRef.current.style.setProperty('--indicator-position', `${translateX}%`);
+    // Calculate precise tab positioning with centering
+    const containerWidth = navigationRef.current.offsetWidth;
+    const tabWidth = containerWidth / tabs.length;
+    const indicatorWidth = tabWidth - 16; // Account for padding
+    const translateX = activeIndex * tabWidth + 8; // Add 8px for centering
+    
+    navigationRef.current.style.setProperty('--indicator-translate', `${translateX}px`);
+    navigationRef.current.style.setProperty('--indicator-width', `${indicatorWidth}px`);
+    
+    // Also need to handle resize events
+    const handleResize = () => {
+      if (!navigationRef.current) return;
+      const newContainerWidth = navigationRef.current.offsetWidth;
+      const newTabWidth = newContainerWidth / tabs.length;
+      const newIndicatorWidth = newTabWidth - 16;
+      const newTranslateX = activeIndex * newTabWidth + 8;
+      navigationRef.current.style.setProperty('--indicator-translate', `${newTranslateX}px`);
+      navigationRef.current.style.setProperty('--indicator-width', `${newIndicatorWidth}px`);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [location, tabs]);
 
   return (
@@ -42,7 +60,8 @@ export default function BottomNavigation() {
       ref={navigationRef}
       className="tab-navigation" 
       style={{
-        '--indicator-position': '0%',
+        '--indicator-translate': '0px',
+        '--indicator-width': 'calc(20% - 16px)',
       } as React.CSSProperties}
     >
       <div className="flex items-center justify-center w-full">
