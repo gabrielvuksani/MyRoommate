@@ -485,9 +485,7 @@ export default function Profile() {
                 <span>
                   {isRefreshing 
                     ? "Refreshing data & returning home..." 
-                    : household 
-                      ? `Refresh ${(household as any).name || 'Household'} Data`
-                      : `Refresh ${(user as any).firstName || 'Profile'} Data`
+                    : "Refresh App & Data"
                   }
                 </span>
               </Button>
