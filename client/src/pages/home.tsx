@@ -116,7 +116,7 @@ export default function Home() {
                 <h1 className="page-title">
                   Welcome back, <span className="truncate">{firstName}</span>
                 </h1>
-                <p className="page-subtitle truncate">Ready to find your perfect living situation?</p>
+                <p className="page-subtitle truncate">Find your perfect living situation</p>
               </div>
               <button
                 onClick={() => setLocation("/profile")}
@@ -243,17 +243,6 @@ export default function Home() {
                   <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                     Be the first to post a listing in your area
                   </p>
-                  <button
-                    onClick={() => setLocation("/roommates")}
-                    className="transition-all btn-animated"
-                  >
-                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-2">
-                      <ArrowRight className="text-white" size={16} />
-                    </div>
-                    <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                      Browse Marketplace
-                    </p>
-                  </button>
                 </CardContent>
               </Card>
             )}

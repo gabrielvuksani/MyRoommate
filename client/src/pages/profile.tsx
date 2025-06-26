@@ -116,11 +116,13 @@ export default function Profile() {
     try {
       // Invalidate all queries to refresh data
       await queryClient.invalidateQueries();
-      // Refresh the entire app after data refresh
+      // Navigate to home page after data refresh
       setTimeout(() => {
-        window.location.reload();
+        setLocation("/");
+        setIsRefreshing(false);
       }, 1000);
-    } finally {
+    } catch (error) {
+      console.error("Refresh failed:", error);
       setIsRefreshing(false);
     }
   };
@@ -481,7 +483,12 @@ export default function Profile() {
               >
                 <RefreshCw size={20} className={isRefreshing ? "animate-spin" : ""} />
                 <span>
-                  {isRefreshing ? "Refreshing..." : "Refresh App"}
+                  {isRefreshing 
+                    ? "Refreshing data & returning home..." 
+                    : household 
+                      ? `Refresh ${(household as any).name || 'Household'} Data`
+                      : `Refresh ${(user as any).firstName || 'Profile'} Data`
+                  }
                 </span>
               </Button>
               {(household as any) && (
