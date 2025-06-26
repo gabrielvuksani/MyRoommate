@@ -170,21 +170,25 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="flex pt-[10px] space-x-2">
+      <div className="pt-36 px-6 space-y-6">
+        {/* Time Period Filter */}
+        <div className="flex justify-center">
+          <div className="flex space-x-2 p-1 rounded-2xl" style={{ background: 'var(--surface-secondary)' }}>
             {["week", "month", "all"].map((period) => (
               <button
                 key={period}
                 onClick={() => setSelectedPeriod(period)}
-                className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                className="px-6 py-2 rounded-xl text-sm font-semibold transition-all"
                 style={{
                   background: selectedPeriod === period 
                     ? 'var(--primary)' 
-                    : 'var(--surface-secondary)',
+                    : 'transparent',
                   color: selectedPeriod === period 
                     ? 'white' 
-                    : 'var(--text-secondary)',
-                  border: '1px solid var(--border)'
+                    : 'var(--text-secondary)'
                 }}
               >
                 {period.charAt(0).toUpperCase() + period.slice(1)}
@@ -192,9 +196,7 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
-      </div>
 
-      <div className="pt-[205px] px-6 space-y-6">
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="glass-card" style={{
