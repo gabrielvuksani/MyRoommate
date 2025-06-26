@@ -27,48 +27,76 @@ export default function Messages() {
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household,
+    refetchInterval: connectionStatus === 'connected' ? 2000 : 1000,
+    refetchIntervalInBackground: true,
+    staleTime: 500,
   });
 
   const { sendMessage } = useWebSocket({
-    onConnect: () => setConnectionStatus('connected'),
+    onConnect: () => {
+      setConnectionStatus('connected');
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+    },
     onDisconnect: () => setConnectionStatus('disconnected'),
     onMessage: (data) => {
       if (data.type === 'connection_confirmed') {
         setConnectionStatus('connected');
         console.log('WebSocket connection confirmed:', data);
+        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
         return;
       }
       if (data.type === 'message_error') {
         console.error('Message error:', data.error);
-        // Retry the last message if needed
+        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
         return;
       }
       if (data.type === "new_message") {
-        // Immediately update the messages in the cache for real-time display
+        console.log('Real-time message received:', data.message.id);
+        
         queryClient.setQueryData(["/api/messages"], (old: any) => {
-          const messages = old || [];
-          // Replace temp optimistic message with real one, or add if not exists
-          const tempIndex = messages.findIndex((msg: any) => msg.id.startsWith('temp-') && msg.content === data.message.content && msg.userId === data.message.userId);
-          if (tempIndex !== -1) {
-            // Replace temp message with real one
-            const newMessages = [...messages];
-            newMessages[tempIndex] = data.message;
-            return newMessages;
-          } else {
-            // Check if real message already exists to prevent duplicates
-            const exists = messages.some((msg: any) => msg.id === data.message.id);
-            if (!exists) {
-              return [...messages, data.message];
+          const currentMessages = old || [];
+          
+          if (data.tempId) {
+            const tempIndex = currentMessages.findIndex((msg: any) => msg.id === data.tempId);
+            if (tempIndex !== -1) {
+              console.log('Replacing optimistic message with real one');
+              const newMessages = [...currentMessages];
+              newMessages[tempIndex] = data.message;
+              return newMessages;
             }
           }
-          return messages;
+          
+          const messageExists = currentMessages.some((msg: any) => msg.id === data.message.id);
+          if (messageExists) {
+            console.log('Message already exists in cache, skipping duplicate');
+            return currentMessages;
+          }
+          
+          const filteredMessages = currentMessages.filter((msg: any) => 
+            !(msg.id?.startsWith('temp-') && 
+              msg.content === data.message.content && 
+              msg.userId === data.message.userId)
+          );
+          
+          const updatedMessages = [...filteredMessages, data.message];
+          console.log('Cache updated with new message:', updatedMessages.length, 'total messages');
+          return updatedMessages;
         });
         
-        // Force invalidate and refetch to ensure UI updates across all clients
-        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+        queryClient.invalidateQueries({ 
+          queryKey: ["/api/messages"], 
+          refetchType: 'active' 
+        });
         
-        // Scroll to bottom when new message arrives
-        setTimeout(scrollToBottom, 100);
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            if (shouldAutoScroll) {
+              scrollToBottom();
+            }
+          }, 25);
+        });
+      } else if (data.type === "pong") {
+        console.log('WebSocket pong received - connection healthy');
       } else if (data.type === "user_typing") {
         if (data.userId !== user?.id) {
           setTypingUsers(prev => {
@@ -77,13 +105,13 @@ export default function Messages() {
             }
             return prev;
           });
-          // Clear typing indicator after 3 seconds
           setTimeout(() => {
             setTypingUsers(prev => prev.filter(name => name !== data.userName));
           }, 3000);
           
-          // Auto-scroll when typing indicators appear
-          setTimeout(scrollToBottom, 100);
+          requestAnimationFrame(() => {
+            setTimeout(scrollToBottom, 50);
+          });
         }
       } else if (data.type === "user_stopped_typing") {
         if (data.userId !== user?.id) {
@@ -103,232 +131,197 @@ export default function Messages() {
     }
   };
 
-  const scrollToTop = () => {
-    // Account for header height (144px) plus some padding
-    window.scrollTo({ top: 160, behavior: "smooth" });
-  };
-
-  // Check if user is near bottom of messages
-  const isNearBottom = () => {
-    const threshold = 150;
-    return (
-      window.innerHeight + window.scrollY >=
-      document.documentElement.scrollHeight - threshold
-    );
-  };
-
-  // Auto-scroll logic based on message count
+  // Auto-scroll detection
   useEffect(() => {
-    if (messages.length > 0 && shouldAutoScroll) {
+    const container = document.querySelector('.messages-container');
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShouldAutoScroll(isNearBottom);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Handle header scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Auto-scroll when messages change
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      // For conversations with few messages (≤5), scroll to top
       if (messages.length <= 5) {
-        // For 5 or fewer messages, scroll to top with header offset
-        scrollToTop();
+        window.scrollTo(0, 0);
       } else {
-        // For more than 5 messages, scroll to bottom
-        scrollToBottom();
+        // For longer conversations, maintain auto-scroll behavior
+        if (shouldAutoScroll) {
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+          }, 100);
+        }
       }
     }
   }, [messages, shouldAutoScroll]);
 
-  // Initial scroll behavior when messages load
+  // Auto-scroll on page load
   useEffect(() => {
-    if (!isLoading) {
-      setTimeout(() => {
-        if (messages.length <= 5) {
-          // For few messages, position just below header to avoid overlap
-          window.scrollTo({ top: 160, behavior: "auto" });
-        } else if (messages.length > 5) {
-          messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-        }
-      }, 100);
-    }
-  }, [isLoading, messages.length]);
-
-  // Always ensure proper scroll position on page load
-  useEffect(() => {
-    // Handle initial page load with immediate scroll adjustment for new users
-    if (!isLoading && messages.length === 0) {
-      // For completely new conversations, scroll to top with header offset
-      window.scrollTo({ top: 160, behavior: "auto" });
-    } else if (!isLoading && messages.length <= 5) {
-      // For conversations with few messages, scroll to top with header offset
-      window.scrollTo({ top: 160, behavior: "auto" });
-    }
-  }, [isLoading, messages.length]);
-
-  // Auto-scroll when typing indicators appear (only for longer conversations)
-  useEffect(() => {
-    if (typingUsers.length > 0 && shouldAutoScroll && messages.length > 5) {
-      scrollToBottom();
-    }
-  }, [typingUsers, shouldAutoScroll, messages.length]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setHeaderScrolled(window.scrollY > 10);
-      
-      // If user scrolls up significantly, disable auto-scroll
-      if (!isNearBottom()) {
-        setShouldAutoScroll(false);
+    if (!isLoading && messages) {
+      // Determine scroll behavior based on message count
+      if (messages.length <= 5) {
+        // For new/short conversations, scroll to top
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 100);
       } else {
-        // If user scrolls back to bottom, re-enable auto-scroll
-        setShouldAutoScroll(true);
+        // For longer conversations, scroll to bottom
+        setTimeout(() => {
+          if (shouldAutoScroll) {
+            scrollToBottom();
+          }
+        }, 200);
       }
-    };
-    
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Handle keyboard visibility on mobile
-  useEffect(() => {
-    const handleResize = () => {
-      // Scroll to bottom when keyboard appears
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    }
+  }, [isLoading, messages, shouldAutoScroll]);
 
   const handleTyping = (value: string) => {
     setNewMessage(value);
     
     if (!household || !user) return;
     
-    const userName = user.firstName || user.email?.split('@')[0] || 'Unknown';
+    const userName = formatDisplayName(user.firstName, user.lastName, user.email);
     
-    if (value.trim() && !isTyping) {
+    if (!isTyping) {
       setIsTyping(true);
-      sendMessage({
+      sendMessage?.({
         type: "user_typing",
         householdId: household.id,
         userId: user.id,
         userName,
       });
     }
-    
+
     // Clear existing timeout
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    
+
     // Set new timeout to stop typing indicator
     typingTimeoutRef.current = setTimeout(() => {
       if (isTyping) {
         setIsTyping(false);
-        sendMessage({
+        sendMessage?.({
           type: "user_stopped_typing",
           householdId: household.id,
           userId: user.id,
           userName,
         });
       }
-    }, 1000);
+    }, 2000);
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !household || !user) return;
 
     const messageContent = newMessage.trim();
     
-    // Clear typing indicator
+    // Clear typing timeout and state
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
     if (isTyping) {
       setIsTyping(false);
-      const userName = user.firstName || user.email?.split('@')[0] || 'Unknown';
-      sendMessage({
+      sendMessage?.({
         type: "user_stopped_typing",
         householdId: household.id,
         userId: user.id,
-        userName,
+        userName: formatDisplayName(user.firstName, user.lastName, user.email),
       });
     }
 
-    // Optimistic update - show message immediately
+    // Create optimistic message with temp ID
+    const tempId = `temp-${Date.now()}-${Math.random()}`;
     const optimisticMessage = {
-      id: `temp-${Date.now()}`,
+      id: tempId,
       content: messageContent,
-      householdId: household.id,
       userId: user.id,
+      householdId: household.id,
       createdAt: new Date(),
-      user: user,
-      type: null,
-      linkedTo: null,
-      linkedType: null,
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      },
     };
 
-    queryClient.setQueryData(["/api/messages"], (old: any) => [
-      ...(old || []),
-      optimisticMessage,
-    ]);
-
-    // Send via WebSocket
-    sendMessage({
-      type: "send_message",
-      content: messageContent,
-      householdId: household.id,
-      userId: user.id,
+    // Immediately add optimistic message to cache
+    queryClient.setQueryData(["/api/messages"], (old: any) => {
+      const currentMessages = old || [];
+      return [...currentMessages, optimisticMessage];
     });
 
+    // Clear input immediately for better UX
     setNewMessage("");
-    setTimeout(scrollToBottom, 50);
+
+    try {
+      // Send message via WebSocket with temp ID for replacement
+      sendMessage?.({
+        type: "new_message",
+        tempId,
+        message: {
+          content: messageContent,
+          householdId: household.id,
+          userId: user.id,
+        },
+      });
+
+      // Also send via HTTP as backup
+      await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: messageContent,
+          householdId: household.id,
+          userId: user.id,
+        }),
+      });
+
+      // Invalidate to ensure we have latest state
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      // Remove failed optimistic message
+      queryClient.setQueryData(["/api/messages"], (old: any) => {
+        const currentMessages = old || [];
+        return currentMessages.filter((msg: any) => msg.id !== tempId);
+      });
+    }
   };
 
-  const quickMessages = [
-    { icon: Coffee, text: "Anyone want coffee?", color: "from-amber-400 to-orange-500" },
-    { icon: ShoppingCart, text: "Going grocery shopping, need anything?", color: "from-green-400 to-emerald-500" },
-    { icon: Home, text: "Who's home tonight?", color: "from-blue-400 to-cyan-500" },
-    { icon: Calendar, text: "Movie night this weekend?", color: "from-purple-400 to-pink-500" },
+  const conversationStarters = [
+    { icon: Coffee, text: "Who wants to grab coffee?", color: "text-amber-600" },
+    { icon: Home, text: "House meeting tonight?", color: "text-blue-600" },
+    { icon: ShoppingCart, text: "Need anything from the store?", color: "text-green-600" },
+    { icon: Calendar, text: "Plans for the weekend?", color: "text-purple-600" }
   ];
 
-  const handleQuickMessage = (text: string) => {
-    if (!household || !user) return;
-    
-    // Optimistic update for quick messages too
-    const optimisticMessage = {
-      id: `temp-${Date.now()}`,
-      content: text,
-      householdId: household.id,
-      userId: user.id,
-      createdAt: new Date(),
-      user: user,
-      type: null,
-      linkedTo: null,
-      linkedType: null,
-    };
-
-    queryClient.setQueryData(["/api/messages"], (old: any) => [
-      ...(old || []),
-      optimisticMessage,
-    ]);
-    
-    sendMessage({
-      type: "send_message",
-      content: text,
-      householdId: household.id,
-      userId: user.id,
-    });
-
-    // Enable auto-scroll and scroll appropriately when user sends a message
-    setShouldAutoScroll(true);
-    setTimeout(() => {
-      // After sending, we'll have one more message, so account for that
-      const newMessageCount = messages.length + 1;
-      if (newMessageCount <= 5) {
-        scrollToTop();
-      } else {
-        scrollToBottom();
-      }
-    }, 50);
+  const handleStarterClick = (text: string) => {
+    setNewMessage(text);
   };
 
-  if (isLoading) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-ios-gray">
         <div className="w-8 h-8 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
@@ -370,64 +363,57 @@ export default function Messages() {
         </div>
       </div>
       {/* Messages Container */}
-      <div className="pt-32 pb-32 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="min-h-[60vh] flex flex-col">
-            {messages.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center space-y-8 py-12">
-                <div className="text-center animate-fade-in">
-                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center mb-6 mx-auto shadow-lg">
-                    <MessageCircle size={28} className="text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                    No messages yet
-                  </h3>
-                  <p className="text-gray-600 text-center max-w-sm mx-auto">
-                    Start the conversation with your roommates and keep everyone connected!
-                  </p>
-                </div>
-                
-                {/* Quick Message Starters */}
-                <div className="w-full max-w-lg space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                  <p className="text-sm font-semibold text-gray-800 text-center">Quick conversation starters:</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    {quickMessages.map((quick, index) => {
-                      const IconComponent = quick.icon;
-                      return (
-                        <Card key={index} className="glass-card">
-                          <CardContent className="p-6">
-                            <button
-                              onClick={() => handleQuickMessage(quick.text)}
-                              className="w-full hover:scale-[1.02] transition-all duration-200 group"
-                            >
-                              <div className={`w-10 h-10 bg-gradient-to-br ${quick.color} rounded-2xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform duration-200 shadow-md`}>
-                                <IconComponent size={18} className="text-white" />
-                              </div>
-                              <p className="text-xs text-gray-700 font-medium text-center leading-tight">
-                                {quick.text}
-                              </p>
-                            </button>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </div>
+      <div className="pt-36 pb-40">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="messages-container space-y-4">
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="w-6 h-6 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
               </div>
+            ) : messages && messages.length === 0 ? (
+              <Card className="glass-card">
+                <CardContent className="p-6">
+                  <div className="text-center space-y-4">
+                    <MessageCircle className="w-12 h-12 text-gray-400 mx-auto" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Start the conversation</h3>
+                      <p className="text-gray-600 text-sm mb-6">Be the first to send a message to your household</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {conversationStarters.map((starter, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          className="h-auto p-3 text-left justify-start glass-card hover:bg-white/50 transition-all duration-200"
+                          onClick={() => handleStarterClick(starter.text)}
+                        >
+                          <starter.icon className={`w-4 h-4 mr-2 ${starter.color}`} />
+                          <span className="text-sm">{starter.text}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ) : (
-              <div className="flex-1 space-y-4">
-                {messages.map((message: any) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                    currentUserId={user?.id}
+              <div className="space-y-4">
+                {messages && messages.map((message: any) => (
+                  <MessageBubble 
+                    key={message.id} 
+                    message={message} 
+                    currentUserId={user?.id} 
                   />
                 ))}
                 
-                {/* Typing Indicator */}
-                {typingUsers.length > 0 && (
-                  <div className="flex justify-start animate-fade-in">
-                    <div className="glass-card px-4 py-3 rounded-2xl rounded-tl-md max-w-xs">
+                {/* Typing indicators */}
+                {typingUsers.length > 0 && messages && messages.length > 5 && (
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium shadow-sm">
+                        {typingUsers[0][0]}
+                      </div>
+                    </div>
+                    <div className="glass-card p-3 rounded-2xl max-w-xs">
                       <div className="flex items-center space-x-2">
                         <span className="text-sm text-gray-600 font-medium">
                           {typingUsers.length === 1 
@@ -473,9 +459,11 @@ export default function Messages() {
               <Button
                 type="submit"
                 disabled={!newMessage.trim()}
-                className="w-11 h-11 bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 rounded-full flex items-center justify-center p-0 shadow-lg transition-all duration-200 disabled:opacity-50 ml-1"
+                className="rounded-full w-10 h-10 p-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               >
-                <span className="text-white text-lg font-medium">→</span>
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
               </Button>
             </form>
           </div>

@@ -503,28 +503,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`WebSocket connect: userId=${message.userId}, householdId=${message.householdId}`);
           userId = message.userId;
           householdId = message.householdId;
-          clientsById.set(userId, ws);
-          
-          // Store client metadata for targeted broadcasting
-          (ws as any)._userId = userId;
-          (ws as any)._householdId = householdId;
-          
-          // Add to household client set for fast broadcasting
-          if (!householdClients.has(householdId)) {
-            householdClients.set(householdId, new Set());
-          }
-          householdClients.get(householdId)?.add(ws);
-          
-          // Cache user data for fast message creation
-          if (!userCache.has(userId)) {
-            try {
-              const user = await storage.getUser(userId);
-              if (user) {
-                userCache.set(userId, user);
-                console.log(`User cached: ${userId}`);
+          if (userId && householdId) {
+            clientsById.set(userId, ws);
+            
+            // Store client metadata for targeted broadcasting
+            (ws as any)._userId = userId;
+            (ws as any)._householdId = householdId;
+            
+            // Add to household client set for fast broadcasting
+            if (!householdClients.has(householdId)) {
+              householdClients.set(householdId, new Set());
+            }
+            const householdSet = householdClients.get(householdId);
+            if (householdSet) {
+              householdSet.add(ws);
+            }
+            
+            // Cache user data for fast message creation
+            if (!userCache.has(userId)) {
+              try {
+                const user = await storage.getUser(userId);
+                if (user) {
+                  userCache.set(userId, user);
+                  console.log(`User cached: ${userId}`);
+                }
+              } catch (error) {
+                console.error(`Error caching user ${userId}:`, error);
               }
-            } catch (error) {
-              console.error(`Error caching user ${userId}:`, error);
             }
           }
           
@@ -538,12 +543,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (message.type === 'send_message') {
           const startTime = Date.now();
-          const { content, householdId: msgHouseholdId, userId: msgUserId, linkedTo, linkedType } = message;
+          const { content, householdId: msgHouseholdId, userId: msgUserId, linkedTo, linkedType, tempId } = message;
           
           try {
             // Get cached user for ultra-fast message creation
             const cachedUser = userCache.get(msgUserId);
             
+            // Create message in database
             const newMessage = await storage.createMessage({
               content,
               householdId: msgHouseholdId,
@@ -552,46 +558,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
               linkedType,
             }, cachedUser);
             
-            // Optimized household-based broadcasting with error resilience
+            console.log(`Message created in ${Date.now() - startTime}ms:`, newMessage.id);
+            
+            // Immediate broadcast to all household clients for real-time sync
             const householdClientSet = householdClients.get(msgHouseholdId);
             if (householdClientSet) {
               const broadcastData = JSON.stringify({
                 type: 'new_message',
                 message: newMessage,
+                tempId: tempId, // Include temp ID for optimistic update replacement
+                timestamp: Date.now()
               });
               
-              // Clean up dead connections and broadcast to live ones
+              // Broadcast with immediate delivery and connection cleanup
               const deadConnections = new Set();
+              let successfulBroadcasts = 0;
+              
               householdClientSet.forEach((client: any) => {
                 try {
                   if (client.readyState === WebSocket.OPEN) {
                     client.send(broadcastData);
+                    successfulBroadcasts++;
                   } else {
                     deadConnections.add(client);
                   }
                 } catch (error) {
-                  console.error('Error broadcasting to client:', error);
+                  console.error('Broadcast error:', error);
                   deadConnections.add(client);
                 }
               });
               
-              // Remove dead connections
-              deadConnections.forEach(conn => householdClientSet.delete(conn));
+              // Cleanup dead connections
+              deadConnections.forEach((conn: any) => {
+                householdClientSet.delete(conn);
+                // Also remove from clientsById if it exists
+                for (const [id, client] of Array.from(clientsById.entries())) {
+                  if (client === conn) {
+                    clientsById.delete(id);
+                    break;
+                  }
+                }
+              });
+              
+              console.log(`Broadcasted to ${successfulBroadcasts} clients, cleaned ${deadConnections.size} dead connections`);
             }
             
             // Performance tracking
             messageCount++;
-            totalProcessingTime += Date.now() - startTime;
-            if (messageCount % 10 === 0) {
-              console.log(`Chat Performance: ${messageCount} messages, avg ${(totalProcessingTime/messageCount).toFixed(2)}ms`);
+            const processingTime = Date.now() - startTime;
+            totalProcessingTime += processingTime;
+            
+            // Log performance every 5 messages for real-time monitoring
+            if (messageCount % 5 === 0) {
+              console.log(`Real-time Performance: ${messageCount} messages, avg ${(totalProcessingTime/messageCount).toFixed(1)}ms, last: ${processingTime}ms`);
             }
+            
           } catch (error) {
-            console.error('Error processing message:', error);
-            // Send error back to sender
+            console.error('Message processing error:', error);
+            // Send error back to sender with temp ID for cleanup
             if (ws.readyState === WebSocket.OPEN) {
               ws.send(JSON.stringify({
                 type: 'message_error',
-                error: 'Failed to send message'
+                error: 'Failed to send message',
+                tempId: tempId
               }));
             }
           }
