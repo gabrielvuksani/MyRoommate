@@ -776,10 +776,13 @@
 }
 
 .calendar-day.selected {
-  background: var(--surface);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-soft);
-  border: 2px solid var(--primary);
+  background: var(--primary);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-medium);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transform: scale(1.05);
 }
 
 .calendar-day.has-events::after {
