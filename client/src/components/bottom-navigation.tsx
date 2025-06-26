@@ -31,10 +31,10 @@ export default function BottomNavigation() {
     const activeIndex = tabs.findIndex(tab => tab.path === location);
     if (activeIndex === -1) return;
     
-    // Calculate precise tab positioning with perfect centering
+    // Calculate precise tab positioning with maximum width
     const containerWidth = navigationRef.current.offsetWidth;
     const tabWidth = containerWidth / tabs.length;
-    const indicatorWidth = tabWidth - 16;
+    const indicatorWidth = tabWidth; // Full width to maximize clickable area coverage
     const translateX = activeIndex * tabWidth + (tabWidth - indicatorWidth) / 2;
     
     navigationRef.current.style.setProperty('--indicator-translate', `${translateX}px`);
@@ -45,7 +45,7 @@ export default function BottomNavigation() {
       if (!navigationRef.current) return;
       const newContainerWidth = navigationRef.current.offsetWidth;
       const newTabWidth = newContainerWidth / tabs.length;
-      const newIndicatorWidth = newTabWidth - 16;
+      const newIndicatorWidth = newTabWidth;
       const newTranslateX = activeIndex * newTabWidth + (newTabWidth - newIndicatorWidth) / 2;
       navigationRef.current.style.setProperty('--indicator-translate', `${newTranslateX}px`);
       navigationRef.current.style.setProperty('--indicator-width', `${newIndicatorWidth}px`);
@@ -61,7 +61,7 @@ export default function BottomNavigation() {
       className="tab-navigation" 
       style={{
         '--indicator-translate': '0px',
-        '--indicator-width': 'calc(20% - 16px)',
+        '--indicator-width': '20%',
       } as React.CSSProperties}
     >
       <div className="flex items-center justify-center w-full">

@@ -405,7 +405,7 @@
   top: 8px;
   bottom: 8px;
   left: 0;
-  width: var(--indicator-width, calc(20% - 16px));
+  width: var(--indicator-width, 20%);
   background: linear-gradient(145deg, 
     rgba(255, 255, 255, 0.95) 0%, 
     rgba(255, 255, 255, 0.85) 100%);
