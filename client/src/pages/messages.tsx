@@ -267,27 +267,23 @@ export default function Messages() {
 
     // Immediately add optimistic message to cache
     queryClient.setQueryData(["/api/messages"], (old: any) => {
-      const currentMessages = old || [];
+      const currentMessages = Array.isArray(old) ? old : [];
+      console.log('Adding optimistic message to cache:', tempId);
       return [...currentMessages, optimisticMessage];
+    });
+
+    // Force immediate UI update
+    queryClient.invalidateQueries({ 
+      queryKey: ["/api/messages"],
+      refetchType: 'none' // Don't refetch, just update UI
     });
 
     // Clear input immediately for better UX
     setNewMessage("");
 
     try {
-      // Send message via WebSocket with temp ID for replacement
-      sendMessage?.({
-        type: "new_message",
-        tempId,
-        message: {
-          content: messageContent,
-          householdId: household.id,
-          userId: user.id,
-        },
-      });
-
-      // Also send via HTTP as backup
-      await fetch("/api/messages", {
+      // Send via HTTP first for reliability
+      const response = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -297,16 +293,39 @@ export default function Messages() {
         }),
       });
 
-      // Invalidate to ensure we have latest state
-      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      if (response.ok) {
+        const realMessage = await response.json();
+        console.log('Message sent successfully, replacing optimistic:', tempId, 'with', realMessage.id);
+        
+        // Replace optimistic message with real one
+        queryClient.setQueryData(["/api/messages"], (old: any) => {
+          const currentMessages = Array.isArray(old) ? old : [];
+          const updatedMessages = currentMessages.map((msg: any) => 
+            msg.id === tempId ? realMessage : msg
+          );
+          return updatedMessages;
+        });
+
+        // Send via WebSocket for other clients
+        sendMessage?.({
+          type: "new_message",
+          tempId,
+          message: realMessage,
+        });
+      } else {
+        throw new Error('Failed to send message');
+      }
 
     } catch (error) {
       console.error("Failed to send message:", error);
       // Remove failed optimistic message
       queryClient.setQueryData(["/api/messages"], (old: any) => {
-        const currentMessages = old || [];
+        const currentMessages = Array.isArray(old) ? old : [];
         return currentMessages.filter((msg: any) => msg.id !== tempId);
       });
+      
+      // Show the message back in input for retry
+      setNewMessage(messageContent);
     }
   };
 
