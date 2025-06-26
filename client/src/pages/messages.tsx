@@ -99,6 +99,10 @@ export default function Messages() {
     }
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   // Check if user is near bottom of messages
   const isNearBottom = () => {
     const threshold = 150;
@@ -108,28 +112,38 @@ export default function Messages() {
     );
   };
 
-  // Auto-scroll on new messages
+  // Auto-scroll logic based on message count
   useEffect(() => {
     if (messages.length > 0 && shouldAutoScroll) {
-      scrollToBottom();
+      if (messages.length <= 5) {
+        // For 5 or fewer messages, scroll to top
+        scrollToTop();
+      } else {
+        // For more than 5 messages, scroll to bottom
+        scrollToBottom();
+      }
     }
   }, [messages, shouldAutoScroll]);
 
-  // Initial scroll to bottom when messages load
+  // Initial scroll behavior when messages load
   useEffect(() => {
     if (!isLoading && messages.length > 0) {
       setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+        if (messages.length <= 5) {
+          window.scrollTo({ top: 0, behavior: "auto" });
+        } else {
+          messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+        }
       }, 100);
     }
   }, [isLoading]);
 
-  // Auto-scroll when typing indicators appear
+  // Auto-scroll when typing indicators appear (only for longer conversations)
   useEffect(() => {
-    if (typingUsers.length > 0 && shouldAutoScroll) {
+    if (typingUsers.length > 0 && shouldAutoScroll && messages.length > 5) {
       scrollToBottom();
     }
-  }, [typingUsers, shouldAutoScroll]);
+  }, [typingUsers, shouldAutoScroll, messages.length]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -283,9 +297,17 @@ export default function Messages() {
       userId: user.id,
     });
 
-    // Enable auto-scroll and scroll to bottom when user sends a message
+    // Enable auto-scroll and scroll appropriately when user sends a message
     setShouldAutoScroll(true);
-    setTimeout(scrollToBottom, 50);
+    setTimeout(() => {
+      // After sending, we'll have one more message, so account for that
+      const newMessageCount = messages.length + 1;
+      if (newMessageCount <= 5) {
+        scrollToTop();
+      } else {
+        scrollToBottom();
+      }
+    }, 50);
   };
 
   if (isLoading) {
