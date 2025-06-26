@@ -139,13 +139,12 @@ export default function Roommates() {
                 <p className="page-subtitle">Discover your perfect living situation</p>
               </div>
             </div>
-            <Button
+            <button
               onClick={() => setShowPostForm(true)}
-              className="bg-[var(--surface-secondary)] rounded text-primary border-0"
-              size="sm"
+              className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05]"
             >
-              <Plus className="w-4 h-4" />
-            </Button>
+              <Plus size={24} className="text-white" />
+            </button>
           </div>
         </div>
       </div>
