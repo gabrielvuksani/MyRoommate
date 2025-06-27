@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { flushSync } from "react-dom";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell } fro
 import { getProfileInitials } from "@/lib/nameUtils";
 import { useTheme } from "@/lib/ThemeProvider";
 import BackButton from "../components/back-button";
-import LoadingOverlay from "../components/loading-overlay";
+import { PersistentLoading } from "@/lib/persistentLoading";
 import { notificationService } from "@/lib/notificationService";
 
 import { useLocation } from "wouter";
@@ -32,8 +32,7 @@ export default function Profile() {
   const [isHouseholdEditOpen, setIsHouseholdEditOpen] = useState(false);
   const [editHouseholdName, setEditHouseholdName] = useState("");
   const [headerScrolled, setHeaderScrolled] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isLeavingHousehold, setIsLeavingHousehold] = useState(false);
+
 
   const [isCopied, setIsCopied] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
@@ -41,7 +40,6 @@ export default function Profile() {
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
-    enabled: !isLeavingHousehold && !isRefreshing,
   });
 
   useEffect(() => {
@@ -128,22 +126,23 @@ export default function Profile() {
   };
 
   const handleRefresh = async () => {
-    setIsRefreshing(true);
+    // Show persistent loading overlay
+    PersistentLoading.show("Refreshing app data...");
     
     try {
       await queryClient.clear();
       localStorage.clear();
       sessionStorage.clear();
       
-      // Simple delay then navigate
+      // Navigate immediately - loading will persist through refresh
       setTimeout(() => {
         window.location.href = '/';
-      }, 1000);
+      }, 500);
     } catch (error) {
       console.error('Cache clearing error:', error);
       setTimeout(() => {
         window.location.href = '/';
-      }, 1000);
+      }, 500);
     }
   };
 
@@ -189,14 +188,7 @@ export default function Profile() {
 
 
 
-  // Show loading overlay when performing actions
-  if (isRefreshing || isLeavingHousehold) {
-    return (
-      <LoadingOverlay 
-        message={isRefreshing ? "Refreshing app data..." : "Leaving household..."} 
-      />
-    );
-  }
+
 
   return (
     <div className="page-container page-transition">
@@ -608,37 +600,33 @@ export default function Profile() {
               </Button>
               <Button
                 onClick={handleRefresh}
-                disabled={isRefreshing}
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-blue-700 disabled:opacity-50"
+                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-blue-700"
               >
-                <RefreshCw size={20} className={isRefreshing ? "animate-spin" : ""} />
-                <span>
-                  {isRefreshing 
-                    ? "Refreshing data & returning home..." 
-                    : "Refresh App & Data"
-                  }
+                <RefreshCw size={20} />
+                <span>Refresh App & Data
                 </span>
               </Button>
               {(household as any) && (
                 <Button
                   onClick={async () => {
-                    setIsLeavingHousehold(true);
+                    // Show persistent loading overlay
+                    PersistentLoading.show("Leaving household...");
                     
                     try {
                       await leaveHouseholdMutation.mutateAsync();
                       
-                      // Simple delay then navigate
+                      // Navigate immediately - loading will persist through refresh
                       setTimeout(() => {
                         window.location.href = '/';
-                      }, 1000);
+                      }, 500);
                     } catch (error) {
                       console.error("Failed to leave household:", error);
                       setTimeout(() => {
                         window.location.href = '/';
-                      }, 1000);
+                      }, 500);
                     }
                   }}
-                  disabled={isLeavingHousehold || leaveHouseholdMutation.isPending}
+                  disabled={leaveHouseholdMutation.isPending}
                   className="w-full bg-orange-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-orange-700 disabled:opacity-50"
                 >
                   <UserMinus size={20} />
