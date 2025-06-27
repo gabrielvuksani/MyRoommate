@@ -111,6 +111,13 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Fixed conversation starter cards sizing with min-height 72px and improved spacing
+- ✓ Updated card design with gradient icon backgrounds matching visionOS design language
+- ✓ Added responsive grid layout (1 column mobile, 2 on desktop) with staggered animations
+- ✓ Enhanced message input styling with comprehensive CSS rules to remove all borders
+- ✓ Applied multiple !important border removal rules with maximum specificity selectors
+- ✓ Excluded message-input from global textarea styles using :not(.message-input) selectors
+- ✓ Added specific CSS targeting for glass-card textarea.message-input to force transparent borders
 - ✓ Fixed system appearance feedback to support both light and dark mode with proper text contrast
 - ✓ Redesigned copy feedback to smoothly transition icons without green overlay backgrounds
 - ✓ Enhanced copy button with rotation animation (90°) and scale transitions maintaining design language

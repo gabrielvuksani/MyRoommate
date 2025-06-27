@@ -1235,25 +1235,54 @@ textarea:not(.message-input) {
   transition: all 0.2s ease;
 }
 
-input::placeholder, textarea::placeholder {
+/* Override any global textarea styles for message input */
+textarea.message-input,
+textarea.message-input:not([style]),
+textarea.message-input[class*="message-input"] {
+  border: 0 !important;
+  border-width: 0px !important;
+  border-style: none !important;
+}
+
+/* Ultimate border removal for message input */
+.message-input,
+textarea[class~="message-input"],
+textarea[class*="message-input"],
+.glass-card textarea[class*="message-input"],
+.glass-card .message-input {
+  border: 0 none transparent !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  -webkit-border: 0 !important;
+  -moz-border: 0 !important;
+  -ms-border: 0 !important;
+  -o-border: 0 !important;
+}
+
+input::placeholder, textarea:not(.message-input)::placeholder {
   color: var(--text-tertiary) !important;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus, textarea:not(.message-input):focus, select:focus {
   border-color: var(--primary) !important;
   box-shadow: var(--shadow-glow) !important;
 }
 
 /* Message Input Override - Maximum specificity */
 .glass-card textarea.message-input,
-textarea.message-input.message-input {
+textarea.message-input.message-input,
+textarea.message-input {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
-  border: none !important;
+  border: 0 !important;
   border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
   box-shadow: none !important;
   outline: none !important;
+  outline-width: 0 !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
@@ -1266,12 +1295,17 @@ textarea.message-input.message-input {
 }
 
 .glass-card textarea.message-input:focus,
-textarea.message-input.message-input:focus {
+textarea.message-input.message-input:focus,
+textarea.message-input:focus,
+textarea.message-input:active,
+textarea.message-input:hover {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
-  border: none !important;
+  border: 0 !important;
   border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
   box-shadow: none !important;
   outline: none !important;
   outline-width: 0 !important;
@@ -1290,6 +1324,43 @@ textarea.message-input.message-input::before,
 textarea.message-input.message-input::after {
   display: none !important;
   content: none !important;
+}
+
+/* Force remove all borders from message input with maximum specificity */
+form textarea.message-input,
+div textarea.message-input,
+.glass-card form textarea.message-input,
+.glass-card .message-input,
+body textarea.message-input,
+#root textarea.message-input,
+* textarea.message-input {
+  border: 0px solid transparent !important;
+  border-width: 0px !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-top: 0px solid transparent !important;
+  border-right: 0px solid transparent !important;
+  border-bottom: 0px solid transparent !important;
+  border-left: 0px solid transparent !important;
+  border-image: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Final absolute border removal for message input */
+.fixed .glass-card form textarea.message-input,
+.fixed .glass-card textarea.message-input,
+div.glass-card form textarea.message-input,
+div.glass-card textarea.message-input {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-top-width: 0 !important;
+  border-right-width: 0 !important;
+  border-bottom-width: 0 !important;
+  border-left-width: 0 !important;
 }
 
 label {
