@@ -470,45 +470,53 @@ export default function Profile() {
                 <h4 className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
                   Appearance
                 </h4>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   <Button
                     onClick={() => setTheme("auto")}
-                    className={`py-3 rounded-xl font-medium flex flex-col items-center space-y-1 transition-all ${
-                      theme === 'auto' ? 'ring-2 ring-blue-500' : ''
+                    className={`h-20 rounded-2xl font-medium flex flex-col items-center justify-center space-y-2 transition-all border-2 ${
+                      theme === 'auto' ? 'border-blue-500 shadow-lg' : 'border-transparent'
                     }`}
                     style={{
                       background: theme === 'auto' ? 'var(--primary)' : 'var(--surface-secondary)',
                       color: theme === 'auto' ? '#ffffff' : 'var(--text-primary)'
                     }}
                   >
-                    <div className="text-lg">🌓</div>
-                    <span className="text-xs">Auto</span>
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-r from-orange-400 to-blue-500 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-slate-800 rounded-full" style={{ 
+                        clipPath: 'polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%)' 
+                      }}></div>
+                    </div>
+                    <span className="text-xs font-semibold">Auto</span>
                   </Button>
                   <Button
                     onClick={() => setTheme("light")}
-                    className={`py-3 rounded-xl font-medium flex flex-col items-center space-y-1 transition-all ${
-                      theme === 'light' ? 'ring-2 ring-blue-500' : ''
+                    className={`h-20 rounded-2xl font-medium flex flex-col items-center justify-center space-y-2 transition-all border-2 ${
+                      theme === 'light' ? 'border-blue-500 shadow-lg' : 'border-transparent'
                     }`}
                     style={{
                       background: theme === 'light' ? 'var(--primary)' : 'var(--surface-secondary)',
                       color: theme === 'light' ? '#ffffff' : 'var(--text-primary)'
                     }}
                   >
-                    <Sun size={16} />
-                    <span className="text-xs">Light</span>
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-sm">
+                      <Sun size={16} className="text-white drop-shadow-sm" />
+                    </div>
+                    <span className="text-xs font-semibold">Light</span>
                   </Button>
                   <Button
                     onClick={() => setTheme("dark")}
-                    className={`py-3 rounded-xl font-medium flex flex-col items-center space-y-1 transition-all ${
-                      theme === 'dark' ? 'ring-2 ring-blue-500' : ''
+                    className={`h-20 rounded-2xl font-medium flex flex-col items-center justify-center space-y-2 transition-all border-2 ${
+                      theme === 'dark' ? 'border-blue-500 shadow-lg' : 'border-transparent'
                     }`}
                     style={{
                       background: theme === 'dark' ? 'var(--primary)' : 'var(--surface-secondary)',
                       color: theme === 'dark' ? '#ffffff' : 'var(--text-primary)'
                     }}
                   >
-                    <Moon size={16} />
-                    <span className="text-xs">Dark</span>
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shadow-sm">
+                      <Moon size={16} className="text-slate-300 drop-shadow-sm" />
+                    </div>
+                    <span className="text-xs font-semibold">Dark</span>
                   </Button>
                 </div>
                 <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
