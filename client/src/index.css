@@ -1237,6 +1237,26 @@ input:focus, textarea:focus, select:focus {
   box-shadow: var(--shadow-glow) !important;
 }
 
+/* Message Input Override */
+.message-input {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.message-input:focus {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.message-input::before,
+.message-input::after {
+  display: none !important;
+}
+
 label {
   color: var(--text-secondary) !important;
 }

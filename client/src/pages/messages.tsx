@@ -403,7 +403,7 @@ export default function Messages() {
                     }
                   }}
                   rows={1}
-                  className="w-full bg-transparent border-none text-sm resize-none overflow-hidden p-0"
+                  className="message-input w-full bg-transparent border-none text-sm resize-none overflow-hidden p-0"
                   style={{ 
                     color: 'var(--text-primary)',
                     boxShadow: 'none',
