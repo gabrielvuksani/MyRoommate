@@ -1239,7 +1239,7 @@ input::placeholder, textarea::placeholder {
   color: var(--text-tertiary) !important;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus, textarea:not(.message-input):focus, select:focus {
   border-color: var(--primary) !important;
   box-shadow: var(--shadow-glow) !important;
 }
@@ -1248,20 +1248,37 @@ input:focus, textarea:focus, select:focus {
 textarea.message-input {
   background: transparent !important;
   background-color: transparent !important;
-  border: none !important;
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
   box-shadow: none !important;
   outline: none !important;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+  outline-width: 0 !important;
+  outline-offset: 0 !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
 }
 
-textarea.message-input:focus {
+textarea.message-input:focus,
+textarea.message-input:focus-visible,
+textarea.message-input:active,
+textarea.message-input:hover {
   background: transparent !important;
   background-color: transparent !important;
-  border: none !important;
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
   box-shadow: none !important;
   outline: none !important;
+  outline-width: 0 !important;
+  outline-offset: 0 !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
 }
 
 textarea.message-input::placeholder {
@@ -1270,8 +1287,169 @@ textarea.message-input::placeholder {
 }
 
 textarea.message-input::before,
-textarea.message-input::after {
+textarea.message-input::after,
+textarea.message-input::-webkit-inner-spin-button,
+textarea.message-input::-webkit-outer-spin-button,
+textarea.message-input::-webkit-search-decoration,
+textarea.message-input::-webkit-search-cancel-button,
+textarea.message-input::-webkit-search-results-button,
+textarea.message-input::-webkit-search-results-decoration {
   display: none !important;
+  -webkit-appearance: none !important;
+}
+
+/* Remove any focus ring or outline on webkit browsers */
+textarea.message-input::-webkit-focus-ring {
+  display: none !important;
+}
+
+/* Remove resize handle */
+textarea.message-input::-webkit-resizer {
+  display: none !important;
+}
+
+/* Force remove ALL borders on message input */
+.message-input,
+.message-input:focus,
+.message-input:active,
+.message-input:hover,
+.message-input:focus-visible,
+.message-input:focus-within,
+textarea.message-input,
+textarea.message-input:focus,
+textarea.message-input:active,
+textarea.message-input:hover,
+textarea.message-input:focus-visible,
+textarea.message-input:focus-within {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-image: none !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  text-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Remove focus indicator for accessibility */
+.message-input:focus {
+  outline: 0 !important;
+  outline-offset: 0 !important;
+}
+
+/* Target parent div that might have borders */
+.message-input-container,
+.message-input-wrapper {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove any browser default styling on textarea */
+textarea.message-input:-webkit-autofill,
+textarea.message-input:-webkit-autofill:hover,
+textarea.message-input:-webkit-autofill:focus,
+textarea.message-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+  box-shadow: 0 0 0 30px transparent inset !important;
+}
+
+/* Remove all possible borders from textarea in messages */
+.glass-card textarea.message-input {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Override any Tailwind or other framework borders */
+.message-input.resize-none {
+  border: 0 !important;
+  outline: 0 !important;
+}
+
+/* Remove focus ring from all browsers */
+.message-input:focus-visible {
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Remove any inner effects from the message input glass card */
+.glass-card.message-input-glass-card {
+  overflow: visible !important;
+  /* COMPLETELY remove ALL inset shadows - only keep outer shadow */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.glass-card.message-input-glass-card:hover {
+  /* Also remove inset shadows on hover */
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-2px) scale(1.01);
+}
+
+.dark .glass-card.message-input-glass-card {
+  /* COMPLETELY remove ALL inset shadows - only keep outer shadow */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .glass-card.message-input-glass-card:hover {
+  /* Also remove inset shadows on hover */
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Override the glass-card's inset shadows that create border appearance */
+.glass-card.message-input-glass-card::before {
+  display: none !important;
+}
+
+/* Ensure no borders on any child elements */
+.glass-card.message-input-glass-card form,
+.glass-card.message-input-glass-card div,
+.glass-card.message-input-glass-card textarea {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.message-input-glass-card::before,
+.message-input-glass-card::after {
+  display: none !important;
+}
+
+/* Remove any inner shadow or border effects */
+.message-input-glass-card * {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Ensure the textarea itself has no decoration */
+.message-input-glass-card textarea {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
+  text-shadow: none !important;
+}
+
+/* Override any focus state that might add borders */
+.message-input-glass-card textarea:focus,
+.message-input-glass-card textarea:active {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
 }
 
 label {
