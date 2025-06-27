@@ -22,7 +22,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Profile() {
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, effectiveTheme, setTheme } = useTheme();
 
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -466,19 +466,58 @@ export default function Profile() {
         }}>
           <CardContent className="p-6">
             <div className="space-y-3">
-              <Button
-                onClick={toggleTheme}
-                className="w-full py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all"
-                style={{
-                  background: theme === 'dark' ? 'linear-gradient(135deg, #FCD34D, #F59E0B)' : 'linear-gradient(135deg, #1F2937, #374151)',
-                  color: theme === 'dark' ? '#1F2937' : '#F9FAFB'
-                }}
-              >
-                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                <span>
-                  {theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                </span>
-              </Button>
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                  Appearance
+                </h4>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    onClick={() => setTheme("auto")}
+                    className={`py-3 rounded-xl font-medium flex flex-col items-center space-y-1 transition-all ${
+                      theme === 'auto' ? 'ring-2 ring-blue-500' : ''
+                    }`}
+                    style={{
+                      background: theme === 'auto' ? 'var(--primary)' : 'var(--surface-secondary)',
+                      color: theme === 'auto' ? '#ffffff' : 'var(--text-primary)'
+                    }}
+                  >
+                    <div className="text-lg">🌓</div>
+                    <span className="text-xs">Auto</span>
+                  </Button>
+                  <Button
+                    onClick={() => setTheme("light")}
+                    className={`py-3 rounded-xl font-medium flex flex-col items-center space-y-1 transition-all ${
+                      theme === 'light' ? 'ring-2 ring-blue-500' : ''
+                    }`}
+                    style={{
+                      background: theme === 'light' ? 'var(--primary)' : 'var(--surface-secondary)',
+                      color: theme === 'light' ? '#ffffff' : 'var(--text-primary)'
+                    }}
+                  >
+                    <Sun size={16} />
+                    <span className="text-xs">Light</span>
+                  </Button>
+                  <Button
+                    onClick={() => setTheme("dark")}
+                    className={`py-3 rounded-xl font-medium flex flex-col items-center space-y-1 transition-all ${
+                      theme === 'dark' ? 'ring-2 ring-blue-500' : ''
+                    }`}
+                    style={{
+                      background: theme === 'dark' ? 'var(--primary)' : 'var(--surface-secondary)',
+                      color: theme === 'dark' ? '#ffffff' : 'var(--text-primary)'
+                    }}
+                  >
+                    <Moon size={16} />
+                    <span className="text-xs">Dark</span>
+                  </Button>
+                </div>
+                <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                  {theme === 'auto' 
+                    ? `Following system (currently ${effectiveTheme})`
+                    : `Using ${theme} mode`
+                  }
+                </p>
+              </div>
               <Button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
