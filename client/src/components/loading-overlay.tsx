@@ -22,24 +22,26 @@ export default function LoadingOverlay({ message = "Loading...", stage = "" }: L
       case "completing":
         return {
           icon: <ArrowRight className="w-6 h-6" style={{ color: '#007AFF' }} />,
-          message: "Redirecting to home..."
+          message: message.includes("Refresh") ? "Redirecting to home..." : "Redirecting to home..."
         };
       default:
         return {
           icon: <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#007AFF' }} />,
-          message
+          message: message
         };
     }
   };
 
   const stageContent = getStageContent();
+  
   return (
     <div 
-      className="fixed inset-0 z-[100] flex items-center justify-center"
+      className="fixed inset-0 z-[99999] flex items-center justify-center"
       style={{ 
         background: 'rgba(0, 0, 0, 0.15)',
         backdropFilter: 'blur(4px)',
-        WebkitBackdropFilter: 'blur(4px)'
+        WebkitBackdropFilter: 'blur(4px)',
+        pointerEvents: 'all'
       }}
     >
       <div 
@@ -54,26 +56,15 @@ export default function LoadingOverlay({ message = "Loading...", stage = "" }: L
           marginTop: '10vh'
         }}
       >
-        {/* Glass effect gradient overlay */}
-        <div 
-          className="absolute inset-0 opacity-50 pointer-events-none"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%)'
-          }}
-        />
-        
-        <div className="relative z-10 p-8 flex flex-col items-center space-y-4">
-          {/* Staged icon with animation */}
-          <div className={`transition-all duration-300 ${stage === "success" ? "scale-110" : "scale-100"}`}>
-            <div className="w-12 h-12 flex items-center justify-center">
-              {stageContent.icon}
-            </div>
+        <div className="p-8 flex flex-col items-center space-y-6">
+          {/* Spinner/Icon */}
+          <div className="flex items-center justify-center">
+            {stageContent.icon}
           </div>
           
+          {/* Message */}
           <p 
-            className={`text-lg font-medium transition-all duration-200 ${
-              stage === "success" ? "text-green-600 dark:text-green-400" : ""
-            }`}
+            className="text-center font-medium text-lg leading-relaxed"
             style={{ color: stage === "success" ? undefined : 'var(--text-primary)' }}
           >
             {stageContent.message}

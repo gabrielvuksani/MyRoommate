@@ -41,6 +41,7 @@ export default function Profile() {
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
+    enabled: !isLeavingHousehold && !isRefreshing && !loadingStage,
   });
 
   useEffect(() => {
