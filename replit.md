@@ -111,6 +111,11 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Fixed loading overlay flickering by implementing highest z-index (99999) with early return pattern
+- ✓ Enhanced loading overlay with transparent blur background (8px blur with 1.2 saturation) instead of dark overlay
+- ✓ Implemented flushSync for immediate loading state display to prevent async rendering conflicts
+- ✓ Created staged feedback system with processing → success → completing phases and appropriate icons
+- ✓ Positioned loading modal optimally for visibility while maintaining background awareness of app activity
 - ✓ Rebranded entire application from RoomieHub to myRoommate across all files and references
 - ✓ Updated all PWA icons to use emerald-cyan gradient (from-emerald-400 to-cyan-400) with white Home icon
 - ✓ Applied consistent logo design from landing page to manifest icons in all sizes (72x72 to 512x512)

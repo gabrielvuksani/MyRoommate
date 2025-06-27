@@ -38,9 +38,9 @@ export default function LoadingOverlay({ message = "Loading...", stage = "" }: L
     <div 
       className="fixed inset-0 z-[99999] flex items-center justify-center"
       style={{ 
-        background: 'rgba(0, 0, 0, 0.15)',
-        backdropFilter: 'blur(4px)',
-        WebkitBackdropFilter: 'blur(4px)',
+        background: 'rgba(0, 0, 0, 0.05)',
+        backdropFilter: 'blur(8px) saturate(1.2)',
+        WebkitBackdropFilter: 'blur(8px) saturate(1.2)',
         pointerEvents: 'all'
       }}
     >
