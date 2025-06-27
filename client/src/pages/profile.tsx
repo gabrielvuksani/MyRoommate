@@ -122,10 +122,9 @@ export default function Profile() {
     try {
       // Invalidate all queries to refresh data
       await queryClient.invalidateQueries();
-      // Navigate to home page after data refresh
+      // Wait a moment for data to refresh, then reload the page
       setTimeout(() => {
-        setLocation("/");
-        setIsRefreshing(false);
+        window.location.reload();
       }, 1000);
     } catch (error) {
       console.error("Refresh failed:", error);
