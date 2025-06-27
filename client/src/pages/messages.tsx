@@ -394,11 +394,12 @@ export default function Messages() {
       {/* Message Input - Fixed at bottom with visionOS styling */}
       <div className="fixed bottom-[108px] left-0 right-0 z-40 px-6">
         <div className="max-w-3xl mx-auto">
-          <div className="glass-card rounded-3xl shadow-lg border-0 p-3">
-            <div className="flex items-end gap-2">
-              <div className="flex-1 rounded-2xl px-4 py-2" style={{ 
-                background: 'rgba(255, 255, 255, 0.1)'
-              }}>
+          <div className="glass-card rounded-3xl shadow-lg" style={{ 
+            border: 'none',
+            padding: '12px'
+          }}>
+            <form onSubmit={handleSendMessage} className="flex items-end gap-3">
+              <div className="flex-1">
                 <textarea
                   ref={textareaRef}
                   placeholder="Type a message..."
@@ -415,13 +416,15 @@ export default function Messages() {
                     }
                   }}
                   rows={1}
-                  className="message-input w-full bg-transparent text-base resize-none"
+                  className="message-input w-full text-base resize-none"
                   style={{ 
+                    background: 'transparent !important',
+                    backgroundColor: 'transparent !important',
                     color: 'var(--text-primary)',
                     border: '0',
                     outline: '0',
                     boxShadow: 'none',
-                    padding: '0',
+                    padding: '0 12px',
                     minHeight: '28px',
                     maxHeight: '120px',
                     lineHeight: '28px',
@@ -438,7 +441,7 @@ export default function Messages() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </Button>
-            </div>
+            </form>
           </div>
         </div>
       </div>
