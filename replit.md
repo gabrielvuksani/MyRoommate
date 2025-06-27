@@ -110,7 +110,15 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 
 ## Recent Changes
 
-**June 26, 2025 (Latest):**
+**June 27, 2025 (Latest):**
+- ✓ Made onboarding card heights dynamic and responsive instead of fixed sizing
+- ✓ Removed min-h-[580px] constraints and updated CardContent layout to flex-col without justify-between
+- ✓ Enhanced back button styling with gradient background, proper shadows, and hover states
+- ✓ Added hover:scale-110 and active:scale-95 animations for better interactivity
+- ✓ Applied linear gradient and inset highlights to back button for premium appearance
+- ✓ Improved onboarding UX by allowing content to naturally size based on step requirements
+
+**June 26, 2025 (Earlier):**
 - ✓ Streamlined onboarding process to be the first experience for new users
 - ✓ Implemented automatic redirect to onboarding for users without names or households
 - ✓ Enhanced App.tsx routing logic to prioritize onboarding completion

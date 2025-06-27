@@ -134,8 +134,8 @@ export default function Onboarding() {
         
         {/* Step 1: Welcome */}
         {step === 1 && (
-          <Card className="glass-card text-center page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-6 flex flex-col justify-between h-full">
+          <Card className="glass-card text-center page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
+            <CardContent className="p-8 flex flex-col">
             <div className="flex justify-start mb-4">
               <BackButton to="/" />
             </div>
@@ -189,8 +189,8 @@ export default function Onboarding() {
 
         {/* Step 2: Name Selection */}
         {step === 2 && (
-          <Card className="glass-card page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-6 flex flex-col justify-between h-full">
+          <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
+            <CardContent className="p-8 flex flex-col">
             <div className="text-center mb-6">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/25">
                 <User size={32} className="text-white" />
@@ -264,8 +264,8 @@ export default function Onboarding() {
 
         {/* Step 3: Household Setup */}
         {step === 3 && (
-          <Card className="glass-card page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-6 flex flex-col justify-between h-full">
+          <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
+            <CardContent className="p-8 flex flex-col">
             <div className="text-center mb-8">
               <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-violet-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/25">
                 <Users size={32} className="text-white" />
@@ -466,9 +466,9 @@ export default function Onboarding() {
 
         {/* Step 4: Confirmation */}
         {step === 4 && (
-          <Card className="glass-card text-center page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-6 flex flex-col justify-between h-full">
-              <div className="flex-1 flex flex-col justify-center">
+          <Card className="glass-card text-center page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
+            <CardContent className="p-8 flex flex-col">
+              <div className="flex flex-col justify-center">
                 <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
                   <CheckCircle size={32} className="text-white" />
                 </div>
