@@ -111,6 +111,11 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Completely wiped all database records for fresh start while preserving demo roommate listing
+- ✓ Removed all users, households, members, sessions, messages, chores, expenses, and calendar events
+- ✓ Enhanced PWA manifest with comprehensive icons, shortcuts, screenshots, and modern PWA features
+- ✓ Added app shortcuts for quick actions (Add Expense, Create Chore, Messages)
+- ✓ Implemented advanced PWA features including display_override, launch_handler, and scope_extensions
 - ✓ Hidden bottom navigation tab bar when users are on the onboarding page for cleaner onboarding experience
 - ✓ Enhanced refresh data functionality to completely clear all browser cache including localStorage, sessionStorage, service worker cache, and IndexedDB
 - ✓ Added comprehensive cache clearing with fallback error handling and hard page reload
