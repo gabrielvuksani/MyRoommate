@@ -388,27 +388,29 @@
 
 .bottom-nav-container::before {
   content: '';
-  position: absolute;
-  top: -30px;
-  left: -15px;
-  right: -15px;
-  bottom: -15px;
+  position: fixed;
+  top: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 140px;
   background: transparent;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 40px;
-  mask: linear-gradient(to bottom, 
-    transparent 0%, 
-    rgba(0,0,0,0.15) 25%, 
-    rgba(0,0,0,0.4) 50%, 
-    rgba(0,0,0,0.7) 75%, 
-    rgba(0,0,0,1) 100%);
-  -webkit-mask: linear-gradient(to bottom, 
-    transparent 0%, 
-    rgba(0,0,0,0.15) 25%, 
-    rgba(0,0,0,0.4) 50%, 
-    rgba(0,0,0,0.7) 75%, 
-    rgba(0,0,0,1) 100%);
+  mask: linear-gradient(to top, 
+    rgba(0,0,0,1) 0%, 
+    rgba(0,0,0,0.9) 20%, 
+    rgba(0,0,0,0.6) 40%, 
+    rgba(0,0,0,0.3) 60%, 
+    rgba(0,0,0,0.1) 80%, 
+    transparent 100%);
+  -webkit-mask: linear-gradient(to top, 
+    rgba(0,0,0,1) 0%, 
+    rgba(0,0,0,0.9) 20%, 
+    rgba(0,0,0,0.6) 40%, 
+    rgba(0,0,0,0.3) 60%, 
+    rgba(0,0,0,0.1) 80%, 
+    transparent 100%);
   pointer-events: none;
   z-index: -1;
 }
