@@ -111,6 +111,14 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 26, 2025 (Latest):**
+- ✓ Streamlined onboarding process to be the first experience for new users
+- ✓ Implemented automatic redirect to onboarding for users without names or households
+- ✓ Enhanced App.tsx routing logic to prioritize onboarding completion
+- ✓ Fixed name truncation issues on home page headers to prevent UI breaking
+- ✓ Moved truncate class to parent h1 element for proper text overflow handling
+- ✓ Improved user experience by ensuring complete onboarding before accessing main app features
+
+**June 26, 2025 (Earlier):**
 - ✓ Fixed "Ready to Go!" onboarding step 4 UI layout issues with proper flexbox structure and spacing
 - ✓ Enhanced roommate listing cards with colored badges for better light/dark mode visibility
 - ✓ Updated contact buttons with gradient styling and proper click event handling

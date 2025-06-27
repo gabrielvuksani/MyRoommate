@@ -23,12 +23,15 @@ import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
+  const { data: user } = useQuery({
+    queryKey: ["/api/auth/user"],
+    enabled: isAuthenticated,
+  }) as { data: any };
+  
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
     enabled: isAuthenticated,
   }) as { data: any };
-
-
 
   if (isLoading) {
     return (
@@ -38,11 +41,19 @@ function Router() {
     );
   }
 
+  // Check if user needs onboarding (no name or no household)
+  const needsOnboarding = isAuthenticated && user && (!user.firstName || !household);
+
   return (
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
       <Switch>
         {!isAuthenticated ? (
           <Route path="/" component={Landing} />
+        ) : needsOnboarding ? (
+          <>
+            <Route path="/onboarding" component={Onboarding} />
+            <Route path="/" component={Onboarding} />
+          </>
         ) : (
           <>
             <Route path="/onboarding" component={Onboarding} />

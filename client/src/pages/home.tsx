@@ -113,8 +113,8 @@ export default function Home() {
           <div className="page-header">
             <div className="flex items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <h1 className="page-title">
-                  Welcome back, <span className="truncate">{firstName}</span>
+                <h1 className="page-title truncate">
+                  Welcome back, {firstName}
                 </h1>
                 <p className="page-subtitle truncate">Find your perfect living situation</p>
               </div>
@@ -292,8 +292,8 @@ export default function Home() {
         <div className="page-header">
           <div className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <h1 className="page-title">
-                {greeting}, <span className="truncate">{firstName}</span>
+              <h1 className="page-title truncate">
+                {greeting}, {firstName}
               </h1>
               <p className="page-subtitle truncate">{(household as any)?.name}</p>
             </div>
