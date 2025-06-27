@@ -633,13 +633,22 @@ export default function RoommateMarketplace() {
                       />
 
                       <div className="flex justify-end space-x-3 pt-4">
-                        <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
+                        <Button 
+                          type="button" 
+                          onClick={() => setShowCreateForm(false)}
+                          className="backdrop-blur-sm transition-all duration-200 hover:scale-[1.02] shadow-lg"
+                          style={{
+                            background: 'var(--surface-glass)',
+                            border: '1px solid var(--border)',
+                            color: 'var(--text-secondary)'
+                          }}
+                        >
                           Cancel
                         </Button>
                         <Button 
                           type="submit" 
                           disabled={createListingMutation.isPending}
-                          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 hover:scale-[1.02] transition-all duration-200 shadow-lg"
                         >
                           {createListingMutation.isPending ? "Creating..." : "Create Listing"}
                         </Button>
