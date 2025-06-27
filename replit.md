@@ -168,6 +168,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Added comprehensive system theme change listener for real-time theme updates
 - ✓ Implemented dynamic manifest theme-color updates for seamless PWA experience
 - ✓ Added elegant theme picker UI in profile page with three-button selection interface
+- ✓ Set Auto theme as default selection for new users unless manually changed
+- ✓ Moved theme picker inside the first profile card underneath user information
+- ✓ Enhanced theme picker design with proper icon containers, sizing, and visual hierarchy
+- ✓ Implemented sophisticated visual representations for Auto (half-light/half-dark), Light (sun), and Dark (moon) modes
 
 **June 26, 2025 (Earlier):**
 - ✓ Streamlined onboarding process to be the first experience for new users
