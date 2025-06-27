@@ -517,10 +517,12 @@ export default function Onboarding() {
               <div className="flex space-x-3 mt-8">
                 <Button
                   onClick={() => setStep(step - 1)}
-                  className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all"
+                  className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all hover:scale-[1.02]"
                   style={{
-                    background: 'var(--surface-secondary)',
-                    color: 'var(--text-secondary)'
+                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid rgba(99, 102, 241, 0.3)',
+                    boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)'
                   }}
                 >
                   Back

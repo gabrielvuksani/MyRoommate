@@ -111,10 +111,11 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Completely wiped all database records for fresh start (33 messages, 5 expense splits, 2 expenses, 1 chore, 1 calendar event, 1 roommate listing, 2 household members, 5 households, 4 users, 9 sessions)
 - ✓ Restored iOS 26-style gradient blur effect for bottom navigation after fixing shadow issues
 - ✓ Fixed pseudo-element positioning - changed bottom values back to -20px/-10px to extend blur properly
 - ✓ Enhanced light mode navigation indicator visibility with full opacity (1.0) and subtle shadow
-- ✓ Improved back button styling with purple-tinted gradient for better light mode contrast
+- ✓ Improved onboarding "Back" button styling with purple-tinted gradient for better light mode contrast
 - ✓ Updated routing logic to distinguish between new users (no firstName) and existing users without households
 - ✓ Verified "Browse for roommates" button correctly navigates to /roommates route
 - ✓ Updated refresh button in profile page to redirect to home page after data refresh
