@@ -75,7 +75,7 @@ export default function Landing() {
               <Home size={32} className="text-white" />
             </div>
             <h1 className="font-bold text-[#1a1a1a] text-[32px] leading-tight mb-4">
-              MyRoommate
+              myRoommate
             </h1>
             <p className="text-lg text-gray-600 max-w-md mx-auto leading-relaxed">
               Transform shared living into a seamless, intelligent experience.

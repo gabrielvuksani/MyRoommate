@@ -1,8 +1,8 @@
-# RoomieHub - Roommate Management App
+# myRoommate - Roommate Management App
 
 ## Overview
 
-RoomieHub is a full-stack web application designed to help roommates manage shared living responsibilities. The app provides features for chore management, expense splitting, calendar events, and real-time messaging. Built with a modern React frontend and Express.js backend, it uses PostgreSQL for data persistence and WebSocket for real-time communication.
+myRoommate is a full-stack web application designed to help roommates manage shared living responsibilities. The app provides features for chore management, expense splitting, calendar events, and real-time messaging. Built with a modern React frontend and Express.js backend, it uses PostgreSQL for data persistence and WebSocket for real-time communication.
 
 ## System Architecture
 
@@ -111,6 +111,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Rebranded entire application from RoomieHub to myRoommate across all files and references
+- ✓ Updated all PWA icons to use emerald-cyan gradient (from-emerald-400 to-cyan-400) with white Home icon
+- ✓ Applied consistent logo design from landing page to manifest icons in all sizes (72x72 to 512x512)
+- ✓ Changed app title in HTML, manifest, service worker, and all screenshots to myRoommate
 - ✓ Completely wiped all database records for fresh start while preserving demo roommate listing
 - ✓ Removed all users, households, members, sessions, messages, chores, expenses, and calendar events
 - ✓ Enhanced PWA manifest with comprehensive icons, shortcuts, screenshots, and modern PWA features
