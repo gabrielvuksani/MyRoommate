@@ -111,13 +111,15 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Streamlined bottom navigation shadows to prevent blur interference
+- ✓ Removed excessive box-shadow layers from .bottom-nav and .nav-indicator
+- ✓ Kept only essential inset highlights for clean iOS 26 blur effect
 - ✓ Updated refresh button in profile page to actually reload the page after data refresh
 - ✓ Changed handleRefresh function to use window.location.reload() instead of navigation
 - ✓ Implemented iOS 26-style gradient blur effect for bottom navigation
 - ✓ Added layered pseudo-elements with gradient masks for progressive blur intensity
 - ✓ Created sophisticated blur transition from light (5px) at top to strong (30px) at bottom
 - ✓ Enhanced navigation with increased backdrop-filter saturation (2.0) and brightness
-- ✓ Applied multi-layer shadow system with enhanced inset highlights for premium depth
 - ✓ Made onboarding card heights dynamic and responsive instead of fixed sizing
 - ✓ Enhanced back button styling with gradient background, proper shadows, and hover states
 - ✓ Improved onboarding UX by allowing content to naturally size based on step requirements
