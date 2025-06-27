@@ -16,7 +16,7 @@ import { getProfileInitials } from "@/lib/nameUtils";
 import { useTheme } from "@/lib/ThemeProvider";
 import BackButton from "../components/back-button";
 import { PersistentLoading } from "@/lib/persistentLoading";
-import { notificationService } from "@/lib/notificationService";
+import { notificationService } from "@/lib/notifications";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -149,21 +149,21 @@ export default function Profile() {
   const handleTestNotification = async () => {
     setIsTestingNotification(true);
     try {
-      const success = await notificationService.sendTestNotification();
+      const success = await notificationService.showTestNotification();
       if (success) {
         setNotificationPermission(notificationService.getPermissionStatus());
         
         // Send additional demo notifications to showcase different types
         setTimeout(() => {
-          notificationService.sendMessageNotification("Alex", "Hey! Are you free this weekend?");
+          notificationService.showMessageNotification("Alex", "Hey! Are you free this weekend?");
         }, 2000);
         
         setTimeout(() => {
-          notificationService.sendChoreNotification("Take out trash", "Sam");
+          notificationService.showChoreNotification("Take out trash", "Sam");
         }, 4000);
         
         setTimeout(() => {
-          notificationService.sendExpenseNotification("Groceries", 45.67, "Jordan");
+          notificationService.showExpenseNotification("Groceries", 45.67, "Jordan");
         }, 6000);
       }
     } catch (error) {

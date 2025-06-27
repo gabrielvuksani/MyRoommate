@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
+import { notificationService } from "@/lib/notifications";
 
 import ExpenseCard from "@/components/expense-card";
 import { Plus } from "lucide-react";
@@ -99,9 +100,18 @@ export default function Expenses() {
         splits,
       });
     },
-    onSuccess: () => {
+    onSuccess: (_, expenseData) => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
       queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
+      
+      // Send notification for new expense
+      if (expenseData && expenseData.expense) {
+        const paidByUser = (household as any)?.members?.find((m: any) => m.userId === expenseData.expense.paidBy);
+        const paidByName = paidByUser ? `${paidByUser.user.firstName || paidByUser.user.email?.split('@')[0]}` : 'someone';
+        const amount = parseFloat(expenseData.expense.amount);
+        notificationService.showExpenseNotification(expenseData.expense.title, amount, paidByName);
+      }
+      
       setIsCreateOpen(false);
       setNewExpense({
         title: "",

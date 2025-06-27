@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
+import { notificationService } from "@/lib/notifications";
 
 import ChoreBoard from "@/components/chore-board";
 import { Plus } from "lucide-react";
@@ -46,6 +47,11 @@ export default function Chores() {
     enabled: !!household,
   });
 
+  const { data: members = [] } = useQuery({
+    queryKey: ["/api/households/current/members"],
+    enabled: !!household,
+  }) as { data: any[] };
+
   const createChoreMutation = useMutation({
     mutationFn: async (choreData: any) => {
       const dataToSend = {
@@ -54,8 +60,16 @@ export default function Chores() {
       };
       await apiRequest("POST", "/api/chores", dataToSend);
     },
-    onSuccess: () => {
+    onSuccess: (_, choreData) => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
+      
+      // Send notification for new chore assignment
+      if (choreData.assignedTo && choreData.title && Array.isArray(members)) {
+        const assignedUser = members.find((m: any) => m.user.id === choreData.assignedTo);
+        const assignedName = assignedUser ? `${assignedUser.user.firstName || assignedUser.user.email?.split('@')[0]}` : 'someone';
+        notificationService.showChoreNotification(choreData.title, assignedName);
+      }
+      
       setIsCreateOpen(false);
       setNewChore({
         title: '',
@@ -167,7 +181,7 @@ export default function Chores() {
                       <SelectValue placeholder="Assign to... *" />
                     </SelectTrigger>
                     <SelectContent>
-                      {household?.members?.map((member: any) => (
+                      {Array.isArray(members) && members.map((member: any) => (
                         <SelectItem key={member.userId} value={member.userId}>
                           {member.user.firstName || member.user.email?.split('@')[0]}
                         </SelectItem>

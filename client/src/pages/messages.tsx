@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
-import { notificationService } from "@/lib/notificationService";
+import { notificationService } from "@/lib/notifications";
 import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
@@ -101,9 +101,10 @@ export default function Messages() {
         });
         
         // Send notification for new messages (only if not from current user)
-        if (data.message && data.message.userId !== user?.id && !document.hasFocus()) {
+        if (data.message && data.message.userId !== user?.id) {
           const userName = formatDisplayName(data.message.user?.firstName || null, data.message.user?.lastName || null);
-          notificationService.sendMessageNotification(userName, data.message.content || '');
+          const householdName = household?.name;
+          notificationService.showMessageNotification(userName, data.message.content || '', householdName);
         }
         
         queryClient.invalidateQueries({ 

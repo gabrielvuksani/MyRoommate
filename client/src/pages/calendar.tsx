@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
+import { notificationService } from "@/lib/notifications";
 
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react";
 
@@ -48,8 +49,14 @@ export default function Calendar() {
       };
       await apiRequest("POST", "/api/calendar", dataToSend);
     },
-    onSuccess: () => {
+    onSuccess: (_, eventData) => {
       queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
+      
+      // Send notification for new calendar event
+      if (eventData && eventData.title && eventData.startDate) {
+        notificationService.showCalendarNotification(eventData.title, eventData.startDate);
+      }
+      
       setIsCreateOpen(false);
       setNewEvent({
         title: '',
