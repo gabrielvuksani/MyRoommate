@@ -5,55 +5,40 @@ export function useKeyboardHeight() {
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   useEffect(() => {
-    // For iOS/Android PWA detection
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isAndroid = /Android/.test(navigator.userAgent);
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                  (window.navigator as any).standalone === true;
-
-    // Visual viewport API for modern browsers
-    if ('visualViewport' in window && window.visualViewport) {
-      const handleViewportChange = () => {
-        const viewport = window.visualViewport!;
-        const hasKeyboard = window.innerHeight - viewport.height > 50;
-        
-        setKeyboardHeight(hasKeyboard ? window.innerHeight - viewport.height : 0);
-        setIsKeyboardVisible(hasKeyboard);
-      };
-
-      window.visualViewport.addEventListener('resize', handleViewportChange);
-      window.visualViewport.addEventListener('scroll', handleViewportChange);
-
-      return () => {
-        if (window.visualViewport) {
-          window.visualViewport.removeEventListener('resize', handleViewportChange);
-          window.visualViewport.removeEventListener('scroll', handleViewportChange);
-        }
-      };
-    }
+    let initialHeight = window.innerHeight;
     
-    // Fallback for older browsers
-    const initialHeight = window.innerHeight;
-
-    const handleResize = () => {
+    // Simple height-based detection
+    const checkKeyboard = () => {
       const currentHeight = window.innerHeight;
       const heightDiff = initialHeight - currentHeight;
-      const hasKeyboard = heightDiff > 50;
-
+      const hasKeyboard = heightDiff > 100; // Increased threshold for reliability
+      
       setKeyboardHeight(hasKeyboard ? heightDiff : 0);
       setIsKeyboardVisible(hasKeyboard);
     };
 
-    // Also listen to focus/blur events on inputs
-    const handleFocus = () => {
-      setTimeout(() => {
-        handleResize();
-      }, 300); // Delay to allow keyboard animation
+    // Handle window resize
+    const handleResize = () => {
+      // Update initial height if window is resized when keyboard is not visible
+      if (!isKeyboardVisible) {
+        initialHeight = window.innerHeight;
+      }
+      checkKeyboard();
+    };
+
+    // Handle focus events
+    const handleFocus = (e: FocusEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        setTimeout(checkKeyboard, 300);
+      }
     };
 
     const handleBlur = () => {
-      setKeyboardHeight(0);
-      setIsKeyboardVisible(false);
+      setTimeout(() => {
+        setKeyboardHeight(0);
+        setIsKeyboardVisible(false);
+      }, 100);
     };
 
     window.addEventListener('resize', handleResize);
@@ -65,7 +50,7 @@ export function useKeyboardHeight() {
       document.removeEventListener('focusin', handleFocus);
       document.removeEventListener('focusout', handleBlur);
     };
-  }, []);
+  }, [isKeyboardVisible]);
 
   return { keyboardHeight, isKeyboardVisible };
 }

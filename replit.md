@@ -122,6 +122,9 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Hidden bottom navigation when keyboard is visible to prevent tabs being cut off
 - ✓ Adjusted messages page input and container positioning dynamically based on keyboard visibility
 - ✓ Added smooth transitions for keyboard show/hide animations in messages page
+- ✓ Fixed keyboard crash issue by simplifying detection logic and removing Visual Viewport API complexity
+- ✓ Fixed bottom navigation showing during onboarding by adding proper state checks in App.tsx
+- ✓ Navigation now properly hides when needsOnboarding is true or user is on /onboarding route
 - ✓ Changed app title in HTML, manifest, service worker, and all screenshots to myRoommate
 - ✓ Completely wiped all database records for fresh start while preserving demo roommate listing
 - ✓ Removed all users, households, members, sessions, messages, chores, expenses, and calendar events

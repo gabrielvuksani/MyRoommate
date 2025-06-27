@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/lib/ThemeProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { getUserFlags } from "@/lib/userUtils";
+import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
@@ -25,6 +26,7 @@ import BottomNavigation from "@/components/bottom-navigation";
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
   const [location] = useLocation();
+  const { isKeyboardVisible } = useKeyboardHeight();
   const { data: user } = useQuery({
     queryKey: ["/api/auth/user"],
     enabled: isAuthenticated,
@@ -79,7 +81,7 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
       
-      {isAuthenticated && household && <BottomNavigation />}
+      {isAuthenticated && household && !needsOnboarding && location !== '/onboarding' && !isKeyboardVisible && <BottomNavigation />}
     </div>
   );
 }
