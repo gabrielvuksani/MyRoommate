@@ -413,32 +413,7 @@
   z-index: -1;
 }
 
-.bottom-nav-container::after {
-  content: '';
-  position: absolute;
-  top: -20px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
-  background: transparent;
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border-radius: 34px;
-  mask: linear-gradient(to bottom, 
-    transparent 0%, 
-    rgba(0,0,0,0.2) 30%, 
-    rgba(0,0,0,0.5) 60%, 
-    rgba(0,0,0,0.8) 85%, 
-    rgba(0,0,0,1) 100%);
-  -webkit-mask: linear-gradient(to bottom, 
-    transparent 0%, 
-    rgba(0,0,0,0.2) 30%, 
-    rgba(0,0,0,0.5) 60%, 
-    rgba(0,0,0,0.8) 85%, 
-    rgba(0,0,0,1) 100%);
-  pointer-events: none;
-  z-index: -1;
-}
+
 
 .bottom-nav {
   position: relative;
