@@ -128,6 +128,8 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Simplified onboarding logic: new users (no firstName) vs existing users (firstName but no household)
 - ✓ Fixed Leave Household button to navigate to home page after leaving (window.location.href = '/')
 - ✓ Fixed Refresh App & Data button to navigate to home page on error
+- ✓ Simplified refresh functionality to prevent errors by removing complex cache clearing operations
+- ✓ Refresh now clears React Query cache and storage, then navigates to home page
 - ✓ Changed app title in HTML, manifest, service worker, and all screenshots to myRoommate
 - ✓ Completely wiped all database records for fresh start while preserving demo roommate listing
 - ✓ Removed all users, households, members, sessions, messages, chores, expenses, and calendar events

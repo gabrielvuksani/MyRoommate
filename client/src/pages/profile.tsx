@@ -128,110 +128,22 @@ export default function Profile() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     
+    // Simple and effective refresh:
+    // 1. Clear React Query cache
+    await queryClient.clear();
+    
+    // 2. Clear local storage
     try {
-      // Clear all React Query cache completely
-      await queryClient.clear();
-      
-      // Clear all browser storage
       localStorage.clear();
       sessionStorage.clear();
-      
-      // Clear cookies (document.cookie method for current domain)
-      try {
-        document.cookie.split(";").forEach(cookie => {
-          const eqPos = cookie.indexOf("=");
-          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
-          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-        });
-      } catch (err) {
-        console.log('Cookie clearing skipped:', err);
-      }
-      
-      // Clear service worker cache and registrations (PWA + website)
-      if ('serviceWorker' in navigator) {
-        try {
-          // Clear all cache storage (both PWA and regular website caches)
-          if ('caches' in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(
-              cacheNames.map(cacheName => caches.delete(cacheName))
-            );
-          }
-          
-          // Update service worker and clear registration cache
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(
-            registrations.map(async (registration) => {
-              try {
-                // Force update to clear cached service worker
-                await registration.update();
-                // Optionally unregister and re-register for complete reset
-                if (registration.active) {
-                  registration.active.postMessage({ type: 'CLEAR_CACHE' });
-                }
-              } catch (err) {
-                console.log('Service worker update skipped:', err);
-              }
-            })
-          );
-        } catch (err) {
-          console.log('Service worker cache clearing skipped:', err);
-        }
-      }
-      
-      // Clear IndexedDB (used by many PWA libraries)
-      if ('indexedDB' in window) {
-        try {
-          const databases = await indexedDB.databases();
-          await Promise.all(
-            databases.map(db => {
-              if (db.name) {
-                const deleteReq = indexedDB.deleteDatabase(db.name);
-                return new Promise((resolve, reject) => {
-                  deleteReq.onsuccess = () => resolve(undefined);
-                  deleteReq.onerror = () => reject(deleteReq.error);
-                  deleteReq.onblocked = () => resolve(undefined); // Handle blocked state
-                });
-              }
-            })
-          );
-        } catch (err) {
-          console.log('IndexedDB cleanup skipped:', err);
-        }
-      }
-      
-      // Clear WebSQL (legacy, but still used by some systems)
-      try {
-        if ('webkitStorageInfo' in window) {
-          (window as any).webkitStorageInfo.requestQuota(
-            (window as any).TEMPORARY, 0, () => {}, () => {}
-          );
-        }
-      } catch (err) {
-        console.log('WebSQL clearing skipped:', err);
-      }
-      
-      // Clear Application Cache (legacy PWA cache) - deprecated but handle gracefully
-      try {
-        if ('applicationCache' in window) {
-          const appCache = (window as any).applicationCache;
-          if (appCache && typeof appCache.swapCache === 'function') {
-            appCache.swapCache();
-          }
-        }
-      } catch (err) {
-        console.log('Application cache clearing skipped:', err);
-      }
-      
-      // Force hard reload with cache bypass for both PWA and website
-      // This ensures complete cache clearing regardless of mode
-      window.location.reload();
-    } catch (error) {
-      console.error('Cache clearing error:', error);
-      // Ultimate fallback: navigate to home
-      window.location.href = '/';
+    } catch (e) {
+      console.log('Storage clear error:', e);
     }
+    
+    // 3. Navigate to home with hard reload
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 500); // Small delay to show loading state
   };
 
   const handleTestNotification = async () => {
