@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { flushSync } from "react-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -141,8 +142,11 @@ export default function Profile() {
   };
 
   const handleRefresh = async () => {
-    setIsRefreshing(true);
-    setLoadingStage("processing");
+    // Force immediate synchronous state update
+    flushSync(() => {
+      setIsRefreshing(true);
+      setLoadingStage("processing");
+    });
     
     try {
       // Clear all React Query cache completely
@@ -308,14 +312,12 @@ export default function Profile() {
 
   return (
     <div className="page-container page-transition">
-      {/* Loading overlay for leaving household */}
-      {(isLeavingHousehold || loadingStage) && (
-        <LoadingOverlay message="Leaving household..." stage={loadingStage} />
-      )}
-      
-      {/* Loading overlay for refreshing app */}
-      {isRefreshing && (
-        <LoadingOverlay message="Refreshing app data..." stage={loadingStage} />
+      {/* Loading overlay - unified for both actions */}
+      {(isLeavingHousehold || isRefreshing || loadingStage) && (
+        <LoadingOverlay 
+          message={isRefreshing ? "Refreshing app data..." : "Leaving household..."} 
+          stage={loadingStage} 
+        />
       )}
       
       <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
@@ -739,8 +741,11 @@ export default function Profile() {
               {(household as any) && (
                 <Button
                   onClick={() => {
-                    setIsLeavingHousehold(true);
-                    setLoadingStage("processing");
+                    // Force immediate synchronous state update
+                    flushSync(() => {
+                      setIsLeavingHousehold(true);
+                      setLoadingStage("processing");
+                    });
                     leaveHouseholdMutation.mutate();
                   }}
                   disabled={isLeavingHousehold || leaveHouseholdMutation.isPending}
