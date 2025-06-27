@@ -127,6 +127,7 @@ export default function Profile() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
+    // Don't set it back to false - let the page navigation handle it
     
     // Simple and effective refresh:
     // 1. Clear React Query cache
@@ -141,9 +142,10 @@ export default function Profile() {
     }
     
     // 3. Navigate to home with hard reload
+    // Keep loading state until navigation happens
     setTimeout(() => {
       window.location.href = '/';
-    }, 500); // Small delay to show loading state
+    }, 500); // Small delay to ensure loading overlay is visible
   };
 
   const handleTestNotification = async () => {
