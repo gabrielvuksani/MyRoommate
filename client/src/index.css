@@ -1239,7 +1239,7 @@ input::placeholder, textarea::placeholder {
   color: var(--text-tertiary) !important;
 }
 
-input:focus, textarea:not(.message-input):focus, select:focus {
+input:focus, textarea:focus, select:focus {
   border-color: var(--primary) !important;
   box-shadow: var(--shadow-glow) !important;
 }
@@ -1249,11 +1249,8 @@ textarea.message-input {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
-  border-width: 0 !important;
-  border-style: none !important;
   box-shadow: none !important;
   outline: none !important;
-  outline-width: 0 !important;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -1263,18 +1260,8 @@ textarea.message-input:focus {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
-  border-width: 0 !important;
-  border-style: none !important;
   box-shadow: none !important;
   outline: none !important;
-  outline-width: 0 !important;
-}
-
-textarea.message-input:active,
-textarea.message-input:hover {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
 }
 
 textarea.message-input::placeholder {
@@ -1285,60 +1272,6 @@ textarea.message-input::placeholder {
 textarea.message-input::before,
 textarea.message-input::after {
   display: none !important;
-}
-
-/* Ensure message input is completely borderless */
-.message-input,
-.message-input:focus,
-.message-input:active,
-.message-input:hover,
-.message-input:focus-visible,
-textarea.message-input,
-textarea.message-input:focus,
-textarea.message-input:active,
-textarea.message-input:hover,
-textarea.message-input:focus-visible {
-  border: 0 !important;
-  border-width: 0 !important;
-  border-style: none !important;
-  border-color: transparent !important;
-  outline: 0 !important;
-  outline-width: 0 !important;
-  outline-style: none !important;
-  outline-color: transparent !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  background-color: transparent !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
-}
-
-/* Override any Tailwind base styles */
-@layer base {
-  textarea.message-input {
-    border: 0 !important;
-    outline: 0 !important;
-  }
-}
-
-/* Final override for message input - absolute specificity */
-div.glass-card textarea.message-input,
-div.glass-card textarea.message-input:focus,
-div.glass-card textarea.message-input:active,
-div.glass-card textarea.message-input:hover,
-div.glass-card textarea.message-input:focus-visible,
-.fixed textarea.message-input,
-.fixed textarea.message-input:focus {
-  border: 0 !important;
-  border-width: 0 !important;
-  border-style: none !important;
-  outline: none !important;
-  outline-width: 0 !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
 }
 
 label {
