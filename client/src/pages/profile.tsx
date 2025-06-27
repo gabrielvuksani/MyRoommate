@@ -37,6 +37,7 @@ export default function Profile() {
   const [isCopied, setIsCopied] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [isTestingNotification, setIsTestingNotification] = useState(false);
+  const [manualNotification, setManualNotification] = useState({ title: '', body: '' });
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -170,6 +171,27 @@ export default function Profile() {
       console.error('Test notification failed:', error);
     } finally {
       setIsTestingNotification(false);
+    }
+  };
+
+  const handleSendManualNotification = async () => {
+    if (!manualNotification.title.trim() || !manualNotification.body.trim()) {
+      return;
+    }
+
+    try {
+      const success = await notificationService.showHouseholdNotification(
+        manualNotification.title.trim(),
+        manualNotification.body.trim()
+      );
+      
+      if (success) {
+        // Clear the form after successful send
+        setManualNotification({ title: '', body: '' });
+        console.log('Manual notification sent successfully');
+      }
+    } catch (error) {
+      console.error('Failed to send manual notification:', error);
     }
   };
 
@@ -598,6 +620,41 @@ export default function Profile() {
                   }
                 </span>
               </Button>
+
+              {notificationPermission === 'granted' && (
+                <div className="mt-4 p-4 rounded-xl" style={{ background: 'var(--surface-secondary)' }}>
+                  <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Send Manual Notification</h4>
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      placeholder="Notification title..."
+                      value={manualNotification.title}
+                      onChange={(e) => setManualNotification(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-700"
+                      style={{ background: 'var(--surface-primary)', color: 'var(--text-primary)' }}
+                    />
+                    <textarea
+                      placeholder="Notification message..."
+                      value={manualNotification.body}
+                      onChange={(e) => setManualNotification(prev => ({ ...prev, body: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-700 resize-none"
+                      style={{ background: 'var(--surface-primary)', color: 'var(--text-primary)' }}
+                      rows={2}
+                    />
+                    <Button
+                      onClick={handleSendManualNotification}
+                      disabled={!manualNotification.title.trim() || !manualNotification.body.trim()}
+                      className="w-full py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+                        color: 'white'
+                      }}
+                    >
+                      Send to Household
+                    </Button>
+                  </div>
+                </div>
+              )}
               <Button
                 onClick={handleRefresh}
                 className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-blue-700"

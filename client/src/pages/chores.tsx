@@ -38,6 +38,10 @@ export default function Chores() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const { data: user } = useQuery<{ id: string; firstName?: string; lastName?: string; email: string }>({
+    queryKey: ["/api/auth/user"],
+  });
+
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
   });
@@ -63,11 +67,16 @@ export default function Chores() {
     onSuccess: (_, choreData) => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
       
-      // Send notification for new chore assignment
-      if (choreData.assignedTo && choreData.title && Array.isArray(members)) {
+      // Send notification for new chore assignment with intelligent user filtering
+      if (choreData.assignedTo && choreData.title && Array.isArray(members) && user?.id) {
         const assignedUser = members.find((m: any) => m.user.id === choreData.assignedTo);
         const assignedName = assignedUser ? `${assignedUser.user.firstName || assignedUser.user.email?.split('@')[0]}` : 'someone';
-        notificationService.showChoreNotification(choreData.title, assignedName);
+        notificationService.showChoreNotification(
+          choreData.title, 
+          user.id, 
+          user.id, // creator is current user
+          assignedName
+        );
       }
       
       setIsCreateOpen(false);

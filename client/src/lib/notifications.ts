@@ -79,7 +79,7 @@ export class NotificationService {
     return this.permission;
   }
 
-  async showNotification(options: NotificationOptions, type: NotificationType = 'message'): Promise<boolean> {
+  async showNotification(options: NotificationOptions, type: NotificationType = 'message', currentUserId?: string, actionUserId?: string): Promise<boolean> {
     // Check if notifications are supported
     if (!('Notification' in window)) {
       console.warn('Notifications not supported');
@@ -89,6 +89,12 @@ export class NotificationService {
     // Check permission
     if (this.permission !== 'granted') {
       console.warn('Notification permission not granted');
+      return false;
+    }
+
+    // Don't show notifications if the current user is the one performing the action (avoid self-spam)
+    if (currentUserId && actionUserId && currentUserId === actionUserId) {
+      console.log('User performed action themselves, skipping notification to avoid spam');
       return false;
     }
 
@@ -142,45 +148,57 @@ export class NotificationService {
   }
 
   // Predefined notification types for common app events
-  async showMessageNotification(senderName: string, messageContent: string, householdName?: string): Promise<boolean> {
+  async showMessageNotification(senderName: string, messageContent: string, currentUserId?: string, senderUserId?: string, householdName?: string): Promise<boolean> {
     return this.showNotification({
       title: `New message from ${senderName}`,
       body: householdName ? `${householdName}: ${messageContent}` : messageContent,
       tag: 'message-notification'
-    }, 'message');
+    }, 'message', currentUserId, senderUserId);
   }
 
-  async showChoreNotification(title: string, assignedTo?: string): Promise<boolean> {
+  async showChoreNotification(title: string, currentUserId?: string, creatorUserId?: string, assignedTo?: string): Promise<boolean> {
     return this.showNotification({
       title: 'New Chore Assigned',
       body: assignedTo ? `${title} - Assigned to ${assignedTo}` : title,
       tag: 'chore-notification'
-    }, 'chore');
+    }, 'chore', currentUserId, creatorUserId);
   }
 
-  async showExpenseNotification(title: string, amount: number, paidBy: string): Promise<boolean> {
+  async showExpenseNotification(title: string, amount: number, paidBy: string, currentUserId?: string, creatorUserId?: string): Promise<boolean> {
     return this.showNotification({
       title: 'New Expense Added',
       body: `${title} - $${amount.toFixed(2)} paid by ${paidBy}`,
       tag: 'expense-notification'
-    }, 'expense');
+    }, 'expense', currentUserId, creatorUserId);
   }
 
-  async showCalendarNotification(title: string, startDate: string): Promise<boolean> {
+  async showCalendarNotification(title: string, startDate: string, currentUserId?: string, creatorUserId?: string): Promise<boolean> {
     const date = new Date(startDate).toLocaleDateString();
     return this.showNotification({
       title: 'New Calendar Event',
       body: `${title} on ${date}`,
       tag: 'calendar-notification'
-    }, 'calendar');
+    }, 'calendar', currentUserId, creatorUserId);
   }
 
+  // Manual notification capability for admin/manual use
+  async showCustomNotification(title: string, body: string, currentUserId?: string): Promise<boolean> {
+    return this.showNotification({
+      title,
+      body,
+      tag: 'custom-notification',
+      requireInteraction: true
+    }, 'household', currentUserId);
+  }
+
+  // Household-wide notifications (bypasses user filtering since it's manual)
   async showHouseholdNotification(title: string, body: string): Promise<boolean> {
     return this.showNotification({
       title,
       body,
-      tag: 'household-notification',
-      requireInteraction: true
+      tag: 'household-announcement',
+      requireInteraction: true,
+      vibrate: [200, 100, 200]
     }, 'household');
   }
 
