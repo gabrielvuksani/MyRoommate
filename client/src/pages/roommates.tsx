@@ -143,40 +143,87 @@ export default function Roommates() {
       <div className="pt-44 px-6 pb-24 space-y-6">
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList 
-            className="grid w-full grid-cols-2 backdrop-blur-sm"
-            style={{ 
-              background: 'var(--surface-secondary)',
-              border: '1px solid var(--border)'
-            }}
-          >
-            <TabsTrigger 
-              value="browse" 
-              className="transition-all duration-200"
-              style={{
-                color: activeTab === 'browse' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                background: activeTab === 'browse' ? 'var(--surface)' : 'transparent',
-                boxShadow: activeTab === 'browse' ? 'var(--shadow-soft)' : 'none'
-              }}
-            >
-              <Search className="w-4 h-4 mr-2" />
-              Browse ({listingsArray.length})
-            </TabsTrigger>
-            <TabsTrigger 
-              value="my-listings" 
-              className="transition-all duration-200"
-              style={{
-                color: activeTab === 'my-listings' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                background: activeTab === 'my-listings' ? 'var(--surface)' : 'transparent',
-                boxShadow: activeTab === 'my-listings' ? 'var(--shadow-soft)' : 'none'
-              }}
-            >
-              <Home className="w-4 h-4 mr-2" />
-              My Listings ({myListingsArray.length})
-            </TabsTrigger>
-          </TabsList>
+          <div className="relative p-1 rounded-2xl backdrop-blur-md" style={{
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid var(--border)',
+            backdropFilter: 'blur(20px) saturate(1.8)'
+          }}>
+            <div className="grid w-full grid-cols-2 relative">
+              {/* Sliding indicator */}
+              <div 
+                className="absolute top-0 bottom-0 rounded-xl transition-all duration-500 will-change-transform"
+                style={{
+                  width: '50%',
+                  left: activeTab === 'browse' ? '0%' : '50%',
+                  background: 'var(--surface)',
+                  boxShadow: '0 2px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                  backdropFilter: 'blur(8px)',
+                  transitionTimingFunction: 'cubic-bezier(0.25, 1.4, 0.35, 1)'
+                }}
+              />
+              
+              <TabsTrigger 
+                value="browse" 
+                className="relative z-10 transition-all duration-300 font-medium rounded-xl px-4 py-3"
+                style={{
+                  color: activeTab === 'browse' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  background: 'transparent',
+                  border: 'none',
+                  boxShadow: 'none'
+                }}
+              >
+                <Search className="w-4 h-4 mr-2" />
+                Browse ({listingsArray.length})
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="my-listings" 
+                className="relative z-10 transition-all duration-300 font-medium rounded-xl px-4 py-3"
+                style={{
+                  color: activeTab === 'my-listings' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  background: 'transparent',
+                  border: 'none',
+                  boxShadow: 'none'
+                }}
+              >
+                <Home className="w-4 h-4 mr-2" />
+                My Listings ({myListingsArray.length})
+              </TabsTrigger>
+            </div>
+          </div>
 
           <TabsContent value="browse" className="space-y-6">
+            {/* Search Bar */}
+            <div className="flex gap-3">
+              <div className="flex-1 relative">
+                <MapPin 
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" 
+                  style={{ color: 'var(--text-tertiary)' }}
+                />
+                <Input
+                  placeholder="Search by city..."
+                  value={searchCity}
+                  onChange={(e) => setSearchCity(e.target.value)}
+                  className="pl-10 backdrop-blur-sm transition-all duration-200"
+                  style={{
+                    background: 'var(--surface-glass)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+              </div>
+              <Button 
+                variant="outline" 
+                className="backdrop-blur-sm transition-all duration-200"
+                style={{
+                  background: 'var(--surface-glass)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                <Filter className="w-4 h-4" />
+              </Button>
+            </div>
 
             {/* Post Listing Form */}
             {showPostForm && (
