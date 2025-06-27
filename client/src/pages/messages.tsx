@@ -390,17 +390,27 @@ export default function Messages() {
               className="flex items-center space-x-2"
             >
               <div className="flex-1 rounded-full px-4 py-3 mr-1">
-                <Input
-                  type="text"
+                <textarea
                   placeholder="Type a message..."
                   value={newMessage}
                   onChange={(e) => handleTyping(e.target.value)}
-                  className="w-full bg-transparent border-none text-sm focus:outline-none focus:ring-0 focus:border-0 shadow-none p-0"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      if (newMessage.trim()) {
+                        handleSendMessage(e as any);
+                      }
+                    }
+                  }}
+                  rows={1}
+                  className="w-full bg-transparent border-none text-sm resize-none overflow-hidden p-0"
                   style={{ 
                     color: 'var(--text-primary)',
                     boxShadow: 'none',
                     outline: 'none',
-                    border: 'none'
+                    border: 'none',
+                    minHeight: '20px',
+                    maxHeight: '120px'
                   }}
                 />
               </div>
