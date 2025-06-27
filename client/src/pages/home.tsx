@@ -213,9 +213,14 @@ export default function Home() {
               </h3>
               <button
                 onClick={() => setLocation("/roommates")}
-                className="text-sm text-primary font-medium transition-colors btn-animated"
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+                style={{ 
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
               >
-                View All
+                <span className="text-sm font-medium">View All</span>
+                <ArrowRight size={14} />
               </button>
             </div>
             
@@ -578,9 +583,14 @@ export default function Home() {
             </h2>
             <button
               onClick={() => setLocation("/dashboard")}
-              className="text-sm text-primary font-medium transition-colors btn-animated"
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+              style={{ 
+                background: 'var(--surface-secondary)',
+                color: 'var(--text-secondary)'
+              }}
             >
-              View All
+              <span className="text-sm font-medium">View All</span>
+              <ArrowRight size={14} />
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -669,9 +679,14 @@ export default function Home() {
               </h2>
               <button
                 onClick={() => setLocation("/messages")}
-                className="text-sm text-primary font-medium transition-colors btn-animated"
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+                style={{ 
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
               >
-                View All
+                <span className="text-sm font-medium">View All</span>
+                <ArrowRight size={14} />
               </button>
             </div>
 
@@ -752,9 +767,14 @@ export default function Home() {
             </div>
             <button
               onClick={() => setLocation("/roommates")}
-              className="text-sm text-primary font-medium transition-colors btn-animated"
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+              style={{ 
+                background: 'var(--surface-secondary)',
+                color: 'var(--text-secondary)'
+              }}
             >
-              View All
+              <span className="text-sm font-medium">View All</span>
+              <ArrowRight size={14} />
             </button>
           </div>
 
@@ -796,9 +816,14 @@ export default function Home() {
             <div className="text-center">
               <button
                 onClick={() => setLocation("/roommates")}
-                className="text-sm text-primary font-medium transition-colors btn-animated"
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+                style={{ 
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
               >
-                View All
+                <span className="text-sm font-medium">View All</span>
+                <ArrowRight size={14} />
               </button>
             </div>
           )}
