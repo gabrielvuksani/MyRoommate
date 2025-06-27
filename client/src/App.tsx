@@ -41,8 +41,11 @@ function Router() {
     );
   }
 
-  // Check if user needs onboarding (no name or no household)
-  const needsOnboarding = isAuthenticated && user && (!user.firstName || !household);
+  // Check if user needs onboarding (no name)
+  const needsOnboarding = isAuthenticated && user && !user.firstName;
+  
+  // Check if user has no household but has completed onboarding
+  const hasNoHousehold = isAuthenticated && user && user.firstName && !household;
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>

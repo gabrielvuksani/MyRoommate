@@ -111,9 +111,12 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
-- ✓ Fixed bottom navigation shadow by adjusting pseudo-element positioning
-- ✓ Changed ::before and ::after bottom values from negative to 0px to prevent blur effects extending below tab bar
-- ✓ Eliminated unwanted shadow appearance while maintaining iOS 26-style gradient blur effect
+- ✓ Restored iOS 26-style gradient blur effect for bottom navigation after fixing shadow issues
+- ✓ Fixed pseudo-element positioning - changed bottom values back to -20px/-10px to extend blur properly
+- ✓ Enhanced light mode navigation indicator visibility with full opacity (1.0) and subtle shadow
+- ✓ Improved back button styling with purple-tinted gradient for better light mode contrast
+- ✓ Updated routing logic to distinguish between new users (no firstName) and existing users without households
+- ✓ Verified "Browse for roommates" button correctly navigates to /roommates route
 - ✓ Updated refresh button in profile page to redirect to home page after data refresh
 - ✓ Changed handleRefresh function to use window.location.href = "/" for home navigation
 - ✓ Implemented iOS 26-style gradient blur effect for bottom navigation
