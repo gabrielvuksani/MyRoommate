@@ -90,28 +90,13 @@ export default function Profile() {
       const result = await apiRequest("POST", "/api/households/leave", {});
       return result;
     },
-    onSuccess: async () => {
-      // Stage 1: Show success feedback (500ms)
-      setTimeout(() => {
-        setIsLeavingHousehold(false);
-        setLoadingStage("success");
-      }, 500);
-      
-      // Stage 2: Clear cache and prepare transition (1000ms)
-      setTimeout(async () => {
-        await queryClient.clear();
-        setLoadingStage("completing");
-      }, 1000);
-      
-      // Stage 3: Smooth transition to home (1500ms)
-      setTimeout(() => {
-        setLocation('/');
-      }, 1500);
+    onSuccess: () => {
+      // Don't modify loading state here - button handler controls entire sequence
+      queryClient.invalidateQueries();
     },
     onError: (error: any) => {
       console.error("Failed to leave household:", error);
-      setIsLeavingHousehold(false);
-      setLoadingStage("");
+      // Don't modify loading state here - button handler will handle it
     },
   });
 
@@ -256,15 +241,11 @@ export default function Profile() {
       
       // Stage 3: Navigate to home (1500ms)
       setTimeout(() => {
-        setIsRefreshing(false);
-        setLoadingStage("");
         setLocation('/');
       }, 1500);
     } catch (error) {
       console.error('Cache clearing error:', error);
       setTimeout(() => {
-        setIsRefreshing(false);
-        setLoadingStage("");
         setLocation('/');
       }, 1500);
     }
@@ -740,13 +721,39 @@ export default function Profile() {
               </Button>
               {(household as any) && (
                 <Button
-                  onClick={() => {
+                  onClick={async () => {
                     // Force immediate synchronous state update
                     flushSync(() => {
                       setIsLeavingHousehold(true);
                       setLoadingStage("processing");
                     });
-                    leaveHouseholdMutation.mutate();
+                    
+                    try {
+                      // Call the mutation and wait for completion
+                      await leaveHouseholdMutation.mutateAsync();
+                      
+                      // Stage 1: Show success feedback (500ms)
+                      setTimeout(() => {
+                        setLoadingStage("success");
+                      }, 500);
+                      
+                      // Stage 2: Clear cache and prepare transition (1000ms)  
+                      setTimeout(async () => {
+                        await queryClient.clear();
+                        setLoadingStage("completing");
+                      }, 1000);
+                      
+                      // Stage 3: Navigate to home (1500ms)
+                      setTimeout(() => {
+                        setLocation('/');
+                      }, 1500);
+                    } catch (error) {
+                      console.error("Failed to leave household:", error);
+                      setTimeout(() => {
+                        setIsLeavingHousehold(false);
+                        setLoadingStage("");
+                      }, 1500);
+                    }
                   }}
                   disabled={isLeavingHousehold || leaveHouseholdMutation.isPending}
                   className="w-full bg-orange-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-orange-700 disabled:opacity-50"
