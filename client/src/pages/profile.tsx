@@ -149,23 +149,25 @@ export default function Profile() {
 
   const handleTestNotification = async () => {
     setIsTestingNotification(true);
+    console.log('Test notification button clicked');
+    
     try {
+      // First request permission if needed
+      const hasPermission = await notificationService.requestPermission();
+      setNotificationPermission(notificationService.getPermissionStatus());
+      
+      if (!hasPermission) {
+        console.error('Notification permission denied');
+        return;
+      }
+
+      console.log('Permission granted, showing test notifications');
       const success = await notificationService.showTestNotification();
+      
       if (success) {
-        setNotificationPermission(notificationService.getPermissionStatus());
-        
-        // Send additional demo notifications to showcase different types
-        setTimeout(() => {
-          notificationService.showMessageNotification("Alex", "Hey! Are you free this weekend?");
-        }, 2000);
-        
-        setTimeout(() => {
-          notificationService.showChoreNotification("Take out trash", "Sam");
-        }, 4000);
-        
-        setTimeout(() => {
-          notificationService.showExpenseNotification("Groceries", 45.67, "Jordan");
-        }, 6000);
+        console.log('Test notifications initiated successfully');
+      } else {
+        console.error('Test notifications failed');
       }
     } catch (error) {
       console.error('Test notification failed:', error);

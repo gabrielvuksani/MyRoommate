@@ -93,13 +93,15 @@ export class NotificationService {
     }
 
     // Don't show notifications if the current user is the one performing the action (avoid self-spam)
-    if (currentUserId && actionUserId && currentUserId === actionUserId) {
+    // Skip this check for test notifications and manual notifications
+    if (currentUserId && actionUserId && currentUserId === actionUserId && type !== 'household') {
       console.log('User performed action themselves, skipping notification to avoid spam');
       return false;
     }
 
     // Don't show notifications if document is focused (user is actively using the app)
-    if (document.hasFocus()) {
+    // Skip this check for test notifications
+    if (document.hasFocus() && type !== 'household' && !options.tag?.includes('test')) {
       console.log('Document has focus, skipping notification');
       return false;
     }
@@ -119,27 +121,23 @@ export class NotificationService {
     };
 
     try {
-      // Use service worker for PWA if available
-      if (this.serviceWorkerRegistration) {
-        await this.serviceWorkerRegistration.showNotification(options.title, notificationOptions);
-        console.log('Notification shown via Service Worker');
-      } else {
-        // Fallback to regular notification for web browsers
-        const notification = new Notification(options.title, notificationOptions);
-        
-        // Auto-close after 5 seconds for non-PWA notifications
-        setTimeout(() => {
-          notification.close();
-        }, 5000);
+      console.log('Creating notification:', options.title, notificationOptions);
+      
+      // Always use regular Notification API for better compatibility
+      const notification = new Notification(options.title, notificationOptions);
+      
+      // Auto-close after 8 seconds
+      setTimeout(() => {
+        notification.close();
+      }, 8000);
 
-        // Handle click events for regular notifications
-        notification.onclick = () => {
-          window.focus();
-          notification.close();
-        };
+      // Handle click events
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
 
-        console.log('Notification shown via Web API');
-      }
+      console.log('Notification created successfully:', options.title);
       return true;
     } catch (error) {
       console.error('Error showing notification:', error);
@@ -204,41 +202,61 @@ export class NotificationService {
 
   // Test notification for debugging
   async showTestNotification(): Promise<boolean> {
+    console.log('Starting test notification...');
+    
     const hasPermission = await this.requestPermission();
     if (!hasPermission) {
+      console.error('Permission denied for notifications');
       return false;
     }
 
-    const notifications = [
-      {
-        title: 'New Message',
-        body: 'Hey! Can you pick up groceries on your way home?',
-        type: 'message' as NotificationType
-      },
-      {
-        title: 'Chore Reminder',
-        body: 'Kitchen cleaning is due today',
-        type: 'chore' as NotificationType
-      },
-      {
-        title: 'Expense Added',
-        body: 'Groceries - $47.82 paid by Alex',
-        type: 'expense' as NotificationType
+    console.log('Permission granted, showing test notification');
+
+    // Show immediate test notification
+    try {
+      const success = await this.showNotification({
+        title: 'myRoommate Test',
+        body: 'Notifications are working! 🎉',
+        tag: 'test-notification',
+        requireInteraction: false
+      }, 'household'); // Use household type to bypass focus/spam checks
+
+      if (success) {
+        // Show additional demo notifications with delays
+        const notifications = [
+          {
+            title: 'New Message',
+            body: 'Hey! Can you pick up groceries on your way home?',
+            type: 'message' as NotificationType
+          },
+          {
+            title: 'Chore Reminder', 
+            body: 'Kitchen cleaning is due today',
+            type: 'chore' as NotificationType
+          },
+          {
+            title: 'Expense Added',
+            body: 'Groceries - $47.82 paid by Alex',
+            type: 'expense' as NotificationType
+          }
+        ];
+
+        for (let i = 0; i < notifications.length; i++) {
+          setTimeout(() => {
+            this.showNotification({
+              title: notifications[i].title,
+              body: notifications[i].body,
+              tag: `test-demo-${i}`
+            }, 'household'); // Use household type for demo notifications
+          }, (i + 1) * 2000);
+        }
       }
-    ];
 
-    // Show notifications with delays
-    for (let i = 0; i < notifications.length; i++) {
-      setTimeout(() => {
-        this.showNotification({
-          title: notifications[i].title,
-          body: notifications[i].body,
-          tag: `test-${i}`
-        }, notifications[i].type);
-      }, i * 2000);
+      return success;
+    } catch (error) {
+      console.error('Error showing test notification:', error);
+      return false;
     }
-
-    return true;
   }
 
   // Clear all notifications
