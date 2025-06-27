@@ -111,6 +111,12 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Implemented server-side manual notification system with POST /api/notifications/send endpoint for backend-triggered notifications
+- ✓ Removed document focus detection from notification system for better UX - users now receive notifications even when app is active
+- ✓ Added portrait orientation restriction - app now displays rotation message when device is in landscape mode
+- ✓ Enhanced WebSocket system to handle server-side notification broadcasting to household members
+- ✓ Fixed notification anti-spam logic to prevent users from getting notifications for their own actions while allowing server notifications
+- ✓ Updated client-side WebSocket handling to automatically display browser notifications for server-sent messages
 - ✓ Created seamless persistent loading system that survives page refreshes using sessionStorage and direct DOM manipulation
 - ✓ Loading overlay now persists throughout entire navigation process including page reload with blur background
 - ✓ Implemented automatic restoration on page load with safety timeout to prevent infinite loading states

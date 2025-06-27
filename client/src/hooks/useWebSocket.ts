@@ -63,6 +63,22 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
       ws.current.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          
+          // Handle server-side notifications
+          if (data.type === 'notification') {
+            console.log('Received server notification:', data.data);
+            
+            // Show browser notification if available
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification(data.data.title, {
+                body: data.data.body,
+                icon: '/favicon.ico',
+                tag: `server-notification-${Date.now()}`,
+                requireInteraction: false
+              });
+            }
+          }
+          
           onMessage?.(data);
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);

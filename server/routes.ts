@@ -659,10 +659,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Manual notification endpoint for server-side notifications
+  app.post("/api/notifications/send", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const household = await storage.getUserHousehold(user.claims.sub);
+      if (!household) {
+        return res.status(404).json({ message: "Not part of a household" });
+      }
+
+      const { title, body, type = 'household' } = req.body;
+      
+      if (!title || !body) {
+        return res.status(400).json({ message: "Title and body are required" });
+      }
+
+      console.log(`Manual notification from server: ${title} - ${body}`);
+
+      // Broadcast notification immediately to all household members via WebSocket
+      const notificationData = { 
+        title, 
+        body, 
+        type, 
+        householdId: household.household.id, 
+        senderId: user.claims.sub,
+        senderName: user.claims.first_name || 'Admin'
+      };
+
+      // Use setTimeout to ensure response is sent before broadcasting
+      setTimeout(() => {
+        broadcastNotificationToHousehold(
+          household.household.id, 
+          notificationData, 
+          user.claims.sub // Exclude sender from notification
+        );
+      }, 100);
+
+      res.json({ 
+        success: true, 
+        message: "Server notification sent to household members",
+        data: { title, body, type }
+      });
+    } catch (error) {
+      console.error("Error sending manual notification:", error);
+      res.status(500).json({ message: "Failed to send notification" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // High-performance WebSocket setup with user caching
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+
+  // Server-side notification broadcast function
+  function broadcastNotificationToHousehold(householdId: string, notification: any, excludeUserId?: string) {
+    console.log(`Broadcasting notification to household ${householdId}:`, notification);
+    
+    wss.clients.forEach((client: any) => {
+      if (client.readyState === WebSocket.OPEN && 
+          client._householdId === householdId &&
+          client._userId !== excludeUserId) {
+        
+        const notificationMessage = {
+          type: 'notification',
+          data: {
+            title: notification.title,
+            body: notification.body,
+            notificationType: notification.type || 'household',
+            timestamp: new Date().toISOString(),
+            senderId: notification.senderId,
+            senderName: notification.senderName
+          }
+        };
+        
+        client.send(JSON.stringify(notificationMessage));
+      }
+    });
+  }
   
   // Performance optimization caches
   const userCache = new Map<string, any>();

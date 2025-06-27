@@ -99,12 +99,7 @@ export class NotificationService {
       return false;
     }
 
-    // Don't show notifications if document is focused (user is actively using the app)
-    // Skip this check for test notifications
-    if (document.hasFocus() && type !== 'household' && !options.tag?.includes('test')) {
-      console.log('Document has focus, skipping notification');
-      return false;
-    }
+    // Removed document focus detection for better UX - users should get notifications even when app is active
 
     const notificationOptions: NotificationOptions = {
       icon: '/favicon.ico',
