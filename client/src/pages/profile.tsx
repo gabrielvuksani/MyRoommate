@@ -740,6 +740,7 @@ export default function Profile() {
                 <Button
                   onClick={() => {
                     setIsLeavingHousehold(true);
+                    setLoadingStage("processing");
                     leaveHouseholdMutation.mutate();
                   }}
                   disabled={isLeavingHousehold || leaveHouseholdMutation.isPending}
