@@ -123,10 +123,8 @@ export default function Profile() {
     try {
       // Invalidate all queries to refresh data
       await queryClient.invalidateQueries();
-      // Wait a moment for data to refresh, then redirect to home page
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1000);
+      // Immediately redirect to home page
+      window.location.href = "/";
     } catch (error) {
       console.error("Refresh failed:", error);
       setIsRefreshing(false);
