@@ -384,40 +384,52 @@ export default function Messages() {
       {/* Message Input - Fixed at bottom with visionOS styling */}
       <div className="fixed bottom-[108px] left-0 right-0 z-40 px-6">
         <div className="max-w-3xl mx-auto">
-          <div className="glass-card p-4 rounded-3xl shadow-lg border border-white/20">
+          <div className="glass-card p-4 rounded-3xl shadow-lg" style={{ border: 'none' }}>
             <form
               onSubmit={handleSendMessage}
-              className="flex items-center space-x-2"
+              className="flex items-end space-x-2"
             >
-              <div className="flex-1 rounded-full px-4 py-3 mr-1">
+              <div className="flex-1" style={{ 
+                background: 'rgba(255, 255, 255, 0.1)', 
+                borderRadius: '20px',
+                padding: '8px 16px'
+              }}>
                 <textarea
                   placeholder="Type a message..."
                   value={newMessage}
-                  onChange={(e) => handleTyping(e.target.value)}
+                  onChange={(e) => {
+                    handleTyping(e.target.value);
+                    // Auto-resize textarea
+                    e.target.style.height = 'auto';
+                    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
                       if (newMessage.trim()) {
                         handleSendMessage(e as any);
+                        // Reset height after sending
+                        e.currentTarget.style.height = 'auto';
                       }
                     }
                   }}
                   rows={1}
-                  className="message-input w-full bg-transparent border-none text-sm resize-none overflow-hidden p-0"
+                  className="message-input w-full bg-transparent text-sm resize-none overflow-y-auto"
                   style={{ 
                     color: 'var(--text-primary)',
                     boxShadow: 'none',
                     outline: 'none',
                     border: 'none',
-                    minHeight: '20px',
-                    maxHeight: '120px'
+                    minHeight: '24px',
+                    maxHeight: '120px',
+                    lineHeight: '1.5'
                   }}
                 />
               </div>
               <Button
                 type="submit"
                 disabled={!newMessage.trim()}
-                className="rounded-full w-10 h-10 p-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                className="rounded-full w-10 h-10 p-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex-shrink-0"
               >
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
