@@ -111,6 +111,8 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Enhanced tab transitions with premium soft bounce effect using refined easing curves and 0.5s duration
+- ✓ Added subtle scaling interactions for tab buttons with smooth hover and active states
 - ✓ Redesigned blur gradient to start from screen bottom edge and softly fade above navigation bar
 - ✓ Implemented authentic visionOS liquid glass effects with 20px blur, 180% saturation, and multi-layered depth
 - ✓ Added light refraction layer with inset highlights simulating curved glass light behavior
