@@ -45,7 +45,13 @@ function Router() {
 
   // Check onboarding completion status
   const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-  const needsOnboarding = isAuthenticated && user && (!user.firstName || (!household && !hasCompletedOnboarding));
+  
+  // Determine routing logic:
+  // 1. New users (no firstName) -> Onboarding
+  // 2. Existing users with household -> Home with navigation
+  // 3. Existing users without household (left household or chose roommate browsing) -> Home without navigation
+  const isNewUser = isAuthenticated && user && !user.firstName;
+  const needsOnboarding = isNewUser;
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
@@ -63,14 +69,14 @@ function Router() {
           <>
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/" component={Home} />
-            <Route path="/chores" component={Chores} />
-            <Route path="/expenses" component={Expenses} />
-            <Route path="/calendar" component={Calendar} />
-            <Route path="/messages" component={Messages} />
+            <Route path="/chores" component={household ? Chores : Home} />
+            <Route path="/expenses" component={household ? Expenses : Home} />
+            <Route path="/calendar" component={household ? Calendar : Home} />
+            <Route path="/messages" component={household ? Messages : Home} />
     
             <Route path="/profile" component={Profile} />
             <Route path="/settings" component={Profile} />
-            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/dashboard" component={household ? Dashboard : Home} />
 
             <Route path="/roommates" component={Roommates} />
             <Route path="/listings/:id" component={ListingDetail} />

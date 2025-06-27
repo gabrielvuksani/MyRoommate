@@ -145,6 +145,9 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Made onboarding card heights dynamic and responsive instead of fixed sizing
 - ✓ Enhanced back button styling with gradient background, proper shadows, and hover states
 - ✓ Improved onboarding UX by allowing content to naturally size based on step requirements
+- ✓ Added loading overlays to profile page for leaving household and refreshing app operations
+- ✓ Created LoadingOverlay component for consistent loading state UI across the application
+- ✓ Fixed routing logic to redirect household-restricted pages to home view for users without households
 
 **June 26, 2025 (Earlier):**
 - ✓ Streamlined onboarding process to be the first experience for new users

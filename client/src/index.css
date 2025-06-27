@@ -417,7 +417,8 @@
 
 
 
-.bottom-nav {
+/* Light mode navigation */
+:root .bottom-nav {
   position: relative;
   background: linear-gradient(135deg, 
     rgba(255, 255, 255, 0.12) 0%, 

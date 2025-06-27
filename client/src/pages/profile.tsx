@@ -14,6 +14,7 @@ import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun } from "lucide-rea
 import { getProfileInitials } from "@/lib/nameUtils";
 import { useTheme } from "@/lib/ThemeProvider";
 import BackButton from "../components/back-button";
+import LoadingOverlay from "../components/loading-overlay";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -147,6 +148,16 @@ export default function Profile() {
 
   return (
     <div className="page-container page-transition">
+      {/* Loading overlay for leaving household */}
+      {leaveHouseholdMutation.isPending && (
+        <LoadingOverlay message="Leaving household..." />
+      )}
+      
+      {/* Loading overlay for refreshing app */}
+      {isRefreshing && (
+        <LoadingOverlay message="Refreshing app data..." />
+      )}
+      
       <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
         <div className="page-header">
           <div className="flex items-center space-x-4">
