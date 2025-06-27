@@ -727,6 +727,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }));
         }
         
+        // Handle ping/pong for connection keepalive in deployment
+        if (message.type === 'ping') {
+          ws.send(JSON.stringify({ type: 'pong' }));
+          return;
+        }
+        
         if (message.type === 'send_message') {
           const startTime = Date.now();
           const { content, householdId: msgHouseholdId, userId: msgUserId, linkedTo, linkedType, tempId } = message;

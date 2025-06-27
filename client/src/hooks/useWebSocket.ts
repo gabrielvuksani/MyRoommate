@@ -18,7 +18,10 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     // Handle both development and production environments
     const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/ws`;
+    // In production, ensure we use the full domain for WebSocket connections
+    const wsUrl = process.env.NODE_ENV === 'production' || window.location.protocol === 'https:' 
+      ? `${protocol}//${host}/ws`
+      : `${protocol}//${host}/ws`;
     
     let reconnectTimeout: NodeJS.Timeout;
     let heartbeatInterval: NodeJS.Timeout;

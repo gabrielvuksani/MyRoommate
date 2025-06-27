@@ -43,7 +43,8 @@ export default function Onboarding() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
       localStorage.setItem('onboarding_completed', 'true');
-      setLocation('/');
+      // Refresh the page to ensure all state is properly reset
+      window.location.href = '/';
     },
   });
 
@@ -64,7 +65,8 @@ export default function Onboarding() {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       localStorage.setItem('onboarding_completed', 'true');
-      setLocation('/');
+      // Refresh the page to ensure all state is properly reset
+      window.location.href = '/';
     },
     onError: (error: any) => {
       console.error("Frontend: Join mutation error:", error);

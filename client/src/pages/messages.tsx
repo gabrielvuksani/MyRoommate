@@ -9,6 +9,7 @@ import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { notificationService } from "@/lib/notificationService";
 import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
+import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
 export default function Messages() {
   const [newMessage, setNewMessage] = useState("");
@@ -23,6 +24,7 @@ export default function Messages() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { keyboardHeight, isKeyboardVisible } = useKeyboardHeight();
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -319,8 +321,11 @@ export default function Messages() {
       {/* Scrollable Messages Container */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto"
-        style={{ paddingTop: '140px', paddingBottom: '200px' }}
+        className="flex-1 overflow-y-auto transition-all duration-200"
+        style={{ 
+          paddingTop: '140px', 
+          paddingBottom: isKeyboardVisible ? '120px' : '200px' 
+        }}
       >
         <div className="max-w-3xl mx-auto px-6">
           <div className="space-y-4 min-h-full">
@@ -391,8 +396,13 @@ export default function Messages() {
           </div>
         </div>
       </div>
-      {/* Message Input - Fixed at bottom with visionOS styling */}
-      <div className="fixed bottom-[108px] left-0 right-0 z-40 px-6">
+      {/* Message Input - Fixed at bottom with dynamic positioning for keyboard */}
+      <div 
+        className="fixed left-0 right-0 z-40 px-6 transition-all duration-200"
+        style={{ 
+          bottom: isKeyboardVisible ? '20px' : '108px'
+        }}
+      >
         <div className="max-w-3xl mx-auto">
           <div className="glass-card rounded-3xl shadow-lg" style={{ 
             border: 'none',

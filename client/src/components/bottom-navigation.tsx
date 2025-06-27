@@ -3,11 +3,13 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useEffect } from "react";
+import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
 export default function BottomNavigation() {
   const [location, setLocation] = useLocation();
   const { user } = useAuth();
   const navigationRef = useRef<HTMLElement>(null);
+  const { isKeyboardVisible } = useKeyboardHeight();
   
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -17,8 +19,11 @@ export default function BottomNavigation() {
   // Check onboarding completion status
   const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
   
-  // Don't show navigation if user is on onboarding page or hasn't completed onboarding and doesn't have a household
-  if (location === '/onboarding' || (!hasCompletedOnboarding && !household)) {
+  // Don't show navigation if:
+  // 1. User is on onboarding page
+  // 2. User hasn't completed onboarding and doesn't have a household
+  // 3. Keyboard is visible (for mobile devices)
+  if (location === '/onboarding' || (!hasCompletedOnboarding && !household) || isKeyboardVisible) {
     return null;
   }
 

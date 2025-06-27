@@ -116,6 +116,12 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Applied consistent logo design from landing page to manifest icons in all sizes (72x72 to 512x512)
 - ✓ Fixed PWA manifest icons to use exact Lucide home icon SVG path matching landing page (house outline with door)
 - ✓ Updated all PWA icons to use stroke-based rendering (outline style) instead of filled paths to perfectly match landing page logo
+- ✓ Fixed WebSocket connection issues for deployment by adding ping/pong keepalive mechanism
+- ✓ Added automatic page refresh after household creation/join to prevent modal getting stuck
+- ✓ Implemented native iOS/Android keyboard detection using Visual Viewport API
+- ✓ Hidden bottom navigation when keyboard is visible to prevent tabs being cut off
+- ✓ Adjusted messages page input and container positioning dynamically based on keyboard visibility
+- ✓ Added smooth transitions for keyboard show/hide animations in messages page
 - ✓ Changed app title in HTML, manifest, service worker, and all screenshots to myRoommate
 - ✓ Completely wiped all database records for fresh start while preserving demo roommate listing
 - ✓ Removed all users, households, members, sessions, messages, chores, expenses, and calendar events
