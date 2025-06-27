@@ -60,13 +60,9 @@ function Router() {
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
       <Switch>
         {!isAuthenticated ? (
-          <>
-            <Route path="/landing" component={Landing} />
-            <Route path="/" component={Landing} />
-          </>
+          <Route path="/" component={Landing} />
         ) : needsOnboarding ? (
           <>
-            <Route path="/landing" component={Landing} />
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/roommates" component={Roommates} />
             <Route path="/listings/:id" component={ListingDetail} />
@@ -74,7 +70,6 @@ function Router() {
           </>
         ) : (
           <>
-            <Route path="/landing" component={Landing} />
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/" component={Home} />
             <Route path="/chores" component={hasHousehold ? Chores : Home} />
