@@ -5,10 +5,11 @@
 
 export interface UserFlags {
   isNewUser: boolean;          // User without firstName (needs name entry)
-  isExistingUser: boolean;     // User with firstName but no household
-  needsOnboarding: boolean;    // User without firstName
+  isExistingUser: boolean;     // User with firstName but no household (returning user)
+  needsOnboarding: boolean;    // User needs to complete onboarding flow
   hasNoHousehold: boolean;     // User with firstName but no household
   isFullyOnboarded: boolean;   // User with firstName and household
+  isInOnboarding: boolean;     // User is currently in the onboarding process
 }
 
 /**
@@ -16,18 +17,27 @@ export interface UserFlags {
  * @param user - User object from authentication
  * @param household - Household object from API
  * @param isAuthenticated - Authentication status
+ * @param currentPath - Current URL path to track onboarding state
  * @returns UserFlags object with all differentiation flags
  */
-export function getUserFlags(user: any, household: any, isAuthenticated: boolean): UserFlags {
+export function getUserFlags(user: any, household: any, isAuthenticated: boolean, currentPath?: string): UserFlags {
+  // Check if user has completed onboarding (stored in localStorage)
+  const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+  
   // User without firstName needs full onboarding including name entry
   const isNewUser = isAuthenticated && user && !user.firstName;
   
-  // User with firstName but no household (existing user returning)
-  const isExistingUser = isAuthenticated && user && user.firstName && !household;
+  // User is currently in onboarding flow (on /onboarding path or hasn't completed it)
+  const isInOnboarding = currentPath === '/onboarding' || (!hasCompletedOnboarding && isAuthenticated && user && !household);
+  
+  // User with firstName but no household AND has completed onboarding (returning user)
+  const isExistingUser = isAuthenticated && user && user.firstName && !household && hasCompletedOnboarding;
+  
+  // User needs onboarding if they're new OR haven't completed onboarding flow
+  const needsOnboarding = isNewUser || (!hasCompletedOnboarding && isAuthenticated && user && !household);
   
   // Legacy compatibility flags
-  const needsOnboarding = isNewUser;
-  const hasNoHousehold = isExistingUser;
+  const hasNoHousehold = isAuthenticated && user && user.firstName && !household;
   const isFullyOnboarded = isAuthenticated && user && user.firstName && household;
 
   return {
@@ -35,7 +45,8 @@ export function getUserFlags(user: any, household: any, isAuthenticated: boolean
     isExistingUser,
     needsOnboarding,
     hasNoHousehold,
-    isFullyOnboarded
+    isFullyOnboarded,
+    isInOnboarding
   };
 }
 

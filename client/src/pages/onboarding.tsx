@@ -42,6 +42,7 @@ export default function Onboarding() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+      localStorage.setItem('onboarding_completed', 'true');
       setLocation('/');
     },
   });
@@ -62,6 +63,7 @@ export default function Onboarding() {
       console.log("Frontend: Join mutation success, invalidating queries");
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      localStorage.setItem('onboarding_completed', 'true');
       setLocation('/');
     },
     onError: (error: any) => {
@@ -465,7 +467,10 @@ export default function Onboarding() {
               </Button>
               {householdData.action === 'browse' ? (
                 <Button
-                  onClick={() => setLocation("/roommates")}
+                  onClick={() => {
+                    localStorage.setItem('onboarding_completed', 'true');
+                    setLocation("/roommates");
+                  }}
                   className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white font-semibold rounded-2xl btn-animated shadow-lg shadow-purple-500/25 transition-all duration-200 hover:scale-[1.02]"
                 >
                   Browse Roommates

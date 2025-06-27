@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 
@@ -24,6 +24,7 @@ import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
+  const [location] = useLocation();
   const { data: user } = useQuery({
     queryKey: ["/api/auth/user"],
     enabled: isAuthenticated,
@@ -42,9 +43,9 @@ function Router() {
     );
   }
 
-  // Get centralized user flags for consistent differentiation
-  const userFlags = getUserFlags(user, household, isAuthenticated);
-  const { isNewUser, isExistingUser, needsOnboarding, hasNoHousehold, isFullyOnboarded } = userFlags;
+  // Check onboarding completion status
+  const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+  const needsOnboarding = isAuthenticated && user && (!user.firstName || (!household && !hasCompletedOnboarding));
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
@@ -54,6 +55,8 @@ function Router() {
         ) : needsOnboarding ? (
           <>
             <Route path="/onboarding" component={Onboarding} />
+            <Route path="/roommates" component={Roommates} />
+            <Route path="/listings/:id" component={ListingDetail} />
             <Route path="/" component={Onboarding} />
           </>
         ) : (

@@ -14,8 +14,11 @@ export default function BottomNavigation() {
     enabled: !!user,
   });
 
-  // Don't show navigation if user doesn't have a household
-  if (!household) {
+  // Check onboarding completion status
+  const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+  
+  // Don't show navigation if user hasn't completed onboarding or doesn't have a household
+  if (!hasCompletedOnboarding && !household) {
     return null;
   }
 
