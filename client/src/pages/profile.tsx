@@ -89,14 +89,9 @@ export default function Profile() {
       return result;
     },
     onSuccess: async () => {
-      // Show loading state
-      setIsLeavingHousehold(true);
-      
-      // Clear all cached data
+      // Clear all cached data and force page reload
       await queryClient.clear();
-      
-      // Redirect to home page
-      window.location.href = "/";
+      window.location.reload();
     },
     onError: (error: any) => {
       console.error("Failed to leave household:", error);

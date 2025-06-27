@@ -38,19 +38,13 @@ export default function Onboarding() {
 
   const createHouseholdMutation = useMutation({
     mutationFn: async (data: any) => {
-      console.log("Creating household with data:", data);
       return apiRequest("POST", "/api/households", data);
     },
-    onSuccess: (data) => {
-      console.log("Household created successfully:", data);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
       localStorage.setItem('onboarding_completed', 'true');
       setLocation('/');
     },
-    onError: (error: any) => {
-      console.error("Household creation error:", error);
-      setErrorMessage("Unable to create household. Please try again.");
-    }
   });
 
   const joinHouseholdMutation = useMutation({
@@ -119,9 +113,7 @@ export default function Onboarding() {
   });
 
   const handleNext = () => {
-    console.log("handleNext called from step:", step, "isNewUser:", isNewUser, "isExistingUser:", isExistingUser);
     const nextStep = getNextOnboardingStep(step, isNewUser, isExistingUser);
-    console.log("Next step calculated:", nextStep);
     
     if (step === 2 && isNewUser) {
       // New users: Update name before proceeding to household setup
@@ -132,7 +124,6 @@ export default function Onboarding() {
     }
     
     if (nextStep !== step) {
-      console.log("Moving to step:", nextStep);
       setStep(nextStep);
     }
   };
@@ -145,13 +136,10 @@ export default function Onboarding() {
   };
 
   const handleFinish = () => {
-    console.log("handleFinish called with action:", householdData.action, "data:", householdData);
     setErrorMessage(''); // Clear any previous errors
     if (householdData.action === 'create') {
-      console.log("Triggering household creation mutation");
       createHouseholdMutation.mutate({ name: householdData.name });
     } else {
-      console.log("Triggering household join mutation");
       joinHouseholdMutation.mutate(householdData.inviteCode);
     }
   };

@@ -129,7 +129,7 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Extended cache clearing to work for both PWA and regular website modes with cookie clearing
 - ✓ Added service worker message handling for coordinated cache clearing across all registration types
 - ✓ Implemented legacy cache clearing (WebSQL, Application Cache) for maximum compatibility
-- ✓ Fixed Leave Household button to properly redirect to home page using window.location.href = "/"
+- ✓ Fixed Leave Household button to properly refresh the entire page using window.location.reload()
 - ✓ Standardized all View All buttons across the application to match the Featured Listings design with background and ArrowRight icon
 - ✓ Applied consistent styling: flex items-center space-x-2 px-4 py-2 rounded-xl with surface-secondary background
 - ✓ Updated Recent Activity, Household Performance, and Find Roommates View All buttons to match Featured Listings design
@@ -183,7 +183,7 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Redesigned loading overlay with premium glass morphism modal design matching app's design language
 - ✓ Implemented proper z-index (100) for loading overlay to appear above all content including modals
 - ✓ Added sophisticated gradient spinner and glass effects with backdrop blur for loading states
-- ✓ Fixed timing issues - leave household shows loading spinner and redirects to home page immediately
+- ✓ Fixed timing issues - leave household and refresh now redirect immediately after loading state starts
 - ✓ Applied modal-enter animation and premium styling consistent with app's visionOS aesthetic
 - ✓ Enhanced tab switching animation with refined bouncy cubic-bezier curve (0.25, 1.4, 0.35, 1) for premium feel
 - ✓ Fixed loading state to show immediately on button click before any async operations
@@ -208,13 +208,6 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Created NotificationService class with proper permission handling and service worker integration
 - ✓ Added test notification button with dynamic states based on permission status
 - ✓ Implemented notification click handling to focus or open the app when notifications are tapped
-- ✓ Added deployment-specific WebSocket fixes for production environment compatibility
-- ✓ Enhanced WebSocket connection handling with immediate acknowledgment for deployment environments
-- ✓ Added comprehensive debugging logs for WebSocket connection issues in production
-- ✓ Implemented connection confirmation system for deployment WebSocket reliability
-- ✓ Fixed leave household button to redirect to home page while showing loading spinner
-- ✓ Added more frequent initial ping intervals for deployment WebSocket connections
-- ✓ Enhanced onboarding flow debugging with detailed console logs for step progression
 
 **June 26, 2025 (Earlier):**
 - ✓ Streamlined onboarding process to be the first experience for new users

@@ -675,13 +675,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   console.log('WebSocket server initialized on path /ws');
   
-  wss.on('connection', (ws: any, req: any) => {
-    console.log('New WebSocket connection established from:', req.headers.origin || 'unknown origin');
+  wss.on('connection', (ws: any) => {
+    console.log('New WebSocket connection established');
     let userId: string | null = null;
     let householdId: string | null = null;
-    
-    // Send immediate connection acknowledgment for deployment environments
-    ws.send(JSON.stringify({ type: 'connection_ack', timestamp: Date.now() }));
     
     ws.on('message', async (data: any) => {
       try {
@@ -817,17 +814,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Handle ping/pong for connection keepalive
         if (message.type === 'ping') {
-          ws.send(JSON.stringify({ type: 'pong', timestamp: Date.now() }));
-          
-          // Send connection status confirmation
-          if (userId && householdId) {
-            ws.send(JSON.stringify({ 
-              type: 'connection_confirmed', 
-              userId, 
-              householdId,
-              status: 'online' 
-            }));
-          }
+          ws.send(JSON.stringify({ type: 'pong' }));
           return;
         }
         
