@@ -85,15 +85,13 @@ export default function Profile() {
 
   const leaveHouseholdMutation = useMutation({
     mutationFn: async () => {
-      // Add a small delay to ensure loading state is visible
       const result = await apiRequest("POST", "/api/households/leave", {});
-      // Keep loading state visible during cache clear
-      await queryClient.clear();
       return result;
     },
     onSuccess: async () => {
-      // Redirect happens after mutation completes
-      window.location.href = "/";
+      // Clear all cached data and force page reload
+      await queryClient.clear();
+      window.location.reload();
     },
     onError: (error: any) => {
       console.error("Failed to leave household:", error);

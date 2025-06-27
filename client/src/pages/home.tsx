@@ -674,7 +674,7 @@ export default function Home() {
               </h2>
               <button
                 onClick={() => setLocation("/messages")}
-                className="text-sm text-primary font-medium transition-colors btn-animated pt-[4px] pb-[4px] pl-[10px] pr-[10px]"
+                className="text-sm text-primary font-medium transition-colors btn-animated"
               >
                 View All
               </button>
@@ -799,14 +799,12 @@ export default function Home() {
 
           {featuredListings.length > 3 && (
             <div className="text-center">
-              <Button
+              <button
                 onClick={() => setLocation("/roommates")}
-                variant="outline"
-                className="bg-white/60 backdrop-blur-sm border-gray-200 hover:bg-white/80"
+                className="text-sm text-primary font-medium transition-colors btn-animated"
               >
-                View {featuredListings.length - 3} more listings
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
+                View All
+              </button>
             </div>
           )}
         </div>
