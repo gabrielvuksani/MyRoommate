@@ -581,16 +581,24 @@ export default function Onboarding() {
 
         {/* Step indicator */}
         <div className="flex justify-center mt-8 space-x-3">
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === step
-                  ? "w-8 bg-gradient-to-r from-emerald-500 to-cyan-500"
-                  : "w-2 bg-gray-400 dark:bg-gray-500"
-              }`}
-            />
-          ))}
+          {(() => {
+            // Get visible steps based on user type
+            const visibleSteps = isNewUser ? [1, 2, 3, 4] : [1, 3, 4];
+            
+            // Map current step to indicator position
+            const currentIndicatorPosition = visibleSteps.indexOf(step) + 1;
+            
+            return visibleSteps.map((stepNum, index) => (
+              <div
+                key={stepNum}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  index + 1 === currentIndicatorPosition
+                    ? "w-8 bg-gradient-to-r from-emerald-500 to-cyan-500"
+                    : "w-2 bg-gray-400 dark:bg-gray-500"
+                }`}
+              />
+            ));
+          })()}
         </div>
       </div>
     </div>

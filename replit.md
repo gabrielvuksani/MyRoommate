@@ -111,6 +111,7 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Made step indicator dots dynamically match visible steps based on user type (4 dots for new users, 3 for existing)
 - ✓ Implemented comprehensive user differentiation flag system throughout the application
 - ✓ Created centralized userUtils.ts with getUserFlags function for consistent user type detection
 - ✓ Added isNewUser and isExistingUser flags with complete onboarding flow differentiation logic
