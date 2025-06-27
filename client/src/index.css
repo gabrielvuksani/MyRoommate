@@ -376,7 +376,7 @@
   color: var(--text-tertiary);
 }
 
-/* Bottom Navigation - Simplified & Centered */
+/* Bottom Navigation - iOS 26 Gradient Blur Effect */
 .bottom-nav-container {
   position: fixed;
   bottom: 20px;
@@ -386,34 +386,91 @@
   pointer-events: none;
 }
 
+.bottom-nav-container::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  background: transparent;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 44px;
+  mask: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(0,0,0,0.1) 20%, 
+    rgba(0,0,0,0.3) 50%, 
+    rgba(0,0,0,0.6) 80%, 
+    rgba(0,0,0,1) 100%);
+  -webkit-mask: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(0,0,0,0.1) 20%, 
+    rgba(0,0,0,0.3) 50%, 
+    rgba(0,0,0,0.6) 80%, 
+    rgba(0,0,0,1) 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.bottom-nav-container::after {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: transparent;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 34px;
+  mask: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(0,0,0,0.2) 30%, 
+    rgba(0,0,0,0.5) 60%, 
+    rgba(0,0,0,0.8) 85%, 
+    rgba(0,0,0,1) 100%);
+  -webkit-mask: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(0,0,0,0.2) 30%, 
+    rgba(0,0,0,0.5) 60%, 
+    rgba(0,0,0,0.8) 85%, 
+    rgba(0,0,0,1) 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
 .bottom-nav {
   position: relative;
   background: linear-gradient(145deg, 
-    rgba(255, 255, 255, 0.8) 0%, 
-    rgba(255, 255, 255, 0.6) 100%);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+    rgba(255, 255, 255, 0.85) 0%, 
+    rgba(255, 255, 255, 0.75) 100%);
+  backdrop-filter: blur(30px) saturate(2.0) brightness(1.1);
+  -webkit-backdrop-filter: blur(30px) saturate(2.0) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 24px;
   padding: 8px;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.4) inset;
+    0 12px 48px rgba(0, 0, 0, 0.15),
+    0 2px 0 rgba(255, 255, 255, 0.5) inset,
+    0 0 0 0.5px rgba(255, 255, 255, 0.2);
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 0;
   height: 76px;
   pointer-events: auto;
+  z-index: 1;
 }
 
 .dark .bottom-nav {
   background: linear-gradient(145deg, 
-    rgba(28, 28, 30, 0.9) 0%, 
-    rgba(44, 44, 46, 0.8) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+    rgba(28, 28, 30, 0.95) 0%, 
+    rgba(44, 44, 46, 0.85) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+    0 12px 48px rgba(0, 0, 0, 0.5),
+    0 2px 0 rgba(255, 255, 255, 0.12) inset,
+    0 0 0 0.5px rgba(255, 255, 255, 0.08);
 }
 
 .nav-indicator {
