@@ -344,7 +344,12 @@ export default function Messages() {
                           className="glass-card px-4 py-4 text-left flex items-center gap-3 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer group min-h-[72px]"
                           onClick={() => handleStarterClick(starter.text)}
                           style={{
-                            animation: `modal-enter 0.3s ease-out ${index * 0.05}s backwards`
+                            animation: `modal-enter 0.3s ease-out ${index * 0.05}s backwards`,
+                            background: 'var(--glass-card-bg)',
+                            backdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)',
+                            WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)',
+                            border: '1px solid var(--glass-card-border)',
+                            boxShadow: 'var(--glass-card-shadow)'
                           }}
                         >
                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${starter.color} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-xl transition-shadow duration-200 ml-1`}>
@@ -399,8 +404,11 @@ export default function Messages() {
       <div className="fixed bottom-[108px] left-0 right-0 z-40 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="glass-card rounded-3xl shadow-lg" style={{ 
-            border: 'none',
-            padding: '12px'
+            border: '1px solid var(--glass-card-border)',
+            padding: '12px',
+            background: 'var(--glass-card-bg)',
+            backdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)',
+            WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)'
           }}>
             <form onSubmit={handleSendMessage} className="flex items-end gap-3">
               <div className="flex-1">
