@@ -395,21 +395,21 @@
   bottom: 0;
   height: 140px;
   background: transparent;
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(200%) brightness(110%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(110%);
   mask: linear-gradient(to top, 
-    rgba(0,0,0,1) 0%, 
-    rgba(0,0,0,0.9) 20%, 
-    rgba(0,0,0,0.6) 40%, 
-    rgba(0,0,0,0.3) 60%, 
-    rgba(0,0,0,0.1) 80%, 
+    rgba(0,0,0,0.7) 0%, 
+    rgba(0,0,0,0.5) 25%, 
+    rgba(0,0,0,0.3) 50%, 
+    rgba(0,0,0,0.15) 70%, 
+    rgba(0,0,0,0.05) 85%, 
     transparent 100%);
   -webkit-mask: linear-gradient(to top, 
-    rgba(0,0,0,1) 0%, 
-    rgba(0,0,0,0.9) 20%, 
-    rgba(0,0,0,0.6) 40%, 
-    rgba(0,0,0,0.3) 60%, 
-    rgba(0,0,0,0.1) 80%, 
+    rgba(0,0,0,0.7) 0%, 
+    rgba(0,0,0,0.5) 25%, 
+    rgba(0,0,0,0.3) 50%, 
+    rgba(0,0,0,0.15) 70%, 
+    rgba(0,0,0,0.05) 85%, 
     transparent 100%);
   pointer-events: none;
   z-index: -1;
@@ -419,17 +419,21 @@
 
 .bottom-nav {
   position: relative;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px) saturate(180%) brightness(120%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(120%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(200%) brightness(125%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(125%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 24px;
   padding: 8px;
   box-shadow: 
-    0 8px 32px rgba(31, 38, 135, 0.2),
-    inset 0 4px 20px rgba(255, 255, 255, 0.3),
-    inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5),
-    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
+    0 8px 32px rgba(31, 38, 135, 0.15),
+    0 2px 8px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 4px 20px rgba(255, 255, 255, 0.2),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.3),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.15),
+    inset 8px 8px 16px rgba(255, 255, 255, 0.1),
+    inset -8px -8px 16px rgba(255, 255, 255, 0.05);
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 0;
@@ -460,15 +464,19 @@
 }
 
 .dark .bottom-nav {
-  background: rgba(28, 28, 30, 0.15);
-  backdrop-filter: blur(20px) saturate(180%) brightness(90%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(90%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(28, 28, 30, 0.05);
+  backdrop-filter: blur(20px) saturate(200%) brightness(110%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(110%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 4px 20px rgba(255, 255, 255, 0.05),
-    inset 2px 2px 1px 0 rgba(255, 255, 255, 0.1),
-    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.05);
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 4px 20px rgba(255, 255, 255, 0.08),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.15),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.08),
+    inset 8px 8px 16px rgba(255, 255, 255, 0.05),
+    inset -8px -8px 16px rgba(255, 255, 255, 0.03);
 }
 
 .dark .bottom-nav::after {
