@@ -1,5 +1,5 @@
-// Service Worker for RoomieHub PWA
-const CACHE_NAME = 'roomiehub-v1';
+// Service Worker for myRoommate PWA
+const CACHE_NAME = 'myroommate-v1';
 const urlsToCache = [
   '/',
   '/manifest.json',
@@ -108,7 +108,7 @@ self.addEventListener('push', (event) => {
       vibrate: [200, 100, 200],
       data: data.data || {},
       requireInteraction: false,
-      tag: data.tag || 'roomiehub-notification'
+      tag: data.tag || 'myroommate-notification'
     };
 
     event.waitUntil(
