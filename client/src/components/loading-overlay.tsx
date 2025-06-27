@@ -1,4 +1,38 @@
-export default function LoadingOverlay({ message = "Loading..." }: { message?: string }) {
+import { CheckCircle, Loader2, ArrowRight } from 'lucide-react';
+
+interface LoadingOverlayProps {
+  message?: string;
+  stage?: "" | "processing" | "success" | "completing";
+}
+
+export default function LoadingOverlay({ message = "Loading...", stage = "" }: LoadingOverlayProps) {
+  
+  const getStageContent = () => {
+    switch (stage) {
+      case "processing":
+        return {
+          icon: <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#007AFF' }} />,
+          message: message.includes("Refresh") ? "Clearing app data..." : "Leaving household..."
+        };
+      case "success":
+        return {
+          icon: <CheckCircle className="w-6 h-6" style={{ color: '#34C759' }} />,
+          message: message.includes("Refresh") ? "Data cleared successfully" : "Left household successfully"
+        };
+      case "completing":
+        return {
+          icon: <ArrowRight className="w-6 h-6" style={{ color: '#007AFF' }} />,
+          message: "Redirecting to home..."
+        };
+      default:
+        return {
+          icon: <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#007AFF' }} />,
+          message
+        };
+    }
+  };
+
+  const stageContent = getStageContent();
   return (
     <div 
       className="fixed inset-0 z-[100] flex items-center justify-center"
@@ -28,28 +62,20 @@ export default function LoadingOverlay({ message = "Loading..." }: { message?: s
         />
         
         <div className="relative z-10 p-8 flex flex-col items-center space-y-4">
-          {/* Premium gradient spinner */}
-          <div className="relative w-12 h-12">
-            <div 
-              className="absolute inset-0 rounded-full animate-spin"
-              style={{
-                background: 'conic-gradient(from 0deg, transparent 0deg, #007AFF 90deg, transparent 360deg)',
-                animation: 'spin 0.8s linear infinite'
-              }}
-            />
-            <div 
-              className="absolute inset-[3px] rounded-full"
-              style={{
-                background: 'var(--surface-overlay)',
-              }}
-            />
+          {/* Staged icon with animation */}
+          <div className={`transition-all duration-300 ${stage === "success" ? "scale-110" : "scale-100"}`}>
+            <div className="w-12 h-12 flex items-center justify-center">
+              {stageContent.icon}
+            </div>
           </div>
           
           <p 
-            className="text-lg font-medium"
-            style={{ color: 'var(--text-primary)' }}
+            className={`text-lg font-medium transition-all duration-200 ${
+              stage === "success" ? "text-green-600 dark:text-green-400" : ""
+            }`}
+            style={{ color: stage === "success" ? undefined : 'var(--text-primary)' }}
           >
-            {message}
+            {stageContent.message}
           </p>
         </div>
       </div>

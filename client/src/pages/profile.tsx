@@ -33,6 +33,7 @@ export default function Profile() {
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLeavingHousehold, setIsLeavingHousehold] = useState(false);
+  const [loadingStage, setLoadingStage] = useState<"" | "processing" | "success" | "completing">("");
   const [isCopied, setIsCopied] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [isTestingNotification, setIsTestingNotification] = useState(false);
@@ -89,19 +90,27 @@ export default function Profile() {
       return result;
     },
     onSuccess: async () => {
-      // Clear all cached data
-      await queryClient.clear();
-      
-      // Add hang time for better UX
+      // Stage 1: Show success feedback (500ms)
       setTimeout(() => {
         setIsLeavingHousehold(false);
-        // Navigate to home page instead of reloading
+        setLoadingStage("success");
+      }, 500);
+      
+      // Stage 2: Clear cache and prepare transition (1000ms)
+      setTimeout(async () => {
+        await queryClient.clear();
+        setLoadingStage("completing");
+      }, 1000);
+      
+      // Stage 3: Smooth transition to home (1500ms)
+      setTimeout(() => {
         setLocation('/');
       }, 1500);
     },
     onError: (error: any) => {
       console.error("Failed to leave household:", error);
       setIsLeavingHousehold(false);
+      setLoadingStage("");
     },
   });
 
@@ -133,6 +142,7 @@ export default function Profile() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
+    setLoadingStage("processing");
     
     try {
       // Clear all React Query cache completely
@@ -230,16 +240,27 @@ export default function Profile() {
         console.log('Application cache clearing skipped:', err);
       }
       
-      // Add hang time for better UX, then navigate to home
+      // Stage 1: Show success feedback (500ms)
+      setTimeout(() => {
+        setLoadingStage("success");
+      }, 500);
+      
+      // Stage 2: Prepare transition (1000ms)
+      setTimeout(() => {
+        setLoadingStage("completing");
+      }, 1000);
+      
+      // Stage 3: Navigate to home (1500ms)
       setTimeout(() => {
         setIsRefreshing(false);
+        setLoadingStage("");
         setLocation('/');
       }, 1500);
     } catch (error) {
       console.error('Cache clearing error:', error);
-      // Add hang time even on error, then navigate to home
       setTimeout(() => {
         setIsRefreshing(false);
+        setLoadingStage("");
         setLocation('/');
       }, 1500);
     }
@@ -288,13 +309,13 @@ export default function Profile() {
   return (
     <div className="page-container page-transition">
       {/* Loading overlay for leaving household */}
-      {isLeavingHousehold && (
-        <LoadingOverlay message="Leaving household..." />
+      {(isLeavingHousehold || loadingStage) && (
+        <LoadingOverlay message="Leaving household..." stage={loadingStage} />
       )}
       
       {/* Loading overlay for refreshing app */}
       {isRefreshing && (
-        <LoadingOverlay message="Refreshing app data..." />
+        <LoadingOverlay message="Refreshing app data..." stage={loadingStage} />
       )}
       
       <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
