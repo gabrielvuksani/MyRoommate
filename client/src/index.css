@@ -1228,7 +1228,7 @@ input, select {
   transition: all 0.2s ease;
 }
 
-textarea {
+textarea:not(.message-input) {
   background: var(--surface) !important;
   color: var(--text-primary) !important;
   border: 1px solid var(--border) !important;
@@ -1244,18 +1244,22 @@ input:focus, textarea:focus, select:focus {
   box-shadow: var(--shadow-glow) !important;
 }
 
-/* Message Input Override - Target ONLY the textarea element */
-textarea.message-input {
+/* Message Input Override - Maximum specificity with all possible selectors */
+textarea.message-input,
+.message-input,
+.glass-card textarea.message-input,
+.glass-card .message-input,
+div textarea.message-input,
+form textarea.message-input,
+* textarea.message-input {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
-  border: 0 !important;
+  border: none !important;
   border-width: 0 !important;
-  border-style: none !important;
   border-color: transparent !important;
   box-shadow: none !important;
-  outline: 0 !important;
-  outline-width: 0 !important;
+  outline: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
@@ -1268,40 +1272,53 @@ textarea.message-input {
 }
 
 textarea.message-input:focus,
-textarea.message-input:active,
-textarea.message-input:hover {
+.message-input:focus,
+.glass-card textarea.message-input:focus,
+.glass-card .message-input:focus,
+div textarea.message-input:focus,
+form textarea.message-input:focus,
+* textarea.message-input:focus {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
-  border: 0 !important;
+  border: none !important;
   border-width: 0 !important;
-  border-style: none !important;
   border-color: transparent !important;
   box-shadow: none !important;
-  outline: 0 !important;
+  outline: none !important;
   outline-width: 0 !important;
+  outline-offset: 0 !important;
 }
 
-textarea.message-input::placeholder {
+textarea.message-input::placeholder,
+.message-input::placeholder,
+.glass-card textarea.message-input::placeholder,
+.glass-card .message-input::placeholder {
   color: var(--text-secondary) !important;
   opacity: 0.7 !important;
 }
 
-/* Override default textarea styles for message input */
-textarea {
-  background: var(--surface) !important;
-  color: var(--text-primary) !important;
-  border: 1px solid var(--border) !important;
+textarea.message-input::before,
+textarea.message-input::after,
+.glass-card textarea.message-input::before,
+.glass-card textarea.message-input::after {
+  display: none !important;
+  content: none !important;
 }
 
-textarea.message-input {
+/* Message page specific overrides */
+.page-enter textarea.message-input,
+body textarea.message-input,
+#root textarea.message-input {
   background: transparent !important;
   border: none !important;
+  outline: none !important;
 }
 
-/* Conversation starter button cards - ensure they look like glass cards */
-button.glass-card,
-button.starter-card {
+/* Conversation starter cards - ensure consistent styling */
+.glass-card button.glass-card,
+.glass-card .glass-card,
+button.glass-card.glass-card {
   background: var(--glass-card-bg) !important;
   backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
   -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
@@ -1309,15 +1326,28 @@ button.starter-card {
   box-shadow: var(--glass-card-shadow) !important;
 }
 
-/* Target the textarea more specifically */
-form textarea.message-input,
-div textarea.message-input,
-.glass-card textarea.message-input {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  border-width: 0px !important;
-  outline: none !important;
+/* Ensure message input container has proper styling */
+.fixed .glass-card {
+  background: var(--glass-card-bg) !important;
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
+  border: 1px solid var(--glass-card-border) !important;
+  box-shadow: var(--glass-card-shadow) !important;
+}
+
+/* Force remove all borders from message input */
+textarea.message-input,
+textarea.message-input:focus,
+textarea.message-input:active,
+textarea.message-input:hover {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
 }
 
 label {
