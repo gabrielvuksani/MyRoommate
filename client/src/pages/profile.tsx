@@ -89,9 +89,9 @@ export default function Profile() {
       return result;
     },
     onSuccess: async () => {
-      // Clear all cached data and force page reload
+      // Clear all cached data and navigate to home
       await queryClient.clear();
-      window.location.reload();
+      window.location.href = '/';
     },
     onError: (error: any) => {
       console.error("Failed to leave household:", error);
@@ -229,8 +229,8 @@ export default function Profile() {
       window.location.reload();
     } catch (error) {
       console.error('Cache clearing error:', error);
-      // Ultimate fallback: force reload with cache bypass
-      window.location.href = window.location.href;
+      // Ultimate fallback: navigate to home
+      window.location.href = '/';
     }
   };
 
