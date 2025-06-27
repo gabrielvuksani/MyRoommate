@@ -263,10 +263,10 @@ export default function Messages() {
   };
 
   const conversationStarters = [
-    { icon: Coffee, text: "Who wants to grab coffee?", color: "text-amber-600" },
-    { icon: Home, text: "House meeting tonight?", color: "text-blue-600" },
-    { icon: ShoppingCart, text: "Need anything from the store?", color: "text-green-600" },
-    { icon: Calendar, text: "Plans for the weekend?", color: "text-purple-600" }
+    { icon: Coffee, text: "Who wants to grab coffee?", color: "from-amber-400 to-orange-600" },
+    { icon: Home, text: "House meeting tonight?", color: "from-blue-400 to-blue-600" },
+    { icon: ShoppingCart, text: "Need anything from the store?", color: "from-emerald-400 to-green-600" },
+    { icon: Calendar, text: "Plans for the weekend?", color: "from-purple-400 to-purple-600" }
   ];
 
   const handleStarterClick = (text: string) => {
@@ -337,17 +337,21 @@ export default function Messages() {
                       <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Start the conversation</h3>
                       <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Be the first to send a message to your household</p>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {conversationStarters.map((starter, index) => (
-                        <Button
+                        <button
                           key={index}
-                          variant="outline"
-                          className="h-auto p-3 text-left justify-start glass-card hover:bg-white/50 transition-all duration-200"
+                          className="glass-card px-4 py-4 text-left flex items-center gap-3 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer group min-h-[72px]"
                           onClick={() => handleStarterClick(starter.text)}
+                          style={{
+                            animation: `modal-enter 0.3s ease-out ${index * 0.05}s backwards`
+                          }}
                         >
-                          <starter.icon className={`w-4 h-4 mr-2 ${starter.color}`} />
-                          <span className="text-sm">{starter.text}</span>
-                        </Button>
+                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${starter.color} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-xl transition-shadow duration-200 ml-1`}>
+                            <starter.icon className="w-5 h-5 text-white" />
+                          </div>
+                          <span className="text-sm text-[var(--text-primary)] leading-relaxed flex-1 pr-2">{starter.text}</span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -416,20 +420,7 @@ export default function Messages() {
                     }
                   }}
                   rows={1}
-                  className="message-input w-full text-base resize-none"
-                  style={{ 
-                    background: 'transparent !important',
-                    backgroundColor: 'transparent !important',
-                    color: 'var(--text-primary)',
-                    border: '0',
-                    outline: '0',
-                    boxShadow: 'none',
-                    padding: '0 12px',
-                    minHeight: '28px',
-                    maxHeight: '120px',
-                    lineHeight: '28px',
-                    overflowY: 'auto'
-                  }}
+                  className="message-input w-full text-base resize-none px-3 py-1"
                 />
               </div>
               <Button
