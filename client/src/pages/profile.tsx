@@ -291,15 +291,18 @@ export default function Profile() {
     );
   }
 
+  // Early return for loading states to prevent any content flashing
+  if (isLeavingHousehold || isRefreshing || loadingStage) {
+    return (
+      <LoadingOverlay 
+        message={isRefreshing ? "Refreshing app data..." : "Leaving household..."} 
+        stage={loadingStage} 
+      />
+    );
+  }
+
   return (
     <div className="page-container page-transition">
-      {/* Loading overlay - unified for both actions */}
-      {(isLeavingHousehold || isRefreshing || loadingStage) && (
-        <LoadingOverlay 
-          message={isRefreshing ? "Refreshing app data..." : "Leaving household..."} 
-          stage={loadingStage} 
-        />
-      )}
       
       <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
         <div className="page-header">
