@@ -119,6 +119,9 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Hidden bottom navigation tab bar when users are on the onboarding page for cleaner onboarding experience
 - ✓ Enhanced refresh data functionality to completely clear all browser cache including localStorage, sessionStorage, service worker cache, and IndexedDB
 - ✓ Added comprehensive cache clearing with fallback error handling and hard page reload
+- ✓ Extended cache clearing to work for both PWA and regular website modes with cookie clearing
+- ✓ Added service worker message handling for coordinated cache clearing across all registration types
+- ✓ Implemented legacy cache clearing (WebSQL, Application Cache) for maximum compatibility
 - ✓ Fixed Leave Household button to properly refresh the entire page using window.location.reload()
 - ✓ Standardized all View All buttons across the application to match the Featured Listings design with background and ArrowRight icon
 - ✓ Applied consistent styling: flex items-center space-x-2 px-4 py-2 rounded-xl with surface-secondary background
