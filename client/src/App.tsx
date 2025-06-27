@@ -26,7 +26,7 @@ import ListingDetail from "@/pages/listing-detail";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [location] = useLocation();
   const { isKeyboardVisible } = useKeyboardHeight();
 
@@ -39,17 +39,14 @@ function Router() {
   useEffect(() => {
     PersistentLoading.checkAndShow();
   }, []);
-  const { data: user } = useQuery({
-    queryKey: ["/api/auth/user"],
-    enabled: isAuthenticated,
-  }) as { data: any };
   
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
     enabled: isAuthenticated,
   }) as { data: any };
 
-  if (isLoading) {
+  // Show loading only for authenticated users during data fetching
+  if (isLoading && isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <div className="w-8 h-8 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
@@ -60,6 +57,17 @@ function Router() {
   // Get comprehensive user flags using centralized logic
   const userFlags = getUserFlags(user, household, isAuthenticated, location);
   const { needsOnboarding, hasHousehold } = userFlags;
+
+  // Debug: Test minimal rendering first
+  if (!isAuthenticated) {
+    return (
+      <div style={{ background: '#F5F7FA', minHeight: '100vh', padding: '20px' }}>
+        <h1 style={{ color: '#1C1C1E', fontSize: '24px', fontWeight: 'bold' }}>MyRoommate</h1>
+        <p style={{ color: '#8E8E93', marginTop: '10px' }}>Authentication: {isAuthenticated ? 'Yes' : 'No'}</p>
+        <p style={{ color: '#8E8E93' }}>Loading: {isLoading ? 'Yes' : 'No'}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
@@ -103,13 +111,10 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <div style={{ background: '#F5F7FA', minHeight: '100vh', padding: '20px' }}>
+      <h1 style={{ color: '#1C1C1E', fontSize: '24px', fontWeight: 'bold' }}>MyRoommate Test</h1>
+      <p style={{ color: '#8E8E93', marginTop: '10px' }}>React is working!</p>
+    </div>
   );
 }
 
