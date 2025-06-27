@@ -37,20 +37,21 @@ export default function LoadingOverlay({ message = "Loading...", stage = "" }: L
     <div 
       className="fixed inset-0 z-[100] flex items-center justify-center"
       style={{ 
-        background: 'rgba(0, 0, 0, 0.4)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)'
+        background: 'rgba(0, 0, 0, 0.15)',
+        backdropFilter: 'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)'
       }}
     >
       <div 
-        className="relative overflow-hidden rounded-3xl shadow-2xl min-w-[280px]"
+        className="relative overflow-hidden rounded-3xl shadow-2xl min-w-[280px] max-w-[320px]"
         style={{
           background: 'var(--surface-overlay)',
           backdropFilter: 'blur(30px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(30px) saturate(1.8)',
           border: '1px solid var(--border)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1) inset',
-          animation: 'modal-enter 0.2s ease-out'
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1) inset',
+          animation: 'modal-enter 0.2s ease-out',
+          marginTop: '10vh'
         }}
       >
         {/* Glass effect gradient overlay */}
