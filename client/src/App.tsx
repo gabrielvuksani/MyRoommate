@@ -47,7 +47,7 @@ function Router() {
 
   // Get comprehensive user flags using centralized logic
   const userFlags = getUserFlags(user, household, isAuthenticated, location);
-  const { needsOnboarding } = userFlags;
+  const { needsOnboarding, hasHousehold } = userFlags;
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
@@ -65,14 +65,14 @@ function Router() {
           <>
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/" component={Home} />
-            <Route path="/chores" component={household ? Chores : Home} />
-            <Route path="/expenses" component={household ? Expenses : Home} />
-            <Route path="/calendar" component={household ? Calendar : Home} />
-            <Route path="/messages" component={household ? Messages : Home} />
+            <Route path="/chores" component={hasHousehold ? Chores : Home} />
+            <Route path="/expenses" component={hasHousehold ? Expenses : Home} />
+            <Route path="/calendar" component={hasHousehold ? Calendar : Home} />
+            <Route path="/messages" component={hasHousehold ? Messages : Home} />
     
             <Route path="/profile" component={Profile} />
             <Route path="/settings" component={Profile} />
-            <Route path="/dashboard" component={household ? Dashboard : Home} />
+            <Route path="/dashboard" component={hasHousehold ? Dashboard : Home} />
 
             <Route path="/roommates" component={Roommates} />
             <Route path="/listings/:id" component={ListingDetail} />
@@ -81,7 +81,7 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
       
-      {isAuthenticated && household && !needsOnboarding && location !== '/onboarding' && !isKeyboardVisible && <BottomNavigation />}
+      {isAuthenticated && hasHousehold && !needsOnboarding && location !== '/onboarding' && !isKeyboardVisible && <BottomNavigation />}
     </div>
   );
 }

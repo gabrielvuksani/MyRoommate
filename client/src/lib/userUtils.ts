@@ -4,11 +4,10 @@
  */
 
 export interface UserFlags {
-  isNewUser: boolean;          // User without firstName (needs name entry)
-  isExistingUser: boolean;     // User with firstName but no household (returning user)
+  isNewUser: boolean;          // User without firstName (needs full onboarding with name setup)
+  isReturningUser: boolean;    // User with firstName but no household (returning user)
   needsOnboarding: boolean;    // User needs to complete onboarding flow
-  hasNoHousehold: boolean;     // User with firstName but no household
-  isFullyOnboarded: boolean;   // User with firstName and household
+  hasHousehold: boolean;       // User has an active household
   isInOnboarding: boolean;     // User is currently in the onboarding process
 }
 
@@ -21,34 +20,36 @@ export interface UserFlags {
  * @returns UserFlags object with all differentiation flags
  */
 export function getUserFlags(user: any, household: any, isAuthenticated: boolean, currentPath?: string): UserFlags {
-  // Check if user has completed onboarding (stored in localStorage)
-  const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-  
-  // User without firstName needs full onboarding including name entry
-  const isNewUser = isAuthenticated && user && !user.firstName;
-  
+  if (!isAuthenticated || !user) {
+    return {
+      isNewUser: false,
+      isReturningUser: false,
+      needsOnboarding: false,
+      hasHousehold: false,
+      isInOnboarding: false
+    };
+  }
+
   // User is currently in onboarding flow
   const isInOnboarding = currentPath === '/onboarding';
   
-  // User with firstName but no household AND has completed onboarding (returning user)
-  const isExistingUser = isAuthenticated && user && user.firstName && !household && hasCompletedOnboarding;
+  // New user: no firstName (needs full onboarding including name entry)
+  const isNewUser = !user.firstName;
   
-  // User needs onboarding if:
-  // 1. They're new (no firstName) OR
-  // 2. They haven't completed onboarding AND don't have a household
-  // Note: Being in onboarding path doesn't affect needsOnboarding status
-  const needsOnboarding = isNewUser || (!hasCompletedOnboarding && isAuthenticated && user && !household);
+  // Returning user: has firstName but no household
+  const isReturningUser = !!user.firstName && !household;
   
-  // Legacy compatibility flags
-  const hasNoHousehold = isAuthenticated && user && user.firstName && !household;
-  const isFullyOnboarded = isAuthenticated && user && user.firstName && household;
+  // User needs onboarding if they don't have a household (new or returning)
+  const needsOnboarding = !household;
+  
+  // User has an active household
+  const hasHousehold = !!household;
 
   return {
     isNewUser,
-    isExistingUser,
+    isReturningUser,
     needsOnboarding,
-    hasNoHousehold,
-    isFullyOnboarded,
+    hasHousehold,
     isInOnboarding
   };
 }
@@ -68,12 +69,12 @@ export function shouldShowOnboardingStep(stepNumber: number, isNewUser: boolean)
  * Get the appropriate navigation flow for different user types
  * @param currentStep - Current onboarding step
  * @param isNewUser - Whether user is new
- * @param isExistingUser - Whether user is existing
+ * @param isReturningUser - Whether user is returning
  * @returns Next step number or navigation instruction
  */
-export function getNextOnboardingStep(currentStep: number, isNewUser: boolean, isExistingUser: boolean): number {
-  if (currentStep === 1 && isExistingUser) {
-    // Existing users skip name step and go directly to household choice
+export function getNextOnboardingStep(currentStep: number, isNewUser: boolean, isReturningUser: boolean): number {
+  if (currentStep === 1 && isReturningUser) {
+    // Returning users skip name step and go directly to household choice
     return 3;
   } else if (currentStep < 4) {
     return currentStep + 1;
@@ -84,12 +85,12 @@ export function getNextOnboardingStep(currentStep: number, isNewUser: boolean, i
 /**
  * Get the appropriate back navigation for different user types
  * @param currentStep - Current onboarding step
- * @param isExistingUser - Whether user is existing
+ * @param isReturningUser - Whether user is returning
  * @returns Previous step number
  */
-export function getPreviousOnboardingStep(currentStep: number, isExistingUser: boolean): number {
-  if (currentStep === 3 && isExistingUser) {
-    // Existing users go back to step 1 (skip name step)
+export function getPreviousOnboardingStep(currentStep: number, isReturningUser: boolean): number {
+  if (currentStep === 3 && isReturningUser) {
+    // Returning users go back to step 1 (skip name step)
     return 1;
   } else if (currentStep > 1) {
     return currentStep - 1;

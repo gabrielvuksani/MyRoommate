@@ -125,6 +125,12 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Fixed keyboard crash issue by simplifying detection logic and removing Visual Viewport API complexity
 - ✓ Fixed bottom navigation showing during onboarding by adding proper state checks in App.tsx
 - ✓ Navigation now properly hides when needsOnboarding is true or user is on /onboarding route
+- ✓ Streamlined user flags to differentiate new users (no firstName) from returning users (has firstName, no household)
+- ✓ Simplified userUtils.ts to use isNewUser and isReturningUser flags instead of complex onboarding completion tracking
+- ✓ Updated App.tsx to use simplified hasHousehold flag for route protection and navigation visibility
+- ✓ Fixed "Leave Household" button to show loading state, add 1.5s hang time, and navigate to home page instead of reloading
+- ✓ Fixed "Refresh App & Data" button to show loading state, add 1.5s hang time, and navigate to home page after clearing cache
+- ✓ Updated onboarding component to use streamlined isReturningUser flag for consistent user type detection
 - ✓ Changed app title in HTML, manifest, service worker, and all screenshots to myRoommate
 - ✓ Completely wiped all database records for fresh start while preserving demo roommate listing
 - ✓ Removed all users, households, members, sessions, messages, chores, expenses, and calendar events

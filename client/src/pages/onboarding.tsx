@@ -115,7 +115,7 @@ export default function Onboarding() {
   });
 
   const handleNext = () => {
-    const nextStep = getNextOnboardingStep(step, isNewUser, isExistingUser);
+    const nextStep = getNextOnboardingStep(step, isNewUser, isReturningUser);
     
     if (step === 2 && isNewUser) {
       // New users: Update name before proceeding to household setup
@@ -131,7 +131,7 @@ export default function Onboarding() {
   };
 
   const handleBack = () => {
-    const prevStep = getPreviousOnboardingStep(step, isExistingUser);
+    const prevStep = getPreviousOnboardingStep(step, isReturningUser);
     if (prevStep !== step) {
       setStep(prevStep);
     }
@@ -151,15 +151,14 @@ export default function Onboarding() {
   // Track initial user state when onboarding starts
   const [initialUserState] = useState(() => {
     const hasFirstName = !!(user as any)?.firstName;
-    const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
     return {
       isNewUser: !hasFirstName,
-      isExistingUser: hasFirstName && !hasCompletedOnboarding
+      isReturningUser: hasFirstName
     };
   });
   
   // Use initial state for onboarding flow to prevent mid-onboarding state changes
-  const { isNewUser, isExistingUser } = initialUserState;
+  const { isNewUser, isReturningUser } = initialUserState;
 
   return (
     <div className="min-h-screen page-container page-transition flex items-center justify-center p-6">
@@ -169,7 +168,7 @@ export default function Onboarding() {
         {step === 1 && (
           <Card className="glass-card text-center page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-8 flex flex-col">
-            {isExistingUser && (
+            {isReturningUser && (
               <div className="flex justify-start mb-4">
                 <BackButton to="/" />
               </div>

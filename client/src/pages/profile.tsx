@@ -89,9 +89,15 @@ export default function Profile() {
       return result;
     },
     onSuccess: async () => {
-      // Clear all cached data and force page reload
+      // Clear all cached data
       await queryClient.clear();
-      window.location.reload();
+      
+      // Add hang time for better UX
+      setTimeout(() => {
+        setIsLeavingHousehold(false);
+        // Navigate to home page instead of reloading
+        setLocation('/');
+      }, 1500);
     },
     onError: (error: any) => {
       console.error("Failed to leave household:", error);
@@ -224,13 +230,18 @@ export default function Profile() {
         console.log('Application cache clearing skipped:', err);
       }
       
-      // Force hard reload with cache bypass for both PWA and website
-      // This ensures complete cache clearing regardless of mode
-      window.location.reload();
+      // Add hang time for better UX, then navigate to home
+      setTimeout(() => {
+        setIsRefreshing(false);
+        setLocation('/');
+      }, 1500);
     } catch (error) {
       console.error('Cache clearing error:', error);
-      // Ultimate fallback: force reload with cache bypass
-      window.location.href = window.location.href;
+      // Add hang time even on error, then navigate to home
+      setTimeout(() => {
+        setIsRefreshing(false);
+        setLocation('/');
+      }, 1500);
     }
   };
 
