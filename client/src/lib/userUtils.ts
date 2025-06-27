@@ -21,25 +21,27 @@ export interface UserFlags {
  * @returns UserFlags object with all differentiation flags
  */
 export function getUserFlags(user: any, household: any, isAuthenticated: boolean, currentPath?: string): UserFlags {
-  // Simple and clear user type differentiation
+  // Check if user has completed onboarding (stored in localStorage)
+  const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
   
-  // New user: Authenticated but no firstName
+  // User without firstName needs full onboarding including name entry
   const isNewUser = isAuthenticated && user && !user.firstName;
   
-  // Existing user: Has firstName but no household
-  const isExistingUser = isAuthenticated && user && user.firstName && !household;
-  
-  // Needs onboarding: Either new user OR existing user without household
-  const needsOnboarding = isNewUser || isExistingUser;
-  
-  // Fully onboarded: Has both firstName AND household
-  const isFullyOnboarded = isAuthenticated && user && user.firstName && household;
-  
-  // Currently in onboarding flow
+  // User is currently in onboarding flow
   const isInOnboarding = currentPath === '/onboarding';
   
-  // Legacy compatibility
-  const hasNoHousehold = isExistingUser;
+  // User with firstName but no household AND has completed onboarding (returning user)
+  const isExistingUser = isAuthenticated && user && user.firstName && !household && hasCompletedOnboarding;
+  
+  // User needs onboarding if:
+  // 1. They're new (no firstName) OR
+  // 2. They haven't completed onboarding AND don't have a household
+  // Note: Being in onboarding path doesn't affect needsOnboarding status
+  const needsOnboarding = isNewUser || (!hasCompletedOnboarding && isAuthenticated && user && !household);
+  
+  // Legacy compatibility flags
+  const hasNoHousehold = isAuthenticated && user && user.firstName && !household;
+  const isFullyOnboarded = isAuthenticated && user && user.firstName && household;
 
   return {
     isNewUser,
