@@ -416,14 +416,17 @@ export default function Messages() {
                     }
                   }}
                   rows={1}
-                  className="message-input w-full text-base resize-none"
+                  className="message-input w-full text-base resize-none border-0 outline-none focus:border-0 focus:outline-none focus:ring-0 focus-visible:outline-none"
                   style={{ 
                     background: 'transparent !important',
                     backgroundColor: 'transparent !important',
                     color: 'var(--text-primary)',
-                    border: '0',
-                    outline: '0',
-                    boxShadow: 'none',
+                    border: '0 !important',
+                    borderWidth: '0 !important',
+                    borderStyle: 'none !important',
+                    outline: '0 !important',
+                    outlineWidth: '0 !important',
+                    boxShadow: 'none !important',
                     padding: '0 12px',
                     minHeight: '28px',
                     maxHeight: '120px',

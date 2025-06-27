@@ -116,6 +116,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Enhanced copy button with rotation animation (90°) and scale transitions maintaining design language
 - ✓ Accelerated theme transitions from 0.3s to 0.2s for snappier light/dark mode switching
 - ✓ Updated all background property transitions to include backdrop-filter for complete theme smoothness
+- ✓ Converted message input to multi-line textarea with auto-resize functionality
+- ✓ Fixed message input background and border issues with comprehensive CSS overrides
+- ✓ Enhanced glass card alignment for message input container
+- ✓ Applied multiple layers of specificity to ensure borderless message input
 - ✓ Integrated real-time push notifications into messaging system for background message alerts
 - ✓ Added comprehensive notification demo with multiple types (messages, chores, expenses) in test button
 - ✓ Implemented smart notification detection based on document focus state for optimal user experience
