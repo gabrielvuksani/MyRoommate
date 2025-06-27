@@ -467,8 +467,8 @@ export default function Onboarding() {
         {/* Step 4: Confirmation */}
         {step === 4 && (
           <Card className="glass-card text-center page-enter min-h-[580px]" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-6 flex flex-col h-full">
-              <div className="flex-1 flex flex-col justify-center items-center">
+            <CardContent className="p-6 flex flex-col justify-between h-full">
+              <div className="flex-1 flex flex-col justify-center">
                 <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
                   <CheckCircle size={32} className="text-white" />
                 </div>
@@ -496,7 +496,7 @@ export default function Onboarding() {
                 )}
 
                 {errorMessage && (
-                  <div className="mb-6 glass-card bg-red-50/90 dark:bg-red-900/20 border-red-200/50 dark:border-red-800/50 shadow-lg shadow-red-500/20 page-enter max-w-sm mx-auto w-full">
+                  <div className="mb-6 glass-card bg-red-50/90 dark:bg-red-900/20 border-red-200/50 dark:border-red-800/50 shadow-lg shadow-red-500/20 page-enter">
                     <div className="p-4">
                       <div className="flex items-start space-x-3">
                         <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -514,7 +514,7 @@ export default function Onboarding() {
                 )}
               </div>
 
-              <div className="flex space-x-3">
+              <div className="flex space-x-3 mt-8">
                 <Button
                   onClick={() => setStep(step - 1)}
                   className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all"
