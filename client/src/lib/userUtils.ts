@@ -39,8 +39,8 @@ export function getUserFlags(user: any, household: any, isAuthenticated: boolean
   // Returning user: has firstName but no household
   const isReturningUser = !!user.firstName && !household;
   
-  // User needs onboarding if they don't have a household (new or returning)
-  const needsOnboarding = !household;
+  // Only new users (without firstName) need onboarding
+  const needsOnboarding = !user.firstName;
   
   // User has an active household
   const hasHousehold = !!household;
