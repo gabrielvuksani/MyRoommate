@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/ThemeProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
+import { getUserFlags } from "@/lib/userUtils";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
@@ -41,11 +42,9 @@ function Router() {
     );
   }
 
-  // Check if user needs onboarding (no name)
-  const needsOnboarding = isAuthenticated && user && !user.firstName;
-  
-  // Check if user has no household but has completed onboarding
-  const hasNoHousehold = isAuthenticated && user && user.firstName && !household;
+  // Get centralized user flags for consistent differentiation
+  const userFlags = getUserFlags(user, household, isAuthenticated);
+  const { isNewUser, isExistingUser, needsOnboarding, hasNoHousehold, isFullyOnboarded } = userFlags;
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>

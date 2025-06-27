@@ -9,6 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { CheckCircle, Users, Home, ArrowRight, User, Search } from "lucide-react";
 import BackButton from "@/components/back-button";
+import { getUserFlags, shouldShowOnboardingStep, getNextOnboardingStep, getPreviousOnboardingStep } from "@/lib/userUtils";
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
@@ -105,15 +106,25 @@ export default function Onboarding() {
   });
 
   const handleNext = () => {
-    if (step === 2) {
-      // Update user name before proceeding to household setup
+    const nextStep = getNextOnboardingStep(step, isNewUser, isExistingUser);
+    
+    if (step === 2 && isNewUser) {
+      // New users: Update name before proceeding to household setup
       updateUserMutation.mutate({
         firstName: userData.firstName,
         lastName: userData.lastName
       });
     }
-    if (step < 4) {
-      setStep(step + 1);
+    
+    if (nextStep !== step) {
+      setStep(nextStep);
+    }
+  };
+
+  const handleBack = () => {
+    const prevStep = getPreviousOnboardingStep(step, isExistingUser);
+    if (prevStep !== step) {
+      setStep(prevStep);
     }
   };
 
@@ -127,6 +138,10 @@ export default function Onboarding() {
   };
 
   const firstName = userData.firstName || (user as any)?.firstName || (user as any)?.email?.split('@')[0] || 'there';
+  
+  // Get centralized user flags for consistent differentiation
+  const userFlags = getUserFlags(user, null, true); // null household since we're in onboarding
+  const { isNewUser, isExistingUser } = userFlags;
 
   return (
     <div className="min-h-screen page-container page-transition flex items-center justify-center p-6">
@@ -136,7 +151,7 @@ export default function Onboarding() {
         {step === 1 && (
           <Card className="glass-card text-center page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-8 flex flex-col">
-            {step > 1 && (
+            {isExistingUser && (
               <div className="flex justify-start mb-4">
                 <BackButton to="/" />
               </div>
@@ -189,8 +204,8 @@ export default function Onboarding() {
           </Card>
         )}
 
-        {/* Step 2: Name Selection */}
-        {step === 2 && (
+        {/* Step 2: Name Selection - Only for new users */}
+        {step === 2 && shouldShowOnboardingStep(2, isNewUser) && (
           <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-8 flex flex-col">
             <div className="text-center mb-6">
@@ -235,16 +250,20 @@ export default function Onboarding() {
             </div>
 
             <div className="flex space-x-3">
-              <Button
-                onClick={() => setStep(step - 1)}
-                className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all"
-                style={{
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                Back
-              </Button>
+              {isNewUser && (
+                <Button
+                  onClick={handleBack}
+                  className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all hover:scale-[1.02]"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid rgba(99, 102, 241, 0.3)',
+                    boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)'
+                  }}
+                >
+                  Back
+                </Button>
+              )}
               <Button
                 onClick={handleNext}
                 disabled={!userData.firstName.trim() || updateUserMutation.isPending}
@@ -433,11 +452,13 @@ export default function Onboarding() {
 
             <div className="flex space-x-3 pt-[10px] pb-[10px]">
               <Button
-                onClick={() => setStep(step - 1)}
-                className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all"
+                onClick={handleBack}
+                className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all hover:scale-[1.02]"
                 style={{
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-secondary)'
+                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                  boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)'
                 }}
               >
                 Back
@@ -518,7 +539,7 @@ export default function Onboarding() {
 
               <div className="flex space-x-3 mt-8">
                 <Button
-                  onClick={() => setStep(step - 1)}
+                  onClick={handleBack}
                   className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all hover:scale-[1.02]"
                   style={{
                     background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
