@@ -376,13 +376,13 @@ export default function Messages() {
                   <div className="text-center space-y-4">
                     <MessageCircle 
                       className="w-12 h-12 mx-auto" 
-                      style={{ color: effectiveTheme === 'dark' ? '#9CA3AF' : '#6B7280' }} 
+                      style={{ color: 'var(--text-secondary)' }} 
                     />
                     <div>
-                      <h3 className="font-semibold mb-2" style={{ color: effectiveTheme === 'dark' ? '#FFFFFF' : '#1A1A1A' }}>
+                      <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
                         Start the conversation
                       </h3>
-                      <p className="text-sm mb-6" style={{ color: effectiveTheme === 'dark' ? '#A1A1AA' : '#6B7280' }}>
+                      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
                         Be the first to send a message to your household
                       </p>
                     </div>
@@ -394,17 +394,11 @@ export default function Messages() {
                           onClick={() => handleStarterClick(starter.text)}
                           style={{
                             animation: `modal-enter 0.3s ease-out ${index * 0.05}s backwards`,
-                            background: effectiveTheme === 'dark' 
-                              ? 'rgba(30, 30, 30, 0.7)'
-                              : 'rgba(255, 255, 255, 0.9)',
+                            background: 'var(--glass-card-bg)',
                             backdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)',
                             WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)',
-                            border: effectiveTheme === 'dark' 
-                              ? '1px solid rgba(255, 255, 255, 0.1)'
-                              : '1px solid rgba(255, 255, 255, 0.3)',
-                            boxShadow: effectiveTheme === 'dark'
-                              ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.05) inset'
-                              : '0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 -1px 0 rgba(0, 0, 0, 0.02) inset'
+                            border: '1px solid var(--glass-card-border)',
+                            boxShadow: 'var(--glass-card-shadow)'
                           }}
                         >
                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${starter.color} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-xl transition-shadow duration-200 ml-1`}>
@@ -412,7 +406,7 @@ export default function Messages() {
                           </div>
                           <span 
                             className="text-sm leading-relaxed flex-1 pr-2"
-                            style={{ color: effectiveTheme === 'dark' ? '#FFFFFF' : '#1A1A1A' }}
+                            style={{ color: 'var(--text-primary)' }}
                           >
                             {starter.text}
                           </span>

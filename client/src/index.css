@@ -42,6 +42,11 @@
   --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.08);
   --shadow-strong: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-glow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+  
+  /* Glass Card Variables */
+  --glass-card-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+  --glass-card-border: rgba(255, 255, 255, 0.3);
+  --glass-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 -1px 0 rgba(0, 0, 0, 0.02) inset;
 }
 
 /* visionOS-inspired Design System - Dark Mode */
@@ -73,6 +78,11 @@
   --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.4);
   --shadow-strong: 0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 0 0 3px rgba(10, 132, 255, 0.2);
+  
+  /* Glass Card Variables - Dark Mode */
+  --glass-card-bg: linear-gradient(145deg, rgba(30, 30, 30, 0.7) 0%, rgba(25, 25, 25, 0.85) 100%);
+  --glass-card-border: rgba(255, 255, 255, 0.15);
+  --glass-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
 }
 
 /* Shared Variables (Both Light & Dark) */
