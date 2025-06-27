@@ -1315,15 +1315,77 @@ body textarea.message-input,
   outline: none !important;
 }
 
-/* Conversation starter cards - ensure consistent styling */
-.glass-card button.glass-card,
-.glass-card .glass-card,
-button.glass-card.glass-card {
+/* Conversation starter cards - maximum specificity targeting */
+.card .grid button,
+.glass-card .grid button,
+.page-enter .grid button,
+body .grid button,
+#root .grid button,
+.card-content .grid button,
+.space-y-4 .grid button {
   background: var(--glass-card-bg) !important;
   backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
   -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
   border: 1px solid var(--glass-card-border) !important;
   box-shadow: var(--glass-card-shadow) !important;
+}
+
+/* Dark mode support for conversation starters */
+.dark .card .grid button,
+.dark .glass-card .grid button,
+.dark .page-enter .grid button,
+.dark body .grid button,
+.dark #root .grid button,
+.dark .card-content .grid button,
+.dark .space-y-4 .grid button {
+  background: rgba(30, 30, 30, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Specific conversation starter button styling */
+button.conversation-starter-btn,
+.conversation-starter-btn {
+  background: var(--glass-card-bg) !important;
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
+  border: 1px solid var(--glass-card-border) !important;
+  box-shadow: var(--glass-card-shadow) !important;
+}
+
+.dark button.conversation-starter-btn,
+.dark .conversation-starter-btn {
+  background: rgba(30, 30, 30, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Override any conflicting button styles in messages page */
+.page-enter button.conversation-starter-btn {
+  background: var(--glass-card-bg) !important;
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
+}
+
+/* Force textarea styles with ultimate specificity */
+form textarea.message-input,
+div form textarea.message-input,
+.fixed textarea.message-input,
+body textarea.message-input,
+* textarea.message-input {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0px solid transparent !important;
+  border-width: 0px !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0px solid transparent !important;
+  outline-width: 0px !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
 }
 
 /* Ensure message input container has proper styling */

@@ -341,7 +341,7 @@ export default function Messages() {
                       {conversationStarters.map((starter, index) => (
                         <button
                           key={index}
-                          className="glass-card px-4 py-4 text-left flex items-center gap-3 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer group min-h-[72px]"
+                          className="conversation-starter-btn px-4 py-4 text-left flex items-center gap-3 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer group min-h-[72px]"
                           onClick={() => handleStarterClick(starter.text)}
                           style={{
                             animation: `modal-enter 0.3s ease-out ${index * 0.05}s backwards`,
@@ -429,6 +429,14 @@ export default function Messages() {
                   }}
                   rows={1}
                   className="message-input w-full text-base resize-none px-3 py-1"
+                  style={{
+                    background: 'transparent !important',
+                    backgroundColor: 'transparent !important',
+                    border: '0 !important',
+                    borderWidth: '0 !important',
+                    outline: 'none !important',
+                    boxShadow: 'none !important'
+                  }}
                 />
               </div>
               <Button
