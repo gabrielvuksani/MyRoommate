@@ -11,6 +11,28 @@ import { notificationService } from "@/lib/notificationService";
 import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
+interface WebSocketMessage {
+  type: string;
+  message?: {
+    id?: string;
+    userId?: string;
+    content?: string;
+    user?: {
+      firstName?: string;
+      lastName?: string;
+    };
+  };
+  userId?: string;
+  userName?: string;
+  user?: {
+    firstName?: string;
+    lastName?: string;
+  };
+  content?: string;
+  householdId?: string;
+  error?: string;
+}
+
 export default function Messages() {
   const [newMessage, setNewMessage] = useState("");
   const [headerScrolled, setHeaderScrolled] = useState(false);
@@ -22,13 +44,13 @@ export default function Messages() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { user } = useAuth();
+  const { user } = useAuth() as { user: any };
   const queryClient = useQueryClient();
   const { keyboardHeight, isKeyboardVisible } = useKeyboardHeight();
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
-  });
+  }) as { data: any };
 
   const { data: serverMessages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
@@ -49,7 +71,7 @@ export default function Messages() {
       queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
     },
     onDisconnect: () => setConnectionStatus('disconnected'),
-    onMessage: (data) => {
+    onMessage: (data: WebSocketMessage) => {
       if (data.type === 'connection_confirmed') {
         setConnectionStatus('connected');
         console.log('WebSocket connection confirmed:', data);
@@ -61,13 +83,13 @@ export default function Messages() {
         queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
         return;
       }
-      if (data.type === "new_message") {
-        console.log('Real-time message received:', data.message.id);
+      if (data.type === "new_message" && data.message) {
+        console.log('Real-time message received:', data.message.id || 'unknown');
         
         queryClient.setQueryData(["/api/messages"], (old: any) => {
           const currentMessages = old || [];
           
-          const messageExists = currentMessages.some((msg: any) => msg.id === data.message.id);
+          const messageExists = data.message?.id ? currentMessages.some((msg: any) => msg.id === data.message!.id) : false;
           if (messageExists) {
             console.log('Message already exists in cache, skipping duplicate');
             return currentMessages;
@@ -79,9 +101,9 @@ export default function Messages() {
         });
         
         // Send notification for new messages (only if not from current user)
-        if ((data as any).userId !== user?.id && !document.hasFocus()) {
-          const userName = formatDisplayName((data as any).user?.firstName, (data as any).user?.lastName);
-          notificationService.sendMessageNotification(userName, (data as any).content);
+        if (data.message && data.message.userId !== user?.id && !document.hasFocus()) {
+          const userName = formatDisplayName(data.message.user?.firstName || null, data.message.user?.lastName || null);
+          notificationService.sendMessageNotification(userName, data.message.content || '');
         }
         
         queryClient.invalidateQueries({ 
@@ -97,15 +119,15 @@ export default function Messages() {
       } else if (data.type === "pong") {
         console.log('WebSocket pong received - connection healthy');
       } else if (data.type === "user_typing") {
-        if ((data as any).userId !== user?.id) {
+        if (data.userId !== user?.id && data.userName) {
           setTypingUsers(prev => {
-            if (!prev.includes((data as any).userName)) {
-              return [...prev, (data as any).userName];
+            if (!prev.includes(data.userName!)) {
+              return [...prev, data.userName!];
             }
             return prev;
           });
           setTimeout(() => {
-            setTypingUsers(prev => prev.filter(name => name !== (data as any).userName));
+            setTypingUsers(prev => prev.filter(name => name !== data.userName!));
           }, 3000);
           
           requestAnimationFrame(() => {
@@ -113,8 +135,8 @@ export default function Messages() {
           });
         }
       } else if (data.type === "user_stopped_typing") {
-        if ((data as any).userId !== user?.id) {
-          setTypingUsers(prev => prev.filter(name => name !== (data as any).userName));
+        if (data.userId !== user?.id && data.userName) {
+          setTypingUsers(prev => prev.filter(name => name !== data.userName!));
         }
       }
     },
@@ -170,14 +192,14 @@ export default function Messages() {
     
     if (!household || !user) return;
     
-    const userName = formatDisplayName((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email);
+    const userName = formatDisplayName(user?.firstName, user?.lastName, user?.email);
     
     if (!isTyping) {
       setIsTyping(true);
       sendMessage?.({
         type: "user_typing",
-        householdId: household.id,
-        userId: (user as any)?.id,
+        householdId: household?.id,
+        userId: user?.id,
         userName,
       });
     }
@@ -193,8 +215,8 @@ export default function Messages() {
         setIsTyping(false);
         sendMessage?.({
           type: "user_stopped_typing",
-          householdId: household.id,
-          userId: (user as any)?.id,
+          householdId: household?.id,
+          userId: user?.id,
           userName,
         });
       }
@@ -215,7 +237,7 @@ export default function Messages() {
       if (!response.ok) throw new Error('Failed to send message');
       return response.json();
     },
-    onSuccess: (newMessage) => {
+    onSuccess: (newMessage: any) => {
       console.log('Message sent successfully:', newMessage.id);
       
       // Force immediate refresh to show the new message
@@ -251,9 +273,9 @@ export default function Messages() {
       setIsTyping(false);
       sendMessage?.({
         type: "user_stopped_typing",
-        householdId: household.id,
-        userId: (user as any)?.id,
-        userName: formatDisplayName((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email),
+        householdId: household?.id,
+        userId: user?.id,
+        userName: formatDisplayName(user?.firstName, user?.lastName, user?.email),
       });
     }
 
