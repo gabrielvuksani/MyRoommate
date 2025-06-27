@@ -15,10 +15,21 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
   useEffect(() => {
     if (!userId || !householdId) return;
 
+    // Determine WebSocket protocol and URL
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    // Handle both development and production environments
     const host = window.location.host;
+    
+    // For Replit deployments, ensure we use the correct WebSocket URL
+    // Replit uses a specific pattern for WebSocket connections
     const wsUrl = `${protocol}//${host}/ws`;
+    
+    console.log("WebSocket connection attempt:", {
+      url: wsUrl,
+      protocol: window.location.protocol,
+      host: window.location.host,
+      userId,
+      householdId
+    });
     
     let reconnectTimeout: NodeJS.Timeout;
     let heartbeatInterval: NodeJS.Timeout;
@@ -49,17 +60,44 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
         
         onConnect?.();
         
+        // Send a ping immediately to confirm connection in deployment
+        if (ws.current?.readyState === WebSocket.OPEN) {
+          ws.current.send(JSON.stringify({ type: 'ping' }));
+        }
+        
         // Start heartbeat to keep connection alive in deployment
         heartbeatInterval = setInterval(() => {
           if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'ping' }));
           }
         }, 30000); // Send ping every 30 seconds
+        
+        // For deployment environments, send ping more frequently initially
+        const initialPingInterval = setInterval(() => {
+          if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({ type: 'ping' }));
+          }
+        }, 5000); // Send ping every 5 seconds for first minute
+        
+        // Clear initial ping interval after 1 minute
+        setTimeout(() => clearInterval(initialPingInterval), 60000);
       };
 
       ws.current.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          
+          // Handle connection confirmation for deployment
+          if (data.type === 'connection_confirmed') {
+            console.log('Connection confirmed:', data);
+            onConnect?.();
+          }
+          
+          // Handle connection acknowledgment
+          if (data.type === 'connection_ack') {
+            console.log('Connection acknowledged by server');
+          }
+          
           onMessage?.(data);
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
