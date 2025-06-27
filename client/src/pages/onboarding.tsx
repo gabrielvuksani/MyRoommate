@@ -136,9 +136,11 @@ export default function Onboarding() {
         {step === 1 && (
           <Card className="glass-card text-center page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-8 flex flex-col">
-            <div className="flex justify-start mb-4">
-              <BackButton to="/" />
-            </div>
+            {step > 1 && (
+              <div className="flex justify-start mb-4">
+                <BackButton to="/" />
+              </div>
+            )}
             <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/25">
               <Home size={32} className="text-white" />
             </div>

@@ -111,6 +111,7 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Hidden back icon button on first onboarding step for new users - only appears on steps 2-4
 - ✓ Completely wiped all database records for fresh start (33 messages, 5 expense splits, 2 expenses, 1 chore, 1 calendar event, 1 roommate listing, 2 household members, 5 households, 4 users, 9 sessions)
 - ✓ Restored iOS 26-style gradient blur effect for bottom navigation after fixing shadow issues
 - ✓ Fixed pseudo-element positioning - changed bottom values back to -20px/-10px to extend blur properly
