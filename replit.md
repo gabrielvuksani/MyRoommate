@@ -111,6 +111,7 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Hidden bottom navigation tab bar when users are on the onboarding page for cleaner onboarding experience
 - ✓ Enhanced refresh data functionality to completely clear all browser cache including localStorage, sessionStorage, service worker cache, and IndexedDB
 - ✓ Added comprehensive cache clearing with fallback error handling and hard page reload
 - ✓ Fixed Leave Household button to properly refresh the entire page using window.location.reload()
