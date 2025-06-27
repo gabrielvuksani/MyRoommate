@@ -177,37 +177,6 @@ export default function Roommates() {
           </TabsList>
 
           <TabsContent value="browse" className="space-y-6">
-            {/* Search Bar */}
-            <div className="flex gap-3">
-              <div className="flex-1 relative">
-                <MapPin 
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" 
-                  style={{ color: 'var(--text-tertiary)' }}
-                />
-                <Input
-                  placeholder="Search by city..."
-                  value={searchCity}
-                  onChange={(e) => setSearchCity(e.target.value)}
-                  className="pl-10 backdrop-blur-sm transition-all duration-200"
-                  style={{
-                    background: 'var(--surface-glass)',
-                    border: '1px solid var(--border)',
-                    color: 'var(--text-primary)'
-                  }}
-                />
-              </div>
-              <Button 
-                variant="outline" 
-                className="backdrop-blur-sm transition-all duration-200"
-                style={{
-                  background: 'var(--surface-glass)',
-                  border: '1px solid var(--border)',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                <Filter className="w-4 h-4" />
-              </Button>
-            </div>
 
             {/* Post Listing Form */}
             {showPostForm && (
