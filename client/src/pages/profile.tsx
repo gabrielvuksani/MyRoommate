@@ -31,6 +31,7 @@ export default function Profile() {
   const [editHouseholdName, setEditHouseholdName] = useState("");
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLeavingHousehold, setIsLeavingHousehold] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -76,15 +77,19 @@ export default function Profile() {
 
   const leaveHouseholdMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("POST", "/api/households/leave", {});
+      // Add a small delay to ensure loading state is visible
+      const result = await apiRequest("POST", "/api/households/leave", {});
+      // Keep loading state visible during cache clear
+      await queryClient.clear();
+      return result;
     },
     onSuccess: async () => {
-      // Clear cache and redirect immediately
-      queryClient.clear();
+      // Redirect happens after mutation completes
       window.location.href = "/";
     },
     onError: (error: any) => {
       console.error("Failed to leave household:", error);
+      setIsLeavingHousehold(false);
     },
   });
 
@@ -131,7 +136,7 @@ export default function Profile() {
   return (
     <div className="page-container page-transition">
       {/* Loading overlay for leaving household */}
-      {leaveHouseholdMutation.isPending && (
+      {isLeavingHousehold && (
         <LoadingOverlay message="Leaving household..." />
       )}
       
@@ -489,8 +494,11 @@ export default function Profile() {
               </Button>
               {(household as any) && (
                 <Button
-                  onClick={() => leaveHouseholdMutation.mutate()}
-                  disabled={leaveHouseholdMutation.isPending}
+                  onClick={() => {
+                    setIsLeavingHousehold(true);
+                    leaveHouseholdMutation.mutate();
+                  }}
+                  disabled={isLeavingHousehold || leaveHouseholdMutation.isPending}
                   className="w-full bg-orange-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-orange-700 disabled:opacity-50"
                 >
                   <UserMinus size={20} />
