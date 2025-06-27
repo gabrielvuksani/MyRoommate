@@ -79,18 +79,8 @@ export default function Profile() {
       return await apiRequest("POST", "/api/households/leave", {});
     },
     onSuccess: async () => {
-      // First remove all cached data completely
-      queryClient.removeQueries({ queryKey: ["/api/households/current"] });
-      queryClient.removeQueries({ queryKey: ["/api/chores"] });
-      queryClient.removeQueries({ queryKey: ["/api/expenses"] });
-      queryClient.removeQueries({ queryKey: ["/api/calendar"] });
-      queryClient.removeQueries({ queryKey: ["/api/messages"] });
-      queryClient.removeQueries({ queryKey: ["/api/balance"] });
-      
-      // Clear the entire query cache to ensure no stale data
+      // Clear cache and redirect immediately
       queryClient.clear();
-      
-      // Force a page reload to ensure clean state
       window.location.href = "/";
     },
     onError: (error: any) => {
@@ -120,17 +110,9 @@ export default function Profile() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    try {
-      // Invalidate all queries to refresh data
-      await queryClient.invalidateQueries();
-      // Wait a moment for data to refresh, then redirect to home page
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1000);
-    } catch (error) {
-      console.error("Refresh failed:", error);
-      setIsRefreshing(false);
-    }
+    // Invalidate queries and redirect immediately
+    await queryClient.invalidateQueries();
+    window.location.href = "/";
   };
 
   if (!user) {
