@@ -374,30 +374,48 @@ export default function Messages() {
               <Card className="glass-card">
                 <CardContent className="p-6">
                   <div className="text-center space-y-4">
-                    <MessageCircle className="w-12 h-12 text-gray-400 mx-auto" />
+                    <MessageCircle 
+                      className="w-12 h-12 mx-auto" 
+                      style={{ color: effectiveTheme === 'dark' ? '#9CA3AF' : '#6B7280' }} 
+                    />
                     <div>
-                      <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Start the conversation</h3>
-                      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Be the first to send a message to your household</p>
+                      <h3 className="font-semibold mb-2" style={{ color: effectiveTheme === 'dark' ? '#FFFFFF' : '#1A1A1A' }}>
+                        Start the conversation
+                      </h3>
+                      <p className="text-sm mb-6" style={{ color: effectiveTheme === 'dark' ? '#A1A1AA' : '#6B7280' }}>
+                        Be the first to send a message to your household
+                      </p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {conversationStarters.map((starter, index) => (
                         <button
                           key={index}
-                          className="conversation-starter-btn px-4 py-4 text-left flex items-center gap-3 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer group min-h-[72px]"
+                          className="px-4 py-4 text-left flex items-center gap-3 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer group min-h-[72px]"
                           onClick={() => handleStarterClick(starter.text)}
                           style={{
                             animation: `modal-enter 0.3s ease-out ${index * 0.05}s backwards`,
-                            background: 'var(--glass-card-bg)',
+                            background: effectiveTheme === 'dark' 
+                              ? 'rgba(30, 30, 30, 0.7)'
+                              : 'rgba(255, 255, 255, 0.9)',
                             backdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)',
                             WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)',
-                            border: '1px solid var(--glass-card-border)',
-                            boxShadow: 'var(--glass-card-shadow)'
+                            border: effectiveTheme === 'dark' 
+                              ? '1px solid rgba(255, 255, 255, 0.1)'
+                              : '1px solid rgba(255, 255, 255, 0.3)',
+                            boxShadow: effectiveTheme === 'dark'
+                              ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.05) inset'
+                              : '0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 -1px 0 rgba(0, 0, 0, 0.02) inset'
                           }}
                         >
                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${starter.color} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-xl transition-shadow duration-200 ml-1`}>
                             <starter.icon className="w-5 h-5 text-white" />
                           </div>
-                          <span className="text-sm text-[var(--text-primary)] leading-relaxed flex-1 pr-2">{starter.text}</span>
+                          <span 
+                            className="text-sm leading-relaxed flex-1 pr-2"
+                            style={{ color: effectiveTheme === 'dark' ? '#FFFFFF' : '#1A1A1A' }}
+                          >
+                            {starter.text}
+                          </span>
                         </button>
                       ))}
                     </div>
