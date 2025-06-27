@@ -142,7 +142,7 @@ export default function Onboarding() {
   const firstName = userData.firstName || (user as any)?.firstName || (user as any)?.email?.split('@')[0] || 'there';
   
   // Get centralized user flags for consistent differentiation
-  const userFlags = getUserFlags(user, null, true); // null household since we're in onboarding
+  const userFlags = getUserFlags(user, null, true, '/onboarding'); // null household since we're in onboarding
   const { isNewUser, isExistingUser } = userFlags;
 
   return (
@@ -207,7 +207,7 @@ export default function Onboarding() {
         )}
 
         {/* Step 2: Name Selection - Only for new users */}
-        {step === 2 && shouldShowOnboardingStep(2, isNewUser) && (
+        {step === 2 && (
           <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-8 flex flex-col">
             <div className="text-center mb-6">
