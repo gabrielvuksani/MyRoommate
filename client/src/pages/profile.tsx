@@ -127,9 +127,50 @@ export default function Profile() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // Invalidate queries and redirect immediately
-    await queryClient.invalidateQueries();
-    window.location.href = "/";
+    
+    try {
+      // Clear all React Query cache completely
+      await queryClient.clear();
+      
+      // Clear all browser storage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear service worker cache if available
+      if ('serviceWorker' in navigator && 'caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        );
+      }
+      
+      // Clear IndexedDB (if used by any libraries)
+      if ('indexedDB' in window) {
+        try {
+          const databases = await indexedDB.databases();
+          await Promise.all(
+            databases.map(db => {
+              if (db.name) {
+                const deleteReq = indexedDB.deleteDatabase(db.name);
+                return new Promise((resolve, reject) => {
+                  deleteReq.onsuccess = () => resolve(undefined);
+                  deleteReq.onerror = () => reject(deleteReq.error);
+                });
+              }
+            })
+          );
+        } catch (err) {
+          console.log('IndexedDB cleanup skipped:', err);
+        }
+      }
+      
+      // Force hard reload to clear all in-memory state
+      window.location.reload();
+    } catch (error) {
+      console.error('Cache clearing error:', error);
+      // Fallback to simple reload if clearing fails
+      window.location.reload();
+    }
   };
 
   const handleTestNotification = async () => {
