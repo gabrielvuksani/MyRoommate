@@ -159,6 +159,10 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Adjusted timing to 0.55s for snappier, more premium tab switching while keeping satisfying bounce effect
 - ✓ Updated home page expense display to show full dollar amounts with cents (.toFixed(2))
 - ✓ Wiped all database records clean except for the demo roommate listing for fresh deployment state
+- ✓ Added iPhone/Safari status bar control with dynamic theme-color meta tags
+- ✓ Implemented PWA manifest for native-like mobile experience
+- ✓ Enhanced mobile viewport settings with viewport-fit=cover for iPhone notch support
+- ✓ Added dynamic status bar styling that switches between light/dark modes automatically
 
 **June 26, 2025 (Earlier):**
 - ✓ Streamlined onboarding process to be the first experience for new users
