@@ -1,7 +1,7 @@
 {
-  "name": "RoomieHub",
+  "name": "RoomieHub - Roommate Management",
   "short_name": "RoomieHub",
-  "description": "Your premium roommate management companion",
+  "description": "Your premium roommate management companion for seamless shared living",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f7f8fa",
@@ -10,7 +10,25 @@
   "scope": "/",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%23f7f8fa'/%3E%3Cpath d='M96 48c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm-32 80c-8.837 0-16 7.163-16 16v16h96v-16c0-8.837-7.163-16-16-16H64z' fill='%236366f1'/%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Crect width='72' height='72' rx='16' fill='%23f7f8fa'/%3E%3Cpath d='M36 18c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-16 40c-4.418 0-8 3.582-8 8v8h48v-8c0-4.418-3.582-8-8-8H20z' fill='%236366f1'/%3E%3C/svg%3E",
+      "sizes": "72x72",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%23f7f8fa'/%3E%3Cpath d='M48 24c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-16 40c-4.418 0-8 3.582-8 8v8h48v-8c0-4.418-3.582-8-8-8H32z' fill='%236366f1'/%3E%3C/svg%3E",
+      "sizes": "96x96",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 144 144'%3E%3Crect width='144' height='144' rx='32' fill='%23f7f8fa'/%3E%3Cpath d='M72 36c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18zm-24 60c-6.627 0-12 5.373-12 12v12h72v-12c0-6.627-5.373-12-12-12H48z' fill='%236366f1'/%3E%3C/svg%3E",
+      "sizes": "144x144",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%23f7f8fa'/%3E%3Cpath d='M96 48c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm-32 80c-8.837 0-16 7.163-16 16v16h96v-16c0-8.837-7.163-16-16-16H64z' fill='%236366f1'/%3E%3C/svg%3E",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "maskable any"
@@ -22,11 +40,74 @@
       "purpose": "maskable any"
     }
   ],
-  "categories": ["lifestyle", "utilities"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'%3E%3Crect width='540' height='720' fill='%23f7f8fa'/%3E%3Ctext x='270' y='360' text-anchor='middle' fill='%236366f1' font-size='24' font-family='system-ui'%3ERoomieHub Dashboard%3C/text%3E%3C/svg%3E",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 593'%3E%3Crect width='1024' height='593' fill='%23f7f8fa'/%3E%3Ctext x='512' y='296' text-anchor='middle' fill='%236366f1' font-size='32' font-family='system-ui'%3ERoomieHub Dashboard%3C/text%3E%3C/svg%3E",
+      "sizes": "1024x593",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add Expense",
+      "short_name": "Add Expense",
+      "description": "Quickly split a new expense",
+      "url": "/expenses?action=create",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%2310b981'/%3E%3Cpath d='M48 20c-4.418 0-8 3.582-8 8v12H28c-4.418 0-8 3.582-8 8s3.582 8 8 8h12v12c0 4.418 3.582 8 8 8s8-3.582 8-8V56h12c4.418 0 8-3.582 8-8s-3.582-8-8-8H56V28c0-4.418-3.582-8-8-8z' fill='white'/%3E%3C/svg%3E",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Create Chore",
+      "short_name": "New Chore",
+      "description": "Add a new household chore",
+      "url": "/chores?action=create",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%235b21b6'/%3E%3Cpath d='M76 28L42 62l-14-14c-3.124-3.124-8.19-3.124-11.314 0s-3.124 8.19 0 11.314l20 20c3.124 3.124 8.19 3.124 11.314 0L87.314 39.314c3.124-3.124 3.124-8.19 0-11.314s-8.19-3.124-11.314 0z' fill='white'/%3E%3C/svg%3E",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "short_name": "Chat",
+      "description": "Open household chat",
+      "url": "/messages",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%232563eb'/%3E%3Cpath d='M24 24c-4.418 0-8 3.582-8 8v32c0 4.418 3.582 8 8 8h6v8c0 2.122 1.325 4.011 3.313 4.726C34.215 84.909 35.132 85 36 85c1.414 0 2.776-.577 3.764-1.658L48 75h24c4.418 0 8-3.582 8-8V32c0-4.418-3.582-8-8-8H24z' fill='white'/%3E%3C/svg%3E",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "categories": ["lifestyle", "utilities", "productivity"],
   "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,
+  "display_override": ["window-controls-overlay", "standalone"],
   "edge_side_panel": {
     "preferred_width": 400
-  }
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "handle_links": "preferred",
+  "scope_extensions": [
+    {"origin": "*.replit.app"}
+  ]
 }
