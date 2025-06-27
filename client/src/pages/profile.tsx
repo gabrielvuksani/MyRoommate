@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun } from "lucide-react";
+import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check } from "lucide-react";
 import { getProfileInitials } from "@/lib/nameUtils";
 import { useTheme } from "@/lib/ThemeProvider";
 import BackButton from "../components/back-button";
@@ -32,6 +32,7 @@ export default function Profile() {
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLeavingHousehold, setIsLeavingHousehold] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -107,9 +108,15 @@ export default function Profile() {
     window.location.href = "/api/logout";
   };
 
-  const copyInviteCode = () => {
+  const copyInviteCode = async () => {
     if ((household as any)?.inviteCode) {
-      navigator.clipboard.writeText((household as any).inviteCode);
+      try {
+        await navigator.clipboard.writeText((household as any).inviteCode);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy invite code:', err);
+      }
     }
   };
 
@@ -425,13 +432,18 @@ export default function Profile() {
                     </span>
                     <button
                       onClick={copyInviteCode}
-                      className="p-2 rounded-lg btn-animated"
+                      className="p-2 rounded-lg btn-animated transition-all duration-200 relative overflow-hidden"
                       style={{
-                        background: 'var(--surface-secondary)',
-                        color: 'var(--text-secondary)'
+                        background: isCopied ? 'var(--success)' : 'var(--surface-secondary)',
+                        color: isCopied ? '#ffffff' : 'var(--text-secondary)'
                       }}
                     >
-                      <Copy size={14} />
+                      <div className={`transition-all duration-200 ${isCopied ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}>
+                        <Copy size={14} />
+                      </div>
+                      <div className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${isCopied ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
+                        <Check size={14} />
+                      </div>
                     </button>
                   </div>
                 </div>
