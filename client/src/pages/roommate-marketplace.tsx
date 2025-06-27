@@ -25,6 +25,7 @@ import { insertRoommateListingSchema } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useLocation } from "wouter";
 
 export default function RoommateMarketplace() {
@@ -59,22 +60,44 @@ export default function RoommateMarketplace() {
   });
 
   const form = useForm({
-    resolver: zodResolver(insertRoommateListingSchema.extend({
-      availableFrom: insertRoommateListingSchema.shape.availableFrom.transform(
-        (val) => val instanceof Date ? val : new Date(val)
-      ),
+    resolver: zodResolver(z.object({
+      title: z.string().min(1, "Title is required"),
+      description: z.string().optional(),
+      rent: z.string().min(1, "Rent is required"),
+      utilities: z.string().optional(),
+      location: z.string().min(1, "Location is required"),
+      city: z.string().min(1, "City is required"),
+      university: z.string().optional(),
+      availableFrom: z.date(),
+      availableTo: z.date().optional(),
+      roomType: z.enum(["private", "shared", "studio"]),
+      housingType: z.enum(["apartment", "house", "condo", "townhouse", "dorm", "shared_house"]),
+      genderPreference: z.enum(["male", "female", "any", "non_binary"]).optional(),
+      studentYear: z.enum(["freshman", "sophomore", "junior", "senior", "graduate", "any"]).optional(),
+      studyHabits: z.enum(["quiet", "moderate", "social", "flexible"]).optional(),
+      socialPreferences: z.enum(["introverted", "extroverted", "balanced", "flexible"]).optional(),
+      lifestylePreferences: z.array(z.string()).optional(),
+      amenities: z.array(z.string()).optional(),
+      contactInfo: z.string().optional(),
     })),
     defaultValues: {
       title: "",
       description: "",
       rent: "",
+      utilities: "",
       location: "",
       city: "",
+      university: "",
       availableFrom: new Date(),
+      availableTo: new Date(),
       roomType: "private",
       housingType: "apartment",
+      genderPreference: "any",
+      studentYear: "any",
+      studyHabits: "flexible",
+      socialPreferences: "balanced",
+      lifestylePreferences: [],
       amenities: [],
-      preferences: "",
       contactInfo: "",
       isActive: true,
       featured: false,
@@ -91,6 +114,18 @@ export default function RoommateMarketplace() {
       form.reset();
     },
   });
+
+  const createDemoMutation = useMutation({
+    mutationFn: () => apiRequest('/api/roommate-listings/demo', 'POST', {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/roommate-listings'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/roommate-listings/my'] });
+    },
+  });
+
+  const createDemoListing = () => {
+    createDemoMutation.mutate();
+  };
 
   const onSubmit = (data: any) => {
     createListingMutation.mutate({
@@ -239,6 +274,13 @@ export default function RoommateMarketplace() {
               >
                 <Filter className="w-4 h-4" />
               </Button>
+              <Button 
+                onClick={() => createDemoMutation.mutate()}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                disabled={createDemoMutation.isPending}
+              >
+                {createDemoMutation.isPending ? "Creating..." : "Add Demo"}
+              </Button>
             </div>
 
             {/* Create Listing Form */}
@@ -267,7 +309,21 @@ export default function RoommateMarketplace() {
                           <FormItem>
                             <FormLabel>Listing Title</FormLabel>
                             <FormControl>
-                              <Input placeholder="Beautiful room in downtown apartment" {...field} />
+                              <Input placeholder="Room near UC Berkeley campus" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="university"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>University</FormLabel>
+                            <FormControl>
+                              <Input placeholder="UC Berkeley" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -291,10 +347,45 @@ export default function RoommateMarketplace() {
 
                         <FormField
                           control={form.control}
+                          name="utilities"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Utilities ($)</FormLabel>
+                              <FormControl>
+                                <Input type="number" placeholder="100" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField
+                          control={form.control}
                           name="availableFrom"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Available From</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="date" 
+                                  {...field}
+                                  value={field.value instanceof Date ? field.value.toISOString().split('T')[0] : field.value}
+                                  onChange={(e) => field.onChange(new Date(e.target.value))}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="availableTo"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Available Until</FormLabel>
                               <FormControl>
                                 <Input 
                                   type="date" 
@@ -315,9 +406,9 @@ export default function RoommateMarketplace() {
                           name="location"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Location</FormLabel>
+                              <FormLabel>Street Address</FormLabel>
                               <FormControl>
-                                <Input placeholder="Downtown" {...field} />
+                                <Input placeholder="1234 Telegraph Ave" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -331,7 +422,7 @@ export default function RoommateMarketplace() {
                             <FormItem>
                               <FormLabel>City</FormLabel>
                               <FormControl>
-                                <Input placeholder="San Francisco" {...field} />
+                                <Input placeholder="Berkeley" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -379,7 +470,111 @@ export default function RoommateMarketplace() {
                                   <SelectItem value="apartment">Apartment</SelectItem>
                                   <SelectItem value="house">House</SelectItem>
                                   <SelectItem value="condo">Condo</SelectItem>
+                                  <SelectItem value="townhouse">Townhouse</SelectItem>
                                   <SelectItem value="dorm">Dorm</SelectItem>
+                                  <SelectItem value="shared_house">Shared House</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField
+                          control={form.control}
+                          name="genderPreference"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Gender Preference</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Any" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="any">Any</SelectItem>
+                                  <SelectItem value="male">Male</SelectItem>
+                                  <SelectItem value="female">Female</SelectItem>
+                                  <SelectItem value="non_binary">Non-binary</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="studentYear"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Student Year</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Any" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="any">Any</SelectItem>
+                                  <SelectItem value="freshman">Freshman</SelectItem>
+                                  <SelectItem value="sophomore">Sophomore</SelectItem>
+                                  <SelectItem value="junior">Junior</SelectItem>
+                                  <SelectItem value="senior">Senior</SelectItem>
+                                  <SelectItem value="graduate">Graduate</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField
+                          control={form.control}
+                          name="studyHabits"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Study Habits</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Flexible" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="flexible">Flexible</SelectItem>
+                                  <SelectItem value="quiet">Quiet</SelectItem>
+                                  <SelectItem value="moderate">Moderate</SelectItem>
+                                  <SelectItem value="social">Social</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="socialPreferences"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Social Preferences</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Balanced" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="balanced">Balanced</SelectItem>
+                                  <SelectItem value="introverted">Introverted</SelectItem>
+                                  <SelectItem value="extroverted">Extroverted</SelectItem>
+                                  <SelectItem value="flexible">Flexible</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -396,7 +591,7 @@ export default function RoommateMarketplace() {
                             <FormLabel>Description</FormLabel>
                             <FormControl>
                               <Textarea 
-                                placeholder="Describe the room and what you're looking for..."
+                                placeholder="Describe the room and what you're looking for in a roommate..."
                                 className="h-20"
                                 {...field}
                               />

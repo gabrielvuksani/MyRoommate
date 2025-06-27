@@ -36,6 +36,9 @@ export default function ListingDetail() {
     enabled: !!params?.id,
   });
 
+  // Type guard to ensure listing has required properties
+  const typedListing = listing as any;
+
   useEffect(() => {
     window.scrollTo(0, 0);
 
@@ -69,7 +72,7 @@ export default function ListingDetail() {
     );
   }
 
-  if (!listing) {
+  if (!typedListing) {
     return (
       <div className="min-h-screen pt-36 pb-20 px-6 max-w-3xl mx-auto">
         <Card className="glass-card">
@@ -121,11 +124,11 @@ export default function ListingDetail() {
 
       <div className="pt-36 px-6 max-w-3xl mx-auto space-y-6 page-enter">
         {/* Image or Placeholder */}
-        {listing.images && listing.images.length > 0 ? (
+        {typedListing.images && typedListing.images.length > 0 ? (
           <div className="rounded-3xl overflow-hidden h-64 shadow-lg">
             <img 
-              src={listing.images[0]} 
-              alt={listing.title}
+              src={typedListing.images[0]} 
+              alt={typedListing.title}
               className="w-full h-full object-cover"
             />
           </div>
@@ -141,15 +144,15 @@ export default function ListingDetail() {
             {/* Title and Price */}
             <div>
               <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
-                {listing.title}
+                {typedListing.title}
               </h1>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-lg" style={{ color: 'var(--text-secondary)' }}>
                   <MapPin className="w-5 h-5" />
-                  <span>{listing.location}, {listing.city}</span>
+                  <span>{typedListing.location}, {typedListing.city}</span>
                 </div>
                 <div className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>
-                  {formatRent(listing.rent)}/mo
+                  {formatRent(typedListing.rent)}/mo
                 </div>
               </div>
             </div>
@@ -157,19 +160,19 @@ export default function ListingDetail() {
             {/* Room Details */}
             <div className="flex gap-3 flex-wrap">
               <Badge variant="secondary" className="text-sm px-3 py-1">
-                {listing.roomType.charAt(0).toUpperCase() + listing.roomType.slice(1)} Room
+                {typedListing.roomType.charAt(0).toUpperCase() + typedListing.roomType.slice(1)} Room
               </Badge>
               <Badge variant="secondary" className="text-sm px-3 py-1">
-                {listing.housingType.charAt(0).toUpperCase() + listing.housingType.slice(1)}
+                {typedListing.housingType.charAt(0).toUpperCase() + typedListing.housingType.slice(1)}
               </Badge>
               <Badge variant="secondary" className="text-sm px-3 py-1">
                 <Calendar className="w-3 h-3 mr-1" />
-                Available {format(new Date(listing.availableFrom), 'MMM d, yyyy')}
+                Available {format(new Date(typedListing.availableFrom), 'MMM d, yyyy')}
               </Badge>
             </div>
 
             {/* Description */}
-            {listing.description && (
+            {typedListing.description && (
               <>
                 <Separator />
                 <div>
@@ -177,14 +180,14 @@ export default function ListingDetail() {
                     About this Place
                   </h3>
                   <p style={{ color: 'var(--text-secondary)' }} className="leading-relaxed">
-                    {listing.description}
+                    {typedListing.description}
                   </p>
                 </div>
               </>
             )}
 
             {/* Preferences */}
-            {listing.preferences && (
+            {typedListing.preferences && (
               <>
                 <Separator />
                 <div>
@@ -192,14 +195,14 @@ export default function ListingDetail() {
                     Roommate Preferences
                   </h3>
                   <p style={{ color: 'var(--text-secondary)' }} className="leading-relaxed">
-                    {listing.preferences}
+                    {typedListing.preferences}
                   </p>
                 </div>
               </>
             )}
 
             {/* Amenities */}
-            {listing.amenities && listing.amenities.length > 0 && (
+            {typedListing.amenities && typedListing.amenities.length > 0 && (
               <>
                 <Separator />
                 <div>
@@ -207,7 +210,7 @@ export default function ListingDetail() {
                     Amenities
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
-                    {listing.amenities.map((amenity: string, index: number) => {
+                    {typedListing.amenities.map((amenity: string, index: number) => {
                       const Icon = amenityIcons[amenity] || Home;
                       return (
                         <div 
@@ -228,20 +231,20 @@ export default function ListingDetail() {
         </Card>
 
         {/* Creator Card */}
-        {listing.creator && (
+        {typedListing.creator && (
           <Card className="glass-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium">
-                    {getProfileInitials(listing.creator.firstName, listing.creator.lastName, listing.creator.email)}
+                    {getProfileInitials(typedListing.creator.firstName, typedListing.creator.lastName, typedListing.creator.email)}
                   </div>
                   <div>
                     <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-                      Posted by {formatDisplayName(listing.creator.firstName, listing.creator.lastName, "User")}
+                      Posted by {formatDisplayName(typedListing.creator.firstName, typedListing.creator.lastName, "User")}
                     </h3>
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      {format(new Date(listing.createdAt), 'MMM d, yyyy')}
+                      {format(new Date(typedListing.createdAt), 'MMM d, yyyy')}
                     </p>
                   </div>
                 </div>
@@ -257,7 +260,7 @@ export default function ListingDetail() {
               className="w-full h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
               onClick={() => {
                 // In a real app, this would open a chat or contact form
-                alert(listing.contactInfo || "Contact the poster through the app");
+                alert(typedListing.contactInfo || "Contact the poster through the app");
               }}
             >
               <MessageCircle className="w-5 h-5 mr-2" />

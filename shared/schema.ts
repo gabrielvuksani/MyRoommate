@@ -144,15 +144,23 @@ export const roommateListings = pgTable("roommate_listings", {
   title: text("title").notNull(),
   description: text("description"),
   rent: integer("rent").notNull(),
-  location: text("location").notNull(),
+  utilities: integer("utilities"), // Separate utilities cost
+  location: text("location").notNull(), // Street address
   city: text("city").notNull(),
+  university: text("university"), // University name
   availableFrom: timestamp("available_from", { withTimezone: true }).notNull(),
+  availableTo: timestamp("available_to", { withTimezone: true }), // Lease end date
   roomType: text("room_type", { enum: ["private", "shared", "studio"] }).notNull(),
-  housingType: text("housing_type", { enum: ["apartment", "house", "condo", "townhouse"] }).notNull(),
-  preferences: text("preferences"),
+  housingType: text("housing_type", { enum: ["apartment", "house", "condo", "townhouse", "dorm", "shared_house"] }).notNull(),
+  genderPreference: text("gender_preference", { enum: ["male", "female", "any", "non_binary"] }),
+  studentYear: text("student_year", { enum: ["freshman", "sophomore", "junior", "senior", "graduate", "any"] }),
+  studyHabits: text("study_habits", { enum: ["quiet", "moderate", "social", "flexible"] }),
+  socialPreferences: text("social_preferences", { enum: ["introverted", "extroverted", "balanced", "flexible"] }),
+  lifestylePreferences: text("lifestyle_preferences").array(), // ["non_smoking", "pet_friendly", "vegetarian", etc.]
   amenities: text("amenities").array(),
   images: text("images").array(),
   contactInfo: text("contact_info"),
+  verified: boolean("verified").default(false).notNull(), // Student verification status
   isActive: boolean("is_active").default(true).notNull(),
   featured: boolean("featured").default(false).notNull(),
   createdBy: text("created_by").references(() => users.id),

@@ -537,7 +537,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         availableFrom: new Date("2025-02-01"),
         roomType: "private",
         housingType: "apartment",
-        preferences: "Looking for a clean, respectful roommate who values a quiet home environment. Non-smoker preferred. We have a friendly cat, so must be pet-friendly!",
+        genderPreference: "any",
+        studentYear: "any",
+        studyHabits: "quiet",
+        socialPreferences: "balanced",
+        lifestylePreferences: ["clean", "pet_friendly"],
         amenities: ["In-unit laundry", "Gym", "Rooftop deck", "High-speed WiFi", "Central AC/Heating", "Dishwasher", "Parking available"],
         images: [],
         contactInfo: "Please reach out through the app messaging system",
@@ -615,6 +619,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting roommate listing:", error);
       res.status(500).json({ message: "Failed to delete roommate listing" });
+    }
+  });
+
+  // Demo listing endpoint for university marketplace testing
+  app.post('/api/roommate-listings/demo', async (req: any, res) => {
+    try {
+      const demoListing = {
+        title: "Cozy Room Near UC Berkeley Campus",
+        description: "Looking for a clean, responsible roommate to share a beautiful 2-bedroom apartment just 5 minutes walk from UC Berkeley campus. Perfect for students! The room is fully furnished with a comfortable bed, desk, and closet. Shared living room, kitchen, and bathroom are spacious and well-maintained.",
+        rent: 950,
+        utilities: 75,
+        location: "2647 Telegraph Avenue",
+        city: "Berkeley",
+        university: "UC Berkeley",
+        availableFrom: new Date('2025-08-01'),
+        availableTo: new Date('2026-05-31'),
+        roomType: "private" as const,
+        housingType: "apartment" as const,
+        genderPreference: "any" as const,
+        studentYear: "any" as const,
+        studyHabits: "quiet" as const,
+        socialPreferences: "balanced" as const,
+        lifestylePreferences: ["no_smoking", "pet_friendly", "clean"],
+        amenities: ["WiFi", "Laundry", "Kitchen", "Near Campus", "Quiet", "Furnished"],
+        contactInfo: "student.housing@berkeley.edu",
+        images: [],
+        isActive: true,
+        featured: true,
+        verified: true,
+        createdBy: req.user?.id || '44253576'
+      };
+
+      const listing = await storage.createRoommateListing(demoListing);
+      res.json(listing);
+    } catch (error) {
+      console.error("Error creating demo listing:", error);
+      res.status(500).json({ message: "Failed to create demo listing" });
     }
   });
 

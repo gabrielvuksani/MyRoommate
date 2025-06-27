@@ -87,15 +87,15 @@ export default function Messages() {
       } else if (data.type === "pong") {
         console.log('WebSocket pong received - connection healthy');
       } else if (data.type === "user_typing") {
-        if (data.userId !== user?.id) {
+        if ((data as any).userId !== user?.id) {
           setTypingUsers(prev => {
-            if (!prev.includes(data.userName)) {
-              return [...prev, data.userName];
+            if (!prev.includes((data as any).userName)) {
+              return [...prev, (data as any).userName];
             }
             return prev;
           });
           setTimeout(() => {
-            setTypingUsers(prev => prev.filter(name => name !== data.userName));
+            setTypingUsers(prev => prev.filter(name => name !== (data as any).userName));
           }, 3000);
           
           requestAnimationFrame(() => {
@@ -103,8 +103,8 @@ export default function Messages() {
           });
         }
       } else if (data.type === "user_stopped_typing") {
-        if (data.userId !== user?.id) {
-          setTypingUsers(prev => prev.filter(name => name !== data.userName));
+        if ((data as any).userId !== user?.id) {
+          setTypingUsers(prev => prev.filter(name => name !== (data as any).userName));
         }
       }
     },
@@ -151,14 +151,14 @@ export default function Messages() {
     
     if (!household || !user) return;
     
-    const userName = formatDisplayName(user.firstName, user.lastName, user.email);
+    const userName = formatDisplayName((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email);
     
     if (!isTyping) {
       setIsTyping(true);
       sendMessage?.({
         type: "user_typing",
         householdId: household.id,
-        userId: user.id,
+        userId: (user as any)?.id,
         userName,
       });
     }
@@ -175,7 +175,7 @@ export default function Messages() {
         sendMessage?.({
           type: "user_stopped_typing",
           householdId: household.id,
-          userId: user.id,
+          userId: (user as any)?.id,
           userName,
         });
       }
@@ -233,8 +233,8 @@ export default function Messages() {
       sendMessage?.({
         type: "user_stopped_typing",
         householdId: household.id,
-        userId: user.id,
-        userName: formatDisplayName(user.firstName, user.lastName, user.email),
+        userId: (user as any)?.id,
+        userName: formatDisplayName((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email),
       });
     }
 
