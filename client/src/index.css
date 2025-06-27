@@ -42,11 +42,6 @@
   --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.08);
   --shadow-strong: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-glow: 0 0 0 3px rgba(0, 122, 255, 0.15);
-  
-  /* Glass Card Variables */
-  --glass-card-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
-  --glass-card-border: rgba(0, 0, 0, 0.1);
-  --glass-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 -1px 0 rgba(0, 0, 0, 0.02) inset;
 }
 
 /* visionOS-inspired Design System - Dark Mode */
@@ -78,11 +73,6 @@
   --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.4);
   --shadow-strong: 0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 0 0 3px rgba(10, 132, 255, 0.2);
-  
-  /* Glass Card Variables - Dark Mode */
-  --glass-card-bg: linear-gradient(145deg, rgba(30, 30, 30, 0.7) 0%, rgba(25, 25, 25, 0.85) 100%);
-  --glass-card-border: rgba(255, 255, 255, 0.2);
-  --glass-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
 }
 
 /* Shared Variables (Both Light & Dark) */
@@ -1254,20 +1244,14 @@ input:focus, textarea:focus, select:focus {
   box-shadow: var(--shadow-glow) !important;
 }
 
-/* Message Input Override - Maximum specificity with all possible selectors */
-textarea.message-input,
-.message-input,
+/* Message Input Override - Maximum specificity */
 .glass-card textarea.message-input,
-.glass-card .message-input,
-div textarea.message-input,
-form textarea.message-input,
-* textarea.message-input {
+textarea.message-input.message-input {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
   border: none !important;
   border-width: 0 !important;
-  border-color: transparent !important;
   box-shadow: none !important;
   outline: none !important;
   -webkit-appearance: none !important;
@@ -1281,124 +1265,31 @@ form textarea.message-input,
   resize: none !important;
 }
 
-textarea.message-input:focus,
-.message-input:focus,
 .glass-card textarea.message-input:focus,
-.glass-card .message-input:focus,
-div textarea.message-input:focus,
-form textarea.message-input:focus,
-* textarea.message-input:focus {
+textarea.message-input.message-input:focus {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
   border: none !important;
   border-width: 0 !important;
-  border-color: transparent !important;
   box-shadow: none !important;
   outline: none !important;
   outline-width: 0 !important;
   outline-offset: 0 !important;
 }
 
-textarea.message-input::placeholder,
-.message-input::placeholder,
 .glass-card textarea.message-input::placeholder,
-.glass-card .message-input::placeholder {
+textarea.message-input.message-input::placeholder {
   color: var(--text-secondary) !important;
   opacity: 0.7 !important;
 }
 
-textarea.message-input::before,
-textarea.message-input::after,
 .glass-card textarea.message-input::before,
-.glass-card textarea.message-input::after {
+.glass-card textarea.message-input::after,
+textarea.message-input.message-input::before,
+textarea.message-input.message-input::after {
   display: none !important;
   content: none !important;
-}
-
-/* Message page specific overrides */
-.page-enter textarea.message-input,
-body textarea.message-input,
-#root textarea.message-input {
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
-}
-
-/* Conversation starter cards - maximum specificity targeting */
-.card .grid button,
-.glass-card .grid button,
-.page-enter .grid button,
-body .grid button,
-#root .grid button,
-.card-content .grid button,
-.space-y-4 .grid button {
-  background: var(--glass-card-bg) !important;
-  backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
-  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
-  border: 1px solid var(--glass-card-border) !important;
-  box-shadow: var(--glass-card-shadow) !important;
-}
-
-/* Dark mode support for conversation starters */
-.dark .card .grid button,
-.dark .glass-card .grid button,
-.dark .page-enter .grid button,
-.dark body .grid button,
-.dark #root .grid button,
-.dark .card-content .grid button,
-.dark .space-y-4 .grid button {
-  background: rgba(30, 30, 30, 0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Specific conversation starter button styling */
-button.conversation-starter-btn,
-.conversation-starter-btn {
-  background: var(--glass-card-bg) !important;
-  backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
-  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
-  border: 1px solid var(--glass-card-border) !important;
-  box-shadow: var(--glass-card-shadow) !important;
-}
-
-.dark button.conversation-starter-btn,
-.dark .conversation-starter-btn {
-  background: rgba(30, 30, 30, 0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Override any conflicting button styles in messages page */
-.page-enter button.conversation-starter-btn {
-  background: var(--glass-card-bg) !important;
-  backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
-  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
-}
-
-
-
-/* Ensure message input container has proper styling */
-.fixed .glass-card {
-  background: var(--glass-card-bg) !important;
-  backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
-  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
-  border: 1px solid var(--glass-card-border) !important;
-  box-shadow: var(--glass-card-shadow) !important;
-}
-
-/* Force remove all borders from message input */
-textarea.message-input,
-textarea.message-input:focus,
-textarea.message-input:active,
-textarea.message-input:hover {
-  border: 0 !important;
-  border-width: 0 !important;
-  border-style: none !important;
-  border-color: transparent !important;
-  outline: 0 !important;
-  outline-width: 0 !important;
-  outline-style: none !important;
-  outline-color: transparent !important;
 }
 
 label {

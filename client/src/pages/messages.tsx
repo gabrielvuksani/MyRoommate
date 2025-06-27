@@ -9,7 +9,6 @@ import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { notificationService } from "@/lib/notificationService";
 import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
-import { useTheme } from "@/lib/ThemeProvider";
 
 export default function Messages() {
   const [newMessage, setNewMessage] = useState("");
@@ -17,47 +16,6 @@ export default function Messages() {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
-  
-  const { effectiveTheme } = useTheme();
-  
-  // Inject styles to override any CSS with maximum specificity
-  useEffect(() => {
-    const styleId = 'message-input-override-styles';
-    let styleElement = document.getElementById(styleId) as HTMLStyleElement;
-    
-    if (!styleElement) {
-      styleElement = document.createElement('style');
-      styleElement.id = styleId;
-      document.head.appendChild(styleElement);
-    }
-    
-    styleElement.textContent = `
-      .message-textarea-override,
-      .message-textarea-override:focus,
-      .message-textarea-override:active,
-      .message-textarea-override:hover {
-        background: transparent !important;
-        background-color: transparent !important;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        border-color: transparent !important;
-        outline: none !important;
-        outline-width: 0 !important;
-        outline-style: none !important;
-        box-shadow: none !important;
-        -webkit-appearance: none !important;
-        -moz-appearance: none !important;
-        appearance: none !important;
-      }
-    `;
-    
-    return () => {
-      if (styleElement && styleElement.parentNode) {
-        styleElement.parentNode.removeChild(styleElement);
-      }
-    };
-  }, []);
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -374,42 +332,25 @@ export default function Messages() {
               <Card className="glass-card">
                 <CardContent className="p-6">
                   <div className="text-center space-y-4">
-                    <MessageCircle 
-                      className="w-12 h-12 mx-auto" 
-                      style={{ color: 'var(--text-secondary)' }} 
-                    />
+                    <MessageCircle className="w-12 h-12 text-gray-400 mx-auto" />
                     <div>
-                      <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                        Start the conversation
-                      </h3>
-                      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-                        Be the first to send a message to your household
-                      </p>
+                      <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Start the conversation</h3>
+                      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Be the first to send a message to your household</p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {conversationStarters.map((starter, index) => (
                         <button
                           key={index}
-                          className="px-4 py-4 text-left flex items-center gap-3 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer group min-h-[72px]"
+                          className="glass-card px-4 py-4 text-left flex items-center gap-3 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer group min-h-[72px]"
                           onClick={() => handleStarterClick(starter.text)}
                           style={{
-                            animation: `modal-enter 0.3s ease-out ${index * 0.05}s backwards`,
-                            background: 'var(--glass-card-bg)',
-                            backdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)',
-                            WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)',
-                            border: '1px solid var(--glass-card-border)',
-                            boxShadow: 'var(--glass-card-shadow)'
+                            animation: `modal-enter 0.3s ease-out ${index * 0.05}s backwards`
                           }}
                         >
                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${starter.color} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-xl transition-shadow duration-200 ml-1`}>
                             <starter.icon className="w-5 h-5 text-white" />
                           </div>
-                          <span 
-                            className="text-sm leading-relaxed flex-1 pr-2"
-                            style={{ color: 'var(--text-primary)' }}
-                          >
-                            {starter.text}
-                          </span>
+                          <span className="text-sm text-[var(--text-primary)] leading-relaxed flex-1 pr-2">{starter.text}</span>
                         </button>
                       ))}
                     </div>
@@ -457,22 +398,10 @@ export default function Messages() {
       {/* Message Input - Fixed at bottom with visionOS styling */}
       <div className="fixed bottom-[108px] left-0 right-0 z-40 px-6">
         <div className="max-w-3xl mx-auto">
-          <div 
-            className="rounded-3xl shadow-lg p-3"
-            style={{
-              background: effectiveTheme === 'dark' 
-                ? 'linear-gradient(145deg, rgba(30, 30, 30, 0.9) 0%, rgba(25, 25, 25, 0.85) 100%)'
-                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%)',
-              backdropFilter: 'blur(40px) saturate(1.8) brightness(1.1)',
-              WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.1)',
-              border: effectiveTheme === 'dark' 
-                ? '1px solid rgba(255, 255, 255, 0.15)'
-                : '1px solid rgba(255, 255, 255, 0.3)',
-              boxShadow: effectiveTheme === 'dark'
-                ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.05) inset'
-                : '0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 -1px 0 rgba(0, 0, 0, 0.02) inset'
-            }}
-          >
+          <div className="glass-card rounded-3xl shadow-lg" style={{ 
+            border: 'none',
+            padding: '12px'
+          }}>
             <form onSubmit={handleSendMessage} className="flex items-end gap-3">
               <div className="flex-1">
                 <textarea
@@ -491,15 +420,7 @@ export default function Messages() {
                     }
                   }}
                   rows={1}
-                  className="w-full text-base resize-none message-textarea-override"
-                  style={{
-                    color: effectiveTheme === 'dark' ? '#ffffff' : '#1a1a1a',
-                    padding: '2px 16px',
-                    minHeight: '28px',
-                    maxHeight: '120px',
-                    lineHeight: '28px',
-                    overflowY: 'auto'
-                  }}
+                  className="message-input w-full text-base resize-none px-3 py-1"
                 />
               </div>
               <Button
