@@ -30,6 +30,11 @@ function Router() {
   const [location] = useLocation();
   const { isKeyboardVisible } = useKeyboardHeight();
 
+  // Lock orientation to portrait on PWA/mobile (will be implemented later)
+  useEffect(() => {
+    // Portrait orientation lock will be added after fixing authentication flow
+  }, []);
+
   // Check for persistent loading on page load
   useEffect(() => {
     PersistentLoading.checkAndShow();

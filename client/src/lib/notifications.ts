@@ -101,12 +101,16 @@ export class NotificationService {
 
     // Removed document focus detection for better UX - users should get notifications even when app is active
 
+    // Create app icon as data URL for notifications
+    const appIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Crect width='72' height='72' rx='16' fill='url(%23gradient)'/%3E%3Cdefs%3E%3ClinearGradient id='gradient' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2334d399'/%3E%3Cstop offset='100%25' style='stop-color:%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg transform='translate(12,12) scale(2,2)' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3Cpolyline points='9 22 9 12 15 12 15 22'/%3E%3C/g%3E%3C/svg%3E";
+
     const notificationOptions: NotificationOptions = {
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
-      tag: `myroommate-${type}`,
+      icon: appIcon,
+      badge: appIcon,
+      tag: `myroommate-${type}-${Date.now()}`,
       requireInteraction: false,
       vibrate: [200, 100, 200],
+      silent: false,
       ...options,
       data: {
         type,

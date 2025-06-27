@@ -688,8 +688,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Use setTimeout to ensure response is sent before broadcasting
       setTimeout(() => {
-        broadcastNotificationToHousehold(
-          household.household.id, 
+        broadcastGlobalNotification(
           notificationData, 
           user.claims.sub // Exclude sender from notification
         );
@@ -711,13 +710,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // High-performance WebSocket setup with user caching
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 
-  // Server-side notification broadcast function
-  function broadcastNotificationToHousehold(householdId: string, notification: any, excludeUserId?: string) {
-    console.log(`Broadcasting notification to household ${householdId}:`, notification);
+  // Server-side notification broadcast function - broadcasts to ALL connected users
+  function broadcastGlobalNotification(notification: any, excludeUserId?: string) {
+    console.log(`Broadcasting global notification:`, notification);
     
     wss.clients.forEach((client: any) => {
       if (client.readyState === WebSocket.OPEN && 
-          client._householdId === householdId &&
           client._userId !== excludeUserId) {
         
         const notificationMessage = {
@@ -725,7 +723,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           data: {
             title: notification.title,
             body: notification.body,
-            notificationType: notification.type || 'household',
+            notificationType: notification.type || 'global',
             timestamp: new Date().toISOString(),
             senderId: notification.senderId,
             senderName: notification.senderName
