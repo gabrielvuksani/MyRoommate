@@ -35,7 +35,8 @@ function Router() {
     enabled: isAuthenticated,
   }) as { data: any };
 
-  if (isLoading) {
+  // Show loading only for initial auth check
+  if (isLoading && !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <div className="w-8 h-8 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
@@ -43,9 +44,6 @@ function Router() {
     );
   }
 
-  // Check onboarding completion status
-  const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-  
   // Determine routing logic:
   // 1. New users (no firstName) -> Onboarding
   // 2. Existing users with household -> Home with navigation

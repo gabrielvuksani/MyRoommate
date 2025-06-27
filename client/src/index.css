@@ -1363,6 +1363,19 @@ div.glass-card textarea.message-input {
   border-left-width: 0 !important;
 }
 
+/* Force message input styling on page navigation */
+.message-input.w-full.text-base.resize-none,
+textarea.message-input.w-full.text-base.resize-none {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 label {
   color: var(--text-secondary) !important;
 }
