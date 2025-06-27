@@ -341,16 +341,16 @@ export default function Messages() {
                       {conversationStarters.map((starter, index) => (
                         <button
                           key={index}
-                          className="glass-card p-4 text-left flex items-center gap-3 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer group min-h-[72px]"
+                          className="glass-card px-4 py-4 text-left flex items-center gap-3 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer group min-h-[72px]"
                           onClick={() => handleStarterClick(starter.text)}
                           style={{
                             animation: `modal-enter 0.3s ease-out ${index * 0.05}s backwards`
                           }}
                         >
-                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${starter.color} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-xl transition-shadow duration-200`}>
+                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${starter.color} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-xl transition-shadow duration-200 ml-1`}>
                             <starter.icon className="w-5 h-5 text-white" />
                           </div>
-                          <span className="text-sm text-[var(--text-primary)] leading-relaxed flex-1">{starter.text}</span>
+                          <span className="text-sm text-[var(--text-primary)] leading-relaxed flex-1 pr-2">{starter.text}</span>
                         </button>
                       ))}
                     </div>
