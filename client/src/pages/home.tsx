@@ -120,7 +120,7 @@ export default function Home() {
               </div>
               <button
                 onClick={() => setLocation("/profile")}
-                className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
+                className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
               >
                 <span className="text-white font-bold text-lg">
                   {getProfileInitials((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email)}
@@ -299,7 +299,7 @@ export default function Home() {
             </div>
             <button
               onClick={() => setLocation("/profile")}
-              className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
+              className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
             >
               <span className="text-white font-bold text-lg">
                 {getProfileInitials((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email)}

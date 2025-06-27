@@ -66,12 +66,12 @@ class NotificationService {
             body: options.body,
             icon: options.icon || '/favicon.ico',
             badge: options.badge || '/favicon.ico',
-            tag: options.tag || 'myroommate-notification',
+            tag: options.tag || 'roomieHub-notification',
             requireInteraction: options.requireInteraction || false,
             silent: options.silent || false,
             data: {
               timestamp: Date.now(),
-              app: 'myRoommate'
+              app: 'RoomieHub'
             }
           } as any);
           return true;
@@ -82,7 +82,7 @@ class NotificationService {
       const notification = new Notification(options.title, {
         body: options.body,
         icon: options.icon || '/favicon.ico',
-        tag: options.tag || 'myroommate-notification',
+        tag: options.tag || 'roomieHub-notification',
         requireInteraction: options.requireInteraction || false,
         silent: options.silent || false
       });
@@ -112,7 +112,7 @@ class NotificationService {
   // Test notifications for different scenarios
   async sendTestNotification(): Promise<boolean> {
     return this.sendNotification({
-      title: '🏠 myRoommate Test',
+      title: '🏠 RoomieHub Test',
       body: 'Notifications are working perfectly! You\'ll get updates for messages, chores, and expenses.',
       requireInteraction: false
     });

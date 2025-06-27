@@ -1,6 +1,6 @@
 {
-  "name": "myRoommate - Roommate Management",
-  "short_name": "myRoommate",
+  "name": "RoomieHub - Roommate Management",
+  "short_name": "RoomieHub",
   "description": "Your premium roommate management companion for seamless shared living",
   "start_url": "/",
   "display": "standalone",
@@ -10,31 +10,31 @@
   "scope": "/",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='72' height='72' rx='18' fill='url(%23bg)'/%3E%3Cpath d='M36 18L25 28v22h6v-12h10v12h6V28L36 18zm-3 20v-7l3-3 3 3v7h-6z' fill='white'/%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Crect width='72' height='72' rx='16' fill='%23f7f8fa'/%3E%3Cpath d='M36 18c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-16 40c-4.418 0-8 3.582-8 8v8h48v-8c0-4.418-3.582-8-8-8H20z' fill='%236366f1'/%3E%3C/svg%3E",
       "sizes": "72x72",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='96' height='96' rx='24' fill='url(%23bg)'/%3E%3Cpath d='M48 24L33 37v29h8v-16h14v16h8V37L48 24zm-5 26v-9l5-4 5 4v9h-10z' fill='white'/%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%23f7f8fa'/%3E%3Cpath d='M48 24c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-16 40c-4.418 0-8 3.582-8 8v8h48v-8c0-4.418-3.582-8-8-8H32z' fill='%236366f1'/%3E%3C/svg%3E",
       "sizes": "96x96",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 144 144'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='144' height='144' rx='36' fill='url(%23bg)'/%3E%3Cpath d='M72 36L51 55v44h12v-24h18v24h12V55L72 36zm-6 38v-13l6-5 6 5v13h-12z' fill='white'/%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 144 144'%3E%3Crect width='144' height='144' rx='32' fill='%23f7f8fa'/%3E%3Cpath d='M72 36c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18zm-24 60c-6.627 0-12 5.373-12 12v12h72v-12c0-6.627-5.373-12-12-12H48z' fill='%236366f1'/%3E%3C/svg%3E",
       "sizes": "144x144",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='192' height='192' rx='48' fill='url(%23bg)'/%3E%3Cpath d='M96 48L67 73v71h16v-32h26v32h16V73L96 48zm-9 50v-17l9-7 9 7v17h-18z' fill='white'/%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%23f7f8fa'/%3E%3Cpath d='M96 48c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm-32 80c-8.837 0-16 7.163-16 16v16h96v-16c0-8.837-7.163-16-16-16H64z' fill='%236366f1'/%3E%3C/svg%3E",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "maskable any"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='128' fill='url(%23bg)'/%3E%3Cpath d='M256 128L179 195v189h42v-85h70v85h42V195L256 128zm-23 133v-45l23-18 23 18v45h-46z' fill='white'/%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%23f7f8fa'/%3E%3Cpath d='M256 128c-35.346 0-64 28.654-64 64s28.654 64 64 64 64-28.654 64-64-28.654-64-64-64zm-85.333 213.333c-23.564 0-42.667 19.103-42.667 42.667v42.667h256V384c0-23.564-19.103-42.667-42.667-42.667H170.667z' fill='%236366f1'/%3E%3C/svg%3E",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "maskable any"
@@ -42,13 +42,13 @@
   ],
   "screenshots": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'%3E%3Crect width='540' height='720' fill='%23f7f8fa'/%3E%3Ctext x='270' y='360' text-anchor='middle' fill='%236366f1' font-size='24' font-family='system-ui'%3EmyRoommate Dashboard%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'%3E%3Crect width='540' height='720' fill='%23f7f8fa'/%3E%3Ctext x='270' y='360' text-anchor='middle' fill='%236366f1' font-size='24' font-family='system-ui'%3ERoomieHub Dashboard%3C/text%3E%3C/svg%3E",
       "sizes": "540x720",
       "type": "image/svg+xml",
       "form_factor": "narrow"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 593'%3E%3Crect width='1024' height='593' fill='%23f7f8fa'/%3E%3Ctext x='512' y='296' text-anchor='middle' fill='%236366f1' font-size='32' font-family='system-ui'%3EmyRoommate Dashboard%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 593'%3E%3Crect width='1024' height='593' fill='%23f7f8fa'/%3E%3Ctext x='512' y='296' text-anchor='middle' fill='%236366f1' font-size='32' font-family='system-ui'%3ERoomieHub Dashboard%3C/text%3E%3C/svg%3E",
       "sizes": "1024x593",
       "type": "image/svg+xml",
       "form_factor": "wide"
