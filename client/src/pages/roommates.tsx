@@ -144,32 +144,19 @@ export default function Roommates() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList 
-            className="grid w-full grid-cols-2 p-1 rounded-2xl mb-6 relative overflow-hidden"
+            className="grid w-full grid-cols-2 p-1 rounded-xl mb-6"
             style={{
-              background: 'var(--surface-glass)',
-              border: '1px solid var(--border)',
-              backdropFilter: 'blur(20px) saturate(1.8)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              background: 'var(--surface-secondary)',
+              border: '1px solid var(--border)'
             }}
           >
-            {/* Liquid glass indicator */}
-            <div 
-              className="absolute inset-y-1 rounded-xl transition-all duration-500 ease-out will-change-transform"
-              style={{
-                width: 'calc(50% - 4px)',
-                background: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(10px) saturate(1.2)',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
-                transform: `translateX(${activeTab === 'my-listings' ? 'calc(100% + 4px)' : '4px'})`,
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-              }}
-            />
             <TabsTrigger 
               value="browse" 
-              className="relative z-10 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center py-3 px-4"
+              className="rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center py-3 px-4"
               style={{
                 color: activeTab === 'browse' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                background: 'transparent'
+                background: activeTab === 'browse' ? 'var(--surface)' : 'transparent',
+                boxShadow: activeTab === 'browse' ? 'var(--shadow-soft)' : 'none'
               }}
             >
               <Search className="w-4 h-4 mr-2" />
@@ -177,10 +164,11 @@ export default function Roommates() {
             </TabsTrigger>
             <TabsTrigger 
               value="my-listings" 
-              className="relative z-10 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center py-3 px-4"
+              className="rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center py-3 px-4"
               style={{
                 color: activeTab === 'my-listings' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                background: 'transparent'
+                background: activeTab === 'my-listings' ? 'var(--surface)' : 'transparent',
+                boxShadow: activeTab === 'my-listings' ? 'var(--shadow-soft)' : 'none'
               }}
             >
               <Home className="w-4 h-4 mr-2" />

@@ -111,11 +111,11 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
-- ✓ Enhanced roommates page tab bar with liquid glass design matching bottom navigation aesthetic
-- ✓ Added smooth morphing indicator with 500ms transition duration and proper liquid glass backdrop blur effects
+- ✓ Simplified roommates page tab bar with clean design that properly supports light and dark modes
+- ✓ Replaced complex liquid glass implementation with CSS variable-based styling for better theme compatibility
 - ✓ Restored /landing route for proper new user and returning user flow navigation
 - ✓ Fixed search bar layout by removing unnecessary div wrapper element for cleaner component structure
-- ✓ Applied consistent visionOS design language across tab switching with glass morphism and shadow effects
+- ✓ Applied consistent theming using CSS variables (--surface, --text-primary, --shadow-soft) for cross-theme compatibility
 - ✓ Created seamless persistent loading system that survives page refreshes using sessionStorage and direct DOM manipulation
 - ✓ Loading overlay now persists throughout entire navigation process including page reload with blur background
 - ✓ Implemented automatic restoration on page load with safety timeout to prevent infinite loading states
