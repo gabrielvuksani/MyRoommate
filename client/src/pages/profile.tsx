@@ -140,6 +140,19 @@ export default function Profile() {
       const success = await notificationService.sendTestNotification();
       if (success) {
         setNotificationPermission(notificationService.getPermissionStatus());
+        
+        // Send additional demo notifications to showcase different types
+        setTimeout(() => {
+          notificationService.sendMessageNotification("Alex", "Hey! Are you free this weekend?");
+        }, 2000);
+        
+        setTimeout(() => {
+          notificationService.sendChoreNotification("Take out trash", "Sam");
+        }, 4000);
+        
+        setTimeout(() => {
+          notificationService.sendExpenseNotification("Groceries", 45.67, "Jordan");
+        }, 6000);
       }
     } catch (error) {
       console.error('Test notification failed:', error);
@@ -337,7 +350,7 @@ export default function Profile() {
                   <span className="text-xs font-semibold">Dark</span>
                 </Button>
               </div>
-              <p className="text-xs mt-3" style={{ color: 'var(--text-tertiary)' }}>
+              <p className="text-xs mt-3" style={{ color: 'var(--text-secondary)' }}>
                 {theme === 'auto' 
                   ? `Following system (currently ${effectiveTheme})`
                   : `Using ${theme} mode`
@@ -459,17 +472,17 @@ export default function Profile() {
                     </span>
                     <button
                       onClick={copyInviteCode}
-                      className="p-2 rounded-lg btn-animated transition-all duration-200 relative overflow-hidden"
+                      className="p-2 rounded-lg btn-animated transition-all duration-300 relative"
                       style={{
-                        background: isCopied ? 'var(--success)' : 'var(--surface-secondary)',
-                        color: isCopied ? '#ffffff' : 'var(--text-secondary)'
+                        background: 'var(--surface-secondary)',
+                        color: 'var(--text-secondary)'
                       }}
                     >
-                      <div className={`transition-all duration-200 ${isCopied ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}>
+                      <div className={`transition-all duration-300 ease-in-out ${isCopied ? 'scale-0 opacity-0 rotate-90' : 'scale-100 opacity-100 rotate-0'}`}>
                         <Copy size={14} />
                       </div>
-                      <div className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${isCopied ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
-                        <Check size={14} />
+                      <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out ${isCopied ? 'scale-100 opacity-100 rotate-0' : 'scale-0 opacity-0 -rotate-90'}`}>
+                        <Check size={14} style={{ color: '#10b981' }} />
                       </div>
                     </button>
                   </div>

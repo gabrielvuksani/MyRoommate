@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
+import { notificationService } from "@/lib/notificationService";
 import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
 
 export default function Messages() {
@@ -73,6 +74,12 @@ export default function Messages() {
           console.log('Cache updated with new message:', updatedMessages.length, 'total messages');
           return updatedMessages;
         });
+        
+        // Send notification for new messages (only if not from current user)
+        if ((data as any).userId !== user?.id && !document.hasFocus()) {
+          const userName = formatDisplayName((data as any).user?.firstName, (data as any).user?.lastName);
+          notificationService.sendMessageNotification(userName, (data as any).content);
+        }
         
         queryClient.invalidateQueries({ 
           queryKey: ["/api/messages"], 
