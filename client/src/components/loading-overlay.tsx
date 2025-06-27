@@ -1,39 +1,10 @@
-import { CheckCircle, Loader2, ArrowRight } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface LoadingOverlayProps {
   message?: string;
-  stage?: "" | "processing" | "success" | "completing";
 }
 
-export default function LoadingOverlay({ message = "Loading...", stage = "" }: LoadingOverlayProps) {
-  
-  const getStageContent = () => {
-    switch (stage) {
-      case "processing":
-        return {
-          icon: <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#007AFF' }} />,
-          message: message.includes("Refresh") ? "Clearing app data..." : "Leaving household..."
-        };
-      case "success":
-        return {
-          icon: <CheckCircle className="w-6 h-6" style={{ color: '#34C759' }} />,
-          message: message.includes("Refresh") ? "Data cleared successfully" : "Left household successfully"
-        };
-      case "completing":
-        return {
-          icon: <ArrowRight className="w-6 h-6" style={{ color: '#007AFF' }} />,
-          message: message.includes("Refresh") ? "Redirecting to home..." : "Redirecting to home..."
-        };
-      default:
-        return {
-          icon: <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#007AFF' }} />,
-          message: message
-        };
-    }
-  };
-
-  const stageContent = getStageContent();
-  
+export default function LoadingOverlay({ message = "Loading..." }: LoadingOverlayProps) {
   return (
     <div 
       className="fixed inset-0 z-[99999] flex items-center justify-center"
@@ -57,17 +28,15 @@ export default function LoadingOverlay({ message = "Loading...", stage = "" }: L
         }}
       >
         <div className="p-8 flex flex-col items-center space-y-6">
-          {/* Spinner/Icon */}
           <div className="flex items-center justify-center">
-            {stageContent.icon}
+            <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#007AFF' }} />
           </div>
           
-          {/* Message */}
           <p 
             className="text-center font-medium text-lg leading-relaxed"
-            style={{ color: stage === "success" ? undefined : 'var(--text-primary)' }}
+            style={{ color: 'var(--text-primary)' }}
           >
-            {stageContent.message}
+            {message}
           </p>
         </div>
       </div>

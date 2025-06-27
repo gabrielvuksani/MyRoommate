@@ -34,14 +34,14 @@ export default function Profile() {
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLeavingHousehold, setIsLeavingHousehold] = useState(false);
-  const [loadingStage, setLoadingStage] = useState<"" | "processing" | "success" | "completing">("");
+
   const [isCopied, setIsCopied] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [isTestingNotification, setIsTestingNotification] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
-    enabled: !isLeavingHousehold && !isRefreshing && !loadingStage,
+    enabled: !isLeavingHousehold && !isRefreshing,
   });
 
   useEffect(() => {
@@ -128,127 +128,22 @@ export default function Profile() {
   };
 
   const handleRefresh = async () => {
-    // Force immediate synchronous state update
-    flushSync(() => {
-      setIsRefreshing(true);
-      setLoadingStage("processing");
-    });
+    setIsRefreshing(true);
     
     try {
-      // Clear all React Query cache completely
       await queryClient.clear();
-      
-      // Clear all browser storage
       localStorage.clear();
       sessionStorage.clear();
       
-      // Clear cookies (document.cookie method for current domain)
-      try {
-        document.cookie.split(";").forEach(cookie => {
-          const eqPos = cookie.indexOf("=");
-          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
-          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-        });
-      } catch (err) {
-        console.log('Cookie clearing skipped:', err);
-      }
-      
-      // Clear service worker cache and registrations (PWA + website)
-      if ('serviceWorker' in navigator) {
-        try {
-          // Clear all cache storage (both PWA and regular website caches)
-          if ('caches' in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(
-              cacheNames.map(cacheName => caches.delete(cacheName))
-            );
-          }
-          
-          // Update service worker and clear registration cache
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(
-            registrations.map(async (registration) => {
-              try {
-                // Force update to clear cached service worker
-                await registration.update();
-                // Optionally unregister and re-register for complete reset
-                if (registration.active) {
-                  registration.active.postMessage({ type: 'CLEAR_CACHE' });
-                }
-              } catch (err) {
-                console.log('Service worker update skipped:', err);
-              }
-            })
-          );
-        } catch (err) {
-          console.log('Service worker cache clearing skipped:', err);
-        }
-      }
-      
-      // Clear IndexedDB (used by many PWA libraries)
-      if ('indexedDB' in window) {
-        try {
-          const databases = await indexedDB.databases();
-          await Promise.all(
-            databases.map(db => {
-              if (db.name) {
-                const deleteReq = indexedDB.deleteDatabase(db.name);
-                return new Promise((resolve, reject) => {
-                  deleteReq.onsuccess = () => resolve(undefined);
-                  deleteReq.onerror = () => reject(deleteReq.error);
-                  deleteReq.onblocked = () => resolve(undefined); // Handle blocked state
-                });
-              }
-            })
-          );
-        } catch (err) {
-          console.log('IndexedDB cleanup skipped:', err);
-        }
-      }
-      
-      // Clear WebSQL (legacy, but still used by some systems)
-      try {
-        if ('webkitStorageInfo' in window) {
-          (window as any).webkitStorageInfo.requestQuota(
-            (window as any).TEMPORARY, 0, () => {}, () => {}
-          );
-        }
-      } catch (err) {
-        console.log('WebSQL clearing skipped:', err);
-      }
-      
-      // Clear Application Cache (legacy PWA cache) - deprecated but handle gracefully
-      try {
-        if ('applicationCache' in window) {
-          const appCache = (window as any).applicationCache;
-          if (appCache && typeof appCache.swapCache === 'function') {
-            appCache.swapCache();
-          }
-        }
-      } catch (err) {
-        console.log('Application cache clearing skipped:', err);
-      }
-      
-      // Stage 1: Show success feedback (500ms)
+      // Simple delay then navigate
       setTimeout(() => {
-        setLoadingStage("success");
-      }, 500);
-      
-      // Stage 2: Prepare transition (1000ms)
-      setTimeout(() => {
-        setLoadingStage("completing");
+        window.location.href = '/';
       }, 1000);
-      
-      // Stage 3: Navigate to home (1500ms)
-      setTimeout(() => {
-        setLocation('/');
-      }, 1500);
     } catch (error) {
       console.error('Cache clearing error:', error);
       setTimeout(() => {
-        setLocation('/');
-      }, 1500);
+        window.location.href = '/';
+      }, 1000);
     }
   };
 
@@ -292,12 +187,13 @@ export default function Profile() {
     );
   }
 
-  // Early return for loading states to prevent any content flashing
-  if (isLeavingHousehold || isRefreshing || loadingStage) {
+
+
+  // Show loading overlay when performing actions
+  if (isRefreshing || isLeavingHousehold) {
     return (
       <LoadingOverlay 
         message={isRefreshing ? "Refreshing app data..." : "Leaving household..."} 
-        stage={loadingStage} 
       />
     );
   }
@@ -726,37 +622,20 @@ export default function Profile() {
               {(household as any) && (
                 <Button
                   onClick={async () => {
-                    // Force immediate synchronous state update
-                    flushSync(() => {
-                      setIsLeavingHousehold(true);
-                      setLoadingStage("processing");
-                    });
+                    setIsLeavingHousehold(true);
                     
                     try {
-                      // Call the mutation and wait for completion
                       await leaveHouseholdMutation.mutateAsync();
                       
-                      // Stage 1: Show success feedback (500ms)
+                      // Simple delay then navigate
                       setTimeout(() => {
-                        setLoadingStage("success");
-                      }, 500);
-                      
-                      // Stage 2: Clear cache and prepare transition (1000ms)  
-                      setTimeout(async () => {
-                        await queryClient.clear();
-                        setLoadingStage("completing");
+                        window.location.href = '/';
                       }, 1000);
-                      
-                      // Stage 3: Navigate to home (1500ms)
-                      setTimeout(() => {
-                        setLocation('/');
-                      }, 1500);
                     } catch (error) {
                       console.error("Failed to leave household:", error);
                       setTimeout(() => {
-                        setIsLeavingHousehold(false);
-                        setLoadingStage("");
-                      }, 1500);
+                        window.location.href = '/';
+                      }, 1000);
                     }
                   }}
                   disabled={isLeavingHousehold || leaveHouseholdMutation.isPending}
