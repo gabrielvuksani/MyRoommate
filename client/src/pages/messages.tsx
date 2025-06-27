@@ -19,6 +19,45 @@ export default function Messages() {
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   
   const { effectiveTheme } = useTheme();
+  
+  // Inject styles to override any CSS with maximum specificity
+  useEffect(() => {
+    const styleId = 'message-input-override-styles';
+    let styleElement = document.getElementById(styleId) as HTMLStyleElement;
+    
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = `
+      .message-textarea-override,
+      .message-textarea-override:focus,
+      .message-textarea-override:active,
+      .message-textarea-override:hover {
+        background: transparent !important;
+        background-color: transparent !important;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        border-color: transparent !important;
+        outline: none !important;
+        outline-width: 0 !important;
+        outline-style: none !important;
+        box-shadow: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+      }
+    `;
+    
+    return () => {
+      if (styleElement && styleElement.parentNode) {
+        styleElement.parentNode.removeChild(styleElement);
+      }
+    };
+  }, []);
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -440,28 +479,14 @@ export default function Messages() {
                     }
                   }}
                   rows={1}
-                  className="w-full text-base resize-none"
+                  className="w-full text-base resize-none message-textarea-override"
                   style={{
-                    background: 'transparent !important',
-                    backgroundColor: 'transparent !important',
-                    color: effectiveTheme === 'dark' ? '#ffffff !important' : '#1a1a1a !important',
-                    border: 'none !important',
-                    borderWidth: '0 !important',
-                    borderStyle: 'none !important',
-                    borderColor: 'transparent !important',
-                    outline: 'none !important',
-                    outlineWidth: '0 !important',
-                    outlineStyle: 'none !important',
-                    boxShadow: 'none !important',
-                    padding: '2px 16px !important',
-                    minHeight: '28px !important',
-                    maxHeight: '120px !important',
-                    lineHeight: '28px !important',
-                    overflowY: 'auto !important',
-                    resize: 'none !important',
-                    WebkitAppearance: 'none !important',
-                    MozAppearance: 'none !important',
-                    appearance: 'none !important'
+                    color: effectiveTheme === 'dark' ? '#ffffff' : '#1a1a1a',
+                    padding: '2px 16px',
+                    minHeight: '28px',
+                    maxHeight: '120px',
+                    lineHeight: '28px',
+                    overflowY: 'auto'
                   }}
                 />
               </div>
