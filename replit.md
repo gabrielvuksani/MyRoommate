@@ -160,6 +160,8 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Enhanced light mode navigation indicator with liquid glass refraction layers matching dark mode quality
 - ✓ Added sophisticated pseudo-elements with gradient refraction effects for authentic glass appearance
 - ✓ Implemented multiple background layers with radial gradients for depth and dimension
+- ✓ Fixed light mode navigation indicator visibility with prominent purple gradient design
+- ✓ Updated refraction layers to ensure proper contrast in light mode while preserving dark mode
 
 **June 26, 2025 (Earlier):**
 - ✓ Streamlined onboarding process to be the first experience for new users
