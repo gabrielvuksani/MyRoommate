@@ -442,22 +442,26 @@ export default function Messages() {
                   rows={1}
                   className="w-full text-base resize-none"
                   style={{
-                    background: 'transparent',
-                    backgroundColor: 'transparent',
-                    color: effectiveTheme === 'dark' ? '#ffffff' : '#1a1a1a',
-                    border: 'none',
-                    borderWidth: '0',
-                    outline: 'none',
-                    boxShadow: 'none',
-                    padding: '2px 16px',
-                    minHeight: '28px',
-                    maxHeight: '120px',
-                    lineHeight: '28px',
-                    overflowY: 'auto',
-                    resize: 'none',
-                    WebkitAppearance: 'none',
-                    MozAppearance: 'none',
-                    appearance: 'none'
+                    background: 'transparent !important',
+                    backgroundColor: 'transparent !important',
+                    color: effectiveTheme === 'dark' ? '#ffffff !important' : '#1a1a1a !important',
+                    border: 'none !important',
+                    borderWidth: '0 !important',
+                    borderStyle: 'none !important',
+                    borderColor: 'transparent !important',
+                    outline: 'none !important',
+                    outlineWidth: '0 !important',
+                    outlineStyle: 'none !important',
+                    boxShadow: 'none !important',
+                    padding: '2px 16px !important',
+                    minHeight: '28px !important',
+                    maxHeight: '120px !important',
+                    lineHeight: '28px !important',
+                    overflowY: 'auto !important',
+                    resize: 'none !important',
+                    WebkitAppearance: 'none !important',
+                    MozAppearance: 'none !important',
+                    appearance: 'none !important'
                   }}
                 />
               </div>
