@@ -213,14 +213,9 @@ export default function Home() {
               </h3>
               <button
                 onClick={() => setLocation("/roommates")}
-                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
-                style={{ 
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-secondary)'
-                }}
+                className="text-sm text-primary font-medium transition-colors btn-animated"
               >
-                <span className="text-sm font-medium">View All</span>
-                <ArrowRight size={14} />
+                View All
               </button>
             </div>
             
@@ -583,7 +578,7 @@ export default function Home() {
             </h2>
             <button
               onClick={() => setLocation("/dashboard")}
-              className="text-sm text-primary font-medium transition-colors hover:text-primary/80 btn-animated"
+              className="text-sm text-primary font-medium transition-colors btn-animated"
             >
               View All
             </button>

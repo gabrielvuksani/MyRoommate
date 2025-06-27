@@ -111,6 +111,11 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Fixed Leave Household button to properly refresh the entire page using window.location.reload()
+- ✓ Standardized all View All buttons across the application to match the featured listings design
+- ✓ Removed inconsistent styling from household performance "View All" button (removed hover:text-primary/80)
+- ✓ Updated non-household Featured Listings "View All" button to remove background and ArrowRight icon
+- ✓ Applied consistent text-sm text-primary font-medium transition-colors btn-animated class across all View All buttons
 - ✓ Fixed system appearance feedback to support both light and dark mode with proper text contrast
 - ✓ Redesigned copy feedback to smoothly transition icons without green overlay backgrounds
 - ✓ Enhanced copy button with rotation animation (90°) and scale transitions maintaining design language
