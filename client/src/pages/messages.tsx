@@ -394,17 +394,12 @@ export default function Messages() {
       {/* Message Input - Fixed at bottom with visionOS styling */}
       <div className="fixed bottom-[108px] left-0 right-0 z-40 px-6">
         <div className="max-w-3xl mx-auto">
-          <div className="glass-card rounded-3xl shadow-lg message-input-glass-card" style={{ 
+          <div className="glass-card rounded-3xl shadow-lg" style={{ 
             border: 'none',
             padding: '12px'
           }}>
             <form onSubmit={handleSendMessage} className="flex items-end gap-3">
-              <div className="flex-1" style={{ 
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                boxShadow: 'none'
-              }}>
+              <div className="flex-1">
                 <textarea
                   ref={textareaRef}
                   placeholder="Type a message..."
