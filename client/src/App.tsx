@@ -57,11 +57,7 @@ function Router() {
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
       <Switch>
         {!isAuthenticated ? (
-          <>
-            <Route path="/" component={Landing} />
-            <Route path="/onboarding" component={Landing} />
-            <Route component={Landing} />
-          </>
+          <Route path="/" component={Landing} />
         ) : needsOnboarding ? (
           <>
             <Route path="/onboarding" component={Onboarding} />
