@@ -308,7 +308,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
       <div className="pt-40 px-6 space-y-6">
         {/* Hero Stats */}
         <div className="grid grid-cols-2 gap-4">
@@ -675,7 +674,7 @@ export default function Home() {
               </h2>
               <button
                 onClick={() => setLocation("/messages")}
-                className="text-sm text-primary font-medium transition-colors btn-animated"
+                className="text-sm text-primary font-medium transition-colors btn-animated pt-[4px] pb-[4px] pl-[10px] pr-[10px]"
               >
                 View All
               </button>
@@ -812,8 +811,6 @@ export default function Home() {
           )}
         </div>
       </div>
-
-
     </div>
   );
 }

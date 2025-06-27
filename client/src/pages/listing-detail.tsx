@@ -114,8 +114,8 @@ export default function ListingDetail() {
             <div className="flex items-center space-x-3">
               <BackButton to="/roommates" />
               <div>
-                <h1 className="page-title">Listing Details</h1>
-                <p className="page-subtitle">Room information</p>
+                <h1 className="page-title">Room Information</h1>
+                <p className="page-subtitle">Listing Details</p>
               </div>
             </div>
           </div>
