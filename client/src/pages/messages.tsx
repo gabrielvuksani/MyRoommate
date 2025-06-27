@@ -429,6 +429,14 @@ export default function Messages() {
                   }}
                   rows={1}
                   className="message-input w-full text-base resize-none px-3 py-1"
+                  style={{
+                    background: 'transparent !important',
+                    backgroundColor: 'transparent !important',
+                    border: '0 !important',
+                    borderWidth: '0 !important',
+                    outline: 'none !important',
+                    boxShadow: 'none !important'
+                  }}
                 />
               </div>
               <Button

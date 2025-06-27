@@ -1228,18 +1228,11 @@ input, select {
   transition: all 0.2s ease;
 }
 
-textarea {
+textarea:not(.message-input) {
   background: var(--surface) !important;
   color: var(--text-primary) !important;
   border: 1px solid var(--border) !important;
   transition: all 0.2s ease;
-}
-
-/* Override for message input specifically */
-textarea.message-input {
-  background: transparent !important;
-  border: 0 !important;
-  outline: 0 !important;
 }
 
 input::placeholder, textarea::placeholder {
@@ -1251,29 +1244,75 @@ input:focus, textarea:focus, select:focus {
   box-shadow: var(--shadow-glow) !important;
 }
 
-/* Message Input - Simple and effective */
-.message-input {
+/* Message Input Override - Maximum specificity with all possible selectors */
+textarea.message-input,
+.message-input,
+.glass-card textarea.message-input,
+.glass-card .message-input,
+div textarea.message-input,
+form textarea.message-input,
+* textarea.message-input {
   background: transparent !important;
-  border: 0 !important;
-  outline: 0 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
   box-shadow: none !important;
+  outline: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
   color: var(--text-primary) !important;
   min-height: 28px !important;
   max-height: 120px !important;
   line-height: 28px !important;
   overflow-y: auto !important;
+  resize: none !important;
 }
 
-.message-input:focus {
+textarea.message-input:focus,
+.message-input:focus,
+.glass-card textarea.message-input:focus,
+.glass-card .message-input:focus,
+div textarea.message-input:focus,
+form textarea.message-input:focus,
+* textarea.message-input:focus {
   background: transparent !important;
-  border: 0 !important;
-  outline: 0 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
   box-shadow: none !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-offset: 0 !important;
 }
 
-.message-input::placeholder {
+textarea.message-input::placeholder,
+.message-input::placeholder,
+.glass-card textarea.message-input::placeholder,
+.glass-card .message-input::placeholder {
   color: var(--text-secondary) !important;
   opacity: 0.7 !important;
+}
+
+textarea.message-input::before,
+textarea.message-input::after,
+.glass-card textarea.message-input::before,
+.glass-card textarea.message-input::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Message page specific overrides */
+.page-enter textarea.message-input,
+body textarea.message-input,
+#root textarea.message-input {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
 }
 
 /* Conversation starter cards - maximum specificity targeting */
@@ -1326,7 +1365,28 @@ button.conversation-starter-btn,
   -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
 }
 
-
+/* Force textarea styles with ultimate specificity */
+form textarea.message-input,
+div form textarea.message-input,
+.fixed textarea.message-input,
+body textarea.message-input,
+* textarea.message-input {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0px solid transparent !important;
+  border-width: 0px !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0px solid transparent !important;
+  outline-width: 0px !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
 
 /* Ensure message input container has proper styling */
 .fixed .glass-card {
