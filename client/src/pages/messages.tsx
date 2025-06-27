@@ -9,6 +9,7 @@ import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { notificationService } from "@/lib/notificationService";
 import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
+import { useTheme } from "@/lib/ThemeProvider";
 
 export default function Messages() {
   const [newMessage, setNewMessage] = useState("");
@@ -16,6 +17,8 @@ export default function Messages() {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
+  
+  const { effectiveTheme } = useTheme();
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -403,13 +406,22 @@ export default function Messages() {
       {/* Message Input - Fixed at bottom with visionOS styling */}
       <div className="fixed bottom-[108px] left-0 right-0 z-40 px-6">
         <div className="max-w-3xl mx-auto">
-          <div className="glass-card rounded-3xl shadow-lg" style={{ 
-            border: '1px solid var(--glass-card-border)',
-            padding: '12px',
-            background: 'var(--glass-card-bg)',
-            backdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)',
-            WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.05)'
-          }}>
+          <div 
+            className="rounded-3xl shadow-lg p-3"
+            style={{
+              background: effectiveTheme === 'dark' 
+                ? 'linear-gradient(145deg, rgba(30, 30, 30, 0.9) 0%, rgba(25, 25, 25, 0.85) 100%)'
+                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%)',
+              backdropFilter: 'blur(40px) saturate(1.8) brightness(1.1)',
+              WebkitBackdropFilter: 'blur(40px) saturate(1.8) brightness(1.1)',
+              border: effectiveTheme === 'dark' 
+                ? '1px solid rgba(255, 255, 255, 0.15)'
+                : '1px solid rgba(255, 255, 255, 0.3)',
+              boxShadow: effectiveTheme === 'dark'
+                ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.05) inset'
+                : '0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 -1px 0 rgba(0, 0, 0, 0.02) inset'
+            }}
+          >
             <form onSubmit={handleSendMessage} className="flex items-end gap-3">
               <div className="flex-1">
                 <textarea
@@ -428,14 +440,24 @@ export default function Messages() {
                     }
                   }}
                   rows={1}
-                  className="message-input w-full text-base resize-none px-3 py-1"
+                  className="w-full text-base resize-none"
                   style={{
-                    background: 'transparent !important',
-                    backgroundColor: 'transparent !important',
-                    border: '0 !important',
-                    borderWidth: '0 !important',
-                    outline: 'none !important',
-                    boxShadow: 'none !important'
+                    background: 'transparent',
+                    backgroundColor: 'transparent',
+                    color: effectiveTheme === 'dark' ? '#ffffff' : '#1a1a1a',
+                    border: 'none',
+                    borderWidth: '0',
+                    outline: 'none',
+                    boxShadow: 'none',
+                    padding: '2px 16px',
+                    minHeight: '28px',
+                    maxHeight: '120px',
+                    lineHeight: '28px',
+                    overflowY: 'auto',
+                    resize: 'none',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    appearance: 'none'
                   }}
                 />
               </div>

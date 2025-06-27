@@ -1365,28 +1365,7 @@ button.conversation-starter-btn,
   -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.05) !important;
 }
 
-/* Force textarea styles with ultimate specificity */
-form textarea.message-input,
-div form textarea.message-input,
-.fixed textarea.message-input,
-body textarea.message-input,
-* textarea.message-input {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  border: 0px solid transparent !important;
-  border-width: 0px !important;
-  border-style: none !important;
-  border-color: transparent !important;
-  outline: 0px solid transparent !important;
-  outline-width: 0px !important;
-  outline-style: none !important;
-  outline-color: transparent !important;
-  box-shadow: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
-}
+
 
 /* Ensure message input container has proper styling */
 .fixed .glass-card {
