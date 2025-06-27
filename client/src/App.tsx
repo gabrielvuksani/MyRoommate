@@ -43,15 +43,9 @@ function Router() {
     );
   }
 
-  // Check onboarding completion status
-  const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-  
-  // Determine routing logic:
-  // 1. New users (no firstName) -> Onboarding
-  // 2. Existing users with household -> Home with navigation
-  // 3. Existing users without household (left household or chose roommate browsing) -> Home without navigation
-  const isNewUser = isAuthenticated && user && !user.firstName;
-  const needsOnboarding = isNewUser;
+  // Get comprehensive user flags using centralized logic
+  const userFlags = getUserFlags(user, household, isAuthenticated, location);
+  const { needsOnboarding } = userFlags;
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>

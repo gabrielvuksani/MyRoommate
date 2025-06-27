@@ -122,6 +122,7 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Added app shortcuts for quick actions (Add Expense, Create Chore, Messages)
 - ✓ Implemented advanced PWA features including display_override, launch_handler, and scope_extensions
 - ✓ Hidden bottom navigation tab bar when users are on the onboarding page for cleaner onboarding experience
+- ✓ Fixed onboarding flow bug where users were redirected after entering name in step 2 by tracking initial user state
 - ✓ Enhanced refresh data functionality to completely clear all browser cache including localStorage, sessionStorage, service worker cache, and IndexedDB
 - ✓ Added comprehensive cache clearing with fallback error handling and hard page reload
 - ✓ Extended cache clearing to work for both PWA and regular website modes with cookie clearing

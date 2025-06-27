@@ -102,8 +102,13 @@ export default function Onboarding() {
     mutationFn: async (data: any) => {
       return apiRequest("PATCH", "/api/auth/user", data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+    onSuccess: (data) => {
+      // Update the cached user data without triggering a refetch
+      // This prevents the app from re-evaluating routing mid-onboarding
+      queryClient.setQueryData(["/api/auth/user"], (oldData: any) => ({
+        ...oldData,
+        ...data
+      }));
     },
   });
 
@@ -141,9 +146,18 @@ export default function Onboarding() {
 
   const firstName = userData.firstName || (user as any)?.firstName || (user as any)?.email?.split('@')[0] || 'there';
   
-  // Get centralized user flags for consistent differentiation
-  const userFlags = getUserFlags(user, null, true, '/onboarding'); // null household since we're in onboarding
-  const { isNewUser, isExistingUser } = userFlags;
+  // Track initial user state when onboarding starts
+  const [initialUserState] = useState(() => {
+    const hasFirstName = !!(user as any)?.firstName;
+    const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+    return {
+      isNewUser: !hasFirstName,
+      isExistingUser: hasFirstName && !hasCompletedOnboarding
+    };
+  });
+  
+  // Use initial state for onboarding flow to prevent mid-onboarding state changes
+  const { isNewUser, isExistingUser } = initialUserState;
 
   return (
     <div className="min-h-screen page-container page-transition flex items-center justify-center p-6">
