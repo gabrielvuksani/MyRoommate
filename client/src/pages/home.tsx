@@ -583,7 +583,7 @@ export default function Home() {
             </h2>
             <button
               onClick={() => setLocation("/dashboard")}
-              className="text-sm text-primary font-medium transition-colors hover:text-primary/80 btn-animated"
+              className="text-sm text-primary font-medium transition-colors btn-animated pt-[4px] pb-[4px] pl-[10px] pr-[10px]"
             >
               View All
             </button>
@@ -757,7 +757,7 @@ export default function Home() {
             </div>
             <button
               onClick={() => setLocation("/roommates")}
-              className="text-sm text-primary font-medium transition-colors btn-animated"
+              className="text-sm text-primary font-medium transition-colors btn-animated pt-[4px] pb-[4px] pl-[10px] pr-[10px]"
             >
               View All
             </button>
