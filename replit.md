@@ -111,6 +111,7 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
+- ✓ Completely wiped all database records for fresh start (3 sessions, 2 users, 2 households, 1 household member)
 - ✓ Added light refraction layer with inset highlights simulating curved glass light behavior
 - ✓ Enhanced navigation indicator with liquid glass aesthetics and smooth elastic transitions
 - ✓ Applied comprehensive light/dark mode support for all liquid glass elements
