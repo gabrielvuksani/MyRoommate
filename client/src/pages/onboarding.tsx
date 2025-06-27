@@ -195,7 +195,7 @@ export default function Onboarding() {
 
             <Button 
               onClick={handleNext}
-              className="w-full h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
+              className="w-full h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white btn-animated font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
             >
               Get Started
               <ArrowRight size={16} className="ml-2" />
@@ -253,7 +253,7 @@ export default function Onboarding() {
               {isNewUser && (
                 <Button
                   onClick={handleBack}
-                  className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all hover:scale-[1.02]"
+                  className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all btn-animated hover:scale-[1.02]"
                   style={{
                     background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
                     color: 'var(--text-primary)',
@@ -267,7 +267,7 @@ export default function Onboarding() {
               <Button
                 onClick={handleNext}
                 disabled={!userData.firstName.trim() || updateUserMutation.isPending}
-                className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
+                className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold btn-animated rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
               >
                 {updateUserMutation.isPending ? (
                   <div className="flex items-center space-x-2">
@@ -453,7 +453,7 @@ export default function Onboarding() {
             <div className="flex space-x-3 pt-[10px] pb-[10px]">
               <Button
                 onClick={handleBack}
-                className="flex-1 h-12 border-0 rounded-2xl shadow-sm transition-all hover:scale-[1.02]"
+                className="flex-1 h-12 border-0 rounded-2xl btn-animated shadow-sm transition-all hover:scale-[1.02]"
                 style={{
                   background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
                   color: 'var(--text-primary)',
@@ -466,7 +466,7 @@ export default function Onboarding() {
               {householdData.action === 'browse' ? (
                 <Button
                   onClick={() => setLocation("/roommates")}
-                  className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white font-semibold rounded-2xl shadow-lg shadow-purple-500/25 transition-all duration-200 hover:scale-[1.02]"
+                  className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white font-semibold rounded-2xl btn-animated shadow-lg shadow-purple-500/25 transition-all duration-200 hover:scale-[1.02]"
                 >
                   Browse Roommates
                 </Button>
@@ -477,7 +477,7 @@ export default function Onboarding() {
                     (householdData.action === 'create' && !householdData.name.trim()) ||
                     (householdData.action === 'join' && householdData.inviteCode.length !== 8)
                   }
-                  className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
+                  className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl btn-animated shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
                 >
                   Continue
                 </Button>
