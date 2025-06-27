@@ -153,11 +153,13 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Added sophisticated gradient spinner and glass effects with backdrop blur for loading states
 - ✓ Fixed timing issues - leave household and refresh now redirect immediately after loading state starts
 - ✓ Applied modal-enter animation and premium styling consistent with app's visionOS aesthetic
-- ✓ Enhanced tab switching animation with refined bouncy cubic-bezier curve (0.25, 1.2, 0.35, 1) for premium feel
+- ✓ Enhanced tab switching animation with dramatic bounce effect using cubic-bezier(0.15, 1.8, 0.25, 1) for premium feel
 - ✓ Fixed loading state to show immediately on button click before any async operations
 - ✓ Added will-change: transform to nav indicator for optimized animation performance
-- ✓ Adjusted timing to 0.55s for snappier, more premium tab switching while keeping satisfying bounce effect
-- ✓ Contained bounce animation within navigation borders using CSS containment and max-width constraints
+- ✓ Increased animation duration to 0.65s for more satisfying bounce effect
+- ✓ Implemented smart edge constraints - only outermost tabs (0 and 4) have overflow restrictions
+- ✓ Middle tabs (1, 2, 3) can bounce freely without any containment constraints
+- ✓ Added dynamic class toggling system to apply edge-constrained overflow only when needed
 
 **June 26, 2025 (Earlier):**
 - ✓ Streamlined onboarding process to be the first experience for new users

@@ -35,6 +35,10 @@ export default function BottomNavigation() {
   useEffect(() => {
     if (navigationRef.current && activeIndex !== -1) {
       navigationRef.current.style.setProperty('--indicator-translate', `${activeIndex}`);
+      
+      // Apply overflow constraints only to outermost tabs (0 and 4)
+      const isEdgeTab = activeIndex === 0 || activeIndex === 4;
+      navigationRef.current.classList.toggle('edge-constrained', isEdgeTab);
     }
   }, [activeIndex]);
 
