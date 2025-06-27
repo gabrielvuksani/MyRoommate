@@ -342,7 +342,7 @@ export default function Home() {
                   <DollarSign className="text-white" size={20} />
                 </div>
                 <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                  ${Math.abs(netBalance).toFixed(2)}
+                  ${Math.abs(netBalance).toFixed(0)}
                 </p>
                 <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                   {netBalance > 0
