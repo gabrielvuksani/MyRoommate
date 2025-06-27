@@ -115,6 +115,7 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Updated all PWA icons to use emerald-cyan gradient (from-emerald-400 to-cyan-400) with white Home icon
 - ✓ Applied consistent logo design from landing page to manifest icons in all sizes (72x72 to 512x512)
 - ✓ Fixed PWA manifest icons to use exact Lucide home icon SVG path matching landing page (house outline with door)
+- ✓ Updated all PWA icons to use stroke-based rendering (outline style) instead of filled paths to perfectly match landing page logo
 - ✓ Changed app title in HTML, manifest, service worker, and all screenshots to myRoommate
 - ✓ Completely wiped all database records for fresh start while preserving demo roommate listing
 - ✓ Removed all users, households, members, sessions, messages, chores, expenses, and calendar events
