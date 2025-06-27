@@ -172,6 +172,14 @@ RoomieHub is a full-stack web application designed to help roommates manage shar
 - ✓ Moved theme picker inside the first profile card underneath user information
 - ✓ Enhanced theme picker design with proper icon containers, sizing, and visual hierarchy
 - ✓ Implemented sophisticated visual representations for Auto (half-light/half-dark), Light (sun), and Dark (moon) modes
+- ✓ Added smooth theme transitions (0.3s ease) to eliminate staticky/laggy appearance switching
+- ✓ Implemented copy feedback system with smooth icon transitions from Copy to Check icon
+- ✓ Enhanced invite code copying with background color change to success green and 2-second auto-reset
+- ✓ Restored system appearance feedback text showing current theme status
+- ✓ Built comprehensive cross-platform push notification system compatible with iOS, Android, and desktop
+- ✓ Created NotificationService class with proper permission handling and service worker integration
+- ✓ Added test notification button with dynamic states based on permission status
+- ✓ Implemented notification click handling to focus or open the app when notifications are tapped
 
 **June 26, 2025 (Earlier):**
 - ✓ Streamlined onboarding process to be the first experience for new users

@@ -10,11 +10,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check } from "lucide-react";
+import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell } from "lucide-react";
 import { getProfileInitials } from "@/lib/nameUtils";
 import { useTheme } from "@/lib/ThemeProvider";
 import BackButton from "../components/back-button";
 import LoadingOverlay from "../components/loading-overlay";
+import { notificationService } from "@/lib/notificationService";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -33,6 +34,8 @@ export default function Profile() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLeavingHousehold, setIsLeavingHousehold] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+  const [isTestingNotification, setIsTestingNotification] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -47,6 +50,10 @@ export default function Profile() {
     };
 
     window.addEventListener("scroll", handleScroll);
+    
+    // Check notification permission
+    setNotificationPermission(notificationService.getPermissionStatus());
+    
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -125,6 +132,20 @@ export default function Profile() {
     // Invalidate queries and redirect immediately
     await queryClient.invalidateQueries();
     window.location.href = "/";
+  };
+
+  const handleTestNotification = async () => {
+    setIsTestingNotification(true);
+    try {
+      const success = await notificationService.sendTestNotification();
+      if (success) {
+        setNotificationPermission(notificationService.getPermissionStatus());
+      }
+    } catch (error) {
+      console.error('Test notification failed:', error);
+    } finally {
+      setIsTestingNotification(false);
+    }
   };
 
   if (!user) {
@@ -316,6 +337,12 @@ export default function Profile() {
                   <span className="text-xs font-semibold">Dark</span>
                 </Button>
               </div>
+              <p className="text-xs mt-3" style={{ color: 'var(--text-tertiary)' }}>
+                {theme === 'auto' 
+                  ? `Following system (currently ${effectiveTheme})`
+                  : `Using ${theme} mode`
+                }
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -534,6 +561,23 @@ export default function Profile() {
         }}>
           <CardContent className="p-6">
             <div className="space-y-3">
+              <Button
+                onClick={handleTestNotification}
+                disabled={isTestingNotification}
+                className="w-full bg-purple-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-purple-700 disabled:opacity-50"
+              >
+                <Bell size={20} className={isTestingNotification ? "animate-pulse" : ""} />
+                <span>
+                  {isTestingNotification
+                    ? "Sending test notification..."
+                    : notificationPermission === 'granted'
+                    ? "Test Notifications"
+                    : notificationPermission === 'denied'
+                    ? "Notifications Blocked"
+                    : "Enable Notifications"
+                  }
+                </span>
+              </Button>
               <Button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
