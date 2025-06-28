@@ -140,7 +140,7 @@ export default function Roommates() {
         </div>
       </div>
 
-      <div className="pt-20 px-6 pb-24 space-y-6">
+      <div className="pt-44 px-6 pb-24 space-y-6">
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList 

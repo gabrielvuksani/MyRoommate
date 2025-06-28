@@ -145,11 +145,14 @@ export default function Messages() {
     householdId: household?.id,
   });
 
-  // Streamlined scroll system - works for 0, 1, or 50+ messages
+  // Simplified scroll system
   const scrollToBottom = () => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-    }
+    setTimeout(() => {
+      messagesContainerRef.current?.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: "smooth"
+      });
+    }, 100);
   };
 
   // Auto-resize textarea
@@ -161,12 +164,24 @@ export default function Messages() {
     }
   }, [newMessage]);
 
-  // Scroll to bottom whenever messages change or typing indicators appear
+  // Handle header scroll effect only
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, typingUsers]);
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 0);
+    };
 
-  // Scroll to bottom on initial load
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Always scroll to bottom when messages change or on load
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages]);
+
+  // Initial scroll to bottom on page load
   useEffect(() => {
     if (!isLoading) {
       scrollToBottom();
@@ -331,7 +346,7 @@ export default function Messages() {
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto transition-all duration-200"
         style={{ 
-          paddingTop: '80px', 
+          paddingTop: '140px', 
           paddingBottom: isKeyboardVisible ? '120px' : '200px' 
         }}
       >
