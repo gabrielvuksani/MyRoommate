@@ -110,7 +110,17 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**June 27, 2025 (Latest):**
+**June 28, 2025 (Latest):**
+- ✓ Completed comprehensive architectural transition from modal to full-page expense forms following premium app design patterns
+- ✓ Created dedicated `/add-expense` route with comprehensive expense creation functionality in sectioned glass cards
+- ✓ Maintained all enhanced expense features: smart suggestions, categories, quick amounts, custom splits, recurring options, and notifications
+- ✓ Updated expenses page to navigate to dedicated full-page form instead of modal dialog for cleaner user experience
+- ✓ Applied consistent visionOS liquid glass design language throughout expense creation process
+- ✓ Enhanced expense form organization with sectioned layout, floating header, and proper navigation flow
+- ✓ Improved mobile experience with full-page forms that provide better breathing room and organization
+- ✓ Removed all modal dependencies from expenses page for simplified codebase and better maintainability
+
+**June 27, 2025 (Earlier):**
 - ✓ Created seamless persistent loading system that survives page refreshes using sessionStorage and direct DOM manipulation
 - ✓ Loading overlay now persists throughout entire navigation process including page reload with blur background
 - ✓ Implemented automatic restoration on page load with safety timeout to prevent infinite loading states

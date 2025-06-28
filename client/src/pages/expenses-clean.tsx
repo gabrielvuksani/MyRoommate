@@ -1,7 +1,7 @@
 import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { Plus, DollarSign } from "lucide-react";
+import { Plus, Filter, DollarSign } from "lucide-react";
 import { useLocation } from "wouter";
 import { apiRequest } from "../lib/queryClient";
 import ExpenseCard from "../components/expense-card";
@@ -28,11 +28,11 @@ export default function Expenses() {
   // Fetch data
   const { data: expenses = [] } = useQuery({
     queryKey: ["/api/expenses"],
-  }) as { data: any[] };
+  });
 
   const { data: balance } = useQuery({
     queryKey: ["/api/balance"],
-  }) as { data: any };
+  });
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
