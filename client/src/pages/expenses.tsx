@@ -106,7 +106,7 @@ export default function Expenses() {
         </div>
       </div>
 
-      <div className="pt-32 px-6 space-y-6">
+      <div className="pt-40 px-6 space-y-6">
         {/* Balance Overview */}
         <Card className="glass-card mb-6">
           <CardContent className="p-6">
