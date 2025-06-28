@@ -1,7 +1,7 @@
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, lazy } from "react";
+import { useEffect } from "react";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/ThemeProvider";
@@ -23,6 +23,7 @@ import Onboarding from "@/pages/onboarding";
 import Dashboard from "@/pages/dashboard";
 import Roommates from "@/pages/roommates";
 import ListingDetail from "@/pages/listing-detail";
+import AddExpense from "@/pages/add-expense";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
@@ -86,7 +87,7 @@ function Router() {
 
             <Route path="/roommates" component={Roommates} />
             <Route path="/listings/:id" component={ListingDetail} />
-            <Route path="/add-expense" component={lazy(() => import("./pages/add-expense"))} />
+            <Route path="/add-expense" component={hasHousehold ? AddExpense : Home} />
           </>
         )}
         <Route component={NotFound} />
