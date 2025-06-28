@@ -51,10 +51,6 @@ export default function Expenses() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const { data: user } = useQuery<{ id: string; firstName?: string; lastName?: string; email: string }>({
-    queryKey: ["/api/auth/user"],
-  });
-
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
   });
@@ -108,18 +104,12 @@ export default function Expenses() {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
       queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
       
-      // Send notification for new expense with intelligent user filtering
-      if (expenseData && expenseData.expense && user?.id) {
+      // Send notification for new expense
+      if (expenseData && expenseData.expense) {
         const paidByUser = (household as any)?.members?.find((m: any) => m.userId === expenseData.expense.paidBy);
         const paidByName = paidByUser ? `${paidByUser.user.firstName || paidByUser.user.email?.split('@')[0]}` : 'someone';
         const amount = parseFloat(expenseData.expense.amount);
-        notificationService.showExpenseNotification(
-          expenseData.expense.title, 
-          amount, 
-          paidByName, 
-          user.id, 
-          user.id // creator is current user
-        );
+        notificationService.showExpenseNotification(expenseData.expense.title, amount, paidByName);
       }
       
       setIsCreateOpen(false);

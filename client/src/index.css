@@ -13,8 +13,6 @@
   display: none; /* WebKit */
 }
 
-/* Remove landscape orientation restrictions for proper JS handling */
-
 /* visionOS-inspired Design System - Light Mode */
 :root {
   --primary: #007AFF;

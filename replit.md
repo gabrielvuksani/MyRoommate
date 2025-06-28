@@ -111,15 +111,6 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **June 27, 2025 (Latest):**
-- ✓ Implemented server-side manual notification system with POST /api/notifications/send endpoint for backend-triggered notifications
-- ✓ Updated server notifications to broadcast globally to ALL connected users instead of just household members
-- ✓ Removed document focus detection from notification system for better UX - users now receive notifications even when app is active
-- ✓ Implemented forced portrait orientation lock using CSS transforms - prevents landscape mode completely
-- ✓ Fixed notification format to be minimalistic with proper app icon (emerald-cyan gradient home icon from landing page)
-- ✓ Enhanced WebSocket system to handle global server-side notification broadcasting
-- ✓ Updated PWA manifest with portrait-primary orientation and display_override for better mobile experience
-- ✓ Fixed notification anti-spam logic to prevent users from getting notifications for their own actions while allowing server notifications
-- ✓ Updated client-side WebSocket handling to automatically display browser notifications for server-sent messages
 - ✓ Created seamless persistent loading system that survives page refreshes using sessionStorage and direct DOM manipulation
 - ✓ Loading overlay now persists throughout entire navigation process including page reload with blur background
 - ✓ Implemented automatic restoration on page load with safety timeout to prevent infinite loading states
@@ -133,13 +124,10 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Restored /landing route for new users and fixed user flow routing to ensure proper authentication paths
 - ✓ Fixed TypeScript errors in messages page with proper WebSocket message interfaces for better type safety
 - ✓ Removed div element from roommates page search bar section for cleaner component structure
-- ✓ Built intelligent notification system that prevents spam by filtering out user's own actions
-- ✓ Added smart user ID tracking to avoid notifications when current user creates chores/expenses/messages
-- ✓ Implemented manual notification capability allowing custom household-wide announcements
-- ✓ Enhanced notification service with anti-spam logic and focus detection for optimal user experience
-- ✓ Added manual notification UI in profile page with title/body input and send functionality
-- ✓ Integrated intelligent filtering across messaging, chores, expenses, and calendar events
-- ✓ Created comprehensive cross-platform notification support for PWA and web browsers
+- ✓ Integrated real-time push notifications into messaging system for background message alerts
+- ✓ Added comprehensive notification demo with multiple types (messages, chores, expenses) in test button
+- ✓ Implemented smart notification detection based on document focus state for optimal user experience
+- ✓ Enhanced notification system with automatic permission handling and cross-platform compatibility
 - ✓ Rebranded entire application from RoomieHub to myRoommate across all files and references
 - ✓ Updated all PWA icons to use emerald-cyan gradient (from-emerald-400 to-cyan-400) with white Home icon
 - ✓ Applied consistent logo design from landing page to manifest icons in all sizes (72x72 to 512x512)

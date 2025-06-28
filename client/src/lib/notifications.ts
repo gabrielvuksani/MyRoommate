@@ -79,7 +79,7 @@ export class NotificationService {
     return this.permission;
   }
 
-  async showNotification(options: NotificationOptions, type: NotificationType = 'message', currentUserId?: string, actionUserId?: string): Promise<boolean> {
+  async showNotification(options: NotificationOptions, type: NotificationType = 'message'): Promise<boolean> {
     // Check if notifications are supported
     if (!('Notification' in window)) {
       console.warn('Notifications not supported');
@@ -92,25 +92,18 @@ export class NotificationService {
       return false;
     }
 
-    // Don't show notifications if the current user is the one performing the action (avoid self-spam)
-    // Skip this check for test notifications and manual notifications
-    if (currentUserId && actionUserId && currentUserId === actionUserId && type !== 'household') {
-      console.log('User performed action themselves, skipping notification to avoid spam');
+    // Don't show notifications if document is focused (user is actively using the app)
+    if (document.hasFocus()) {
+      console.log('Document has focus, skipping notification');
       return false;
     }
 
-    // Removed document focus detection for better UX - users should get notifications even when app is active
-
-    // Create app icon as data URL for notifications
-    const appIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Crect width='72' height='72' rx='16' fill='url(%23gradient)'/%3E%3Cdefs%3E%3ClinearGradient id='gradient' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2334d399'/%3E%3Cstop offset='100%25' style='stop-color:%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg transform='translate(12,12) scale(2,2)' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3Cpolyline points='9 22 9 12 15 12 15 22'/%3E%3C/g%3E%3C/svg%3E";
-
     const notificationOptions: NotificationOptions = {
-      icon: appIcon,
-      badge: appIcon,
-      tag: `myroommate-${type}-${Date.now()}`,
+      icon: '/favicon.ico',
+      badge: '/favicon.ico',
+      tag: `myroommate-${type}`,
       requireInteraction: false,
       vibrate: [200, 100, 200],
-      silent: false,
       ...options,
       data: {
         type,
@@ -120,23 +113,27 @@ export class NotificationService {
     };
 
     try {
-      console.log('Creating notification:', options.title, notificationOptions);
-      
-      // Always use regular Notification API for better compatibility
-      const notification = new Notification(options.title, notificationOptions);
-      
-      // Auto-close after 8 seconds
-      setTimeout(() => {
-        notification.close();
-      }, 8000);
+      // Use service worker for PWA if available
+      if (this.serviceWorkerRegistration) {
+        await this.serviceWorkerRegistration.showNotification(options.title, notificationOptions);
+        console.log('Notification shown via Service Worker');
+      } else {
+        // Fallback to regular notification for web browsers
+        const notification = new Notification(options.title, notificationOptions);
+        
+        // Auto-close after 5 seconds for non-PWA notifications
+        setTimeout(() => {
+          notification.close();
+        }, 5000);
 
-      // Handle click events
-      notification.onclick = () => {
-        window.focus();
-        notification.close();
-      };
+        // Handle click events for regular notifications
+        notification.onclick = () => {
+          window.focus();
+          notification.close();
+        };
 
-      console.log('Notification created successfully:', options.title);
+        console.log('Notification shown via Web API');
+      }
       return true;
     } catch (error) {
       console.error('Error showing notification:', error);
@@ -145,117 +142,85 @@ export class NotificationService {
   }
 
   // Predefined notification types for common app events
-  async showMessageNotification(senderName: string, messageContent: string, currentUserId?: string, senderUserId?: string, householdName?: string): Promise<boolean> {
+  async showMessageNotification(senderName: string, messageContent: string, householdName?: string): Promise<boolean> {
     return this.showNotification({
       title: `New message from ${senderName}`,
       body: householdName ? `${householdName}: ${messageContent}` : messageContent,
       tag: 'message-notification'
-    }, 'message', currentUserId, senderUserId);
+    }, 'message');
   }
 
-  async showChoreNotification(title: string, currentUserId?: string, creatorUserId?: string, assignedTo?: string): Promise<boolean> {
+  async showChoreNotification(title: string, assignedTo?: string): Promise<boolean> {
     return this.showNotification({
       title: 'New Chore Assigned',
       body: assignedTo ? `${title} - Assigned to ${assignedTo}` : title,
       tag: 'chore-notification'
-    }, 'chore', currentUserId, creatorUserId);
+    }, 'chore');
   }
 
-  async showExpenseNotification(title: string, amount: number, paidBy: string, currentUserId?: string, creatorUserId?: string): Promise<boolean> {
+  async showExpenseNotification(title: string, amount: number, paidBy: string): Promise<boolean> {
     return this.showNotification({
       title: 'New Expense Added',
       body: `${title} - $${amount.toFixed(2)} paid by ${paidBy}`,
       tag: 'expense-notification'
-    }, 'expense', currentUserId, creatorUserId);
+    }, 'expense');
   }
 
-  async showCalendarNotification(title: string, startDate: string, currentUserId?: string, creatorUserId?: string): Promise<boolean> {
+  async showCalendarNotification(title: string, startDate: string): Promise<boolean> {
     const date = new Date(startDate).toLocaleDateString();
     return this.showNotification({
       title: 'New Calendar Event',
       body: `${title} on ${date}`,
       tag: 'calendar-notification'
-    }, 'calendar', currentUserId, creatorUserId);
+    }, 'calendar');
   }
 
-  // Manual notification capability for admin/manual use
-  async showCustomNotification(title: string, body: string, currentUserId?: string): Promise<boolean> {
-    return this.showNotification({
-      title,
-      body,
-      tag: 'custom-notification',
-      requireInteraction: true
-    }, 'household', currentUserId);
-  }
-
-  // Household-wide notifications (bypasses user filtering since it's manual)
   async showHouseholdNotification(title: string, body: string): Promise<boolean> {
     return this.showNotification({
       title,
       body,
-      tag: 'household-announcement',
-      requireInteraction: true,
-      vibrate: [200, 100, 200]
+      tag: 'household-notification',
+      requireInteraction: true
     }, 'household');
   }
 
   // Test notification for debugging
   async showTestNotification(): Promise<boolean> {
-    console.log('Starting test notification...');
-    
     const hasPermission = await this.requestPermission();
     if (!hasPermission) {
-      console.error('Permission denied for notifications');
       return false;
     }
 
-    console.log('Permission granted, showing test notification');
-
-    // Show immediate test notification
-    try {
-      const success = await this.showNotification({
-        title: 'myRoommate Test',
-        body: 'Notifications are working! 🎉',
-        tag: 'test-notification',
-        requireInteraction: false
-      }, 'household'); // Use household type to bypass focus/spam checks
-
-      if (success) {
-        // Show additional demo notifications with delays
-        const notifications = [
-          {
-            title: 'New Message',
-            body: 'Hey! Can you pick up groceries on your way home?',
-            type: 'message' as NotificationType
-          },
-          {
-            title: 'Chore Reminder', 
-            body: 'Kitchen cleaning is due today',
-            type: 'chore' as NotificationType
-          },
-          {
-            title: 'Expense Added',
-            body: 'Groceries - $47.82 paid by Alex',
-            type: 'expense' as NotificationType
-          }
-        ];
-
-        for (let i = 0; i < notifications.length; i++) {
-          setTimeout(() => {
-            this.showNotification({
-              title: notifications[i].title,
-              body: notifications[i].body,
-              tag: `test-demo-${i}`
-            }, 'household'); // Use household type for demo notifications
-          }, (i + 1) * 2000);
-        }
+    const notifications = [
+      {
+        title: 'New Message',
+        body: 'Hey! Can you pick up groceries on your way home?',
+        type: 'message' as NotificationType
+      },
+      {
+        title: 'Chore Reminder',
+        body: 'Kitchen cleaning is due today',
+        type: 'chore' as NotificationType
+      },
+      {
+        title: 'Expense Added',
+        body: 'Groceries - $47.82 paid by Alex',
+        type: 'expense' as NotificationType
       }
+    ];
 
-      return success;
-    } catch (error) {
-      console.error('Error showing test notification:', error);
-      return false;
+    // Show notifications with delays
+    for (let i = 0; i < notifications.length; i++) {
+      setTimeout(() => {
+        this.showNotification({
+          title: notifications[i].title,
+          body: notifications[i].body,
+          tag: `test-${i}`
+        }, notifications[i].type);
+      }, i * 2000);
     }
+
+    return true;
   }
 
   // Clear all notifications

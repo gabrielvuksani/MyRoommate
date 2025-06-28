@@ -36,10 +36,6 @@ export default function Calendar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const { data: user } = useQuery<{ id: string; firstName?: string; lastName?: string; email: string }>({
-    queryKey: ["/api/auth/user"],
-  });
-
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["/api/calendar"],
   });
@@ -56,14 +52,9 @@ export default function Calendar() {
     onSuccess: (_, eventData) => {
       queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
       
-      // Send notification for new calendar event with intelligent user filtering
-      if (eventData && eventData.title && eventData.startDate && user?.id) {
-        notificationService.showCalendarNotification(
-          eventData.title, 
-          eventData.startDate, 
-          user.id, 
-          user.id // creator is current user
-        );
+      // Send notification for new calendar event
+      if (eventData && eventData.title && eventData.startDate) {
+        notificationService.showCalendarNotification(eventData.title, eventData.startDate);
       }
       
       setIsCreateOpen(false);

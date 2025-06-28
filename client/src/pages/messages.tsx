@@ -100,17 +100,11 @@ export default function Messages() {
           return updatedMessages;
         });
         
-        // Send notification for new messages with intelligent user filtering
+        // Send notification for new messages (only if not from current user)
         if (data.message && data.message.userId !== user?.id) {
           const userName = formatDisplayName(data.message.user?.firstName || null, data.message.user?.lastName || null);
           const householdName = household?.name;
-          notificationService.showMessageNotification(
-            userName, 
-            data.message.content || '', 
-            user?.id, 
-            data.message.userId, 
-            householdName
-          );
+          notificationService.showMessageNotification(userName, data.message.content || '', householdName);
         }
         
         queryClient.invalidateQueries({ 
