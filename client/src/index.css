@@ -186,15 +186,12 @@
               0 0 0 1px rgba(255, 255, 255, 0.08) inset;
 }
 
+/* Unified Header System */
 .floating-header .page-header {
   max-width: 430px;
   margin: 0 auto;
-  padding: 24px 24px 16px 24px;
-}
-
-/* Apple Typography */
-.page-header {
-  padding: 48px 24px 24px 24px;
+  padding: 64px 24px 24px 24px;
+  min-height: 120px;
 }
 
 .page-title {

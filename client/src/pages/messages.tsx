@@ -346,7 +346,7 @@ export default function Messages() {
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto transition-all duration-200"
         style={{ 
-          paddingTop: '140px', 
+          paddingTop: '176px', 
           paddingBottom: isKeyboardVisible ? '120px' : '200px' 
         }}
       >
