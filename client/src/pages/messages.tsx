@@ -145,26 +145,47 @@ export default function Messages() {
     householdId: household?.id,
   });
 
-  // Simplified scroll system
-  const scrollToBottom = () => {
+  // Enhanced scroll system for all message scenarios
+  const scrollToBottom = (force = false) => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    // For mobile keyboard, use instant scroll when keyboard is visible
+    const behavior = isKeyboardVisible ? "auto" : "smooth";
+    
     setTimeout(() => {
-      messagesContainerRef.current?.scrollTo({
-        top: messagesContainerRef.current.scrollHeight,
-        behavior: "smooth"
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: force ? "auto" : behavior
       });
-    }, 100);
+    }, isKeyboardVisible ? 10 : 100);
   };
 
-  // Auto-resize textarea
+  // Smart scroll behavior based on message count and context
+  const handleSmartScroll = (messageCount: number, isInitialLoad = false) => {
+    if (messageCount === 0) {
+      // No messages - stay at top
+      return;
+    } else if (messageCount <= 3) {
+      // Few messages - scroll to bottom instantly for better UX
+      scrollToBottom(true);
+    } else {
+      // Many messages - smooth scroll to bottom
+      scrollToBottom(false);
+    }
+  };
+
+  // Auto-resize textarea with mobile optimization
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+      const newHeight = Math.min(textarea.scrollHeight, isKeyboardVisible ? 80 : 120);
+      textarea.style.height = `${newHeight}px`;
     }
-  }, [newMessage]);
+  }, [newMessage, isKeyboardVisible]);
 
-  // Handle header scroll effect only
+  // Handle header scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 0);
@@ -174,19 +195,20 @@ export default function Messages() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Always scroll to bottom when messages change or on load
+  // Smart message scroll handling
   useEffect(() => {
-    if (messages && messages.length > 0) {
-      scrollToBottom();
+    if (!isLoading && messages) {
+      handleSmartScroll(messages.length, true);
     }
-  }, [messages]);
+  }, [isLoading, messages?.length]);
 
-  // Initial scroll to bottom on page load
+  // Keyboard visibility handling for mobile
   useEffect(() => {
-    if (!isLoading) {
-      scrollToBottom();
+    if (isKeyboardVisible && messages?.length > 0) {
+      // When keyboard opens, scroll to bottom instantly
+      setTimeout(() => scrollToBottom(true), 150);
     }
-  }, [isLoading]);
+  }, [isKeyboardVisible]);
 
   const handleTyping = (value: string) => {
     setNewMessage(value);
@@ -419,17 +441,16 @@ export default function Messages() {
           </div>
         </div>
       </div>
-      {/* Message Input - Fixed at bottom with dynamic positioning for keyboard */}
+      {/* Message Input - Optimized for all devices and keyboard states */}
       <div 
-        className="fixed left-0 right-0 z-40 px-6 transition-all duration-200"
+        className="fixed left-0 right-0 z-40 px-4 transition-all duration-300 ease-out"
         style={{ 
-          bottom: isKeyboardVisible ? '20px' : '108px'
+          bottom: isKeyboardVisible ? `${Math.max(keyboardHeight + 10, 20)}px` : '108px'
         }}
       >
         <div className="max-w-3xl mx-auto">
-          <div className="glass-card rounded-3xl shadow-lg" style={{ 
-            border: 'none',
-            padding: '12px'
+          <div className="glass-card rounded-3xl shadow-lg border-0" style={{ 
+            padding: isKeyboardVisible ? '8px' : '12px'
           }}>
             <form onSubmit={handleSendMessage} className="flex items-end gap-3">
               <div className="flex-1">
@@ -437,9 +458,7 @@ export default function Messages() {
                   ref={textareaRef}
                   placeholder="Type a message..."
                   value={newMessage}
-                  onChange={(e) => {
-                    handleTyping(e.target.value);
-                  }}
+                  onChange={(e) => handleTyping(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -448,14 +467,18 @@ export default function Messages() {
                       }
                     }
                   }}
+                  onFocus={() => {
+                    // Scroll to bottom when input is focused
+                    setTimeout(() => scrollToBottom(true), 300);
+                  }}
                   rows={1}
-                  className="message-input w-full text-base resize-none"
+                  className="message-input w-full text-base resize-none border-0 outline-0"
                   style={{ 
-                    background: 'transparent !important',
-                    backgroundColor: 'transparent !important',
+                    background: 'transparent',
+                    backgroundColor: 'transparent',
                     color: 'var(--text-primary)',
-                    border: '0',
-                    outline: '0',
+                    border: 'none',
+                    outline: 'none',
                     boxShadow: 'none',
                     padding: '0 12px',
                     minHeight: '28px',
