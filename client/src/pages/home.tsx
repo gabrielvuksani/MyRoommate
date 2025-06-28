@@ -669,15 +669,14 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Right Column - Recent Activity */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
-                <MessageCircle className="w-5 h-5 mr-2 text-primary" />
-                Recent Activity
-              </h2>
-              <button
+        {/* Recent Activity - Full Width */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
+              <MessageCircle className="w-5 h-5 mr-2 text-primary" />
+              Recent Activity
+            </h2>
+            <button
                 onClick={() => setLocation("/messages")}
                 className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
                 style={{ 
