@@ -195,7 +195,7 @@ export default function AddExpense() {
         </div>
       </div>
 
-      <div className="pt-44 px-6 space-y-6">
+      <div className="pt-20 px-6 space-y-6">
         
         {/* Basic Details */}
         <Card className="glass-card">

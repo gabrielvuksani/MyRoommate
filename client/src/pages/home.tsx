@@ -308,7 +308,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="pt-44 px-6 space-y-6">
+      <div className="pt-20 px-6 space-y-6">
         {/* Hero Stats */}
         <div className="grid grid-cols-2 gap-4">
           <Card className="glass-card">

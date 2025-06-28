@@ -207,7 +207,7 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="pt-44 px-6 space-y-6">
+      <div className="pt-20 px-6 space-y-6">
         {/* Profile Header */}
         <Card className="glass-card" style={{
           background: 'var(--surface)',
