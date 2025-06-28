@@ -119,6 +119,11 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Enhanced expense form organization with sectioned layout, floating header, and proper navigation flow
 - ✓ Improved mobile experience with full-page forms that provide better breathing room and organization
 - ✓ Removed all modal dependencies from expenses page for simplified codebase and better maintainability
+- ✓ Fixed critical design consistency issues across expense pages with proper header spacing and card structures
+- ✓ Updated both expenses and add-expense pages to use established floating-header, page-header, page-title patterns
+- ✓ Applied proper Card/CardContent components with consistent p-6 padding throughout all expense forms
+- ✓ Fixed header spacing with correct pt-32 px-6 space-y-6 structure matching chores and calendar pages
+- ✓ Ensured complete design language consistency across all pages following iOS 26 liquid glass principles
 
 **June 27, 2025 (Earlier):**
 - ✓ Created seamless persistent loading system that survives page refreshes using sessionStorage and direct DOM manipulation

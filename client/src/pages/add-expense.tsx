@@ -195,7 +195,7 @@ export default function AddExpense() {
         </div>
       </div>
 
-      <div className="page-content space-y-6">
+      <div className="pt-32 px-6 space-y-6">
         
         {/* Basic Details */}
         <Card className="glass-card">
