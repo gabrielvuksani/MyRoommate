@@ -184,11 +184,14 @@ export default function Chores() {
                     }}>
                       <SelectValue placeholder="Assign to... *" />
                     </SelectTrigger>
-                    <SelectContent style={{
-                      background: 'var(--surface)',
-                      border: '1px solid var(--border-color)',
-                      zIndex: 9999
-                    }}>
+                    <SelectContent 
+                      position="popper"
+                      className="!z-[100000] !fixed"
+                      style={{
+                        background: 'var(--surface)',
+                        border: '1px solid var(--border-color)'
+                      }}
+                    >
                       {Array.isArray(members) && members.map((member: any) => (
                         <SelectItem key={member.userId} value={member.userId} style={{ color: 'var(--text-primary)' }}>
                           {member.user.firstName || member.user.email?.split('@')[0]}
