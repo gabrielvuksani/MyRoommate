@@ -244,12 +244,19 @@ export default function Expenses() {
                       setNewExpense({ ...newExpense, paidBy: value })
                     }
                   >
-                    <SelectTrigger className="input-modern">
+                    <SelectTrigger className="input-modern" style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)'
+                    }}>
                       <SelectValue placeholder="Paid by..." />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border-color)'
+                    }}>
                       {(household as any)?.members?.map((member: any) => (
-                        <SelectItem key={member.userId} value={member.userId}>
+                        <SelectItem key={member.userId} value={member.userId} style={{ color: 'var(--text-primary)' }}>
                           {member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'}
                         </SelectItem>
                       ))}
@@ -263,13 +270,20 @@ export default function Expenses() {
                       setShowCustomSplits(value !== "equal");
                     }}
                   >
-                    <SelectTrigger className="input-modern">
+                    <SelectTrigger className="input-modern" style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)'
+                    }}>
                       <SelectValue placeholder="Split method..." />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="equal">Split Equally</SelectItem>
-                      <SelectItem value="custom">Custom Amounts</SelectItem>
-                      <SelectItem value="percentage">By Percentage</SelectItem>
+                    <SelectContent style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border-color)'
+                    }}>
+                      <SelectItem value="equal" style={{ color: 'var(--text-primary)' }}>Split Equally</SelectItem>
+                      <SelectItem value="custom" style={{ color: 'var(--text-primary)' }}>Custom Amounts</SelectItem>
+                      <SelectItem value="percentage" style={{ color: 'var(--text-primary)' }}>By Percentage</SelectItem>
                     </SelectContent>
                   </Select>
 

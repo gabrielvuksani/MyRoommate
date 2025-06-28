@@ -177,12 +177,19 @@ export default function Chores() {
                     className="input-modern w-full"
                   />
                   <Select value={newChore.assignedTo} onValueChange={(value) => setNewChore({ ...newChore, assignedTo: value })} required>
-                    <SelectTrigger className="input-modern">
+                    <SelectTrigger className="input-modern" style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)'
+                    }}>
                       <SelectValue placeholder="Assign to... *" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border-color)'
+                    }}>
                       {Array.isArray(members) && members.map((member: any) => (
-                        <SelectItem key={member.userId} value={member.userId}>
+                        <SelectItem key={member.userId} value={member.userId} style={{ color: 'var(--text-primary)' }}>
                           {member.user.firstName || member.user.email?.split('@')[0]}
                         </SelectItem>
                       ))}
