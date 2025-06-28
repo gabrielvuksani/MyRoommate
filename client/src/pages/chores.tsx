@@ -186,7 +186,8 @@ export default function Chores() {
                     </SelectTrigger>
                     <SelectContent style={{
                       background: 'var(--surface)',
-                      border: '1px solid var(--border-color)'
+                      border: '1px solid var(--border-color)',
+                      zIndex: 9999
                     }}>
                       {Array.isArray(members) && members.map((member: any) => (
                         <SelectItem key={member.userId} value={member.userId} style={{ color: 'var(--text-primary)' }}>
@@ -212,7 +213,8 @@ export default function Chores() {
                     </SelectTrigger>
                     <SelectContent style={{
                       background: 'var(--surface)',
-                      border: '1px solid var(--border-color)'
+                      border: '1px solid var(--border-color)',
+                      zIndex: 9999
                     }}>
                       <SelectItem value="daily" style={{ color: 'var(--text-primary)' }}>Daily</SelectItem>
                       <SelectItem value="weekly" style={{ color: 'var(--text-primary)' }}>Weekly</SelectItem>
@@ -230,7 +232,8 @@ export default function Chores() {
                     </SelectTrigger>
                     <SelectContent style={{
                       background: 'var(--surface)',
-                      border: '1px solid var(--border-color)'
+                      border: '1px solid var(--border-color)',
+                      zIndex: 9999
                     }}>
                       <SelectItem value="low" style={{ color: 'var(--text-primary)' }}>Low Priority</SelectItem>
                       <SelectItem value="medium" style={{ color: 'var(--text-primary)' }}>Medium Priority</SelectItem>
