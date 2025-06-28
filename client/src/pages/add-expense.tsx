@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { ArrowLeft, DollarSign, Users, Calendar, Plus, Minus } from "lucide-react";
 import { apiRequest } from "../lib/queryClient";
 import { notificationService } from '../lib/notifications';
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -45,7 +46,7 @@ export default function AddExpense() {
   // Handle scroll for floating header
   useEffect(() => {
     const handleScroll = () => {
-      setHeaderScrolled(window.scrollY > 10);
+      setHeaderScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -157,60 +158,57 @@ export default function AddExpense() {
     validateCustomSplits();
 
   return (
-    <div className="min-h-screen page-enter" style={{ background: 'var(--background)' }}>
-      {/* Floating Header */}
-      <div
-        className={`fixed top-0 left-0 right-0 z-50 px-4 py-4 transition-all duration-200 ${
-          headerScrolled ? 'backdrop-blur-xl bg-white/65 dark:bg-black/65 border-b border-white/20' : ''
-        }`}
-        style={{
-          backdropFilter: headerScrolled ? 'blur(20px) saturate(1.8)' : 'none',
-        }}
-      >
-        <div className="flex items-center justify-between max-w-lg mx-auto">
-          <div className="flex items-center space-x-3">
+    <div className="page-container page-transition">
+      {/* visionOS Header */}
+      <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
+        <div className="page-header">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setLocation("/expenses")}
+                className="w-10 h-10 rounded-xl flex items-center justify-center hover:scale-105 transition-transform"
+                style={{ background: 'var(--surface-secondary)' }}
+              >
+                <ArrowLeft size={18} style={{ color: 'var(--text-primary)' }} />
+              </button>
+              <div>
+                <h1 className="page-title">Add Expense</h1>
+                <p className="page-subtitle">Split a new expense</p>
+              </div>
+            </div>
             <button
-              onClick={() => setLocation("/expenses")}
-              className="w-10 h-10 rounded-xl flex items-center justify-center hover:scale-105 transition-transform"
-              style={{ background: 'var(--surface-secondary)' }}
+              onClick={handleCreateExpense}
+              disabled={!canCreateExpense || createExpenseMutation.isPending}
+              className={`px-6 py-3 rounded-xl font-medium transition-all ${
+                canCreateExpense && !createExpenseMutation.isPending
+                  ? 'btn-animated text-white shadow-lg hover:scale-[1.05]'
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
+              style={{ 
+                background: canCreateExpense && !createExpenseMutation.isPending ? 'var(--primary)' : 'var(--surface-secondary)',
+                color: canCreateExpense && !createExpenseMutation.isPending ? 'white' : 'var(--text-secondary)'
+              }}
             >
-              <ArrowLeft size={18} style={{ color: 'var(--text-primary)' }} />
+              {createExpenseMutation.isPending ? "Creating..." : "Create"}
             </button>
-            <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
-              Add Expense
-            </h1>
           </div>
-          <button
-            onClick={handleCreateExpense}
-            disabled={!canCreateExpense || createExpenseMutation.isPending}
-            className={`px-6 py-3 rounded-xl font-medium transition-all ${
-              canCreateExpense && !createExpenseMutation.isPending
-                ? 'btn-animated text-white shadow-lg hover:scale-[1.05]'
-                : 'opacity-50 cursor-not-allowed'
-            }`}
-            style={{ 
-              background: canCreateExpense && !createExpenseMutation.isPending ? 'var(--primary)' : 'var(--surface-secondary)',
-              color: canCreateExpense && !createExpenseMutation.isPending ? 'white' : 'var(--text-secondary)'
-            }}
-          >
-            {createExpenseMutation.isPending ? "Creating..." : "Create"}
-          </button>
         </div>
       </div>
 
-      <div className="pt-20 px-4 pb-8 max-w-lg mx-auto space-y-6">
+      <div className="page-content space-y-6">
         
         {/* Basic Details */}
-        <div className="glass-card p-6 space-y-4">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'var(--primary)' }}>
-              <DollarSign size={24} className="text-white" />
+        <Card className="glass-card">
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'var(--primary)' }}>
+                <DollarSign size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Expense Details</h2>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>What did you spend money on?</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Expense Details</h2>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>What did you spend money on?</p>
-            </div>
-          </div>
 
           <input
             placeholder="What did you pay for?"
@@ -350,19 +348,21 @@ export default function AddExpense() {
               color: 'var(--text-primary)'
             }}
           />
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Split Configuration */}
-        <div className="glass-card p-6 space-y-4">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'var(--primary)' }}>
-              <Users size={24} className="text-white" />
+        <Card className="glass-card">
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'var(--primary)' }}>
+                <Users size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Split Details</h2>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>How should this be divided?</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Split Details</h2>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>How should this be divided?</p>
-            </div>
-          </div>
 
           <Select
             value={newExpense.paidBy}
@@ -481,57 +481,60 @@ export default function AddExpense() {
               )}
             </div>
           )}
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Recurring Options */}
-        <div className="glass-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'var(--primary)' }}>
-                <Calendar size={24} className="text-white" />
+        <Card className="glass-card">
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'var(--primary)' }}>
+                  <Calendar size={24} className="text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Recurring Expense</h2>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Repeat this expense automatically</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Recurring Expense</h2>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Repeat this expense automatically</p>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setNewExpense({ ...newExpense, isRecurring: !newExpense.isRecurring });
+                  setShowRecurringOptions(!newExpense.isRecurring);
+                }}
+                className={`w-12 h-6 rounded-full transition-all ${
+                  newExpense.isRecurring ? 'bg-blue-500' : 'bg-gray-300'
+                }`}
+              >
+                <div className={`w-5 h-5 bg-white rounded-full transition-all ${
+                  newExpense.isRecurring ? 'translate-x-6' : 'translate-x-0.5'
+                }`} />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setNewExpense({ ...newExpense, isRecurring: !newExpense.isRecurring });
-                setShowRecurringOptions(!newExpense.isRecurring);
-              }}
-              className={`w-12 h-6 rounded-full transition-all ${
-                newExpense.isRecurring ? 'bg-blue-500' : 'bg-gray-300'
-              }`}
-            >
-              <div className={`w-5 h-5 bg-white rounded-full transition-all ${
-                newExpense.isRecurring ? 'translate-x-6' : 'translate-x-0.5'
-              }`} />
-            </button>
-          </div>
 
-          {showRecurringOptions && (
-            <Select
-              value={newExpense.recurringInterval}
-              onValueChange={(value) => setNewExpense({ ...newExpense, recurringInterval: value })}
-            >
-              <SelectTrigger className="w-full h-14 px-4 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20" style={{
-                background: 'var(--surface-secondary)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)'
-              }}>
-                <SelectValue placeholder="How often?" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="quarterly">Quarterly</SelectItem>
-                <SelectItem value="yearly">Yearly</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        </div>
+            {showRecurringOptions && (
+              <Select
+                value={newExpense.recurringInterval}
+                onValueChange={(value) => setNewExpense({ ...newExpense, recurringInterval: value })}
+              >
+                <SelectTrigger className="w-full h-14 px-4 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20" style={{
+                  background: 'var(--surface-secondary)',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)'
+                }}>
+                  <SelectValue placeholder="How often?" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="quarterly">Quarterly</SelectItem>
+                  <SelectItem value="yearly">Yearly</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
