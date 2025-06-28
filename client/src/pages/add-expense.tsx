@@ -195,7 +195,7 @@ export default function AddExpense() {
         </div>
       </div>
 
-      <div className="px-6 space-y-6" style={{ paddingTop: '11rem' }}>
+      <div className="pt-40 px-6 space-y-6">
         
         {/* Basic Details */}
         <Card className="glass-card">
