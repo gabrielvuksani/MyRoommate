@@ -52,6 +52,9 @@ export default function Chores() {
     enabled: !!household,
   }) as { data: any[] };
 
+  // Use household members if available, otherwise fall back to separate members query
+  const householdMembers = (household as any)?.members || members;
+
   const createChoreMutation = useMutation({
     mutationFn: async (choreData: any) => {
       const dataToSend = {
@@ -64,8 +67,8 @@ export default function Chores() {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
       
       // Send notification for new chore assignment
-      if (choreData.assignedTo && choreData.title && Array.isArray(members)) {
-        const assignedUser = members.find((m: any) => m.user.id === choreData.assignedTo);
+      if (choreData.assignedTo && choreData.title && Array.isArray(householdMembers)) {
+        const assignedUser = householdMembers.find((m: any) => m.userId === choreData.assignedTo);
         const assignedName = assignedUser ? `${assignedUser.user.firstName || assignedUser.user.email?.split('@')[0]}` : 'someone';
         notificationService.showChoreNotification(choreData.title, assignedName);
       }
@@ -188,7 +191,7 @@ export default function Chores() {
                       background: 'var(--surface)',
                       border: '1px solid var(--border-color)'
                     }}>
-                      {Array.isArray(members) && members.map((member: any) => (
+                      {Array.isArray(householdMembers) && householdMembers.map((member: any) => (
                         <SelectItem key={member.userId} value={member.userId} style={{ color: 'var(--text-primary)' }}>
                           {member.user.firstName || member.user.email?.split('@')[0]}
                         </SelectItem>
