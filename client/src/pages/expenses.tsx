@@ -31,12 +31,17 @@ export default function Expenses() {
     title: "",
     amount: "",
     category: "",
+    description: "",
+    date: new Date().toISOString().split('T')[0], // Today's date
     splitType: "equal",
     paidBy: "",
     customSplits: {} as Record<string, string>,
+    isRecurring: false,
+    recurringInterval: "monthly",
   });
   const [activeTab, setActiveTab] = useState<"all" | "unsettled" | "settled">("all");
   const [showCustomSplits, setShowCustomSplits] = useState(false);
+  const [showRecurringOptions, setShowRecurringOptions] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -113,13 +118,19 @@ export default function Expenses() {
       }
       
       setIsCreateOpen(false);
+      setShowCustomSplits(false);
+      setShowRecurringOptions(false);
       setNewExpense({
         title: "",
         amount: "",
         category: "",
+        description: "",
+        date: new Date().toISOString().split('T')[0],
         splitType: "equal",
         paidBy: "",
-        customSplits: {},
+        customSplits: {} as Record<string, string>,
+        isRecurring: false,
+        recurringInterval: "monthly",
       });
     },
     onError: (error) => {
@@ -150,11 +161,35 @@ export default function Expenses() {
     deleteExpenseMutation.mutate(id);
   };
 
+  // Enhanced validation logic
+  const validateCustomSplits = () => {
+    if (newExpense.splitType === "equal") return true;
+    
+    const totalMembers = (household as any)?.members?.length || 0;
+    const splitValues = Object.values(newExpense.customSplits);
+    
+    if (splitValues.length !== totalMembers) return false;
+    
+    if (newExpense.splitType === "percentage") {
+      const totalPercentage = splitValues.reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0);
+      return Math.abs(totalPercentage - 100) < 0.1; // Allow small floating point differences
+    }
+    
+    if (newExpense.splitType === "custom") {
+      const totalCustom = splitValues.reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0);
+      const expenseAmount = parseFloat(newExpense.amount) || 0;
+      return Math.abs(totalCustom - expenseAmount) < 0.01; // Allow small floating point differences
+    }
+    
+    return true;
+  };
+
   const canCreateExpense =
     newExpense.title.trim().length > 0 &&
     newExpense.amount.trim().length > 0 &&
     parseFloat(newExpense.amount) > 0 &&
-    newExpense.paidBy.trim().length > 0;
+    newExpense.paidBy.trim().length > 0 &&
+    validateCustomSplits();
 
   // Filter expenses based on active tab
   const filteredExpenses = (expenses as any).filter((expense: any) => {
@@ -213,31 +248,195 @@ export default function Expenses() {
                 </DialogHeader>
                 <div className="px-6 pb-6 space-y-5">
                   <input
-                    placeholder="Expense title"
+                    placeholder="What did you pay for?"
                     value={newExpense.title}
                     onChange={(e) =>
                       setNewExpense({ ...newExpense, title: e.target.value })
                     }
                     className="input-modern w-full"
                   />
-                  <input
-                    type="number"
-                    step="0.01"
-                    placeholder="Amount"
-                    value={newExpense.amount}
-                    onChange={(e) =>
-                      setNewExpense({ ...newExpense, amount: e.target.value })
-                    }
-                    className="input-modern w-full"
-                  />
-                  <input
-                    placeholder="Category (optional)"
+                  
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={newExpense.amount}
+                        onChange={(e) =>
+                          setNewExpense({ ...newExpense, amount: e.target.value })
+                        }
+                        className="input-modern w-full pl-8 text-lg font-medium"
+                      />
+                    </div>
+                    
+                    {/* Quick Amount Buttons */}
+                    <div className="flex space-x-2">
+                      {[10, 25, 50, 100].map((amount) => (
+                        <button
+                          key={amount}
+                          type="button"
+                          onClick={() => setNewExpense({ ...newExpense, amount: amount.toString() })}
+                          className="px-3 py-1 text-xs rounded-lg transition-all"
+                          style={{
+                            background: 'var(--surface-secondary)',
+                            color: 'var(--text-secondary)',
+                            border: '1px solid var(--border-color)'
+                          }}
+                        >
+                          ${amount}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Select
                     value={newExpense.category}
+                    onValueChange={(value) =>
+                      setNewExpense({ ...newExpense, category: value })
+                    }
+                  >
+                    <SelectTrigger className="input-modern" style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)'
+                    }}>
+                      <SelectValue placeholder="Select category..." />
+                    </SelectTrigger>
+                    <SelectContent style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border-color)'
+                    }}>
+                      <SelectItem value="groceries" style={{ color: 'var(--text-primary)' }}>🛒 Groceries</SelectItem>
+                      <SelectItem value="utilities" style={{ color: 'var(--text-primary)' }}>💡 Utilities</SelectItem>
+                      <SelectItem value="rent" style={{ color: 'var(--text-primary)' }}>🏠 Rent</SelectItem>
+                      <SelectItem value="internet" style={{ color: 'var(--text-primary)' }}>📶 Internet</SelectItem>
+                      <SelectItem value="transportation" style={{ color: 'var(--text-primary)' }}>🚗 Transportation</SelectItem>
+                      <SelectItem value="dining" style={{ color: 'var(--text-primary)' }}>🍽️ Dining Out</SelectItem>
+                      <SelectItem value="entertainment" style={{ color: 'var(--text-primary)' }}>🎬 Entertainment</SelectItem>
+                      <SelectItem value="cleaning" style={{ color: 'var(--text-primary)' }}>🧽 Cleaning Supplies</SelectItem>
+                      <SelectItem value="maintenance" style={{ color: 'var(--text-primary)' }}>🔧 Maintenance</SelectItem>
+                      <SelectItem value="other" style={{ color: 'var(--text-primary)' }}>📝 Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <input
+                    placeholder="Add a note (optional)"
+                    value={newExpense.description}
                     onChange={(e) =>
-                      setNewExpense({ ...newExpense, category: e.target.value })
+                      setNewExpense({ ...newExpense, description: e.target.value })
                     }
                     className="input-modern w-full"
                   />
+
+                  <input
+                    type="date"
+                    value={newExpense.date}
+                    onChange={(e) =>
+                      setNewExpense({ ...newExpense, date: e.target.value })
+                    }
+                    className="input-modern w-full"
+                  />
+
+                  {/* Smart Expense Suggestions */}
+                  {!newExpense.title && newExpense.category && (
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                        Common {newExpense.category} expenses
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(() => {
+                          const suggestions = {
+                            groceries: ["Weekly Groceries", "Costco Run", "Fresh Produce", "Snacks & Drinks"],
+                            utilities: ["Electricity Bill", "Gas Bill", "Water Bill", "Trash/Recycling"],
+                            rent: ["Monthly Rent", "Security Deposit", "Parking Fee"],
+                            internet: ["Internet Bill", "WiFi Setup", "Router/Modem"],
+                            transportation: ["Gas", "Uber/Lyft", "Bus Pass", "Car Maintenance"],
+                            dining: ["Dinner Out", "Pizza Night", "Coffee Run", "Takeout"],
+                            entertainment: ["Movie Tickets", "Concert", "Gaming", "Streaming Service"],
+                            cleaning: ["Toilet Paper", "Laundry Detergent", "Cleaning Supplies"],
+                            maintenance: ["Plumber", "Handyman", "Repairs", "Tools"]
+                          };
+                          return (suggestions[newExpense.category as keyof typeof suggestions] || []).map((suggestion) => (
+                            <button
+                              key={suggestion}
+                              type="button"
+                              onClick={() => setNewExpense({ ...newExpense, title: suggestion })}
+                              className="px-2 py-1 text-xs rounded-lg transition-all hover:scale-105"
+                              style={{
+                                background: 'var(--surface-secondary)',
+                                color: 'var(--text-secondary)',
+                                border: '1px solid var(--border-color)'
+                              }}
+                            >
+                              {suggestion}
+                            </button>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Recurring Expense Toggle */}
+                  <div className="flex items-center justify-between p-3 rounded-xl" style={{
+                    background: 'var(--surface-secondary)',
+                    border: '1px solid var(--border-color)'
+                  }}>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--primary)' }}>
+                        <span className="text-white text-sm">🔄</span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Recurring Expense
+                        </div>
+                        <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          Set up automatic monthly splits
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewExpense({ ...newExpense, isRecurring: !newExpense.isRecurring });
+                        setShowRecurringOptions(!newExpense.isRecurring);
+                      }}
+                      className={`w-12 h-6 rounded-full transition-all ${
+                        newExpense.isRecurring ? 'bg-blue-500' : 'bg-gray-300'
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded-full bg-white transition-transform ${
+                        newExpense.isRecurring ? 'translate-x-6' : 'translate-x-0.5'
+                      }`} />
+                    </button>
+                  </div>
+
+                  {showRecurringOptions && (
+                    <Select
+                      value={newExpense.recurringInterval}
+                      onValueChange={(value) =>
+                        setNewExpense({ ...newExpense, recurringInterval: value })
+                      }
+                    >
+                      <SelectTrigger className="input-modern" style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border-color)',
+                        color: 'var(--text-primary)'
+                      }}>
+                        <SelectValue placeholder="Recurring frequency..." />
+                      </SelectTrigger>
+                      <SelectContent style={{
+                        background: 'var(--surface)',
+                        border: '1px solid var(--border-color)'
+                      }}>
+                        <SelectItem value="weekly" style={{ color: 'var(--text-primary)' }}>📅 Weekly</SelectItem>
+                        <SelectItem value="monthly" style={{ color: 'var(--text-primary)' }}>🗓️ Monthly</SelectItem>
+                        <SelectItem value="quarterly" style={{ color: 'var(--text-primary)' }}>📊 Quarterly</SelectItem>
+                        <SelectItem value="yearly" style={{ color: 'var(--text-primary)' }}>🗓️ Yearly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                   <Select
                     value={newExpense.paidBy}
                     onValueChange={(value) =>
@@ -287,46 +486,217 @@ export default function Expenses() {
                     </SelectContent>
                   </Select>
 
+                  {/* Split Preview for Equal Split */}
+                  {newExpense.splitType === "equal" && newExpense.amount && (household as any)?.members?.length > 0 && (
+                    <div className="p-4 rounded-xl space-y-3" style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border-color)'
+                    }}>
+                      <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                        Split Preview
+                      </div>
+                      <div className="space-y-2">
+                        {(household as any)?.members?.map((member: any) => {
+                          const amountPerPerson = (parseFloat(newExpense.amount) / (household as any).members.length).toFixed(2);
+                          return (
+                            <div key={member.userId} className="flex justify-between items-center">
+                              <span className="text-sm">
+                                {member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'}
+                              </span>
+                              <span className="text-sm font-medium" style={{ color: 'var(--primary)' }}>
+                                ${amountPerPerson}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {showCustomSplits && newExpense.amount && (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
                         {newExpense.splitType === "percentage" ? "Percentage Split" : "Custom Amount Split"}
                       </div>
-                      {(household as any)?.members?.map((member: any) => (
-                        <div key={member.userId} className="flex items-center space-x-3">
-                          <span className="text-sm w-20 truncate">
-                            {member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'}
-                          </span>
-                          <input
-                            type="number"
-                            step={newExpense.splitType === "percentage" ? "1" : "0.01"}
-                            placeholder={newExpense.splitType === "percentage" ? "%" : "$"}
-                            value={newExpense.customSplits[member.userId] || ""}
-                            onChange={(e) =>
-                              setNewExpense({
-                                ...newExpense,
-                                customSplits: {
-                                  ...newExpense.customSplits,
-                                  [member.userId]: e.target.value,
-                                },
-                              })
-                            }
-                            className="input-modern flex-1 text-sm"
-                          />
-                        </div>
-                      ))}
-                      {newExpense.splitType === "percentage" && (
-                        <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          Total: {Object.values(newExpense.customSplits).reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0)}%
-                        </div>
-                      )}
-                      {newExpense.splitType === "custom" && (
-                        <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          Total: ${Object.values(newExpense.customSplits).reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0).toFixed(2)} of ${newExpense.amount}
-                        </div>
-                      )}
+                      
+                      <div className="space-y-3">
+                        {(household as any)?.members?.map((member: any) => (
+                          <div key={member.userId} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">
+                                {member.user.firstName || member.user.email?.split('@')[0] || 'Unknown'}
+                              </span>
+                              {newExpense.splitType === "percentage" && newExpense.customSplits[member.userId] && (
+                                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                  ${((parseFloat(newExpense.amount) * parseFloat(newExpense.customSplits[member.userId])) / 100).toFixed(2)}
+                                </span>
+                              )}
+                            </div>
+                            <div className="relative">
+                              {newExpense.splitType === "custom" && (
+                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-sm" style={{ color: 'var(--text-secondary)' }}>$</span>
+                              )}
+                              {newExpense.splitType === "percentage" && (
+                                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm" style={{ color: 'var(--text-secondary)' }}>%</span>
+                              )}
+                              <input
+                                type="number"
+                                step={newExpense.splitType === "percentage" ? "1" : "0.01"}
+                                placeholder={newExpense.splitType === "percentage" ? "0" : "0.00"}
+                                value={newExpense.customSplits[member.userId] || ""}
+                                onChange={(e) =>
+                                  setNewExpense({
+                                    ...newExpense,
+                                    customSplits: {
+                                      ...newExpense.customSplits,
+                                      [member.userId]: e.target.value,
+                                    },
+                                  })
+                                }
+                                className={`input-modern w-full text-sm ${newExpense.splitType === "custom" ? "pl-7" : "pr-7"}`}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Split Summary */}
+                      <div className="p-3 rounded-lg space-y-2" style={{
+                        background: 'var(--surface-overlay)',
+                        border: '1px solid var(--border-color)'
+                      }}>
+                        {newExpense.splitType === "percentage" && (
+                          <>
+                            <div className="flex justify-between text-xs">
+                              <span style={{ color: 'var(--text-secondary)' }}>Total Percentage:</span>
+                              <span style={{ 
+                                color: Object.values(newExpense.customSplits).reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0) === 100 
+                                  ? 'var(--success)' : 'var(--warning)' 
+                              }}>
+                                {Object.values(newExpense.customSplits).reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0).toFixed(1)}%
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span style={{ color: 'var(--text-secondary)' }}>Total Amount:</span>
+                              <span style={{ color: 'var(--text-primary)' }}>
+                                ${Object.values(newExpense.customSplits).reduce((sum, val) => {
+                                  const percentage = parseFloat(val as string) || 0;
+                                  return sum + (parseFloat(newExpense.amount) * percentage / 100);
+                                }, 0).toFixed(2)}
+                              </span>
+                            </div>
+                          </>
+                        )}
+                        {newExpense.splitType === "custom" && (
+                          <>
+                            <div className="flex justify-between text-xs">
+                              <span style={{ color: 'var(--text-secondary)' }}>Total Split:</span>
+                              <span style={{ 
+                                color: Math.abs(Object.values(newExpense.customSplits).reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0) - parseFloat(newExpense.amount)) < 0.01
+                                  ? 'var(--success)' : 'var(--warning)' 
+                              }}>
+                                ${Object.values(newExpense.customSplits).reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0).toFixed(2)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span style={{ color: 'var(--text-secondary)' }}>Remaining:</span>
+                              <span style={{ color: 'var(--text-primary)' }}>
+                                ${(parseFloat(newExpense.amount) - Object.values(newExpense.customSplits).reduce((sum, val) => sum + (parseFloat(val as string) || 0), 0)).toFixed(2)}
+                              </span>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   )}
+
+                  {/* Quick Split Actions */}
+                  {newExpense.splitType === "percentage" && newExpense.amount && (household as any)?.members?.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                        Quick Actions
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const equalPercentage = (100 / (household as any).members.length).toFixed(1);
+                            const newSplits: Record<string, string> = {};
+                            (household as any).members.forEach((member: any) => {
+                              newSplits[member.userId] = equalPercentage;
+                            });
+                            setNewExpense({ ...newExpense, customSplits: newSplits });
+                          }}
+                          className="px-3 py-1 text-xs rounded-lg transition-all"
+                          style={{
+                            background: 'var(--surface-secondary)',
+                            color: 'var(--text-secondary)',
+                            border: '1px solid var(--border-color)'
+                          }}
+                        >
+                          Equal %
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewExpense({ ...newExpense, customSplits: {} });
+                          }}
+                          className="px-3 py-1 text-xs rounded-lg transition-all"
+                          style={{
+                            background: 'var(--surface-secondary)',
+                            color: 'var(--text-secondary)',
+                            border: '1px solid var(--border-color)'
+                          }}
+                        >
+                          Clear All
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {newExpense.splitType === "custom" && newExpense.amount && (household as any)?.members?.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                        Quick Actions
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const equalAmount = (parseFloat(newExpense.amount) / (household as any).members.length).toFixed(2);
+                            const newSplits: Record<string, string> = {};
+                            (household as any).members.forEach((member: any) => {
+                              newSplits[member.userId] = equalAmount;
+                            });
+                            setNewExpense({ ...newExpense, customSplits: newSplits });
+                          }}
+                          className="px-3 py-1 text-xs rounded-lg transition-all"
+                          style={{
+                            background: 'var(--surface-secondary)',
+                            color: 'var(--text-secondary)',
+                            border: '1px solid var(--border-color)'
+                          }}
+                        >
+                          Equal Split
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewExpense({ ...newExpense, customSplits: {} });
+                          }}
+                          className="px-3 py-1 text-xs rounded-lg transition-all"
+                          style={{
+                            background: 'var(--surface-secondary)',
+                            color: 'var(--text-secondary)',
+                            border: '1px solid var(--border-color)'
+                          }}
+                        >
+                          Clear All
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <button
                     onClick={handleCreateExpense}
                     disabled={
