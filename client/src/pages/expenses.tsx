@@ -253,8 +253,7 @@ export default function Expenses() {
                     </SelectTrigger>
                     <SelectContent style={{
                       background: 'var(--surface)',
-                      border: '1px solid var(--border-color)',
-                      zIndex: 9999
+                      border: '1px solid var(--border-color)'
                     }}>
                       {(household as any)?.members?.map((member: any) => (
                         <SelectItem key={member.userId} value={member.userId} style={{ color: 'var(--text-primary)' }}>
@@ -280,8 +279,7 @@ export default function Expenses() {
                     </SelectTrigger>
                     <SelectContent style={{
                       background: 'var(--surface)',
-                      border: '1px solid var(--border-color)',
-                      zIndex: 9999
+                      border: '1px solid var(--border-color)'
                     }}>
                       <SelectItem value="equal" style={{ color: 'var(--text-primary)' }}>Split Equally</SelectItem>
                       <SelectItem value="custom" style={{ color: 'var(--text-primary)' }}>Custom Amounts</SelectItem>

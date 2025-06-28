@@ -184,14 +184,10 @@ export default function Chores() {
                     }}>
                       <SelectValue placeholder="Assign to... *" />
                     </SelectTrigger>
-                    <SelectContent 
-                      position="popper"
-                      className="!z-[100000] !fixed"
-                      style={{
-                        background: 'var(--surface)',
-                        border: '1px solid var(--border-color)'
-                      }}
-                    >
+                    <SelectContent style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border-color)'
+                    }}>
                       {Array.isArray(members) && members.map((member: any) => (
                         <SelectItem key={member.userId} value={member.userId} style={{ color: 'var(--text-primary)' }}>
                           {member.user.firstName || member.user.email?.split('@')[0]}
@@ -216,8 +212,7 @@ export default function Chores() {
                     </SelectTrigger>
                     <SelectContent style={{
                       background: 'var(--surface)',
-                      border: '1px solid var(--border-color)',
-                      zIndex: 9999
+                      border: '1px solid var(--border-color)'
                     }}>
                       <SelectItem value="daily" style={{ color: 'var(--text-primary)' }}>Daily</SelectItem>
                       <SelectItem value="weekly" style={{ color: 'var(--text-primary)' }}>Weekly</SelectItem>
@@ -235,8 +230,7 @@ export default function Chores() {
                     </SelectTrigger>
                     <SelectContent style={{
                       background: 'var(--surface)',
-                      border: '1px solid var(--border-color)',
-                      zIndex: 9999
+                      border: '1px solid var(--border-color)'
                     }}>
                       <SelectItem value="low" style={{ color: 'var(--text-primary)' }}>Low Priority</SelectItem>
                       <SelectItem value="medium" style={{ color: 'var(--text-primary)' }}>Medium Priority</SelectItem>
