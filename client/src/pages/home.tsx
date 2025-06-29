@@ -669,8 +669,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Recent Activity Section */}
-        <div className="mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Right Column - Recent Activity */}
+          <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
                 <MessageCircle className="w-5 h-5 mr-2 text-primary" />
