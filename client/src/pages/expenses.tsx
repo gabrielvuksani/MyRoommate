@@ -108,7 +108,7 @@ export default function Expenses() {
 
       <div className="pt-44 px-6 space-y-6">
         {/* Balance Overview */}
-        <Card className="glass-card mb-6">
+        <Card className="glass-card mt-[0px] mb-[0px]">
           <CardContent className="p-6">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'var(--primary)' }}>
