@@ -3,13 +3,11 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useEffect } from "react";
-import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
 export default function BottomNavigation() {
   const [location, setLocation] = useLocation();
   const { user } = useAuth();
   const navigationRef = useRef<HTMLElement>(null);
-  const { isKeyboardVisible } = useKeyboardHeight();
   
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -31,11 +29,6 @@ export default function BottomNavigation() {
       navigationRef.current.style.setProperty('--indicator-translate', `${activeIndex}`);
     }
   }, [activeIndex]);
-
-  // Hide tab bar when keyboard is visible
-  if (isKeyboardVisible) {
-    return null;
-  }
 
   return (
     <div className="bottom-nav-container">
