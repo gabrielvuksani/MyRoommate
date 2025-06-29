@@ -111,6 +111,10 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **June 28, 2025 (Latest):**
+- ✓ Completely wiped database for fresh deployment state while preserving demo roommate listing
+- ✓ Cleared all user data: 2 users, 6 sessions, 5 household members, 6 households, 3 messages, 2 expenses with splits
+- ✓ Maintained demo San Francisco apartment listing for roommate marketplace showcase functionality
+- ✓ Database now ready for clean deployment testing with zero existing user conflicts
 - ✓ Enhanced messages page with intelligent scrolling system for all conversation scenarios
 - ✓ Implemented smart scroll behavior: auto-scroll for 50+ messages, stay at top for empty states, instant scroll for 1-3 messages
 - ✓ Optimized mobile keyboard experience with dynamic input positioning and proper viewport handling
