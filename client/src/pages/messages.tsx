@@ -48,11 +48,6 @@ export default function Messages() {
   const { user } = useAuth() as { user: any };
   const queryClient = useQueryClient();
   const { keyboardHeight, isKeyboardVisible } = useKeyboardHeight();
-  
-  // Debug keyboard state
-  useEffect(() => {
-    console.log('Keyboard state:', { isKeyboardVisible, keyboardHeight });
-  }, [isKeyboardVisible, keyboardHeight]);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -164,21 +159,7 @@ export default function Messages() {
     const container = messagesContainerRef.current;
     if (!container) return;
 
-    // For mobile keyboard with single message, use specific positioning
-    if (isKeyboardVisible && messages?.length === 1) {
-      setTimeout(() => {
-        // Position message directly above input with minimal gap
-        const containerHeight = container.clientHeight;
-        const targetScroll = Math.max(0, container.scrollHeight - containerHeight + 10);
-        container.scrollTo({
-          top: targetScroll,
-          behavior: "auto"
-        });
-      }, 10);
-      return;
-    }
-
-    // For mobile keyboard with multiple messages, use instant scroll
+    // For mobile keyboard, use instant scroll when keyboard is visible
     const behavior = isKeyboardVisible ? "auto" : "smooth";
     
     setTimeout(() => {
@@ -238,27 +219,11 @@ export default function Messages() {
     }
   }, [isLoading, messages?.length]);
 
-  // Enhanced keyboard visibility handling for mobile
+  // Keyboard visibility handling for mobile
   useEffect(() => {
     if (isKeyboardVisible && messages?.length > 0) {
-      // For single messages, use more aggressive scrolling
-      if (messages.length === 1) {
-        setTimeout(() => {
-          const container = messagesContainerRef.current;
-          if (container) {
-            container.scrollTop = 0; // Reset to top first
-            setTimeout(() => scrollToBottom(true), 100); // Then scroll to show message
-          }
-        }, 50);
-      } else {
-        // Multi-stage scroll for multiple messages
-        setTimeout(() => scrollToBottom(true), 50);
-        setTimeout(() => scrollToBottom(true), 200);
-        setTimeout(() => scrollToBottom(true), 400);
-      }
-    } else if (!isKeyboardVisible && messages?.length > 0) {
-      // Re-scroll when keyboard closes to maintain position
-      setTimeout(() => scrollToBottom(true), 100);
+      // When keyboard opens, scroll to bottom instantly
+      setTimeout(() => scrollToBottom(true), 150);
     }
   }, [isKeyboardVisible]);
 
@@ -458,13 +423,13 @@ export default function Messages() {
       {/* Scrollable Messages Container - Premium spacing */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] messages-container"
+        className="flex-1 overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
         style={{ 
           paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
-            ? '20px'  // No gap - message directly above input
+            ? '140px'  // Enhanced space for premium keyboard input
             : '200px', // Normal space above tab bar
-          transform: `translateY(${isKeyboardVisible ? '0px' : '0px'})`,
+          transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
           filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`
         }}
       >
@@ -586,12 +551,7 @@ export default function Messages() {
                     }
                   }}
                   onFocus={() => {
-                    // Enhanced scroll logic for keyboard activation
-                    setTimeout(() => {
-                      scrollToBottom(true);
-                      // Additional scroll after keyboard fully opens
-                      setTimeout(() => scrollToBottom(true), 300);
-                    }, 100);
+                    setTimeout(() => scrollToBottom(true), 150);
                   }}
                   rows={1}
                   className="message-input w-full text-base resize-none border-0 outline-0 transition-all duration-400 ease-out"

@@ -9,24 +9,6 @@
   transition: background-color 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, backdrop-filter 0.2s ease;
 }
 
-/* Mobile keyboard detection using viewport units */
-.messages-container {
-  padding-bottom: 200px; /* Default spacing */
-}
-
-/* When keyboard is active, viewport height shrinks significantly */
-@media screen and (max-height: 500px) and (orientation: portrait) {
-  .messages-container {
-    padding-bottom: 20px !important; /* Force minimal spacing */
-  }
-}
-
-@media screen and (max-height: 400px) and (orientation: landscape) {
-  .messages-container {
-    padding-bottom: 20px !important; /* Force minimal spacing */
-  }
-}
-
 *::-webkit-scrollbar { 
   display: none; /* WebKit */
 }
