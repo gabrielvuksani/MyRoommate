@@ -48,6 +48,11 @@ export default function Messages() {
   const { user } = useAuth() as { user: any };
   const queryClient = useQueryClient();
   const { keyboardHeight, isKeyboardVisible } = useKeyboardHeight();
+  
+  // Debug keyboard state
+  useEffect(() => {
+    console.log('Keyboard state:', { isKeyboardVisible, keyboardHeight });
+  }, [isKeyboardVisible, keyboardHeight]);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -453,7 +458,7 @@ export default function Messages() {
       {/* Scrollable Messages Container - Premium spacing */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
+        className="flex-1 overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] messages-container"
         style={{ 
           paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
