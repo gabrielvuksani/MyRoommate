@@ -162,9 +162,9 @@ export default function Messages() {
     // For mobile keyboard with single message, use specific positioning
     if (isKeyboardVisible && messages?.length === 1) {
       setTimeout(() => {
-        // For single message, position it just above the input area
+        // Position message directly above input with minimal gap
         const containerHeight = container.clientHeight;
-        const targetScroll = Math.max(0, container.scrollHeight - containerHeight + 40);
+        const targetScroll = Math.max(0, container.scrollHeight - containerHeight + 10);
         container.scrollTo({
           top: targetScroll,
           behavior: "auto"
@@ -457,7 +457,7 @@ export default function Messages() {
         style={{ 
           paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
-            ? '60px'  // Minimal space to keep single message visible above input
+            ? '20px'  // No gap - message directly above input
             : '200px', // Normal space above tab bar
           transform: `translateY(${isKeyboardVisible ? '0px' : '0px'})`,
           filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`
