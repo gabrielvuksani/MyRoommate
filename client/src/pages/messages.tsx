@@ -159,7 +159,21 @@ export default function Messages() {
     const container = messagesContainerRef.current;
     if (!container) return;
 
-    // For mobile keyboard, use instant scroll when keyboard is visible
+    // For mobile keyboard with single message, use specific positioning
+    if (isKeyboardVisible && messages?.length === 1) {
+      setTimeout(() => {
+        // For single message, position it just above the input area
+        const containerHeight = container.clientHeight;
+        const targetScroll = Math.max(0, container.scrollHeight - containerHeight + 40);
+        container.scrollTo({
+          top: targetScroll,
+          behavior: "auto"
+        });
+      }, 10);
+      return;
+    }
+
+    // For mobile keyboard with multiple messages, use instant scroll
     const behavior = isKeyboardVisible ? "auto" : "smooth";
     
     setTimeout(() => {
@@ -222,10 +236,21 @@ export default function Messages() {
   // Enhanced keyboard visibility handling for mobile
   useEffect(() => {
     if (isKeyboardVisible && messages?.length > 0) {
-      // Multi-stage scroll to ensure latest message stays visible
-      setTimeout(() => scrollToBottom(true), 50);
-      setTimeout(() => scrollToBottom(true), 200);
-      setTimeout(() => scrollToBottom(true), 400);
+      // For single messages, use more aggressive scrolling
+      if (messages.length === 1) {
+        setTimeout(() => {
+          const container = messagesContainerRef.current;
+          if (container) {
+            container.scrollTop = 0; // Reset to top first
+            setTimeout(() => scrollToBottom(true), 100); // Then scroll to show message
+          }
+        }, 50);
+      } else {
+        // Multi-stage scroll for multiple messages
+        setTimeout(() => scrollToBottom(true), 50);
+        setTimeout(() => scrollToBottom(true), 200);
+        setTimeout(() => scrollToBottom(true), 400);
+      }
     } else if (!isKeyboardVisible && messages?.length > 0) {
       // Re-scroll when keyboard closes to maintain position
       setTimeout(() => scrollToBottom(true), 100);
@@ -432,9 +457,9 @@ export default function Messages() {
         style={{ 
           paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
-            ? '100px'  // Reduced space to keep latest message visible
+            ? '60px'  // Minimal space to keep single message visible above input
             : '200px', // Normal space above tab bar
-          transform: `translateY(${isKeyboardVisible ? '0px' : '0px'})`, // Remove container movement
+          transform: `translateY(${isKeyboardVisible ? '0px' : '0px'})`,
           filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`
         }}
       >
