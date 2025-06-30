@@ -184,14 +184,21 @@ export default function Messages() {
     }
   };
 
-  // Auto-resize textarea with mobile optimization
+  // Premium auto-resize textarea with enhanced mobile optimization
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      const maxHeight = isKeyboardVisible ? 100 : 120; // Slightly more room when keyboard visible
-      const newHeight = Math.min(Math.max(textarea.scrollHeight, 36), maxHeight);
+      const baseHeight = 36;
+      const maxHeight = isKeyboardVisible ? 100 : 120;
+      const scrollHeight = textarea.scrollHeight;
+      
+      // Smooth height calculation with easing
+      const newHeight = Math.min(Math.max(scrollHeight, baseHeight), maxHeight);
       textarea.style.height = `${newHeight}px`;
+      
+      // Enhanced transition timing for premium feel
+      textarea.style.transition = 'height 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s ease-out';
     }
   }, [newMessage, isKeyboardVisible]);
 
@@ -413,15 +420,17 @@ export default function Messages() {
         </div>
       </div>
 
-      {/* Scrollable Messages Container */}
+      {/* Scrollable Messages Container - Premium spacing */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto transition-all duration-300 ease-out"
+        className="flex-1 overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
         style={{ 
           paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
-            ? '120px'  // Space for input above keyboard
-            : '200px'  // Normal space above tab bar
+            ? '140px'  // Enhanced space for premium keyboard input
+            : '200px', // Normal space above tab bar
+          transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
+          filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`
         }}
       >
         <div className="max-w-3xl mx-auto px-6">
@@ -493,22 +502,37 @@ export default function Messages() {
           </div>
         </div>
       </div>
-      {/* Message Input - Premium mobile keyboard positioning */}
+      {/* Premium Message Input - Advanced keyboard adaptation */}
       <div 
-        className="fixed left-0 right-0 z-40 px-4 transition-all duration-300 ease-out"
+        className="fixed left-0 right-0 z-40 px-4 transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
         style={{ 
-          bottom: isKeyboardVisible 
-            ? '20px'  // Fixed position just above keyboard with breathing room
-            : '108px' // Normal position above tab bar
+          bottom: isKeyboardVisible ? '20px' : '108px',
+          transform: `translateY(${isKeyboardVisible ? '-2px' : '0px'}) scale(${isKeyboardVisible ? '1.015' : '1'})`,
+          transformOrigin: 'bottom center'
         }}
       >
-        <div className="max-w-3xl mx-auto">
+        <div 
+          className="max-w-3xl mx-auto transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
+          style={{
+            filter: `brightness(${isKeyboardVisible ? '1.04' : '1'}) saturate(${isKeyboardVisible ? '1.1' : '1'})`
+          }}
+        >
           <div 
-            className="glass-card rounded-3xl shadow-lg border-0 transition-all duration-300" 
+            className="glass-card rounded-3xl shadow-lg border-0 transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]" 
             style={{ 
-              padding: isKeyboardVisible ? '10px 12px' : '12px',
-              transform: isKeyboardVisible ? 'scale(0.98)' : 'scale(1)',
-              backdropFilter: isKeyboardVisible ? 'blur(25px) saturate(2.0)' : 'blur(20px) saturate(1.8)'
+              padding: isKeyboardVisible ? '14px 16px' : '12px',
+              background: isKeyboardVisible 
+                ? 'rgba(255, 255, 255, 0.95)' 
+                : 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: isKeyboardVisible 
+                ? 'blur(30px) saturate(2.2) brightness(1.05)' 
+                : 'blur(25px) saturate(1.9)',
+              border: isKeyboardVisible 
+                ? '1px solid rgba(255, 255, 255, 0.4)' 
+                : '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: isKeyboardVisible 
+                ? '0 12px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 1px 0 rgba(255, 255, 255, 0.3) inset' 
+                : '0 8px 25px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
             }}
           >
             <form onSubmit={handleSendMessage} className="flex items-end gap-3">
@@ -527,11 +551,10 @@ export default function Messages() {
                     }
                   }}
                   onFocus={() => {
-                    // Scroll to bottom when input is focused with extra delay for keyboard
-                    setTimeout(() => scrollToBottom(true), isKeyboardVisible ? 100 : 300);
+                    setTimeout(() => scrollToBottom(true), 150);
                   }}
                   rows={1}
-                  className="message-input w-full text-base resize-none border-0 outline-0 transition-all duration-200"
+                  className="message-input w-full text-base resize-none border-0 outline-0 transition-all duration-400 ease-out"
                   style={{ 
                     background: 'transparent',
                     backgroundColor: 'transparent',
@@ -539,21 +562,37 @@ export default function Messages() {
                     border: 'none',
                     outline: 'none',
                     boxShadow: 'none',
-                    padding: '0 12px',
+                    padding: isKeyboardVisible ? '2px 14px' : '0 12px',
                     minHeight: '36px',
                     maxHeight: isKeyboardVisible ? '100px' : '120px',
                     lineHeight: '22px',
                     overflowY: 'auto',
-                    fontSize: '16px' // Prevent zoom on iOS
+                    fontSize: '16px',
+                    transform: `scale(${isKeyboardVisible ? '1.005' : '1'})`,
+                    letterSpacing: isKeyboardVisible ? '0.01em' : '0em'
                   }}
                 />
               </div>
               <Button
                 type="submit"
                 disabled={!newMessage.trim()}
-                className="rounded-full w-11 h-11 p-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex-shrink-0 transition-all duration-200"
+                className="rounded-full w-11 h-11 p-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex-shrink-0 transition-all duration-400 ease-out"
+                style={{
+                  transform: `scale(${isKeyboardVisible ? '1.08' : '1'}) translateY(${isKeyboardVisible ? '-1px' : '0px'})`,
+                  boxShadow: isKeyboardVisible 
+                    ? '0 8px 25px rgba(16, 185, 129, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 1px 0 rgba(255, 255, 255, 0.2) inset' 
+                    : '0 4px 15px rgba(16, 185, 129, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+                }}
               >
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg 
+                  className="w-5 h-5 text-white transition-transform duration-300" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  style={{
+                    transform: `scale(${isKeyboardVisible ? '1.05' : '1'})`
+                  }}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </Button>
