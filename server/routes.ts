@@ -729,7 +729,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Handle ping/pong for connection keepalive in deployment
         if (message.type === 'ping') {
-          ws.send(JSON.stringify({ type: 'pong' }));
+          try {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ type: 'pong' }));
+            }
+          } catch (error) {
+            console.error('Error sending pong:', error);
+          }
           return;
         }
         

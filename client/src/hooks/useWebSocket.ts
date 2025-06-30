@@ -13,19 +13,22 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
   const connectionSent = useRef(false);
 
   useEffect(() => {
-    if (!userId || !householdId) return;
+    if (!userId || !householdId) {
+      console.log('WebSocket not connecting - missing userId or householdId:', { userId: !!userId, householdId: !!householdId });
+      return;
+    }
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    // Handle both development and production environments
     const host = window.location.host;
-    // In production, ensure we use the full domain for WebSocket connections
-    const wsUrl = process.env.NODE_ENV === 'production' || window.location.protocol === 'https:' 
-      ? `${protocol}//${host}/ws`
-      : `${protocol}//${host}/ws`;
+    const wsUrl = `${protocol}//${host}/ws`;
+    
+    console.log('WebSocket attempting to connect to:', wsUrl, 'for user:', userId, 'household:', householdId);
     
     let reconnectTimeout: NodeJS.Timeout;
     let heartbeatInterval: NodeJS.Timeout;
     let isManualClose = false;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 10;
 
     const connect = () => {
       if (ws.current?.readyState === WebSocket.OPEN) {
@@ -52,12 +55,15 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
         
         onConnect?.();
         
+        // Reset reconnect attempts on successful connection
+        reconnectAttempts = 0;
+        
         // Start heartbeat to keep connection alive in deployment
         heartbeatInterval = setInterval(() => {
           if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'ping' }));
           }
-        }, 30000); // Send ping every 30 seconds
+        }, 25000); // Send ping every 25 seconds for better deployment reliability
       };
 
       ws.current.onmessage = (event) => {
@@ -70,18 +76,23 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
       };
 
       ws.current.onclose = (event) => {
-        console.log('WebSocket disconnected:', event.code, event.reason);
+        console.log('WebSocket disconnected:', event.code, event.reason, 'attempts:', reconnectAttempts);
         connectionSent.current = false;
         onDisconnect?.();
 
-        // Auto-reconnect unless manually closed
-        if (!isManualClose) {
-          // Immediate reconnection for deployment reliability
-          const delay = event.code === 1006 ? 500 : 2000; // Fast reconnect for unexpected closures
-          console.log(`Reconnecting in ${delay}ms...`);
+        // Auto-reconnect unless manually closed or max attempts reached
+        if (!isManualClose && reconnectAttempts < maxReconnectAttempts) {
+          reconnectAttempts++;
+          // Progressive backoff: start fast, slow down over time
+          const baseDelay = event.code === 1006 ? 500 : 1000;
+          const delay = Math.min(baseDelay * Math.pow(1.5, reconnectAttempts - 1), 10000);
+          
+          console.log(`Reconnecting in ${delay}ms... (attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
           reconnectTimeout = setTimeout(() => {
             connect();
           }, delay);
+        } else if (reconnectAttempts >= maxReconnectAttempts) {
+          console.error('Max WebSocket reconnection attempts reached. Please refresh the page.');
         }
       };
 

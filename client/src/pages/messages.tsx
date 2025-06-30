@@ -38,7 +38,8 @@ export default function Messages() {
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
+  // Connection status - starts optimistic when user and household are available
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -50,14 +51,18 @@ export default function Messages() {
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
+    retry: 3,
+    retryDelay: 1000,
   }) as { data: any };
 
   const { data: serverMessages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
-    enabled: !!household,
-    refetchInterval: 3000, // Poll every 3 seconds for consistent performance
+    enabled: !!household && !!user,
+    refetchInterval: connectionStatus === 'connected' ? 5000 : 2000, // Slower polling when connected via WebSocket
     refetchIntervalInBackground: true,
-    staleTime: 500,
+    staleTime: connectionStatus === 'connected' ? 30000 : 1000, // Longer stale time when WebSocket is active
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Use server messages directly for reliable message display
@@ -67,10 +72,14 @@ export default function Messages() {
 
   const { sendMessage } = useWebSocket({
     onConnect: () => {
+      console.log('WebSocket connected successfully');
       setConnectionStatus('connected');
       queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
     },
-    onDisconnect: () => setConnectionStatus('disconnected'),
+    onDisconnect: () => {
+      console.log('WebSocket disconnected');
+      setConnectionStatus('disconnected');
+    },
     onMessage: (data: WebSocketMessage) => {
       if (data.type === 'connection_confirmed') {
         setConnectionStatus('connected');
@@ -210,6 +219,13 @@ export default function Messages() {
     }
   }, [isKeyboardVisible]);
 
+  // Update connection status when user/household data becomes available
+  useEffect(() => {
+    if (user && household && connectionStatus === 'disconnected') {
+      setConnectionStatus('connecting');
+    }
+  }, [user, household, connectionStatus]);
+
   const handleTyping = (value: string) => {
     setNewMessage(value);
     
@@ -257,11 +273,27 @@ export default function Messages() {
           userId: user?.id,
         }),
       });
-      if (!response.ok) throw new Error('Failed to send message');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to send message: ${response.status} ${errorText}`);
+      }
       return response.json();
     },
     onSuccess: (newMessage: any) => {
-      console.log('Message sent successfully:', newMessage.id);
+      console.log('Message sent via API fallback:', newMessage.id);
+      
+      // If WebSocket is not connected, update cache directly for immediate UI feedback
+      if (connectionStatus !== 'connected') {
+        queryClient.setQueryData(["/api/messages"], (old: any) => {
+          const currentMessages = old || [];
+          // Check if message already exists to prevent duplicates
+          const messageExists = currentMessages.some((msg: any) => msg.id === newMessage.id);
+          if (!messageExists) {
+            return [...currentMessages, newMessage];
+          }
+          return currentMessages;
+        });
+      }
       
       // Force immediate refresh to show the new message
       queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
@@ -305,8 +337,25 @@ export default function Messages() {
     // Clear input immediately for better UX
     setNewMessage("");
 
-    // Send the message
-    sendMessageMutation.mutate(messageContent);
+    // Try WebSocket first if connected, fallback to API
+    if (connectionStatus === 'connected' && sendMessage) {
+      try {
+        sendMessage({
+          type: "send_message",
+          content: messageContent,
+          householdId: household.id,
+          userId: user.id,
+        });
+        console.log('Message sent via WebSocket');
+      } catch (error) {
+        console.error('WebSocket send failed, falling back to API:', error);
+        sendMessageMutation.mutate(messageContent);
+      }
+    } else {
+      // Use API when WebSocket is not available
+      console.log('Using API fallback for message send');
+      sendMessageMutation.mutate(messageContent);
+    }
   };
 
   const conversationStarters = [
@@ -347,15 +396,15 @@ export default function Messages() {
                 <p className="page-subtitle" style={{ color: 'var(--text-secondary)' }}>Chat with your household</p>
               </div>
               <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${
-                  connectionStatus === 'connected' ? 'bg-green-500' : 
-                  connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse' : 
-                  'bg-red-500'
+                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  connectionStatus === 'connected' ? 'bg-green-500 shadow-green-500/50 shadow-lg' : 
+                  connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse shadow-yellow-500/50 shadow-lg' : 
+                  'bg-red-500 shadow-red-500/50 shadow-lg'
                 }`}></div>
-                <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                  {connectionStatus === 'connected' ? 'You are Online' : 
+                <span className="text-xs font-medium transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>
+                  {connectionStatus === 'connected' ? 'Real-time' : 
                    connectionStatus === 'connecting' ? 'Connecting...' : 
-                   'You are Offline'}
+                   'Syncing messages'}
                 </span>
               </div>
             </div>
