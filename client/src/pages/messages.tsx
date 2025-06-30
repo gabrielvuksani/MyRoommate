@@ -154,34 +154,70 @@ export default function Messages() {
     householdId: household?.id,
   });
 
-  // Enhanced scroll system for all message scenarios
-  const scrollToBottom = (force = false) => {
+  // Premium scroll system - ensures latest message is always fully visible
+  const scrollToBottom = (options: { force?: boolean; smooth?: boolean; keyboardAware?: boolean } = {}) => {
     const container = messagesContainerRef.current;
     if (!container) return;
 
-    // For mobile keyboard, use instant scroll when keyboard is visible
-    const behavior = isKeyboardVisible ? "auto" : "smooth";
+    const { force = false, smooth = true, keyboardAware = false } = options;
     
-    setTimeout(() => {
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: force ? "auto" : behavior
+    // Enhanced scroll calculation for keyboard states
+    const scrollToPosition = () => {
+      // Allow DOM to update container padding for keyboard state
+      requestAnimationFrame(() => {
+        const scrollHeight = container.scrollHeight;
+        const containerHeight = container.clientHeight;
+        
+        // Enhanced buffer calculation for premium keyboard experience
+        const keyboardBuffer = keyboardAware && isKeyboardVisible ? 40 : 0;
+        const optimalScrollTop = Math.max(0, scrollHeight - containerHeight + keyboardBuffer);
+        
+        // Debug logging for keyboard scenarios
+        if (keyboardAware && isKeyboardVisible) {
+          console.log('Keyboard scroll:', {
+            scrollHeight,
+            containerHeight,
+            keyboardBuffer,
+            optimalScrollTop,
+            isKeyboardVisible
+          });
+        }
+        
+        container.scrollTo({
+          top: optimalScrollTop,
+          behavior: force || (keyboardAware && isKeyboardVisible) ? "auto" : (smooth ? "smooth" : "auto")
+        });
       });
-    }, isKeyboardVisible ? 10 : 100);
+    };
+
+    // Premium timing for different scenarios
+    const getDelay = () => {
+      if (keyboardAware && isKeyboardVisible) return 200; // Allow keyboard animation to complete
+      if (force) return 0;
+      return 50;
+    };
+
+    setTimeout(scrollToPosition, getDelay());
   };
 
-  // Smart scroll behavior based on message count and context
-  const handleSmartScroll = (messageCount: number, isInitialLoad = false) => {
+  // Unified smart scroll for all message scenarios - always show latest message fully
+  const handleLatestMessageScroll = (messageCount: number) => {
     if (messageCount === 0) {
-      // No messages - stay at top
+      // No messages - scroll to top smoothly for clean state
+      const container = messagesContainerRef.current;
+      if (container) {
+        container.scrollTo({ top: 0, behavior: "smooth" });
+      }
       return;
-    } else if (messageCount <= 3) {
-      // Few messages - scroll to bottom instantly for better UX
-      scrollToBottom(true);
-    } else {
-      // Many messages - smooth scroll to bottom
-      scrollToBottom(false);
     }
+    
+    // For any number of messages, ensure latest is fully visible with premium timing
+    const forceInstant = messageCount === 1; // Instant for single message
+    scrollToBottom({ 
+      force: forceInstant, 
+      smooth: !forceInstant,
+      keyboardAware: isKeyboardVisible
+    });
   };
 
   // Premium auto-resize textarea with enhanced mobile optimization
@@ -198,7 +234,7 @@ export default function Messages() {
       textarea.style.height = `${newHeight}px`;
       
       // Enhanced transition timing for premium feel
-      textarea.style.transition = 'height 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s ease-out';
+      textarea.style.transition = 'height 0.25s ease-out, transform 0.4s ease-out';
     }
   }, [newMessage, isKeyboardVisible]);
 
@@ -212,18 +248,25 @@ export default function Messages() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Smart message scroll handling
+  // Premium message scroll handling - always show latest message fully
   useEffect(() => {
     if (!isLoading && messages) {
-      handleSmartScroll(messages.length, true);
+      handleLatestMessageScroll(messages.length);
     }
   }, [isLoading, messages?.length]);
 
-  // Keyboard visibility handling for mobile
+  // Auto-scroll when new messages arrive or keyboard state changes
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      scrollToBottom({ force: false, smooth: true });
+    }
+  }, [messages?.length, isKeyboardVisible]);
+
+  // Enhanced keyboard visibility handling for premium mobile experience
   useEffect(() => {
     if (isKeyboardVisible && messages?.length > 0) {
-      // When keyboard opens, scroll to bottom instantly
-      setTimeout(() => scrollToBottom(true), 150);
+      // When keyboard opens, ensure latest message stays fully visible
+      scrollToBottom({ force: true, smooth: false, keyboardAware: true });
     }
   }, [isKeyboardVisible]);
 
@@ -423,7 +466,7 @@ export default function Messages() {
       {/* Scrollable Messages Container - Premium spacing */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
+        className="flex-1 overflow-y-auto transition-all duration-500 ease-out"
         style={{ 
           paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
@@ -504,7 +547,7 @@ export default function Messages() {
       </div>
       {/* Premium Message Input - Advanced keyboard adaptation */}
       <div 
-        className="fixed left-0 right-0 z-40 px-4 transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
+        className="fixed left-0 right-0 z-40 px-4 transition-all duration-500 ease-out"
         style={{ 
           bottom: isKeyboardVisible ? '20px' : '108px',
           transform: `translateY(${isKeyboardVisible ? '-2px' : '0px'}) scale(${isKeyboardVisible ? '1.015' : '1'})`,
@@ -512,13 +555,13 @@ export default function Messages() {
         }}
       >
         <div 
-          className="max-w-3xl mx-auto transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
+          className="max-w-3xl mx-auto transition-all duration-500 ease-out"
           style={{
             filter: `brightness(${isKeyboardVisible ? '1.04' : '1'}) saturate(${isKeyboardVisible ? '1.1' : '1'})`
           }}
         >
           <div 
-            className="glass-card rounded-3xl shadow-lg border-0 transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]" 
+            className="glass-card rounded-3xl shadow-lg border-0 transition-all duration-500 ease-out" 
             style={{ 
               padding: isKeyboardVisible ? '14px 16px' : '12px',
               background: isKeyboardVisible 
@@ -551,7 +594,8 @@ export default function Messages() {
                     }
                   }}
                   onFocus={() => {
-                    setTimeout(() => scrollToBottom(true), 150);
+                    // Enhanced focus scroll with keyboard awareness
+                    scrollToBottom({ force: true, smooth: false, keyboardAware: true });
                   }}
                   rows={1}
                   className="message-input w-full text-base resize-none border-0 outline-0 transition-all duration-400 ease-out"
