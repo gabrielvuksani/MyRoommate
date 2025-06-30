@@ -219,11 +219,16 @@ export default function Messages() {
     }
   }, [isLoading, messages?.length]);
 
-  // Keyboard visibility handling for mobile
+  // Enhanced keyboard visibility handling for mobile
   useEffect(() => {
     if (isKeyboardVisible && messages?.length > 0) {
-      // When keyboard opens, scroll to bottom instantly
-      setTimeout(() => scrollToBottom(true), 150);
+      // Multi-stage scroll to ensure latest message stays visible
+      setTimeout(() => scrollToBottom(true), 50);
+      setTimeout(() => scrollToBottom(true), 200);
+      setTimeout(() => scrollToBottom(true), 400);
+    } else if (!isKeyboardVisible && messages?.length > 0) {
+      // Re-scroll when keyboard closes to maintain position
+      setTimeout(() => scrollToBottom(true), 100);
     }
   }, [isKeyboardVisible]);
 
@@ -427,9 +432,9 @@ export default function Messages() {
         style={{ 
           paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
-            ? '140px'  // Enhanced space for premium keyboard input
+            ? '100px'  // Reduced space to keep latest message visible
             : '200px', // Normal space above tab bar
-          transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
+          transform: `translateY(${isKeyboardVisible ? '0px' : '0px'})`, // Remove container movement
           filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`
         }}
       >
@@ -551,7 +556,12 @@ export default function Messages() {
                     }
                   }}
                   onFocus={() => {
-                    setTimeout(() => scrollToBottom(true), 150);
+                    // Enhanced scroll logic for keyboard activation
+                    setTimeout(() => {
+                      scrollToBottom(true);
+                      // Additional scroll after keyboard fully opens
+                      setTimeout(() => scrollToBottom(true), 300);
+                    }, 100);
                   }}
                   rows={1}
                   className="message-input w-full text-base resize-none border-0 outline-0 transition-all duration-400 ease-out"
