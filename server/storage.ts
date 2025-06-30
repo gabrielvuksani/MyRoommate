@@ -83,6 +83,9 @@ export interface IStorage {
   updateRoommateListing(id: string, updates: Partial<InsertRoommateListing>): Promise<RoommateListing>;
   deleteRoommateListing(id: string): Promise<void>;
   getUserRoommateListings(userId: string): Promise<RoommateListing[]>;
+  
+  // Developer tools operations
+  deleteAllHouseholdData(householdId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -640,6 +643,39 @@ export class DatabaseStorage implements IStorage {
       .where(eq(roommateListings.createdBy, userId))
       .orderBy(desc(roommateListings.createdAt));
     return result;
+  }
+
+  async deleteAllHouseholdData(householdId: string): Promise<void> {
+    console.log(`Deleting all data for household: ${householdId}`);
+    
+    // Delete in the correct order to respect foreign key constraints
+    
+    // 1. Delete expense splits (references expenses)
+    const expenseIds = await db
+      .select({ id: expenses.id })
+      .from(expenses)
+      .where(eq(expenses.householdId, householdId));
+    
+    if (expenseIds.length > 0) {
+      await db.delete(expenseSplits).where(
+        sql`expense_id IN (${sql.join(expenseIds.map(e => sql`${e.id}`), sql`, `)})`
+      );
+    }
+    
+    // 2. Delete other household data
+    await db.delete(messages).where(eq(messages.householdId, householdId));
+    await db.delete(expenses).where(eq(expenses.householdId, householdId));
+    await db.delete(chores).where(eq(chores.householdId, householdId));
+    await db.delete(calendarEvents).where(eq(calendarEvents.householdId, householdId));
+    await db.delete(shoppingItems).where(eq(shoppingItems.householdId, householdId));
+    
+    // 3. Delete household members
+    await db.delete(householdMembers).where(eq(householdMembers.householdId, householdId));
+    
+    // 4. Finally delete the household itself
+    await db.delete(households).where(eq(households.id, householdId));
+    
+    console.log(`Successfully deleted all data for household: ${householdId}`);
   }
 }
 

@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell } from "lucide-react";
+import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell, Trash2 } from "lucide-react";
 import { getProfileInitials } from "@/lib/nameUtils";
 import { useTheme } from "@/lib/ThemeProvider";
 import BackButton from "../components/back-button";
@@ -99,6 +99,19 @@ export default function Profile() {
     },
   });
 
+  const deleteAllDataMutation = useMutation({
+    mutationFn: async () => {
+      const result = await apiRequest("DELETE", "/api/dev/delete-all-data", {});
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.clear();
+    },
+    onError: (error: any) => {
+      console.error("Failed to delete all data:", error);
+    },
+  });
+
   const handleUpdateName = () => {
     if (!editName.firstName.trim()) return;
     updateNameMutation.mutate(editName);
@@ -179,6 +192,32 @@ export default function Profile() {
       setTimeout(() => {
         window.location.reload();
       }, 500);
+    }
+  };
+
+  const handleDeleteAllData = async () => {
+    // Show confirmation dialog
+    if (!window.confirm('Are you sure you want to delete ALL household data? This action cannot be undone and will remove all chores, expenses, messages, calendar events, and household members.')) {
+      return;
+    }
+
+    try {
+      // Show loading state
+      PersistentLoading.show("Deleting all data...");
+      
+      await deleteAllDataMutation.mutateAsync();
+      
+      // Navigate to home after successful deletion
+      setTimeout(() => {
+        PersistentLoading.hide();
+        window.location.replace('/');
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Delete all data error:', error);
+      // Hide loading on error
+      PersistentLoading.hide();
+      alert('Failed to delete all data. Please try again.');
     }
   };
 
@@ -610,6 +649,39 @@ export default function Profile() {
           </Card>
         )}
 
+        {/* Developer Tools */}
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)'
+        }}>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+              Developer Tools
+            </h3>
+            <div className="space-y-3">
+              <Button
+                onClick={handleRefresh}
+                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-blue-700"
+              >
+                <RefreshCw size={20} />
+                <span>Refresh App & Data</span>
+              </Button>
+              <Button
+                onClick={handleDeleteAllData}
+                disabled={deleteAllDataMutation.isPending}
+                className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
+              >
+                <Trash2 size={20} />
+                <span>
+                  {deleteAllDataMutation.isPending
+                    ? "Deleting All Data..."
+                    : "Delete All Data"}
+                </span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Actions */}
         <Card className="glass-card" style={{
           background: 'var(--surface)',
@@ -632,14 +704,6 @@ export default function Profile() {
                     ? "Notifications Blocked"
                     : "Enable Notifications"
                   }
-                </span>
-              </Button>
-              <Button
-                onClick={handleRefresh}
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-blue-700"
-              >
-                <RefreshCw size={20} />
-                <span>Refresh App & Data
                 </span>
               </Button>
               {(household as any) && (

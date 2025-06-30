@@ -659,6 +659,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Developer Tools API - Delete All Data
+  app.delete('/api/dev/delete-all-data', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // For security, only allow the current user's household data to be deleted
+      const membership = await storage.getUserHousehold(userId);
+      if (!membership) {
+        return res.status(404).json({ message: "No household found" });
+      }
+      
+      const householdId = membership.household.id;
+      
+      // Delete all data for the household using storage method
+      await storage.deleteAllHouseholdData(householdId);
+      
+      console.log(`Deleted all data for household: ${householdId}`);
+      res.json({ success: true, message: "All household data deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting all data:", error);
+      res.status(500).json({ message: "Failed to delete all data" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // High-performance WebSocket setup with user caching
