@@ -189,7 +189,8 @@ export default function Messages() {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      const newHeight = Math.min(textarea.scrollHeight, isKeyboardVisible ? 80 : 120);
+      const maxHeight = isKeyboardVisible ? 100 : 120; // Slightly more room when keyboard visible
+      const newHeight = Math.min(Math.max(textarea.scrollHeight, 36), maxHeight);
       textarea.style.height = `${newHeight}px`;
     }
   }, [newMessage, isKeyboardVisible]);
@@ -419,8 +420,8 @@ export default function Messages() {
         style={{ 
           paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
-            ? `${Math.max(keyboardHeight + 140, 180)}px`  // More space when keyboard is visible
-            : '200px'
+            ? '120px'  // Space for input above keyboard
+            : '200px'  // Normal space above tab bar
         }}
       >
         <div className="max-w-3xl mx-auto px-6">
@@ -497,8 +498,8 @@ export default function Messages() {
         className="fixed left-0 right-0 z-40 px-4 transition-all duration-300 ease-out"
         style={{ 
           bottom: isKeyboardVisible 
-            ? `${Math.max(keyboardHeight + 20, 30)}px`  // More breathing room above keyboard
-            : '108px'
+            ? '20px'  // Fixed position just above keyboard with breathing room
+            : '108px' // Normal position above tab bar
         }}
       >
         <div className="max-w-3xl mx-auto">
@@ -538,23 +539,19 @@ export default function Messages() {
                     border: 'none',
                     outline: 'none',
                     boxShadow: 'none',
-                    padding: isKeyboardVisible ? '0 10px' : '0 12px',
-                    minHeight: isKeyboardVisible ? '32px' : '36px',
-                    maxHeight: isKeyboardVisible ? '80px' : '120px',
-                    lineHeight: isKeyboardVisible ? '32px' : '36px',
+                    padding: '0 12px',
+                    minHeight: '36px',
+                    maxHeight: isKeyboardVisible ? '100px' : '120px',
+                    lineHeight: '22px',
                     overflowY: 'auto',
-                    fontSize: isKeyboardVisible ? '16px' : '15px' // Prevent zoom on iOS
+                    fontSize: '16px' // Prevent zoom on iOS
                   }}
                 />
               </div>
               <Button
                 type="submit"
                 disabled={!newMessage.trim()}
-                className="rounded-full p-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex-shrink-0 transition-all duration-200"
-                style={{
-                  width: isKeyboardVisible ? '40px' : '44px',
-                  height: isKeyboardVisible ? '40px' : '44px'
-                }}
+                className="rounded-full w-11 h-11 p-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex-shrink-0 transition-all duration-200"
               >
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
