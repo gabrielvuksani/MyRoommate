@@ -167,26 +167,38 @@ export default function Messages() {
       requestAnimationFrame(() => {
         const scrollHeight = container.scrollHeight;
         const containerHeight = container.clientHeight;
+        const currentScrollTop = container.scrollTop;
         
-        // Enhanced buffer calculation for premium keyboard experience
-        const keyboardBuffer = keyboardAware && isKeyboardVisible ? 40 : 0;
-        const optimalScrollTop = Math.max(0, scrollHeight - containerHeight + keyboardBuffer);
-        
-        // Debug logging for keyboard scenarios
+        // Special handling for short conversations when keyboard is visible
         if (keyboardAware && isKeyboardVisible) {
-          console.log('Keyboard scroll:', {
+          // For keyboard states, ensure we scroll to show the absolute bottom
+          // Even if there's not much content, this ensures input stays visible
+          const maxPossibleScroll = scrollHeight - containerHeight;
+          const targetScroll = Math.max(maxPossibleScroll, 0);
+          
+          console.log('Keyboard scroll (short conversation):', {
             scrollHeight,
             containerHeight,
-            keyboardBuffer,
-            optimalScrollTop,
-            isKeyboardVisible
+            maxPossibleScroll,
+            targetScroll,
+            currentScrollTop,
+            messageCount: messages?.length || 0
+          });
+          
+          container.scrollTo({
+            top: targetScroll,
+            behavior: "auto" // Always instant for keyboard
+          });
+        } else {
+          // Normal scroll behavior for non-keyboard scenarios
+          const keyboardBuffer = 0;
+          const optimalScrollTop = Math.max(0, scrollHeight - containerHeight + keyboardBuffer);
+          
+          container.scrollTo({
+            top: optimalScrollTop,
+            behavior: force ? "auto" : (smooth ? "smooth" : "auto")
           });
         }
-        
-        container.scrollTo({
-          top: optimalScrollTop,
-          behavior: force || (keyboardAware && isKeyboardVisible) ? "auto" : (smooth ? "smooth" : "auto")
-        });
       });
     };
 
@@ -267,6 +279,13 @@ export default function Messages() {
     if (isKeyboardVisible && messages?.length > 0) {
       // When keyboard opens, ensure latest message stays fully visible
       scrollToBottom({ force: true, smooth: false, keyboardAware: true });
+      
+      // Additional scroll for short conversations after DOM updates
+      if (messages.length <= 3) {
+        setTimeout(() => {
+          scrollToBottom({ force: true, smooth: false, keyboardAware: true });
+        }, 300); // Extra time for short conversations
+      }
     }
   }, [isKeyboardVisible]);
 
@@ -470,10 +489,11 @@ export default function Messages() {
         style={{ 
           paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
-            ? '140px'  // Enhanced space for premium keyboard input
+            ? '160px'  // Extra space for short conversations when keyboard is visible
             : '200px', // Normal space above tab bar
           transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
-          filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`
+          filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`,
+          minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto' // Ensure scrollable area for short conversations
         }}
       >
         <div className="max-w-3xl mx-auto px-6">
