@@ -126,22 +126,58 @@ export default function Profile() {
   };
 
   const handleRefresh = async () => {
-    // Show persistent loading overlay
-    PersistentLoading.show("Refreshing app data...");
-    
     try {
-      await queryClient.clear();
-      localStorage.clear();
-      sessionStorage.clear();
+      // Show loading state
+      PersistentLoading.show("Refreshing app data...");
       
-      // Navigate immediately - loading will persist through refresh
+      // Clear all caches step by step for PWA compatibility
+      await queryClient.clear();
+      
+      // Clear browser storage
+      try {
+        localStorage.clear();
+      } catch (e) {
+        console.log('localStorage clear failed:', e);
+      }
+      
+      try {
+        sessionStorage.clear();
+      } catch (e) {
+        console.log('sessionStorage clear failed:', e);
+      }
+      
+      // Clear service worker caches if available
+      if ('serviceWorker' in navigator && 'caches' in window) {
+        try {
+          const cacheNames = await caches.keys();
+          await Promise.all(
+            cacheNames.map(cacheName => caches.delete(cacheName))
+          );
+        } catch (e) {
+          console.log('Cache clearing failed:', e);
+        }
+      }
+      
+      // Use a more PWA-friendly navigation approach
       setTimeout(() => {
-        window.location.href = '/';
-      }, 500);
+        // Hide the loading first
+        PersistentLoading.hide();
+        
+        // For PWA, use location.replace instead of href to avoid navigation issues
+        if (window.location.pathname !== '/') {
+          window.location.replace('/');
+        } else {
+          // If already on home, force a reload
+          window.location.reload();
+        }
+      }, 1000);
+      
     } catch (error) {
-      console.error('Cache clearing error:', error);
+      console.error('Refresh error:', error);
+      // Fallback: hide loading and try simple reload
+      PersistentLoading.hide();
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.reload();
       }, 500);
     }
   };

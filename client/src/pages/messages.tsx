@@ -415,10 +415,12 @@ export default function Messages() {
       {/* Scrollable Messages Container */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto transition-all duration-200"
+        className="flex-1 overflow-y-auto transition-all duration-300 ease-out"
         style={{ 
           paddingTop: '140px', 
-          paddingBottom: isKeyboardVisible ? '120px' : '200px' 
+          paddingBottom: isKeyboardVisible 
+            ? `${Math.max(keyboardHeight + 140, 180)}px`  // More space when keyboard is visible
+            : '200px'
         }}
       >
         <div className="max-w-3xl mx-auto px-6">
@@ -490,19 +492,26 @@ export default function Messages() {
           </div>
         </div>
       </div>
-      {/* Message Input - Optimized for all devices and keyboard states */}
+      {/* Message Input - Premium mobile keyboard positioning */}
       <div 
         className="fixed left-0 right-0 z-40 px-4 transition-all duration-300 ease-out"
         style={{ 
-          bottom: isKeyboardVisible ? `${Math.max(keyboardHeight + 10, 20)}px` : '108px'
+          bottom: isKeyboardVisible 
+            ? `${Math.max(keyboardHeight + 20, 30)}px`  // More breathing room above keyboard
+            : '108px'
         }}
       >
         <div className="max-w-3xl mx-auto">
-          <div className="glass-card rounded-3xl shadow-lg border-0" style={{ 
-            padding: isKeyboardVisible ? '8px' : '12px'
-          }}>
+          <div 
+            className="glass-card rounded-3xl shadow-lg border-0 transition-all duration-300" 
+            style={{ 
+              padding: isKeyboardVisible ? '10px 12px' : '12px',
+              transform: isKeyboardVisible ? 'scale(0.98)' : 'scale(1)',
+              backdropFilter: isKeyboardVisible ? 'blur(25px) saturate(2.0)' : 'blur(20px) saturate(1.8)'
+            }}
+          >
             <form onSubmit={handleSendMessage} className="flex items-end gap-3">
-              <div className="flex-1">
+              <div className="flex-1 relative">
                 <textarea
                   ref={textareaRef}
                   placeholder="Type a message..."
@@ -517,11 +526,11 @@ export default function Messages() {
                     }
                   }}
                   onFocus={() => {
-                    // Scroll to bottom when input is focused
-                    setTimeout(() => scrollToBottom(true), 300);
+                    // Scroll to bottom when input is focused with extra delay for keyboard
+                    setTimeout(() => scrollToBottom(true), isKeyboardVisible ? 100 : 300);
                   }}
                   rows={1}
-                  className="message-input w-full text-base resize-none border-0 outline-0"
+                  className="message-input w-full text-base resize-none border-0 outline-0 transition-all duration-200"
                   style={{ 
                     background: 'transparent',
                     backgroundColor: 'transparent',
@@ -529,18 +538,23 @@ export default function Messages() {
                     border: 'none',
                     outline: 'none',
                     boxShadow: 'none',
-                    padding: '0 12px',
-                    minHeight: '28px',
-                    maxHeight: '120px',
-                    lineHeight: '28px',
-                    overflowY: 'auto'
+                    padding: isKeyboardVisible ? '0 10px' : '0 12px',
+                    minHeight: isKeyboardVisible ? '32px' : '36px',
+                    maxHeight: isKeyboardVisible ? '80px' : '120px',
+                    lineHeight: isKeyboardVisible ? '32px' : '36px',
+                    overflowY: 'auto',
+                    fontSize: isKeyboardVisible ? '16px' : '15px' // Prevent zoom on iOS
                   }}
                 />
               </div>
               <Button
                 type="submit"
                 disabled={!newMessage.trim()}
-                className="rounded-full w-11 h-11 p-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex-shrink-0"
+                className="rounded-full p-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex-shrink-0 transition-all duration-200"
+                style={{
+                  width: isKeyboardVisible ? '40px' : '44px',
+                  height: isKeyboardVisible ? '40px' : '44px'
+                }}
               >
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
