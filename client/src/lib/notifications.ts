@@ -79,6 +79,56 @@ export class NotificationService {
     return this.permission;
   }
 
+  // Enhanced notification capability detection
+  isNotificationSupported(): boolean {
+    return 'Notification' in window;
+  }
+
+  isSecureContext(): boolean {
+    return window.isSecureContext || window.location.protocol === 'https:' || window.location.hostname === 'localhost';
+  }
+
+  canRequestPermission(): boolean {
+    return this.isNotificationSupported() && this.isSecureContext() && this.permission === 'default';
+  }
+
+  isPermissionDenied(): boolean {
+    return this.permission === 'denied';
+  }
+
+  isPermissionGranted(): boolean {
+    return this.permission === 'granted';
+  }
+
+  getNotificationBlockReason(): string | null {
+    if (!this.isNotificationSupported()) {
+      return 'Your browser does not support notifications';
+    }
+    if (!this.isSecureContext()) {
+      return 'Notifications require a secure connection (HTTPS)';
+    }
+    if (this.isPermissionDenied()) {
+      return 'Notifications are blocked. Please enable them in your browser settings';
+    }
+    return null;
+  }
+
+  getDetailedStatus(): {
+    supported: boolean;
+    secure: boolean;
+    permission: NotificationPermission;
+    canRequest: boolean;
+    blockReason: string | null;
+  } {
+    return {
+      supported: this.isNotificationSupported(),
+      secure: this.isSecureContext(),
+      permission: this.permission,
+      canRequest: this.canRequestPermission(),
+      blockReason: this.getNotificationBlockReason()
+    };
+  }
+
   async showNotification(options: NotificationOptions, type: NotificationType = 'message'): Promise<boolean> {
     // Check if notifications are supported
     if (!('Notification' in window)) {

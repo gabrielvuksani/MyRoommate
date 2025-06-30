@@ -36,6 +36,7 @@ export default function Profile() {
 
   const [isCopied, setIsCopied] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+  const [notificationStatus, setNotificationStatus] = useState<any>(null);
   const [isTestingNotification, setIsTestingNotification] = useState(false);
 
   const { data: household } = useQuery({
@@ -52,8 +53,9 @@ export default function Profile() {
 
     window.addEventListener("scroll", handleScroll);
     
-    // Check notification permission
+    // Check notification permission and detailed status
     setNotificationPermission(notificationService.getPermissionStatus());
+    setNotificationStatus(notificationService.getDetailedStatus());
     
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -197,7 +199,7 @@ export default function Profile() {
 
   const handleDeleteAllData = async () => {
     // Show confirmation dialog
-    if (!window.confirm('Are you sure you want to delete ALL household data? This action cannot be undone and will remove all chores, expenses, messages, calendar events, and household members.')) {
+    if (!window.confirm('Are you sure you want to delete all household data? This action cannot be undone and will remove all chores, expenses, messages, calendar events, and household members. Your roommate listings will be preserved.')) {
       return;
     }
 
@@ -222,11 +224,40 @@ export default function Profile() {
   };
 
   const handleTestNotification = async () => {
+    const status = notificationService.getDetailedStatus();
+    
+    // Handle different scenarios intelligently
+    if (!status.supported) {
+      alert('Your browser does not support notifications.');
+      return;
+    }
+    
+    if (!status.secure) {
+      alert('Notifications require a secure connection (HTTPS). They may not work on this connection.');
+      return;
+    }
+    
+    if (status.permission === 'denied') {
+      alert('Notifications are blocked. To enable them:\n\n1. Click the lock icon in your address bar\n2. Select "Allow" for notifications\n3. Refresh the page and try again');
+      return;
+    }
+    
     setIsTestingNotification(true);
     try {
-      const success = await notificationService.showTestNotification();
-      if (success) {
-        setNotificationPermission(notificationService.getPermissionStatus());
+      let success = false;
+      
+      // Request permission if needed
+      if (status.canRequest) {
+        success = await notificationService.requestPermission();
+        if (!success) {
+          alert('Notification permission was denied. Please enable notifications in your browser settings.');
+          return;
+        }
+      }
+      
+      // Show test notification if permission is granted
+      if (status.permission === 'granted' || success) {
+        await notificationService.showTestNotification();
         
         // Send additional demo notifications to showcase different types
         setTimeout(() => {
@@ -241,8 +272,14 @@ export default function Profile() {
           notificationService.showExpenseNotification("Groceries", 45.67, "Jordan");
         }, 6000);
       }
+      
+      // Update status after permission change
+      setNotificationPermission(notificationService.getPermissionStatus());
+      setNotificationStatus(notificationService.getDetailedStatus());
+      
     } catch (error) {
       console.error('Test notification failed:', error);
+      alert('Failed to send test notification. Please check your browser settings.');
     } finally {
       setIsTestingNotification(false);
     }
@@ -691,18 +728,26 @@ export default function Profile() {
             <div className="space-y-3">
               <Button
                 onClick={handleTestNotification}
-                disabled={isTestingNotification}
-                className="w-full bg-purple-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-purple-700 disabled:opacity-50"
+                disabled={isTestingNotification || (notificationStatus && !notificationStatus.supported)}
+                className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 disabled:opacity-50 ${
+                  notificationStatus?.blockReason
+                    ? 'bg-gray-600 hover:bg-gray-700'
+                    : notificationStatus?.permission === 'granted'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-purple-600 hover:bg-purple-700'
+                }`}
               >
                 <Bell size={20} className={isTestingNotification ? "animate-pulse" : ""} />
                 <span>
                   {isTestingNotification
                     ? "Sending test notification..."
-                    : notificationPermission === 'granted'
+                    : notificationStatus?.blockReason
+                    ? "Notifications Unavailable"
+                    : notificationStatus?.permission === 'granted'
                     ? "Test Notifications"
-                    : notificationPermission === 'denied'
-                    ? "Notifications Blocked"
-                    : "Enable Notifications"
+                    : notificationStatus?.canRequest
+                    ? "Enable Notifications"
+                    : "Notifications Blocked"
                   }
                 </span>
               </Button>

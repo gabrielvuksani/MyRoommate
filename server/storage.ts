@@ -646,9 +646,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteAllHouseholdData(householdId: string): Promise<void> {
-    console.log(`Deleting all data for household: ${householdId}`);
+    console.log(`Deleting all household data except roommate listings for household: ${householdId}`);
     
     // Delete in the correct order to respect foreign key constraints
+    // NOTE: Roommate listings are preserved as they're not household-specific
     
     // 1. Delete expense splits (references expenses)
     const expenseIds = await db
@@ -662,7 +663,7 @@ export class DatabaseStorage implements IStorage {
       );
     }
     
-    // 2. Delete other household data
+    // 2. Delete other household data (preserving roommate listings)
     await db.delete(messages).where(eq(messages.householdId, householdId));
     await db.delete(expenses).where(eq(expenses.householdId, householdId));
     await db.delete(chores).where(eq(chores.householdId, householdId));
@@ -675,7 +676,7 @@ export class DatabaseStorage implements IStorage {
     // 4. Finally delete the household itself
     await db.delete(households).where(eq(households.id, householdId));
     
-    console.log(`Successfully deleted all data for household: ${householdId}`);
+    console.log(`Successfully deleted all household data (roommate listings preserved) for household: ${householdId}`);
   }
 }
 
