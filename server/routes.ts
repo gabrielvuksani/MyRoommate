@@ -59,6 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const household = await storage.createHousehold({
         ...data,
         inviteCode,
+        createdBy: userId,
       });
       
       // Add creator as admin

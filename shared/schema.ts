@@ -44,6 +44,7 @@ export const households = pgTable("households", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
   inviteCode: varchar("invite_code", { length: 8 }).unique().notNull(),
+  createdBy: varchar("created_by").references(() => users.id).notNull(),
   rentAmount: decimal("rent_amount", { precision: 10, scale: 2 }),
   rentDueDay: integer("rent_due_day"),
   currency: varchar("currency", { length: 3 }).default("USD"),

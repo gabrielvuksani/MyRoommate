@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -260,34 +260,47 @@ export default function Messages() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Premium message scroll handling - always show latest message fully
+  // Master scroll handler - intelligently handles all scroll scenarios
+  const masterScrollHandler = useCallback(() => {
+    if (!messages || messages.length === 0) return;
+    
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    
+    // Always scroll to show the latest message fully, regardless of scenario
+    requestAnimationFrame(() => {
+      // Calculate scroll to show the bottom completely
+      const scrollHeight = container.scrollHeight;
+      const containerHeight = container.clientHeight;
+      const targetScrollTop = Math.max(0, scrollHeight - containerHeight);
+      
+      // Choose scroll behavior based on context
+      const shouldBeInstant = isKeyboardVisible || 
+                             (messages.length === 1) || 
+                             Math.abs(container.scrollTop - targetScrollTop) > containerHeight;
+      
+      container.scrollTo({
+        top: targetScrollTop,
+        behavior: shouldBeInstant ? "auto" : "smooth"
+      });
+      
+      console.log('Master scroll:', {
+        messageCount: messages.length,
+        isKeyboardVisible,
+        targetScrollTop,
+        behavior: shouldBeInstant ? "instant" : "smooth"
+      });
+    });
+  }, [messages, isKeyboardVisible]);
+
+  // Single effect to handle all scroll scenarios
   useEffect(() => {
     if (!isLoading && messages) {
-      handleLatestMessageScroll(messages.length);
+      // Initial delay for DOM updates, then ensure latest message is visible
+      const delay = isKeyboardVisible ? 250 : 100;
+      setTimeout(masterScrollHandler, delay);
     }
-  }, [isLoading, messages?.length]);
-
-  // Auto-scroll when new messages arrive or keyboard state changes
-  useEffect(() => {
-    if (messages && messages.length > 0) {
-      scrollToBottom({ force: false, smooth: true });
-    }
-  }, [messages?.length, isKeyboardVisible]);
-
-  // Enhanced keyboard visibility handling for premium mobile experience
-  useEffect(() => {
-    if (isKeyboardVisible && messages?.length > 0) {
-      // When keyboard opens, ensure latest message stays fully visible
-      scrollToBottom({ force: true, smooth: false, keyboardAware: true });
-      
-      // Additional scroll for short conversations after DOM updates
-      if (messages.length <= 3) {
-        setTimeout(() => {
-          scrollToBottom({ force: true, smooth: false, keyboardAware: true });
-        }, 300); // Extra time for short conversations
-      }
-    }
-  }, [isKeyboardVisible]);
+  }, [isLoading, messages?.length, isKeyboardVisible, masterScrollHandler]);
 
   // Update connection status when user/household data becomes available
   useEffect(() => {
