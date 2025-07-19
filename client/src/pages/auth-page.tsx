@@ -218,7 +218,20 @@ export default function AuthPage() {
                 {(loginMutation.error || registerMutation.error) && (
                   <div className="p-4 rounded-xl mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50">
                     <p className="text-red-600 dark:text-red-400 text-sm">
-                      {loginMutation.error?.message || registerMutation.error?.message}
+                      {(() => {
+                        const errorMessage = loginMutation.error?.message || registerMutation.error?.message || '';
+                        // Extract clean message from "401: {"message":"text"}" format
+                        const match = errorMessage.match(/{"message":"([^"]+)"}/);
+                        if (match) {
+                          return match[1];
+                        }
+                        // Extract from "statusCode: message" format
+                        const statusMatch = errorMessage.match(/^\d+:\s*(.+)$/);
+                        if (statusMatch) {
+                          return statusMatch[1];
+                        }
+                        return errorMessage;
+                      })()}
                     </p>
                   </div>
                 )}

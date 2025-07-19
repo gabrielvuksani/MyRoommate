@@ -115,12 +115,17 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ **FIXED: Authentication errors now show inline instead of redirecting to error pages**
 - ✓ **FIXED: Streamlined all message boxes to appear at top of login/signup form**
 - ✓ **FIXED: Login validation to properly handle password pattern matching**
+- ✓ **FIXED: Error message display to show clean text without status codes or JSON formatting**
+- ✓ **COMPLETED: Database cleanup - wiped all user data while preserving demo roommate listing**
 - ✓ Updated authentication mutations to use proper API calls instead of form submission for better error handling
 - ✓ Added enhanced frontend password validation (uppercase, lowercase, number, special character) to catch errors before submission
 - ✓ Fixed registration and login flows to display validation errors inline in the form
 - ✓ Streamlined message display system - all messages now appear at top of auth form with consistent styling
 - ✓ Enhanced dark mode support for all message boxes and form elements
 - ✓ Fixed login schema validation to prevent "string did not match expected pattern" errors
+- ✓ Implemented intelligent error message parsing to extract clean text from API responses
+- ✓ Cleaned database of all users, households, sessions, and related data for fresh deployment state
+- ✓ Preserved demo roommate listing while removing all other user-generated content
 - ✓ Added email verification requirement before user registration completion using Resend API
 - ✓ Implemented password reset functionality with dedicated reset page at `/reset-password`
 - ✓ Enhanced authentication flow with proper error handling for unverified users during login
