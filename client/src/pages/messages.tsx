@@ -8,7 +8,7 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { notificationService } from "@/lib/notifications";
-import { MessageCircle, Coffee, Home, ShoppingCart, Calendar, Users, Search } from "lucide-react";
+import { MessageCircle, Coffee, Home, ShoppingCart, Calendar, Users, Search, ChevronLeft, Send } from "lucide-react";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -396,12 +396,12 @@ export default function Messages() {
 
   // Single effect to handle all scroll scenarios
   useEffect(() => {
-    if (!isLoading && messages) {
+    if (!messagesLoading && messages) {
       // Initial delay for DOM updates, then ensure latest message is visible
       const delay = isKeyboardVisible ? 250 : 100;
       setTimeout(masterScrollHandler, delay);
     }
-  }, [isLoading, messages?.length, isKeyboardVisible, masterScrollHandler]);
+  }, [messagesLoading, messages?.length, isKeyboardVisible, masterScrollHandler]);
 
   // Update connection status when user/household data becomes available
   useEffect(() => {
