@@ -4,8 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle, AlertCircle } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle } from "lucide-react";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
@@ -21,37 +20,6 @@ export default function AuthPage() {
     lastName: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
-
-  // Check URL parameters for verification status or errors
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const verified = urlParams.get('verified');
-    const error = urlParams.get('error');
-    
-    if (verified) {
-      // User just verified their email - they should already be logged in
-      window.location.href = "/?verified=true";
-    } else if (error) {
-      switch (error) {
-        case 'invalid-token':
-          setErrors({ general: 'Invalid verification token. Please request a new verification email.' });
-          break;
-        case 'token-expired':
-          setErrors({ general: 'Verification token has expired. Please request a new verification email.' });
-          break;
-        case 'verification-failed':
-          setErrors({ general: 'Email verification failed. Please try again.' });
-          break;
-        default:
-          setErrors({ general: 'An error occurred during verification.' });
-      }
-      // Clean up URL
-      window.history.replaceState({}, '', '/auth');
-    }
-  }, []);
 
   // Scroll to top on page load
   useEffect(() => {
@@ -129,54 +97,6 @@ export default function AuthPage() {
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
-    }
-  };
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!resetEmail) {
-      setErrors({ email: "Email is required" });
-      return;
-    }
-
-    if (!/\S+@\S+\.\S+/.test(resetEmail)) {
-      setErrors({ email: "Please enter a valid email address" });
-      return;
-    }
-
-    setErrors({});
-
-    try {
-      const response = await apiRequest("POST", "/api/forgot-password", {
-        email: resetEmail,
-      });
-
-      if (response.ok) {
-        setEmailSent(true);
-      } else {
-        const data = await response.json();
-        setErrors({ general: data.message || "Failed to send reset email" });
-      }
-    } catch (err) {
-      setErrors({ general: "Network error. Please try again." });
-    }
-  };
-
-  const handleResendVerification = async (email: string) => {
-    try {
-      const response = await apiRequest("POST", "/api/resend-verification", {
-        email,
-      });
-
-      if (response.ok) {
-        setErrors({ general: "Verification email sent! Please check your inbox." });
-      } else {
-        const data = await response.json();
-        setErrors({ general: data.message || "Failed to resend verification email" });
-      }
-    } catch (err) {
-      setErrors({ general: "Network error. Please try again." });
     }
   };
 
@@ -306,136 +226,106 @@ export default function AuthPage() {
                     </div>
                   )}
 
-                  {/* Forgot Password Link (Login only) */}
-                  {isLogin && !forgotPasswordMode && (
-                    <div className="text-right">
-                      <button
-                        type="button"
-                        onClick={() => setForgotPasswordMode(true)}
-                        className="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors"
-                      >
-                        Forgot your password?
-                      </button>
-                    </div>
-                  )}
-
                   {/* Submit Button */}
-                  {!forgotPasswordMode ? (
-                    <Button
-                      type="submit"
-                      disabled={loginMutation.isPending || registerMutation.isPending}
-                      className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white border-0 rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
-                    >
-                      {(loginMutation.isPending || registerMutation.isPending) ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                          <span>Please wait...</span>
-                        </div>
-                      ) : isLogin ? (
-                        <div className="flex items-center space-x-2">
-                          <Sparkles size={20} />
-                          <span>Sign In</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle size={20} />
-                          <span>Create Account</span>
-                        </div>
-                      )}
-                    </Button>
-                  ) : (
-                    <Button
-                      type="button"
-                      onClick={handleForgotPassword}
-                      disabled={false}
-                      className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white border-0 rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
-                    >
+                  <Button
+                    type="submit"
+                    disabled={loginMutation.isPending || registerMutation.isPending}
+                    className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white border-0 rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
+                  >
+                    {(loginMutation.isPending || registerMutation.isPending) ? (
                       <div className="flex items-center space-x-2">
-                        <Mail size={20} />
-                        <span>Send Reset Email</span>
+                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                        <span>Please wait...</span>
                       </div>
-                    </Button>
-                  )}
+                    ) : isLogin ? (
+                      <div className="flex items-center space-x-2">
+                        <Sparkles size={20} />
+                        <span>Sign In</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle size={20} />
+                        <span>Create Account</span>
+                      </div>
+                    )}
+                  </Button>
 
                   {/* Error Display */}
-                  {(loginMutation.error || registerMutation.error || errors.general) && (
+                  {(loginMutation.error || registerMutation.error) && (
                     <div className="p-4 rounded-2xl bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm border border-red-200/50 dark:border-red-800/50">
                       <p className="text-red-600 dark:text-red-400 text-sm">
-                        {errors.general || loginMutation.error?.message || registerMutation.error?.message}
+                        {loginMutation.error?.message || registerMutation.error?.message}
                       </p>
-                    </div>
-                  )}
-
-                  {/* Success Display for email sent */}
-                  {emailSent && (
-                    <div className="p-4 rounded-2xl bg-green-50/70 dark:bg-green-900/20 backdrop-blur-sm border border-green-200/50 dark:border-green-800/50">
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                        <p className="text-green-600 dark:text-green-400 text-sm">
-                          Password reset email sent! Check your inbox for instructions.
-                        </p>
-                      </div>
                     </div>
                   )}
                 </form>
 
-                {/* Forgot Password Form */}
-                {forgotPasswordMode && !emailSent && (
-                  <form onSubmit={handleForgotPassword} className="space-y-4 mt-6">
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                        Enter your email address
-                      </label>
-                      <Input
-                        type="email"
-                        placeholder="your@email.com"
-                        value={resetEmail}
-                        onChange={(e) => setResetEmail(e.target.value)}
-                        className="h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50"
-                      />
-                    </div>
-                  </form>
-                )}
-
                 {/* Toggle Form */}
-                <div className="mt-8 text-center space-y-2">
-                  {forgotPasswordMode ? (
-                    <button
-                      onClick={() => {
-                        setForgotPasswordMode(false);
-                        setEmailSent(false);
-                        setResetEmail("");
-                        setErrors({});
-                      }}
-                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-                    >
-                      Back to sign in
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setIsLogin(!isLogin);
-                        setErrors({});
-                        setFormData({
-                          email: "",
-                          password: "",
-                          confirmPassword: "",
-                          firstName: "",
-                          lastName: "",
-                        });
-                      }}
-                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-                    >
-                      {isLogin ? (
-                        <>Don't have an account? <span className="font-semibold text-emerald-500 hover:text-emerald-600">Sign up</span></>
-                      ) : (
-                        <>Already have an account? <span className="font-semibold text-emerald-500 hover:text-emerald-600">Sign in</span></>
-                      )}
-                    </button>
-                  )}
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={() => {
+                      setIsLogin(!isLogin);
+                      setErrors({});
+                      setFormData({
+                        email: "",
+                        password: "",
+                        confirmPassword: "",
+                        firstName: "",
+                        lastName: "",
+                      });
+                    }}
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                  >
+                    {isLogin ? (
+                      <>Don't have an account? <span className="font-semibold text-emerald-500 hover:text-emerald-600">Sign up</span></>
+                    ) : (
+                      <>Already have an account? <span className="font-semibold text-emerald-500 hover:text-emerald-600">Sign in</span></>
+                    )}
+                  </button>
                 </div>
               </CardContent>
             </Card>
+          </div>
+        </div>
+
+        {/* Right Column - Hero */}
+        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-emerald-50/80 to-cyan-50/80 dark:from-emerald-950/80 dark:to-cyan-950/80 backdrop-blur-lg items-center justify-center p-8">
+          <div className="max-w-md text-center">
+            <div className="w-32 h-32 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-emerald-500/25">
+              <Home className="w-16 h-16 text-white" />
+            </div>
+            <h2 className="text-4xl font-bold mb-4 text-[#1a1a1a] dark:text-white">
+              Your roommate journey starts here
+            </h2>
+            <p className="text-xl mb-8 text-gray-600 dark:text-gray-300 leading-relaxed">
+              Manage chores, split expenses, coordinate schedules, and find the perfect roommate match.
+            </p>
+            <div className="space-y-4 text-left">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-emerald-100/70 dark:bg-emerald-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                </div>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Smart expense splitting</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-cyan-100/70 dark:bg-cyan-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                </div>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Chore management system</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-emerald-100/70 dark:bg-emerald-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                </div>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Real-time messaging</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-cyan-100/70 dark:bg-cyan-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                </div>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Roommate marketplace</span>
+              </div>
+            </div>
           </div>
         </div>
 
