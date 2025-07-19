@@ -99,7 +99,7 @@ export default function Landing() {
             ) : (
               <>
                 <Sparkles size={20} className="mr-2" />
-                Get Started Free
+                Get Started for Free
               </>
             )}
           </Button>
