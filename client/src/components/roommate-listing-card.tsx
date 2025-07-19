@@ -78,10 +78,16 @@ export default function RoommateListingCard({ listing, onContact, compact = fals
 
           {/* Type Badges */}
           <div className="flex gap-2 flex-wrap">
-            <Badge className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-0">
+            <Badge className="text-xs border-0" style={{ 
+              background: 'var(--surface-secondary)', 
+              color: 'var(--text-primary)' 
+            }}>
               {listing.roomType}
             </Badge>
-            <Badge className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0">
+            <Badge className="text-xs border-0" style={{ 
+              background: 'var(--surface-secondary)', 
+              color: 'var(--text-primary)' 
+            }}>
               {listing.housingType}
             </Badge>
           </div>
