@@ -621,6 +621,37 @@ export default function Home() {
               <ArrowRight size={14} />
             </button>
           </div>
+          {((chores as any[])?.length === 0 && (!balance || (balance.totalOwed === 0 && balance.totalOwing === 0))) ? (
+            <Card className="glass-card">
+              <CardContent className="p-6">
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 size={24} className="text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+                    No activity yet
+                  </h3>
+                  <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+                    Start tracking chores and expenses to see your household performance!
+                  </p>
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      onClick={() => setLocation("/chores")}
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-medium text-sm transition-all hover:scale-[1.02]"
+                    >
+                      Add Chore
+                    </button>
+                    <button
+                      onClick={() => setLocation("/expenses")}
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-violet-500 text-white font-medium text-sm transition-all hover:scale-[1.02]"
+                    >
+                      Add Expense
+                    </button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {(() => {
               const completedChores = (chores as any[])?.filter(
@@ -695,6 +726,7 @@ export default function Home() {
               );
             })()}
           </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

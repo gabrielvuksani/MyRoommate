@@ -110,7 +110,17 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**July 19, 2025 (Latest):**
+**July 19, 2025 (Latest - Part 2):**
+- ✓ Implemented comprehensive app-wide loading overlay system using PersistentLoading module
+- ✓ Loading overlay persists across page refreshes with beautiful glass morphism design
+- ✓ Added loading to all major navigation points (login, logout, household operations, browsing)
+- ✓ Fixed authentication flow 404 errors with AuthTransition module for seamless compatibility
+- ✓ **Reduced auto-timeout from 5 seconds to 3 seconds** for better user experience
+- ✓ **Added empty state for household performance** when no chores/expenses exist with helpful CTA buttons
+- ✓ **Re-enabled portrait mode restriction** with CSS forcing portrait orientation on mobile devices
+- ✓ User routing logic maintained: new users (no firstName) → onboarding, returning users → home page
+
+**July 19, 2025 (Earlier):**
 - ✓ **MAJOR: Completed transition to custom premium authentication system**
 - ✓ Replaced Replit OIDC with secure email/password authentication using Passport.js
 - ✓ Fixed all authentication references across the entire application (landing page, profile, onboarding, home, messages, listing-detail, bottom-navigation)
