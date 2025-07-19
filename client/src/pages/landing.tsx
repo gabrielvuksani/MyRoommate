@@ -13,7 +13,7 @@ import { useEffect } from "react";
 
 export default function Landing() {
   const handleLogin = () => {
-    window.location.href = "/api/login";
+    window.location.href = "/auth";
   };
 
   // Scroll to top on page load
