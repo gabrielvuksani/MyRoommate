@@ -1,10 +1,12 @@
-import { Resend } from 'resend';
+import { MailerSend, EmailParams as MSEmailParams, Sender, Recipient } from "mailersend";
 
-if (!process.env.RESEND_API_KEY) {
-  throw new Error("RESEND_API_KEY environment variable must be set");
+if (!process.env.MAILERSEND_API_KEY) {
+  throw new Error("MAILERSEND_API_KEY environment variable must be set");
 }
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const mailerSend = new MailerSend({
+  apiKey: process.env.MAILERSEND_API_KEY,
+});
 
 export interface EmailParams {
   to: string;
@@ -16,24 +18,28 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
     console.log('Attempting to send email to:', params.to);
     
-    const result = await resend.emails.send({
-      from: 'myRoommate <onboarding@resend.dev>', // Use Resend's verified domain
-      to: params.to,
-      subject: params.subject,
-      html: params.html,
-    });
+    const sentFrom = new Sender("noreply@trial-ynrw7gyzjp7g2k8e.mlsender.net", "myRoommate");
+    const recipients = [new Recipient(params.to)];
+    
+    const emailParams = new MSEmailParams()
+      .setFrom(sentFrom)
+      .setTo(recipients)
+      .setSubject(params.subject)
+      .setHtml(params.html);
 
+    const result = await mailerSend.email.send(emailParams);
+    
     console.log('Email send result:', result);
     
-    if (result.error) {
-      console.error('Email send error:', result.error);
+    if (result.statusCode === 202) {
+      console.log('Email sent successfully! Response:', result);
+      return true;
+    } else {
+      console.error('Email send failed with status:', result.statusCode);
       return false;
     }
-
-    console.log('Email sent successfully! ID:', result.data?.id);
-    return true;
   } catch (error) {
-    console.error('Resend email error:', error);
+    console.error('MailerSend email error:', error);
     return false;
   }
 }
