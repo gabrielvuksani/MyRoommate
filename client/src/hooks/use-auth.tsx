@@ -39,7 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
-      // Let the auth page handle redirect via useEffect
+      // Force reload to ensure clean state for both PWA and browser
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -57,7 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
-      // Let the auth page handle redirect via useEffect
+      // Force reload to ensure clean state for both PWA and browser
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Registration failed:", error.message);
