@@ -97,8 +97,14 @@ export function setupAuth(app: Express) {
     }
   });
 
-  // Register endpoint
-  app.post("/api/register", async (req, res, next) => {
+  // Register endpoint - support both POST (for app) and GET (for direct browser access)
+  const handleRegister = async (req: any, res: any, next: any) => {
+    // If it's a direct browser request (GET), redirect to auth page
+    if (req.method === 'GET') {
+      return res.redirect('/auth');
+    }
+    
+    // Handle POST register
     try {
       const validatedData = registerSchema.parse(req.body);
       
@@ -139,10 +145,19 @@ export function setupAuth(app: Express) {
       console.error("Registration error:", error);
       res.status(500).json({ message: "Registration failed" });
     }
-  });
+  };
 
-  // Login endpoint
-  app.post("/api/login", (req, res, next) => {
+  app.post("/api/register", handleRegister);
+  app.get("/api/register", handleRegister);
+
+  // Login endpoint - support both POST (for app) and GET (for direct browser access)
+  const handleLogin = (req: any, res: any, next: any) => {
+    // If it's a direct browser request (GET), redirect to auth page
+    if (req.method === 'GET') {
+      return res.redirect('/auth');
+    }
+    
+    // Handle POST login
     try {
       loginSchema.parse(req.body);
       
@@ -163,7 +178,10 @@ export function setupAuth(app: Express) {
       }
       next(error);
     }
-  });
+  };
+
+  app.post("/api/login", handleLogin);
+  app.get("/api/login", handleLogin);
 
   // Logout endpoint - support both POST (for app) and GET (for direct browser access)
   const handleLogout = (req: any, res: any, next: any) => {
