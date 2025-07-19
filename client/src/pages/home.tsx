@@ -192,7 +192,7 @@ export default function Home() {
           )}
 
           {/* Featured Listings Section */}
-          {(myListings as any[])?.length < 0 && (
+          {(myListings as any[])?.length === 0 && (
           <div className="space-y-4 pb-6 border-b" style={{ borderColor: 'var(--border-color)' }}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>

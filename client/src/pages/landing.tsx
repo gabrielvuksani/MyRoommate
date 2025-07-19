@@ -17,7 +17,7 @@ export default function Landing() {
   
   const handleLogin = () => {
     setIsLoading(true);
-    PersistentLoading.show("Taking you to sign in...");
+    PersistentLoading.show("Loading...");
     window.location.href = "/auth";
   };
 
