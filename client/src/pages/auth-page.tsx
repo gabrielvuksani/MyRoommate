@@ -114,9 +114,7 @@ export default function AuthPage() {
     if (cleanMessage.toLowerCase().includes('invalid email or password')) {
       return 'Invalid email or password, please try again.';
     }
-    if (cleanMessage.toLowerCase().includes('please verify your email')) {
-      return 'Please check your email and verify your account before signing in.';
-    }
+
     if (cleanMessage.toLowerCase().includes('user already exists') || cleanMessage.toLowerCase().includes('username already exists')) {
       return 'An account with this email already exists. Please try signing in instead.';
     }
