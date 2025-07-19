@@ -1271,6 +1271,7 @@ textarea.message-input:focus {
 textarea.message-input::placeholder {
   color: var(--text-secondary);
   opacity: 0.7;
+  line-height: 22px;
 }
 
 textarea.message-input::before,
