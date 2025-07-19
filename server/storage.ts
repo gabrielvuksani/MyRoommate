@@ -444,15 +444,7 @@ export class DatabaseStorage implements IStorage {
         linkedTo: messages.linkedTo,
         linkedType: messages.linkedType,
         createdAt: messages.createdAt,
-        user: {
-          id: users.id,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          email: users.email,
-          profileImageUrl: users.profileImageUrl,
-          createdAt: users.createdAt,
-          updatedAt: users.updatedAt,
-        },
+        user: users,
       })
       .from(messages)
       .innerJoin(users, eq(messages.userId, users.id))
@@ -480,24 +472,8 @@ export class DatabaseStorage implements IStorage {
         completedAt: shoppingItems.completedAt,
         createdBy: shoppingItems.createdBy,
         createdAt: shoppingItems.createdAt,
-        creator: {
-          id: sql<string>`creator.id`,
-          email: sql<string>`creator.email`,
-          firstName: sql<string>`creator.first_name`,
-          lastName: sql<string>`creator.last_name`,
-          profileImageUrl: sql<string>`creator.profile_image_url`,
-          createdAt: sql<Date>`creator.created_at`,
-          updatedAt: sql<Date>`creator.updated_at`,
-        },
-        completedByUser: {
-          id: sql<string>`completed_by_user.id`,
-          email: sql<string>`completed_by_user.email`,
-          firstName: sql<string>`completed_by_user.first_name`,
-          lastName: sql<string>`completed_by_user.last_name`,
-          profileImageUrl: sql<string>`completed_by_user.profile_image_url`,
-          createdAt: sql<Date>`completed_by_user.created_at`,
-          updatedAt: sql<Date>`completed_by_user.updated_at`,
-        },
+        creator: sql<User>`creator`,
+        completedByUser: sql<User | null>`completed_by_user`,
       })
       .from(shoppingItems)
       .innerJoin(sql`${users} as creator`, sql`${shoppingItems.createdBy} = creator.id`)
@@ -547,54 +523,97 @@ export class DatabaseStorage implements IStorage {
     }
 
     const result = await db
-      .select()
+      .select({
+        id: roommateListings.id,
+        title: roommateListings.title,
+        description: roommateListings.description,
+        rent: roommateListings.rent,
+        utilities: roommateListings.utilities,
+        location: roommateListings.location,
+        city: roommateListings.city,
+        state: roommateListings.state,
+        zipCode: roommateListings.zipCode,
+        university: roommateListings.university,
+        distanceToCampus: roommateListings.distanceToCampus,
+        availableFrom: roommateListings.availableFrom,
+        availableTo: roommateListings.availableTo,
+        roomType: roommateListings.roomType,
+        housingType: roommateListings.housingType,
+        amenities: roommateListings.amenities,
+        lifestylePreferences: roommateListings.lifestylePreferences,
+        genderPreference: roommateListings.genderPreference,
+        studentYear: roommateListings.studentYear,
+        studyHabits: roommateListings.studyHabits,
+        socialPreferences: roommateListings.socialPreferences,
+        images: roommateListings.images,
+        contactInfo: roommateListings.contactInfo,
+        isActive: roommateListings.isActive,
+        featured: roommateListings.featured,
+        verified: roommateListings.verified,
+        createdBy: roommateListings.createdBy,
+        createdAt: roommateListings.createdAt,
+        updatedAt: roommateListings.updatedAt,
+        creator: users,
+      })
       .from(roommateListings)
       .leftJoin(users, eq(roommateListings.createdBy, users.id))
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(roommateListings.featured), desc(roommateListings.createdAt));
     
     return result.map(row => ({
-      id: row.roommate_listings.id,
-      title: row.roommate_listings.title,
-      description: row.roommate_listings.description,
-      rent: row.roommate_listings.rent,
-      utilities: row.roommate_listings.utilities,
-      location: row.roommate_listings.location,
-      city: row.roommate_listings.city,
-      university: row.roommate_listings.university,
-      availableFrom: row.roommate_listings.availableFrom,
-      availableTo: row.roommate_listings.availableTo,
-      roomType: row.roommate_listings.roomType,
-      housingType: row.roommate_listings.housingType,
-      genderPreference: row.roommate_listings.genderPreference,
-      studentYear: row.roommate_listings.studentYear,
-      studyHabits: row.roommate_listings.studyHabits,
-      socialPreferences: row.roommate_listings.socialPreferences,
-      lifestylePreferences: row.roommate_listings.lifestylePreferences,
-      amenities: row.roommate_listings.amenities,
-      images: row.roommate_listings.images,
-      contactInfo: row.roommate_listings.contactInfo,
-      isActive: row.roommate_listings.isActive,
-      featured: row.roommate_listings.featured,
-      verified: row.roommate_listings.verified,
-      createdBy: row.roommate_listings.createdBy,
-      createdAt: row.roommate_listings.createdAt,
-      updatedAt: row.roommate_listings.updatedAt,
-      creator: row.users || {
-        id: row.roommate_listings.createdBy || "unknown",
+      ...row,
+      creator: row.creator || {
+        id: "unknown",
+        email: "contact@email.com",
+        password: "",
         firstName: "Anonymous",
-        lastName: "User", 
-        email: row.roommate_listings.contactInfo || "contact@email.com",
-        createdAt: row.roommate_listings.createdAt,
-        updatedAt: row.roommate_listings.updatedAt,
+        lastName: "User",
         profileImageUrl: null,
+        verified: false,
+        verificationToken: null,
+        phoneNumber: null,
+        dateOfBirth: null,
+        idVerified: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     }));
   }
 
   async getRoommateListing(id: string): Promise<(RoommateListing & { creator: User }) | undefined> {
     const result = await db
-      .select()
+      .select({
+        id: roommateListings.id,
+        title: roommateListings.title,
+        description: roommateListings.description,
+        rent: roommateListings.rent,
+        utilities: roommateListings.utilities,
+        location: roommateListings.location,
+        city: roommateListings.city,
+        state: roommateListings.state,
+        zipCode: roommateListings.zipCode,
+        university: roommateListings.university,
+        distanceToCampus: roommateListings.distanceToCampus,
+        availableFrom: roommateListings.availableFrom,
+        availableTo: roommateListings.availableTo,
+        roomType: roommateListings.roomType,
+        housingType: roommateListings.housingType,
+        amenities: roommateListings.amenities,
+        lifestylePreferences: roommateListings.lifestylePreferences,
+        genderPreference: roommateListings.genderPreference,
+        studentYear: roommateListings.studentYear,
+        studyHabits: roommateListings.studyHabits,
+        socialPreferences: roommateListings.socialPreferences,
+        images: roommateListings.images,
+        contactInfo: roommateListings.contactInfo,
+        isActive: roommateListings.isActive,
+        featured: roommateListings.featured,
+        verified: roommateListings.verified,
+        createdBy: roommateListings.createdBy,
+        createdAt: roommateListings.createdAt,
+        updatedAt: roommateListings.updatedAt,
+        creator: users,
+      })
       .from(roommateListings)
       .leftJoin(users, eq(roommateListings.createdBy, users.id))
       .where(eq(roommateListings.id, id))
@@ -604,38 +623,19 @@ export class DatabaseStorage implements IStorage {
     
     const row = result[0];
     return {
-      id: row.roommate_listings.id,
-      title: row.roommate_listings.title,
-      description: row.roommate_listings.description,
-      rent: row.roommate_listings.rent,
-      utilities: row.roommate_listings.utilities,
-      location: row.roommate_listings.location,
-      city: row.roommate_listings.city,
-      university: row.roommate_listings.university,
-      availableFrom: row.roommate_listings.availableFrom,
-      availableTo: row.roommate_listings.availableTo,
-      roomType: row.roommate_listings.roomType,
-      housingType: row.roommate_listings.housingType,
-      genderPreference: row.roommate_listings.genderPreference,
-      studentYear: row.roommate_listings.studentYear,
-      studyHabits: row.roommate_listings.studyHabits,
-      socialPreferences: row.roommate_listings.socialPreferences,
-      lifestylePreferences: row.roommate_listings.lifestylePreferences,
-      amenities: row.roommate_listings.amenities,
-      images: row.roommate_listings.images,
-      contactInfo: row.roommate_listings.contactInfo,
-      isActive: row.roommate_listings.isActive,
-      featured: row.roommate_listings.featured,
-      verified: row.roommate_listings.verified,
-      createdBy: row.roommate_listings.createdBy,
-      createdAt: row.roommate_listings.createdAt,
-      updatedAt: row.roommate_listings.updatedAt,
-      creator: row.users || {
-        id: row.roommate_listings.createdBy || "unknown",
+      ...row,
+      creator: row.creator || {
+        id: "unknown",
         email: "unknown@example.com",
+        password: "",
         firstName: "Anonymous",
         lastName: "User",
         profileImageUrl: null,
+        verified: false,
+        verificationToken: null,
+        phoneNumber: null,
+        dateOfBirth: null,
+        idVerified: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       }

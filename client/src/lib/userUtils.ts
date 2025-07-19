@@ -4,11 +4,10 @@
  */
 
 export interface UserFlags {
-  isNewUser: boolean;          // User without firstName (needs full onboarding with name setup)
-  isReturningUser: boolean;    // User with firstName but no household (returning user)
-  needsOnboarding: boolean;    // User needs to complete onboarding flow
-  hasHousehold: boolean;       // User has an active household
-  isInOnboarding: boolean;     // User is currently in the onboarding process
+  isNewUser: boolean;
+  isExistingUser: boolean;
+  needsOnboarding: boolean;
+  hasHousehold: boolean;
 }
 
 /**
@@ -19,38 +18,33 @@ export interface UserFlags {
  * @param currentPath - Current URL path to track onboarding state
  * @returns UserFlags object with all differentiation flags
  */
-export function getUserFlags(user: any, household: any, isAuthenticated: boolean, currentPath?: string): UserFlags {
+export function getUserFlags(user: any, household: any, isAuthenticated: boolean, location: string) {
   if (!isAuthenticated || !user) {
     return {
       isNewUser: false,
-      isReturningUser: false,
+      isExistingUser: false,
       needsOnboarding: false,
-      hasHousehold: false,
-      isInOnboarding: false
+      hasHousehold: false
     };
   }
 
-  // User is currently in onboarding flow
-  const isInOnboarding = currentPath === '/onboarding';
-  
-  // New user: no firstName (needs full onboarding including name entry)
+  // Check if user is new (no firstName indicates incomplete profile)
   const isNewUser = !user.firstName;
   
-  // Returning user: has firstName but no household
-  const isReturningUser = !!user.firstName && !household;
+  // Check if user is existing but without household
+  const isExistingUser = !!user.firstName && !household;
   
-  // Only new users (without firstName) need onboarding
-  const needsOnboarding = !user.firstName;
+  // User needs onboarding if they are a new user (no firstName)
+  const needsOnboarding = isNewUser;
   
-  // User has an active household
+  // User has household if household object exists
   const hasHousehold = !!household;
 
   return {
     isNewUser,
-    isReturningUser,
+    isExistingUser,
     needsOnboarding,
-    hasHousehold,
-    isInOnboarding
+    hasHousehold
   };
 }
 

@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/ThemeProvider";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import Landing from "@/pages/landing";
 import { useQuery } from "@tanstack/react-query";
 import { getUserFlags } from "@/lib/userUtils";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
@@ -58,8 +59,9 @@ function Router() {
       <Switch>
         {!user ? (
           <>
+            <Route path="/landing" component={Landing} />
             <Route path="/auth" component={AuthPage} />
-            <Route path="/" component={AuthPage} />
+            <Route path="/" component={Landing} />
           </>
         ) : needsOnboarding ? (
           <>
