@@ -123,19 +123,13 @@ export default function Messages() {
     });
   }, [conversations, searchQuery]);
 
-  // Set default conversation to household if available
+  // Always default to household chat - create one if it doesn't exist
   useEffect(() => {
-    if (!selectedConversation && conversations.length > 0 && household) {
-      const householdConv = conversations.find((c: Conversation) => 
-        c.type === 'household' && c.householdId === household.id
-      );
-      if (householdConv) {
-        setSelectedConversation(householdConv.id);
-      } else if (conversations.length > 0) {
-        setSelectedConversation(conversations[0].id);
-      }
+    if (user && household) {
+      // Set household as default conversation type
+      setSelectedConversation(`household_${household.id}`);
     }
-  }, [conversations, household, selectedConversation]);
+  }, [user, household]);
 
   // Get selected conversation details
   const currentConversation = conversations.find((c: Conversation) => c.id === selectedConversation);
@@ -565,720 +559,233 @@ export default function Messages() {
   }
 
   return (
-    <div className="h-screen flex page-transition">
-      {/* Conversations Sidebar */}
-      <div className="w-full md:w-96 h-full border-r" style={{ borderColor: 'var(--surface-border)', backgroundColor: 'var(--surface-secondary)' }}>
-        {/* Conversations Header */}
-        <div 
-          className="fixed top-0 left-0 md:w-96 right-0 md:right-auto z-50"
-          style={{
-            backgroundColor: 'var(--header-bg)',
-            backdropFilter: 'blur(20px) saturate(1.8)',
-            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-          }}
-        >
+    <div className="h-screen flex flex-col page-transition">
+      {/* Main Chat Header */}
+      <div 
+        className="fixed top-0 left-0 right-0 z-50"
+        style={{
+          backgroundColor: 'var(--header-bg)',
+          backdropFilter: 'blur(20px) saturate(1.8)',
+          WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+        }}
+      >
+        <div className="max-w-3xl mx-auto">
           <div className="page-header bg-transparent">
-            <div className="flex flex-col space-y-4">
-              <div className="flex items-center justify-between">
-                <h1 className="page-title" style={{ color: 'var(--text-primary)' }}>Messages</h1>
-                <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    connectionStatus === 'connected' ? 'bg-green-500 shadow-green-500/50 shadow-lg' : 
-                    connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse shadow-yellow-500/50 shadow-lg' : 
-                    'bg-red-500 shadow-red-500/50 shadow-lg'
-                  }`}></div>
-                  <span className="text-xs font-medium transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>
-                    {connectionStatus === 'connected' ? 'Real-time' : 
-                     connectionStatus === 'connecting' ? 'Connecting...' : 
-                     'Syncing'}
-                  </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                {/* Chat Avatar */}
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center ring-2 ring-white/20 shadow-lg">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                
+                <div>
+                  <h1 className="page-title" style={{ color: 'var(--text-primary)' }}>
+                    {household?.name || 'Household Chat'}
+                  </h1>
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      connectionStatus === 'connected' ? 'bg-green-500 shadow-green-500/50 shadow-lg' : 
+                      connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse shadow-yellow-500/50 shadow-lg' : 
+                      'bg-red-500 shadow-red-500/50 shadow-lg'
+                    }`}></div>
+                    <span className="text-xs font-medium transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>
+                      {connectionStatus === 'connected' ? 'Real-time' : 
+                       connectionStatus === 'connecting' ? 'Connecting...' : 
+                       'Syncing messages'}
+                    </span>
+                  </div>
                 </div>
               </div>
               
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
-                <input
-                  type="text"
-                  placeholder="Search conversations..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-xl input-modern"
-                  style={{ backgroundColor: 'var(--surface-secondary)' }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Conversations List */}
-        <div className="pt-44 px-4 pb-20 h-full overflow-y-auto">
-          {conversationsLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="w-6 h-6 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : filteredConversations.length === 0 ? (
-            <div className="text-center py-8">
-              <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                {searchQuery ? 'No conversations found' : 'No conversations yet'}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {filteredConversations.map((conversation: Conversation) => {
-                const otherParticipant = conversation.participants.find(p => p.userId !== user?.id);
-                const isSelected = selectedConversation === conversation.id;
-                const hasUnread = conversation.participants.find(p => p.userId === user?.id)?.unreadCount > 0;
-                
-                return (
-                  <button
-                    key={conversation.id}
-                    onClick={() => setSelectedConversation(conversation.id)}
-                    className={`w-full text-left p-4 rounded-xl transition-all duration-200 ${
-                      isSelected 
-                        ? 'bg-gradient-to-r from-emerald-400/20 to-cyan-400/20 border-l-4 border-emerald-500' 
-                        : 'hover:bg-white/5'
-                    }`}
-                  >
-                    <div className="flex items-start space-x-3">
-                      {/* Avatar */}
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center ring-2 ring-white/20 shadow-lg">
-                          <span className="text-white text-sm font-semibold">
-                            {conversation.type === 'household' 
-                              ? <Users className="w-6 h-6" />
-                              : getProfileInitials(otherParticipant?.user.firstName || '', otherParticipant?.user.lastName)
-                            }
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
-                            {conversation.type === 'household' 
-                              ? household?.name || 'Household'
-                              : conversation.listing 
-                                ? conversation.listing.title
-                                : formatDisplayName(otherParticipant?.user.firstName || '', otherParticipant?.user.lastName)
-                            }
-                          </h3>
-                          {conversation.lastMessage && (
-                            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                              {new Date(conversation.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                          )}
-                        </div>
-                        
-                        {conversation.listing && (
-                          <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>
-                            📍 {conversation.listing.location}
-                          </p>
-                        )}
-                        
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm truncate" style={{ color: 'var(--text-secondary)' }}>
-                            {conversation.lastMessage 
-                              ? conversation.lastMessage.content
-                              : 'Start a conversation'
-                            }
-                          </p>
-                          {hasUnread && (
-                            <span className="ml-2 px-2 py-1 text-xs bg-emerald-500 text-white rounded-full">
-                              {conversation.participants.find(p => p.userId === user?.id)?.unreadCount}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Messages Panel */}
-      <div className="hidden md:flex flex-1 flex-col">
-        {!selectedConversation ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Select a conversation</h3>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Choose a conversation from the list to start messaging</p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Messages Header */}
-            <div 
-              className="fixed top-0 left-96 right-0 z-40"
-              style={{
-                backgroundColor: 'var(--header-bg)',
-                backdropFilter: 'blur(20px) saturate(1.8)',
-                WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-              }}
-            >
-              <div className="page-header bg-transparent">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                      {currentConversation?.type === 'household' 
-                        ? household?.name || 'Household'
-                        : currentConversation?.listing 
-                          ? currentConversation.listing.title
-                          : formatDisplayName(
-                              currentConversation?.participants.find(p => p.userId !== user?.id)?.user.firstName || '',
-                              currentConversation?.participants.find(p => p.userId !== user?.id)?.user.lastName
-                            )
-                      }
-                    </h2>
-                    {currentConversation?.listing && (
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        📍 {currentConversation.listing.location}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Scrollable Messages Container */}
-            <div 
-              ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto transition-all duration-500 ease-out"
-              style={{ 
-                paddingTop: '140px', 
-                paddingBottom: isKeyboardVisible 
-                  ? '160px'
-                  : '200px',
-                transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
-                filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`,
-                minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto'
-              }}
-            >
-              <div className="max-w-3xl mx-auto px-6">
-                <div className="space-y-4 min-h-full">
-                  {messagesLoading ? (
-                    <div className="flex justify-center py-8">
-                      <div className="w-6 h-6 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  ) : messages && messages.length === 0 ? (
-                    <Card className="glass-card">
-                      <CardContent className="p-6">
-                        <div className="text-center space-y-4">
-                          <MessageCircle className="w-12 h-12 text-gray-400 mx-auto" />
-                          <div>
-                            <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Start the conversation</h3>
-                            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-                              {currentConversation?.type === 'household' 
-                                ? 'Be the first to send a message to your household'
-                                : currentConversation?.listing 
-                                  ? `Ask about ${currentConversation.listing.title}`
-                                  : 'Send your first message'
-                              }
-                            </p>
-                          </div>
-                          {currentConversation?.type === 'household' && (
-                            <div className="grid grid-cols-2 gap-3">
-                              {conversationStarters.map((starter, index) => (
-                                <Button
-                                  key={index}
-                                  variant="outline"
-                                  className="h-auto p-3 text-left justify-start glass-card hover:bg-white/50 transition-all duration-200"
-                                  onClick={() => handleStarterClick(starter.text)}
-                                >
-                                  <starter.icon className={`w-4 h-4 mr-2 ${starter.color}`} />
-                                  <span className="text-sm">{starter.text}</span>
-                                </Button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="space-y-4">
-                      {messages && messages.map((message: any) => (
-                        <MessageBubble 
-                          key={message.id} 
-                          message={message} 
-                          currentUserId={user?.id} 
-                        />
-                      ))}
-                      
-                      {/* Typing indicators */}
-                      {typingUsers.length > 0 && (
-                        <div className="flex items-center space-x-3">
-                          <div className="flex-shrink-0">
-                            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center ring-2 ring-white shadow-lg">
-                              <span className="text-white text-xs font-semibold">
-                                {typingUsers.length > 1 ? `${typingUsers.length}` : typingUsers[0]?.[0]?.toUpperCase()}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <div className="glass-message-bubble received max-w-xs px-4 py-3 rounded-3xl shadow-lg">
-                              <div className="flex items-center space-x-1">
-                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce"></div>
-                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-              </div>
-            </div>
-            
-            {/* Message Input Section */}
-            <div className="fixed bottom-0 left-96 right-0 z-40 pb-20">
-              <div className={`transition-all duration-500 ease-out ${
-                isKeyboardVisible 
-                  ? 'transform scale-[1.015] -translate-y-[2px]' 
-                  : ''
-              }`}>
-                <div className="max-w-3xl mx-auto">
-                  <div className={`mx-6 relative transition-all duration-500 ${
-                    isKeyboardVisible 
-                      ? 'backdrop-blur-[30px] backdrop-saturate-[2.2] backdrop-brightness-[1.05] rounded-2xl' 
-                      : ''
-                  }`}>
-                    <form onSubmit={handleSendMessage} className="relative">
-                      <div className={`flex items-end space-x-3 p-3 rounded-2xl transition-all duration-500 ${
-                        isKeyboardVisible 
-                          ? 'bg-gradient-to-br from-white/25 via-white/20 to-white/15 shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] ring-1 ring-white/20' 
-                          : 'bg-surface-secondary shadow-lg'
-                      }`}>
-                        <div className="flex-1 relative">
-                          <textarea
-                            ref={textareaRef}
-                            value={newMessage}
-                            onChange={(e) => handleTyping(e.target.value)}
-                            placeholder={currentConversation?.listing 
-                              ? `Ask about ${currentConversation.listing.title}...`
-                              : "Type a message..."
-                            }
-                            className={`w-full px-4 py-2 bg-transparent rounded-xl resize-none focus:outline-none transition-all duration-500 input-modern ${
-                              isKeyboardVisible 
-                                ? 'placeholder:text-gray-500 text-gray-900 tracking-wide' 
-                                : ''
-                            }`}
-                            style={{ 
-                              minHeight: '36px',
-                              maxHeight: isKeyboardVisible ? '100px' : '120px',
-                              color: 'var(--text-primary)'
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSendMessage(e);
-                              }
-                            }}
-                          />
-                          
-                          {isKeyboardVisible && (
-                            <div className="absolute inset-0 rounded-xl pointer-events-none overflow-hidden">
-                              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
-                              <div className="absolute -inset-px bg-gradient-to-br from-white/10 to-transparent opacity-50 blur-sm"></div>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <Button
-                          type="submit"
-                          disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                          size="icon"
-                          className={`rounded-xl transition-all duration-500 relative overflow-hidden ${
-                            isKeyboardVisible 
-                              ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 shadow-[0_10px_40px_-10px_rgba(16,185,129,0.5)] transform hover:scale-[1.08] active:scale-[1.02]' 
-                              : 'bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95'
-                          } ${
-                            !newMessage.trim() || sendMessageMutation.isPending 
-                              ? 'opacity-50 cursor-not-allowed' 
-                              : ''
-                          }`}
-                          style={{ marginBottom: '3px' }}
-                        >
-                          {sendMessageMutation.isPending ? (
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          ) : (
-                            <Send className="w-4 h-4 text-white" />
-                          )}
-                          
-                          {isKeyboardVisible && newMessage.trim() && !sendMessageMutation.isPending && (
-                            <>
-                              <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent animate-shimmer"></div>
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                      
-                      {isKeyboardVisible && (
-                        <div className="absolute -inset-1 bg-gradient-to-br from-emerald-400/20 via-cyan-400/10 to-emerald-400/20 rounded-2xl blur-xl opacity-50 -z-10 animate-pulse"></div>
-                      )}
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-      
-      {/* Mobile View - Show either conversation list or messages */}
-      <div className="md:hidden h-full">
-        {!selectedConversation ? (
-          /* Mobile Conversations List */
-          <div className="h-full" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-            {/* Mobile Conversations Header */}
-            <div 
-              className="fixed top-0 left-0 right-0 z-50"
-              style={{
-                backgroundColor: 'var(--header-bg)',
-                backdropFilter: 'blur(20px) saturate(1.8)',
-                WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-              }}
-            >
-              <div className="page-header bg-transparent">
-                <div className="flex flex-col space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h1 className="page-title" style={{ color: 'var(--text-primary)' }}>Messages</h1>
-                    <div className="flex items-center space-x-2">
-                      <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        connectionStatus === 'connected' ? 'bg-green-500 shadow-green-500/50 shadow-lg' : 
-                        connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse shadow-yellow-500/50 shadow-lg' : 
-                        'bg-red-500 shadow-red-500/50 shadow-lg'
-                      }`}></div>
-                      <span className="text-xs font-medium transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>
-                        {connectionStatus === 'connected' ? 'Real-time' : 
-                         connectionStatus === 'connecting' ? 'Connecting...' : 
-                         'Syncing'}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Search Bar */}
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
-                    <input
-                      type="text"
-                      placeholder="Search conversations..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 rounded-xl input-modern"
-                      style={{ backgroundColor: 'var(--surface-secondary)' }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Mobile Conversations List */}
-            <div className="pt-44 px-4 pb-20 h-full overflow-y-auto">
-              {conversationsLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="w-6 h-6 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              ) : filteredConversations.length === 0 ? (
-                <div className="text-center py-8">
-                  <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                    {searchQuery ? 'No conversations found' : 'No conversations yet'}
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {filteredConversations.map((conversation: Conversation) => {
-                    const otherParticipant = conversation.participants.find(p => p.userId !== user?.id);
-                    const hasUnread = conversation.participants.find(p => p.userId === user?.id)?.unreadCount > 0;
-                    
-                    return (
-                      <button
-                        key={conversation.id}
-                        onClick={() => setSelectedConversation(conversation.id)}
-                        className="w-full text-left p-4 rounded-xl transition-all duration-200 hover:bg-white/5"
-                      >
-                        <div className="flex items-start space-x-3">
-                          {/* Avatar */}
-                          <div className="flex-shrink-0">
-                            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center ring-2 ring-white/20 shadow-lg">
-                              <span className="text-white text-sm font-semibold">
-                                {conversation.type === 'household' 
-                                  ? <Users className="w-6 h-6" />
-                                  : getProfileInitials(otherParticipant?.user.firstName || '', otherParticipant?.user.lastName)
-                                }
-                              </span>
-                            </div>
-                          </div>
-                          
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1">
-                              <h3 className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
-                                {conversation.type === 'household' 
-                                  ? household?.name || 'Household'
-                                  : conversation.listing 
-                                    ? conversation.listing.title
-                                    : formatDisplayName(otherParticipant?.user.firstName || '', otherParticipant?.user.lastName)
-                                }
-                              </h3>
-                              {conversation.lastMessage && (
-                                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                  {new Date(conversation.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                              )}
-                            </div>
-                            
-                            {conversation.listing && (
-                              <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>
-                                📍 {conversation.listing.location}
-                              </p>
-                            )}
-                            
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm truncate" style={{ color: 'var(--text-secondary)' }}>
-                                {conversation.lastMessage 
-                                  ? conversation.lastMessage.content
-                                  : 'Start a conversation'
-                                }
-                              </p>
-                              {hasUnread && (
-                                <span className="ml-2 px-2 py-1 text-xs bg-emerald-500 text-white rounded-full">
-                                  {conversation.participants.find(p => p.userId === user?.id)?.unreadCount}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+              {/* Conversation Switcher - Only show if other conversations exist */}
+              {conversations.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon" 
+                  className="rounded-xl"
+                  onClick={() => setSearchQuery(searchQuery ? "" : " ")} // Toggle to show conversation list
+                >
+                  <MessageCircle className="w-5 h-5" />
+                </Button>
               )}
             </div>
           </div>
-        ) : (
-          /* Mobile Messages View */
-          <div className="h-full flex flex-col">
-            {/* Mobile Messages Header */}
-            <div 
-              className="fixed top-0 left-0 right-0 z-50"
-              style={{
-                backgroundColor: 'var(--header-bg)',
-                backdropFilter: 'blur(20px) saturate(1.8)',
-                WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-              }}
-            >
-              <div className="page-header bg-transparent">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setSelectedConversation(null)}
-                      className="rounded-xl"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </Button>
+        </div>
+      </div>
+      
+      {/* Scrollable Messages Container */}
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto transition-all duration-500 ease-out"
+        style={{ 
+          paddingTop: '140px', 
+          paddingBottom: isKeyboardVisible 
+            ? '160px'
+            : '200px',
+          transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
+          filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`,
+          minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto'
+        }}
+      >
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="space-y-4 min-h-full">
+            {messagesLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="w-6 h-6 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : messages && messages.length === 0 ? (
+              <Card className="glass-card">
+                <CardContent className="p-6">
+                  <div className="text-center space-y-4">
+                    <Users className="w-16 h-16 text-gray-400 mx-auto" />
                     <div>
-                      <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                        {currentConversation?.type === 'household' 
-                          ? household?.name || 'Household'
-                          : currentConversation?.listing 
-                            ? currentConversation.listing.title
-                            : formatDisplayName(
-                                currentConversation?.participants.find(p => p.userId !== user?.id)?.user.firstName || '',
-                                currentConversation?.participants.find(p => p.userId !== user?.id)?.user.lastName
-                              )
-                        }
-                      </h2>
-                      {currentConversation?.listing && (
-                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                          📍 {currentConversation.listing.location}
-                        </p>
-                      )}
+                      <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Welcome to your household chat!</h3>
+                      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+                        Connect with your housemates, coordinate activities, and keep everyone in the loop.
+                      </p>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Mobile Messages Container */}
-            <div 
-              ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto transition-all duration-500 ease-out"
-              style={{ 
-                paddingTop: '140px', 
-                paddingBottom: isKeyboardVisible 
-                  ? '160px'
-                  : '200px',
-                transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
-                filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`,
-                minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto'
-              }}
-            >
-              <div className="px-4">
-                <div className="space-y-4 min-h-full">
-                  {messagesLoading ? (
-                    <div className="flex justify-center py-8">
-                      <div className="w-6 h-6 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  ) : messages && messages.length === 0 ? (
-                    <Card className="glass-card">
-                      <CardContent className="p-6">
-                        <div className="text-center space-y-4">
-                          <MessageCircle className="w-12 h-12 text-gray-400 mx-auto" />
-                          <div>
-                            <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Start the conversation</h3>
-                            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-                              {currentConversation?.type === 'household' 
-                                ? 'Be the first to send a message to your household'
-                                : currentConversation?.listing 
-                                  ? `Ask about ${currentConversation.listing.title}`
-                                  : 'Send your first message'
-                              }
-                            </p>
-                          </div>
-                          {currentConversation?.type === 'household' && (
-                            <div className="grid grid-cols-2 gap-3">
-                              {conversationStarters.map((starter, index) => (
-                                <Button
-                                  key={index}
-                                  variant="outline"
-                                  className="h-auto p-3 text-left justify-start glass-card hover:bg-white/50 transition-all duration-200"
-                                  onClick={() => handleStarterClick(starter.text)}
-                                >
-                                  <starter.icon className={`w-4 h-4 mr-2 ${starter.color}`} />
-                                  <span className="text-sm">{starter.text}</span>
-                                </Button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="space-y-4">
-                      {messages && messages.map((message: any) => (
-                        <MessageBubble 
-                          key={message.id} 
-                          message={message} 
-                          currentUserId={user?.id} 
-                        />
-                      ))}
-                      
-                      {/* Typing indicators */}
-                      {typingUsers.length > 0 && (
-                        <div className="flex items-center space-x-3">
-                          <div className="flex-shrink-0">
-                            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center ring-2 ring-white shadow-lg">
-                              <span className="text-white text-xs font-semibold">
-                                {typingUsers.length > 1 ? `${typingUsers.length}` : typingUsers[0]?.[0]?.toUpperCase()}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <div className="glass-message-bubble received max-w-xs px-4 py-3 rounded-3xl shadow-lg">
-                              <div className="flex items-center space-x-1">
-                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce"></div>
-                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-              </div>
-            </div>
-            
-            {/* Mobile Message Input */}
-            <div className="fixed bottom-0 left-0 right-0 z-40 pb-20">
-              <div className={`transition-all duration-500 ease-out ${
-                isKeyboardVisible 
-                  ? 'transform scale-[1.015] -translate-y-[2px]' 
-                  : ''
-              }`}>
-                <div className="px-4">
-                  <div className={`relative transition-all duration-500 ${
-                    isKeyboardVisible 
-                      ? 'backdrop-blur-[30px] backdrop-saturate-[2.2] backdrop-brightness-[1.05] rounded-2xl' 
-                      : ''
-                  }`}>
-                    <form onSubmit={handleSendMessage} className="relative">
-                      <div className={`flex items-end space-x-3 p-3 rounded-2xl transition-all duration-500 ${
-                        isKeyboardVisible 
-                          ? 'bg-gradient-to-br from-white/25 via-white/20 to-white/15 shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] ring-1 ring-white/20' 
-                          : 'bg-surface-secondary shadow-lg'
-                      }`}>
-                        <div className="flex-1 relative">
-                          <textarea
-                            ref={textareaRef}
-                            value={newMessage}
-                            onChange={(e) => handleTyping(e.target.value)}
-                            placeholder={currentConversation?.listing 
-                              ? `Ask about ${currentConversation.listing.title}...`
-                              : "Type a message..."
-                            }
-                            className={`w-full px-4 py-2 bg-transparent rounded-xl resize-none focus:outline-none transition-all duration-500 input-modern ${
-                              isKeyboardVisible 
-                                ? 'placeholder:text-gray-500 text-gray-900 tracking-wide' 
-                                : ''
-                            }`}
-                            style={{ 
-                              minHeight: '36px',
-                              maxHeight: isKeyboardVisible ? '100px' : '120px',
-                              color: 'var(--text-primary)'
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSendMessage(e);
-                              }
-                            }}
-                          />
-                        </div>
-                        
+                    <div className="grid grid-cols-2 gap-3">
+                      {conversationStarters.map((starter, index) => (
                         <Button
-                          type="submit"
-                          disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                          size="icon"
-                          className={`rounded-xl transition-all duration-500 relative overflow-hidden ${
-                            isKeyboardVisible 
-                              ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 shadow-[0_10px_40px_-10px_rgba(16,185,129,0.5)] transform hover:scale-[1.08] active:scale-[1.02]' 
-                              : 'bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95'
-                          } ${
-                            !newMessage.trim() || sendMessageMutation.isPending 
-                              ? 'opacity-50 cursor-not-allowed' 
-                              : ''
-                          }`}
+                          key={index}
+                          variant="outline"
+                          className="h-auto p-3 text-left justify-start glass-card hover:bg-white/50 transition-all duration-200"
+                          onClick={() => handleStarterClick(starter.text)}
                         >
-                          {sendMessageMutation.isPending ? (
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          ) : (
-                            <Send className="w-4 h-4 text-white" />
-                          )}
+                          <starter.icon className={`w-4 h-4 mr-2 ${starter.color}`} />
+                          <span className="text-sm">{starter.text}</span>
                         </Button>
-                      </div>
-                    </form>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {messages && messages.map((message: any) => (
+                  <MessageBubble 
+                    key={message.id} 
+                    message={message} 
+                    currentUserId={user?.id} 
+                  />
+                ))}
+                
+                {/* Typing indicators */}
+                {typingUsers.length > 0 && (
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center ring-2 ring-white shadow-lg">
+                        <span className="text-white text-xs font-semibold">
+                          {typingUsers.length > 1 ? `${typingUsers.length}` : typingUsers[0]?.[0]?.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="glass-message-bubble received max-w-xs px-4 py-3 rounded-3xl shadow-lg">
+                        <div className="flex items-center space-x-1">
+                          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+      </div>
+      
+      {/* Message Input Section */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 pb-20">
+        <div className={`transition-all duration-500 ease-out ${
+          isKeyboardVisible 
+            ? 'transform scale-[1.015] -translate-y-[2px]' 
+            : ''
+        }`}>
+          <div className="max-w-3xl mx-auto">
+            <div className={`mx-6 relative transition-all duration-500 ${
+              isKeyboardVisible 
+                ? 'backdrop-blur-[30px] backdrop-saturate-[2.2] backdrop-brightness-[1.05] rounded-2xl' 
+                : ''
+            }`}>
+              <form onSubmit={handleSendMessage} className="relative">
+                <div className={`flex items-end space-x-3 p-3 rounded-2xl transition-all duration-500 ${
+                  isKeyboardVisible 
+                    ? 'bg-gradient-to-br from-white/25 via-white/20 to-white/15 shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] ring-1 ring-white/20' 
+                    : 'bg-surface-secondary shadow-lg'
+                }`}>
+                  <div className="flex-1 relative">
+                    <textarea
+                      ref={textareaRef}
+                      value={newMessage}
+                      onChange={(e) => handleTyping(e.target.value)}
+                      placeholder="Message your household..."
+                      className={`w-full px-4 py-2 bg-transparent rounded-xl resize-none focus:outline-none transition-all duration-500 input-modern ${
+                        isKeyboardVisible 
+                          ? 'placeholder:text-gray-500 text-gray-900 tracking-wide' 
+                          : ''
+                      }`}
+                      style={{ 
+                        minHeight: '36px',
+                        maxHeight: isKeyboardVisible ? '100px' : '120px',
+                        color: 'var(--text-primary)'
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage(e);
+                        }
+                      }}
+                    />
+                    
+                    {isKeyboardVisible && (
+                      <div className="absolute inset-0 rounded-xl pointer-events-none overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+                        <div className="absolute -inset-px bg-gradient-to-br from-white/10 to-transparent opacity-50 blur-sm"></div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                    size="icon"
+                    className={`rounded-xl transition-all duration-500 relative overflow-hidden ${
+                      isKeyboardVisible 
+                        ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 shadow-[0_10px_40px_-10px_rgba(16,185,129,0.5)] transform hover:scale-[1.08] active:scale-[1.02]' 
+                        : 'bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95'
+                    } ${
+                      !newMessage.trim() || sendMessageMutation.isPending 
+                        ? 'opacity-50 cursor-not-allowed' 
+                        : ''
+                    }`}
+                    style={{ marginBottom: '3px' }}
+                  >
+                    {sendMessageMutation.isPending ? (
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <Send className="w-4 h-4 text-white" />
+                    )}
+                    
+                    {isKeyboardVisible && newMessage.trim() && !sendMessageMutation.isPending && (
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent animate-shimmer"></div>
+                      </>
+                    )}
+                  </Button>
+                </div>
+                
+                {isKeyboardVisible && (
+                  <div className="absolute -inset-1 bg-gradient-to-br from-emerald-400/20 via-cyan-400/10 to-emerald-400/20 rounded-2xl blur-xl opacity-50 -z-10 animate-pulse"></div>
+                )}
+              </form>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
     </div>
