@@ -20,6 +20,7 @@ export default function AuthPage() {
     lastName: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [authError, setAuthError] = useState("");
 
   // Scroll to top on page load
   useEffect(() => {
@@ -72,14 +73,17 @@ export default function AuthPage() {
     e.preventDefault();
     if (!validateForm()) return;
 
+    // Clear any previous auth errors
+    setAuthError("");
+
     try {
       if (isLogin) {
-        loginMutation.mutate({
+        await loginMutation.mutateAsync({
           email: formData.email,
           password: formData.password,
         });
       } else {
-        registerMutation.mutate({
+        await registerMutation.mutateAsync({
           email: formData.email,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
@@ -87,8 +91,11 @@ export default function AuthPage() {
           lastName: formData.lastName,
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Auth error:", error);
+      // Extract error message from the error object
+      const errorMessage = error.message || "Authentication failed. Please try again.";
+      setAuthError(errorMessage);
     }
   };
 
@@ -97,6 +104,10 @@ export default function AuthPage() {
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
+    }
+    // Clear auth error when user starts typing
+    if (authError) {
+      setAuthError("");
     }
   };
 
@@ -118,6 +129,22 @@ export default function AuthPage() {
                 {isLogin ? "Sign in to your account" : "Create your account"}
               </p>
             </div>
+
+            {/* Error Message */}
+            {authError && (
+              <Card className="bg-red-50/90 dark:bg-red-900/30 backdrop-blur-xl border border-red-200/50 dark:border-red-700/50 rounded-2xl shadow-lg">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <p className="text-red-700 dark:text-red-300 font-medium">{authError}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Form Card */}
             <Card className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-white/30 dark:border-slate-700/30 rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-slate-900/50">
