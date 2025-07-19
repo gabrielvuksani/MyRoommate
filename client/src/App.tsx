@@ -92,9 +92,9 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
       
-      {/* Navigation - Hide in certain states */}
-      {user && !needsOnboarding && !isKeyboardVisible && (
-        <BottomNavigation hasHousehold={hasHousehold} />
+      {/* Navigation - Only show for users with households */}
+      {user && hasHousehold && !needsOnboarding && !isKeyboardVisible && (
+        <BottomNavigation />
       )}
     </div>
   );
