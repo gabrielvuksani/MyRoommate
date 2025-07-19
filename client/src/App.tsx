@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserFlags } from "@/lib/userUtils";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { PersistentLoading } from "@/lib/persistentLoading";
+import { isPWA, getInitialRoute } from "@/lib/pwaUtils";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import Home from "@/pages/home";
@@ -36,6 +37,9 @@ function Router() {
   useEffect(() => {
     PersistentLoading.checkAndShow();
   }, []);
+
+  // Detect PWA mode
+  const isInPWAMode = isPWA();
   
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -61,7 +65,7 @@ function Router() {
           <>
             <Route path="/landing" component={Landing} />
             <Route path="/auth" component={AuthPage} />
-            <Route path="/" component={Landing} />
+            <Route path="/" component={isInPWAMode ? AuthPage : Landing} />
           </>
         ) : needsOnboarding ? (
           <>
