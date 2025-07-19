@@ -33,8 +33,10 @@ import { db } from "./db";
 import { eq, and, desc, asc, sql } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations (mandatory for Replit Auth)
+  // User operations
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: User): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   
   // Household operations
@@ -94,6 +96,16 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(user: User): Promise<User> {
+    const [result] = await db.insert(users).values(user).returning();
+    return result;
+  }
+
   async upsertUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
@@ -109,7 +121,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async createHousehold(household: InsertHousehold & { inviteCode: string }): Promise<Household> {
+  async createHousehold(household: InsertHousehold & { inviteCode: string, createdBy: string }): Promise<Household> {
     const [created] = await db.insert(households).values(household).returning();
     return created;
   }

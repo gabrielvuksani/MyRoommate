@@ -5,19 +5,18 @@ import { useEffect } from "react";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/ThemeProvider";
-import { useAuth } from "@/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { getUserFlags } from "@/lib/userUtils";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { PersistentLoading } from "@/lib/persistentLoading";
 import NotFound from "@/pages/not-found";
-import Landing from "@/pages/landing";
+import AuthPage from "@/pages/auth-page";
 import Home from "@/pages/home";
 import Chores from "@/pages/chores";
 import Expenses from "@/pages/expenses";
 import Calendar from "@/pages/calendar";
 import Messages from "@/pages/messages";
-
 import Profile from "@/pages/profile";
 import Onboarding from "@/pages/onboarding";
 import Dashboard from "@/pages/dashboard";
@@ -28,7 +27,7 @@ import AddExpense from "@/pages/add-expense";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const [location] = useLocation();
   const { isKeyboardVisible } = useKeyboardHeight();
 
@@ -36,14 +35,10 @@ function Router() {
   useEffect(() => {
     PersistentLoading.checkAndShow();
   }, []);
-  const { data: user } = useQuery({
-    queryKey: ["/api/auth/user"],
-    enabled: isAuthenticated,
-  }) as { data: any };
   
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
-    enabled: isAuthenticated,
+    enabled: !!user,
   }) as { data: any };
 
   if (isLoading) {
@@ -55,16 +50,16 @@ function Router() {
   }
 
   // Get comprehensive user flags using centralized logic
-  const userFlags = getUserFlags(user, household, isAuthenticated, location);
+  const userFlags = getUserFlags(user, household, !!user, location);
   const { needsOnboarding, hasHousehold } = userFlags;
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
       <Switch>
-        {!isAuthenticated ? (
+        {!user ? (
           <>
-            <Route path="/landing" component={Landing} />
-            <Route path="/" component={Landing} />
+            <Route path="/auth" component={AuthPage} />
+            <Route path="/" component={AuthPage} />
           </>
         ) : needsOnboarding ? (
           <>
@@ -95,7 +90,10 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
       
-      {isAuthenticated && hasHousehold && !needsOnboarding && location !== '/onboarding' && !isKeyboardVisible && <BottomNavigation />}
+      {/* Navigation - Hide in certain states */}
+      {user && !needsOnboarding && !isKeyboardVisible && (
+        <BottomNavigation hasHousehold={hasHousehold} />
+      )}
     </div>
   );
 }
@@ -103,11 +101,13 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <TooltipProvider>
+            <Router />
+          </TooltipProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

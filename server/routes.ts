@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import {
   insertHouseholdSchema,
   insertChoreSchema,
@@ -17,21 +17,12 @@ import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  // Auth routes are now handled in setupAuth function
 
+  // User profile routes
   app.patch('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { firstName, lastName } = req.body;
       
       const updatedUser = await storage.upsertUser({
@@ -50,7 +41,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Household routes
   app.post('/api/households', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const data = insertHouseholdSchema.parse(req.body);
       
       // Generate invite code
@@ -74,7 +65,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/households/join', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { inviteCode } = req.body;
       
       console.log("Join household attempt:", { userId, inviteCode, codeLength: inviteCode?.length });

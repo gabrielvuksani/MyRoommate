@@ -28,13 +28,19 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table for Replit Auth
+// User storage table for Custom Auth
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
-  email: varchar("email").unique(),
+  email: varchar("email").unique().notNull(),
+  password: varchar("password").notNull(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  verified: boolean("verified").default(false),
+  verificationToken: varchar("verification_token"),
+  phoneNumber: varchar("phone_number"),
+  dateOfBirth: date("date_of_birth"),
+  idVerified: boolean("id_verified").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -331,12 +337,46 @@ export const insertRoommateListingSchema = createInsertSchema(roommateListings).
 }).extend({
   availableFrom: z.string().transform((val) => new Date(val)),
   availableTo: z.union([z.string(), z.null()]).optional().transform((val) => val ? new Date(val) : null),
-  contactInfo: z.string().min(1, "Contact information is required"),
+  contactInfo: z.string().email("Please enter a valid email address for contact"),
+});
+
+// Authentication schemas
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  verified: true,
+  verificationToken: true,
+  idVerified: true,
+});
+
+export const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+export const registerSchema = insertUserSchema.extend({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
+      "Password must contain uppercase, lowercase, number, and special character"),
+  confirmPassword: z.string(),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  phoneNumber: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type LoginData = z.infer<typeof loginSchema>;
+export type RegisterData = z.infer<typeof registerSchema>;
 export type Household = typeof households.$inferSelect;
 export type InsertHousehold = z.infer<typeof insertHouseholdSchema>;
 export type HouseholdMember = typeof householdMembers.$inferSelect;
