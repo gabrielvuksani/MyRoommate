@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { ArrowLeft, Home, MapPin, Calendar, Users, GraduationCap, Heart } from "lucide-react";
@@ -19,9 +19,6 @@ export default function AddListing() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const [headerScrolled, setHeaderScrolled] = useState(false);
-  const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const addressInputRef = useRef<HTMLInputElement>(null);
   
   const [newListing, setNewListing] = useState({
     title: "",
@@ -57,62 +54,7 @@ export default function AddListing() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Address autocomplete functionality
-  const commonAddresses = {
-    "Berkeley": [
-      "2647 Telegraph Avenue, Berkeley, CA",
-      "2650 Durant Avenue, Berkeley, CA", 
-      "2180 Milvia Street, Berkeley, CA",
-      "2536 Regent Street, Berkeley, CA",
-      "2419 Dwight Way, Berkeley, CA"
-    ],
-    "San Francisco": [
-      "1234 Market Street, San Francisco, CA",
-      "567 Mission Street, San Francisco, CA",
-      "890 Castro Street, San Francisco, CA",
-      "345 Valencia Street, San Francisco, CA"
-    ],
-    "Palo Alto": [
-      "123 University Avenue, Palo Alto, CA",
-      "456 Forest Avenue, Palo Alto, CA",
-      "789 Middlefield Road, Palo Alto, CA"
-    ]
-  };
 
-  const handleAddressChange = (value: string) => {
-    setNewListing({ ...newListing, location: value });
-    
-    if (value.length > 2) {
-      const allSuggestions: string[] = [];
-      Object.entries(commonAddresses).forEach(([city, addresses]) => {
-        if (newListing.city === city || !newListing.city) {
-          const matching = addresses.filter(addr => 
-            addr.toLowerCase().includes(value.toLowerCase())
-          );
-          allSuggestions.push(...matching);
-        }
-      });
-      
-      // Add generic suggestions based on input
-      if (value.length > 3) {
-        allSuggestions.push(
-          `${value}, ${newListing.city || 'Berkeley'}, CA`,
-          `${value} Street, ${newListing.city || 'Berkeley'}, CA`,
-          `${value} Avenue, ${newListing.city || 'Berkeley'}, CA`
-        );
-      }
-      
-      setAddressSuggestions(allSuggestions.slice(0, 5));
-      setShowSuggestions(allSuggestions.length > 0);
-    } else {
-      setShowSuggestions(false);
-    }
-  };
-
-  const selectAddress = (address: string) => {
-    setNewListing({ ...newListing, location: address });
-    setShowSuggestions(false);
-  };
 
   const createListingMutation = useMutation({
     mutationFn: async (listingData: any) => {
@@ -208,7 +150,7 @@ export default function AddListing() {
       </div>
 
       {/* Content */}
-      <div className="pt-44 px-6 space-y-6 pb-32">
+      <div className="pt-32 px-6 space-y-6 pb-32">
         
         {/* Basic Information */}
         <Card className="glass-card">
@@ -266,37 +208,15 @@ export default function AddListing() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative">
+              <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                   Street Address *
                 </label>
                 <Input
-                  ref={addressInputRef}
                   placeholder="e.g., 123 Telegraph Ave"
                   value={newListing.location}
-                  onChange={(e) => handleAddressChange(e.target.value)}
-                  onFocus={() => newListing.location.length > 2 && setShowSuggestions(true)}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  onChange={(e) => setNewListing({ ...newListing, location: e.target.value })}
                 />
-                
-                {/* Address Suggestions Dropdown */}
-                {showSuggestions && addressSuggestions.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-surface border border-border rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                    {addressSuggestions.map((address, index) => (
-                      <div
-                        key={index}
-                        className="px-4 py-3 hover:bg-surface-secondary cursor-pointer transition-colors border-b border-border last:border-b-0"
-                        onClick={() => selectAddress(address)}
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <MapPin size={14} style={{ color: 'var(--text-secondary)' }} />
-                          <span className="text-sm">{address}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
               
               <div>
@@ -637,6 +557,12 @@ export default function AddListing() {
 
         {/* Submit Button */}
         <div className="sticky bottom-0 pt-4 pb-8" style={{ background: 'var(--background)' }}>
+          {/* Validation Helper */}
+          {(!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom) && (
+            <p className="text-center text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
+              Please fill in all required fields (*)
+            </p>
+          )}
           <button
             onClick={handleCreateListing}
             disabled={createListingMutation.isPending || !newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom}
@@ -645,12 +571,7 @@ export default function AddListing() {
             {createListingMutation.isPending ? "Creating Listing..." : "Create Listing"}
           </button>
           
-          {/* Validation Helper */}
-          {(!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom) && (
-            <p className="text-center text-sm mt-3" style={{ color: 'var(--text-secondary)' }}>
-              Please fill in all required fields (*)
-            </p>
-          )}
+          
         </div>
       </div>
     </div>
