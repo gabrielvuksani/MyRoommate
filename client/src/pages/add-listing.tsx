@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Home, MapPin, Calendar, Users, GraduationCap, Heart } from "lucide-react";
+import { ArrowLeft, Home, MapPin, Calendar, Users, GraduationCap, Heart, Camera, X } from "lucide-react";
 import { apiRequest } from "../lib/queryClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ export default function AddListing() {
     lifestylePreferences: [] as string[],
     amenities: [] as string[],
     contactInfo: "",
+    images: [] as string[],
   });
 
   useEffect(() => {
@@ -190,6 +191,86 @@ export default function AddListing() {
                   className="w-full"
                 />
               </div>
+              
+              {/* Image Upload Section */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                  Photos (Optional)
+                </label>
+                <p className="text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>
+                  Add photos to make your listing stand out
+                </p>
+                
+                <div className="space-y-3">
+                  {/* Upload Button */}
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        files.forEach(file => {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            if (event.target?.result) {
+                              setNewListing(prev => ({
+                                ...prev,
+                                images: [...prev.images, event.target?.result as string]
+                              }));
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        });
+                        e.target.value = ''; // Reset input
+                      }}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <label
+                      htmlFor="image-upload"
+                      className="flex items-center justify-center w-full h-24 border-2 border-dashed rounded-xl cursor-pointer transition-all hover:scale-[1.02]"
+                      style={{
+                        borderColor: 'var(--border)',
+                        background: 'var(--surface-secondary)'
+                      }}
+                    >
+                      <div className="text-center">
+                        <Camera className="w-6 h-6 mx-auto mb-2" style={{ color: 'var(--text-secondary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          Click to add photos
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+                  
+                  {/* Image Previews */}
+                  {newListing.images.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {newListing.images.map((image, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={image}
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg"
+                          />
+                          <button
+                            onClick={() => {
+                              setNewListing(prev => ({
+                                ...prev,
+                                images: prev.images.filter((_, i) => i !== index)
+                              }));
+                            }}
+                            className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -232,7 +313,7 @@ export default function AddListing() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                     State/Province
@@ -255,16 +336,7 @@ export default function AddListing() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                    Neighborhood
-                  </label>
-                  <Input
-                    placeholder="e.g., Downtown, Northside"
-                    value={newListing.neighborhood || ""}
-                    onChange={(e) => setNewListing({ ...newListing, neighborhood: e.target.value })}
-                  />
-                </div>
+
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

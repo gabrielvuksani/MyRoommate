@@ -301,7 +301,14 @@ export default function ListingDetail() {
                     <div className="mt-3">
                       <div className="flex flex-wrap gap-2">
                         {typedListing.lifestylePreferences.map((pref: string, index: number) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
+                          <Badge 
+                            key={index} 
+                            className="text-xs border-0" 
+                            style={{
+                              background: 'var(--surface-secondary)',
+                              color: 'var(--text-primary)'
+                            }}
+                          >
                             {pref.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                           </Badge>
                         ))}
