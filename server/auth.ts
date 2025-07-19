@@ -67,6 +67,10 @@ export function setupAuth(app: Express) {
             return done(null, false, { message: "Invalid email or password" });
           }
           
+          if (!user.verified) {
+            return done(null, false, { message: "Please verify your email address" });
+          }
+          
           // Don't return password in user object
           const { password: _, ...userWithoutPassword } = user;
           return done(null, userWithoutPassword as any);
@@ -112,6 +116,7 @@ export function setupAuth(app: Express) {
 
       // Hash password and create user
       const hashedPassword = await hashPassword(validatedData.password);
+      const verificationToken = nanoid(32);
       
       const user = await storage.createUser({
         id: nanoid(),
@@ -121,8 +126,8 @@ export function setupAuth(app: Express) {
         lastName: validatedData.lastName,
         phoneNumber: validatedData.phoneNumber,
         dateOfBirth: validatedData.dateOfBirth ? new Date(validatedData.dateOfBirth) : null,
-        verified: true, // No email verification required
-        verificationToken: null,
+        verificationToken,
+        verified: true, // Auto-verify for now
         idVerified: false,
         profileImageUrl: null,
       });
