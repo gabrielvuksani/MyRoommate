@@ -127,7 +127,7 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ **Auto-populated contact email**: Contact information field in listing form now auto-fills with user's email but remains editable
 - ✓ **PWA detection and landing page skip**: Added comprehensive PWA/native app detection that automatically skips landing page and goes directly to auth for better app-like experience
 - ✓ **Portrait mode restriction**: Implemented comprehensive portrait mode enforcement with meta tags, CSS media queries, and PWA manifest settings to prevent landscape usage and show rotation message
-- ✓ **Streamlined authentication flow**: Fixed 404 errors during login/signup by using window.location.href redirects (consistent with logout), works seamlessly for both PWA and browser environments
+- ✓ **Streamlined authentication flow**: Eliminated 404 flash during login/signup by implementing AuthTransition state management using sessionStorage, showing loading state during redirect, works seamlessly for both PWA and browser environments
 - ✓ **Enhanced landing page dark mode**: Added comprehensive dark mode support for landing page with proper gradients, text colors, and glass morphism effects
 - ✓ Fixed listing detail page to properly handle multiple images with carousel interface
 - ✓ Added navigation arrows and image indicators for multi-image galleries following iOS design patterns

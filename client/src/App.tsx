@@ -12,6 +12,7 @@ import { getUserFlags } from "@/lib/userUtils";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { PersistentLoading } from "@/lib/persistentLoading";
 import { shouldSkipLanding } from "@/lib/pwaUtils";
+import { AuthTransition } from "@/lib/authTransition";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import Home from "@/pages/home";
@@ -36,14 +37,19 @@ function Router() {
   // Check for persistent loading on page load
   useEffect(() => {
     PersistentLoading.checkAndShow();
-  }, []);
+    // Clear auth transition when component mounts with a user
+    if (user && AuthTransition.isInProgress()) {
+      AuthTransition.clear();
+    }
+  }, [user]);
   
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
     enabled: !!user,
   }) as { data: any };
 
-  if (isLoading) {
+  // Show loading state during auth transition or initial load
+  if (isLoading || AuthTransition.isInProgress()) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <div className="w-8 h-8 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>

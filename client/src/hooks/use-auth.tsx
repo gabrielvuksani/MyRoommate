@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { User, LoginData, RegisterData } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
+import { AuthTransition } from "../lib/authTransition";
 
 type AuthContextType = {
   user: User | null;
@@ -38,6 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (user: User) => {
+      // Mark authentication transition in progress
+      AuthTransition.setInProgress();
       // Set user data immediately for instant UI update
       queryClient.setQueryData(["/api/user"], user);
       // Redirect using window.location (consistent with logout, works for PWA and browser)
@@ -58,6 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (user: User) => {
+      // Mark authentication transition in progress
+      AuthTransition.setInProgress();
       // Set user data immediately for instant UI update
       queryClient.setQueryData(["/api/user"], user);
       // Redirect using window.location (consistent with logout, works for PWA and browser)
