@@ -39,8 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
-      // Force reload to ensure clean state for both PWA and browser
-      window.location.href = "/";
+      // Small delay to let loading overlay show, then redirect
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 200);
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -58,8 +60,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
-      // Force reload to ensure clean state for both PWA and browser
-      window.location.href = "/";
+      // Small delay to let loading overlay show, then redirect
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 200);
     },
     onError: (error: Error) => {
       console.error("Registration failed:", error.message);

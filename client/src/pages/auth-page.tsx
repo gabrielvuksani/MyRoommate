@@ -20,6 +20,7 @@ export default function AuthPage() {
     lastName: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Scroll to top on page load
   useEffect(() => {
@@ -72,6 +73,8 @@ export default function AuthPage() {
     e.preventDefault();
     if (!validateForm()) return;
 
+    setIsRedirecting(true);
+
     try {
       if (isLogin) {
         await loginMutation.mutateAsync({
@@ -91,7 +94,7 @@ export default function AuthPage() {
       }
     } catch (error) {
       console.error("Auth error:", error);
-      // Error is handled in mutation onError
+      setIsRedirecting(false); // Reset loading on error
     }
   };
 
@@ -104,8 +107,19 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="min-h-screen flex">
+    <>
+      {/* Loading Overlay */}
+      {isRedirecting && (
+        <div className="fixed inset-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Signing you in...</p>
+          </div>
+        </div>
+      )}
+      
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <div className="min-h-screen flex">
         {/* Left Column - Form */}
         <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
           <div className="w-full max-w-md space-y-8">
@@ -331,7 +345,49 @@ export default function AuthPage() {
             </div>
           </div>
         </div>
+
+        {/* Right Column - Hero */}
+        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-emerald-50/80 to-cyan-50/80 dark:from-emerald-950/80 dark:to-cyan-950/80 backdrop-blur-lg items-center justify-center p-8">
+          <div className="max-w-md text-center">
+            <div className="w-32 h-32 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-emerald-500/25">
+              <Home className="w-16 h-16 text-white" />
+            </div>
+            <h2 className="text-4xl font-bold mb-4 text-[#1a1a1a] dark:text-white">
+              Your roommate journey starts here
+            </h2>
+            <p className="text-xl mb-8 text-gray-600 dark:text-gray-300 leading-relaxed">
+              Manage chores, split expenses, coordinate schedules, and find the perfect roommate match.
+            </p>
+            <div className="space-y-4 text-left">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-emerald-100/70 dark:bg-emerald-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                </div>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Smart expense splitting</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-cyan-100/70 dark:bg-cyan-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                </div>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Chore management system</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-emerald-100/70 dark:bg-emerald-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                </div>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Real-time messaging</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-cyan-100/70 dark:bg-cyan-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                </div>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">Roommate marketplace</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+    </>
   );
 }
