@@ -93,10 +93,42 @@ export default function AuthPage() {
       }
     } catch (error: any) {
       console.error("Auth error:", error);
-      // Extract error message from the error object
-      const errorMessage = error.message || "Authentication failed. Please try again.";
-      setAuthError(errorMessage);
+      // Extract and format error message
+      const rawErrorMessage = error.message || "Authentication failed. Please try again.";
+      const cleanErrorMessage = formatErrorMessage(rawErrorMessage);
+      setAuthError(cleanErrorMessage);
     }
+  };
+
+  const formatErrorMessage = (errorMessage: string) => {
+    // Clean up common error patterns
+    let cleanMessage = errorMessage
+      .replace(/^\d+:\s*/, '') // Remove error codes like "401: "
+      .replace(/[{}]/g, '') // Remove curly braces
+      .replace(/^"message":"/, '') // Remove JSON structure
+      .replace(/^"/, '').replace(/"$/, '') // Remove quotes
+      .replace(/message":"/, '') // Remove remaining message structure
+      .trim();
+
+    // Add more user-friendly messaging
+    if (cleanMessage.toLowerCase().includes('invalid email or password')) {
+      return 'Invalid email or password, please try again.';
+    }
+    if (cleanMessage.toLowerCase().includes('please verify your email')) {
+      return 'Please check your email and verify your account before signing in.';
+    }
+    if (cleanMessage.toLowerCase().includes('user already exists') || cleanMessage.toLowerCase().includes('username already exists')) {
+      return 'An account with this email already exists. Please try signing in instead.';
+    }
+    if (cleanMessage.toLowerCase().includes('authentication failed')) {
+      return 'Authentication failed. Please check your credentials and try again.';
+    }
+    if (cleanMessage.toLowerCase().includes('registration failed')) {
+      return 'Registration failed. Please check your information and try again.';
+    }
+
+    // Return cleaned message with fallback
+    return cleanMessage || 'Something went wrong. Please try again.';
   };
 
   const updateFormData = (field: string, value: string) => {
@@ -143,7 +175,7 @@ export default function AuthPage() {
                     <div>
                       <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Authentication Error</h3>
                       <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        {authError.replace(/^\d+:\s*/, '').replace(/[{}]/g, '').replace(/^"/, '').replace(/"$/, '')}
+                        {authError}
                       </p>
                     </div>
                   </div>
