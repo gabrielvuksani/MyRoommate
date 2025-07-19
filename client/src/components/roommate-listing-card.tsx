@@ -5,6 +5,7 @@ import { MapPin, Calendar, Home, User, DollarSign, Star } from "lucide-react";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { format } from "date-fns";
 import { useLocation } from "wouter";
+import { memo } from "react";
 
 interface RoommateListingCardProps {
   listing: any;
@@ -12,7 +13,7 @@ interface RoommateListingCardProps {
   compact?: boolean;
 }
 
-export default function RoommateListingCard({ listing, onContact, compact = false }: RoommateListingCardProps) {
+function RoommateListingCard({ listing, onContact, compact = false }: RoommateListingCardProps) {
   const [, navigate] = useLocation();
   
   const formatRent = (rent: string) => {
@@ -152,3 +153,5 @@ export default function RoommateListingCard({ listing, onContact, compact = fals
     </Card>
   );
 }
+
+export default memo(RoommateListingCard);
