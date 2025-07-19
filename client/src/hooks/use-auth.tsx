@@ -40,9 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (user: User) => {
       // Set user data immediately for instant UI update
       queryClient.setQueryData(["/api/user"], user);
-      // Invalidate to refresh any other dependent queries
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+      // Redirect using window.location (consistent with logout, works for PWA and browser)
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -61,9 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (user: User) => {
       // Set user data immediately for instant UI update
       queryClient.setQueryData(["/api/user"], user);
-      // Invalidate to refresh any other dependent queries
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+      // Redirect using window.location (consistent with logout, works for PWA and browser)
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Registration failed:", error.message);

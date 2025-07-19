@@ -27,19 +27,13 @@ export default function AuthPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Redirect after successful authentication
+  // Redirect if user was already logged in when they accessed this page
   React.useEffect(() => {
-    if (user && (loginMutation.isSuccess || registerMutation.isSuccess)) {
-      // Successful auth - add small delay to ensure state is properly updated
-      const timer = setTimeout(() => {
-        setLocation("/");
-      }, 100);
-      return () => clearTimeout(timer);
-    } else if (user && !loginMutation.isPending && !registerMutation.isPending && !loginMutation.isSuccess && !registerMutation.isSuccess) {
+    if (user && !loginMutation.isPending && !registerMutation.isPending && !loginMutation.isSuccess && !registerMutation.isSuccess) {
       // User was already logged in when they accessed this page
-      setLocation("/");
+      window.location.href = "/";
     }
-  }, [user, loginMutation.isSuccess, registerMutation.isSuccess, loginMutation.isPending, registerMutation.isPending, setLocation]);
+  }, [user, loginMutation.isPending, registerMutation.isPending, loginMutation.isSuccess, registerMutation.isSuccess]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -84,20 +78,20 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-        const result = await loginMutation.mutateAsync({
+        await loginMutation.mutateAsync({
           email: formData.email,
           password: formData.password,
         });
-        // Login successful - the useEffect will handle navigation
+        // Login successful - onSuccess will handle navigation
       } else {
-        const result = await registerMutation.mutateAsync({
+        await registerMutation.mutateAsync({
           email: formData.email,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
           firstName: formData.firstName,
           lastName: formData.lastName,
         });
-        // Registration successful - the useEffect will handle navigation
+        // Registration successful - onSuccess will handle navigation
       }
     } catch (error: any) {
       console.error("Auth error:", error);
