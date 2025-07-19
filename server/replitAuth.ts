@@ -110,8 +110,8 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/callback", (req, res, next) => {
     passport.authenticate(`myroommate:${req.hostname}`, {
-      successReturnToOrRedirect: "/auth?success=true",
-      failureRedirect: "/auth?error=true",
+      successReturnToOrRedirect: "/auth/success",
+      failureRedirect: "/api/login",
     })(req, res, next);
   });
 
