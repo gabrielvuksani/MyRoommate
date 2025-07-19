@@ -13,6 +13,7 @@ import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { PersistentLoading } from "@/lib/persistentLoading";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
+import ResetPasswordPage from "@/pages/reset-password-page";
 import Home from "@/pages/home";
 import Chores from "@/pages/chores";
 import Expenses from "@/pages/expenses";
@@ -61,6 +62,7 @@ function Router() {
           <>
             <Route path="/landing" component={Landing} />
             <Route path="/auth" component={AuthPage} />
+            <Route path="/reset-password" component={ResetPasswordPage} />
             <Route path="/" component={Landing} />
           </>
         ) : needsOnboarding ? (
