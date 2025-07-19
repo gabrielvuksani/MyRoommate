@@ -18,7 +18,10 @@ import {
   Sparkles,
   Cat,
   Shield,
-  ArrowRight
+  ArrowRight,
+  Star,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
@@ -30,6 +33,7 @@ export default function ListingDetail() {
   const [, navigate] = useLocation();
   const { user } = useAuth();
   const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const { data: listing, isLoading } = useQuery({
     queryKey: [`/api/roommate-listings/${params?.id}`],
@@ -123,15 +127,48 @@ export default function ListingDetail() {
       </div>
 
       <div className="pt-36 px-6 max-w-3xl mx-auto space-y-6 page-enter">
-        {/* Image or Placeholder with Featured Badge */}
+        {/* Image Gallery with Featured Badge */}
         <div className="relative">
           {typedListing.images && typedListing.images.length > 0 ? (
-            <div className="rounded-3xl overflow-hidden h-64 shadow-lg">
+            <div className="rounded-3xl overflow-hidden h-64 shadow-lg relative">
               <img 
-                src={typedListing.images[0]} 
-                alt={typedListing.title}
-                className="w-full h-full object-cover"
+                src={typedListing.images[currentImageIndex]} 
+                alt={`${typedListing.title} - Image ${currentImageIndex + 1}`}
+                className="w-full h-full object-cover transition-opacity duration-300"
               />
+              
+              {/* Navigation Arrows - Only show if multiple images */}
+              {typedListing.images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setCurrentImageIndex(prev => prev === 0 ? typedListing.images.length - 1 : prev - 1)}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-all"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentImageIndex(prev => prev === typedListing.images.length - 1 ? 0 : prev + 1)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-all"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                  
+                  {/* Image Indicators */}
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-2">
+                    {typedListing.images.map((_, index: number) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          index === currentImageIndex 
+                            ? 'bg-white' 
+                            : 'bg-white/50 hover:bg-white/75'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <div className="h-64 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-3xl flex items-center justify-center shadow-lg">
@@ -168,7 +205,7 @@ export default function ListingDetail() {
                   </span>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>
+                  <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                     {formatRent(typedListing.rent)}/mo
                   </div>
                   {typedListing.utilities && (

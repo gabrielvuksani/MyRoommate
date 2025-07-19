@@ -529,30 +529,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(existingListings[0]);
       }
 
+      // Create a sample image as base64 data URL for demo purposes
+      const createSampleImage = () => {
+        const svgContent = `
+          <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <rect width="400" height="300" fill="url(#bg)"/>
+            <rect x="20" y="20" width="360" height="260" fill="rgba(255,255,255,0.1)" rx="12"/>
+            <circle cx="200" cy="120" r="40" fill="rgba(255,255,255,0.2)"/>
+            <rect x="160" y="140" width="80" height="6" fill="rgba(255,255,255,0.3)" rx="3"/>
+            <rect x="170" y="155" width="60" height="4" fill="rgba(255,255,255,0.2)" rx="2"/>
+            <text x="200" y="200" text-anchor="middle" font-family="system-ui" font-size="16" fill="white" opacity="0.8">Beautiful Modern Room</text>
+            <text x="200" y="220" text-anchor="middle" font-family="system-ui" font-size="12" fill="white" opacity="0.6">Near UC Berkeley Campus</text>
+          </svg>
+        `;
+        
+        const base64 = btoa(svgContent);
+        return `data:image/svg+xml;base64,${base64}`;
+      };
+
       const demoListing = await storage.createRoommateListing({
-        title: "Sunny Room in Modern Downtown Apartment",
-        description: "Beautiful, spacious room available in a newly renovated 3-bedroom apartment in the heart of downtown. The apartment features a modern kitchen with stainless steel appliances, hardwood floors throughout, and floor-to-ceiling windows with stunning city views. Perfect for young professionals or students looking for a vibrant living experience.",
-        rent: 1200,
-        utilities: 150,
-        location: "123 Main Street, Apt 4B",
-        city: "San Francisco",
+        title: "Beautiful Modern Room in Shared House",
+        description: "Spacious and bright room available in a beautifully maintained 4-bedroom house just minutes from UC Berkeley campus. The house features a modern kitchen with stainless steel appliances, comfortable living spaces, fast WiFi, and a lovely backyard perfect for studying or relaxing. You'll be sharing with 3 other friendly students who value both academics and social life. The room comes partially furnished with a bed, desk, and ample closet space. This is perfect for someone looking for a balance of privacy and community in their living situation.",
+        rent: 1450,
+        utilities: 125,
+        location: "2847 Telegraph Avenue",
+        city: "Berkeley",
         state: "CA",
-        zipCode: "94102",
-        neighborhood: "SOMA",
-        university: "UC San Francisco",
-        distanceToCampus: "10 min walk",
-        transportationNotes: "Near BART and Muni lines, easy access to downtown",
-        availableFrom: new Date("2025-02-01"),
+        zipCode: "94705",
+        university: "UC Berkeley",
+        distanceToCampus: "8 minute walk",
+        availableFrom: new Date("2025-08-15"),
+        availableTo: new Date("2026-05-31"),
         roomType: "private",
-        housingType: "apartment",
-        genderPreference: "any",
-        studentYear: "any",
+        housingType: "house",
+        genderPreference: "female",
+        studentYear: "graduate",
         studyHabits: "quiet",
         socialPreferences: "balanced",
-        lifestylePreferences: ["clean", "pet_friendly"],
-        amenities: ["In-unit laundry", "Gym", "Rooftop deck", "High-speed WiFi", "Central AC/Heating", "Dishwasher", "Parking available"],
-        images: [],
-        contactInfo: "demo@myRoommate.app",
+        lifestylePreferences: ["clean", "no_smoking", "vegetarian", "quiet"],
+        amenities: [
+          "High-speed WiFi",
+          "In-unit laundry", 
+          "Modern kitchen",
+          "Backyard/garden",
+          "Desk and chair",
+          "Natural lighting",
+          "Shared living spaces",
+          "Near public transit",
+          "Bike storage",
+          "Study-friendly environment"
+        ],
+        images: [createSampleImage()],
+        contactInfo: "sarah.berkeley.housing@gmail.com",
         featured: true,
         createdBy: null,
       });

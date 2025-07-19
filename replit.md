@@ -111,6 +111,14 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 19, 2025 (Latest):**
+- ✓ Fixed listing detail page to properly handle multiple images with carousel interface
+- ✓ Added navigation arrows and image indicators for multi-image galleries following iOS design patterns
+- ✓ Updated price color from blue to theme-aware (white/black) for consistency across light/dark modes
+- ✓ Created comprehensive demo listing with all form fields populated and sample image
+- ✓ Enhanced demo listing with detailed UC Berkeley location, lifestyle preferences, and amenities
+- ✓ Added auto-generated SVG sample image for demo listing showcasing modern design
+- ✓ Implemented auto-featuring system that unfeatues previous listings when new ones are created
+- ✓ Enhanced listing detail page transitions and interaction feedback for premium user experience
 - ✓ Fixed listing detail page badges to work properly in both dark and light modes with explicit color styling
 - ✓ Updated badges with specific blue, purple, and green themes for room type, housing type, and availability
 - ✓ Removed neighborhood and transportation notes fields from add listing form for cleaner interface
