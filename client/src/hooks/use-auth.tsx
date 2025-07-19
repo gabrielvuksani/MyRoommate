@@ -73,8 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (data: any) => {
       if (data.requiresVerification) {
-        // Don't set user data yet, show verification message instead
-        alert(`Please check your email (${data.email}) and click the verification link to complete your account setup.`);
+        // Don't set user data yet, success message handled in component
+        console.log('Registration successful, verification required');
       } else {
         queryClient.setQueryData(["/api/user"], data);
       }

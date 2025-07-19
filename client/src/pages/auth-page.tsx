@@ -178,7 +178,7 @@ export default function AuthPage() {
             {/* Form Card */}
             <Card className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-white/30 dark:border-slate-700/30 rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-slate-900/50">
               <CardContent className="p-8">
-                {/* Verification Messages */}
+                {/* Message Display - Always at top */}
                 {verificationMessage && (
                   <div className={`p-4 rounded-xl mb-6 ${
                     verificationMessage.includes('successfully') 
@@ -202,6 +202,27 @@ export default function AuthPage() {
                   </div>
                 )}
 
+                {/* Registration success message */}
+                {registerMutation.isSuccess && registerMutation.data?.requiresVerification && (
+                  <div className="p-4 rounded-xl mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50">
+                    <div className="flex items-center">
+                      <Mail className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400" />
+                      <p className="text-sm text-blue-800 dark:text-blue-300">
+                        Registration successful! Please check your email and click the verification link to complete your account setup.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Error Display - Always at top */}
+                {(loginMutation.error || registerMutation.error) && (
+                  <div className="p-4 rounded-xl mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50">
+                    <p className="text-red-600 dark:text-red-400 text-sm">
+                      {loginMutation.error?.message || registerMutation.error?.message}
+                    </p>
+                  </div>
+                )}
+
                 {/* Password Reset Form */}
                 {showForgotPassword ? (
                   <div className="space-y-6">
@@ -215,8 +236,8 @@ export default function AuthPage() {
                     </div>
 
                     {resetMessage && (
-                      <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
-                        <p className="text-sm text-blue-800">{resetMessage}</p>
+                      <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50">
+                        <p className="text-sm text-blue-800 dark:text-blue-300">{resetMessage}</p>
                       </div>
                     )}
 
@@ -387,14 +408,7 @@ export default function AuthPage() {
                       )}
                     </Button>
 
-                    {/* Error Display */}
-                    {(loginMutation.error || registerMutation.error) && (
-                      <div className="p-4 rounded-2xl bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm border border-red-200/50 dark:border-red-800/50">
-                        <p className="text-red-600 dark:text-red-400 text-sm">
-                          {loginMutation.error?.message || registerMutation.error?.message}
-                        </p>
-                      </div>
-                    )}
+
 
                     {/* Forgot Password Link - Only for login */}
                     {isLogin && (
