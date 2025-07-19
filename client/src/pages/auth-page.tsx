@@ -26,13 +26,13 @@ export default function AuthPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Redirect if already logged in on page load (not during active auth)
+  // Only redirect if user was already logged in when page loaded (not after auth mutations)
   React.useEffect(() => {
-    if (user && !loginMutation.isPending && !registerMutation.isPending) {
-      // Use window.location for consistency with auth mutations
+    if (user && !loginMutation.isPending && !registerMutation.isPending && !loginMutation.isSuccess && !registerMutation.isSuccess) {
+      // User was already logged in when they accessed this page
       window.location.href = "/";
     }
-  }, [user, loginMutation.isPending, registerMutation.isPending]);
+  }, [user, loginMutation.isPending, registerMutation.isPending, loginMutation.isSuccess, registerMutation.isSuccess]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
