@@ -1,13 +1,11 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { Strategy as AppleStrategy } from "passport-apple";
 import { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User, loginSchema, registerSchema, OAuthData } from "@shared/schema";
+import { User, loginSchema, registerSchema } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 import { nanoid } from "nanoid";
 
@@ -61,14 +59,13 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Local strategy for email/password
   passport.use(
     new LocalStrategy(
       { usernameField: "email" },
       async (email, password, done) => {
         try {
           const user = await storage.getUserByEmail(email);
-          if (!user || !user.password || !(await comparePasswords(password, user.password))) {
+          if (!user || !(await comparePasswords(password, user.password))) {
             return done(null, false, { message: "Invalid email or password" });
           }
           
@@ -86,87 +83,6 @@ export function setupAuth(app: Express) {
       }
     )
   );
-
-  // Google OAuth strategy
-  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-    passport.use(
-      new GoogleStrategy(
-        {
-          clientID: process.env.GOOGLE_CLIENT_ID,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-          callbackURL: "/api/auth/google/callback",
-        },
-        async (accessToken, refreshToken, profile, done) => {
-          try {
-            const oauthData: OAuthData = {
-              provider: "google",
-              providerId: profile.id,
-              email: profile.emails?.[0]?.value || "",
-              firstName: profile.name?.givenName,
-              lastName: profile.name?.familyName,
-              profileImageUrl: profile.photos?.[0]?.value,
-            };
-
-            let user = await storage.getUserByEmail(oauthData.email);
-            
-            if (!user) {
-              // Create new user
-              user = await storage.createOAuthUser(oauthData);
-            } else if (user.provider === "email" && !user.providerId) {
-              // Link existing email account with Google
-              user = await storage.linkOAuthAccount(user.id, oauthData);
-            }
-
-            const { password: _, ...userWithoutPassword } = user;
-            return done(null, userWithoutPassword as any);
-          } catch (error) {
-            return done(error);
-          }
-        }
-      )
-    );
-  }
-
-  // Apple OAuth strategy  
-  if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPLE_KEY_ID && process.env.APPLE_PRIVATE_KEY) {
-    passport.use(
-      new AppleStrategy(
-        {
-          clientID: process.env.APPLE_CLIENT_ID,
-          teamID: process.env.APPLE_TEAM_ID,
-          callbackURL: "/api/auth/apple/callback",
-          keyID: process.env.APPLE_KEY_ID,
-          privateKeyString: process.env.APPLE_PRIVATE_KEY,
-        },
-        async (accessToken, refreshToken, profile, done) => {
-          try {
-            const oauthData: OAuthData = {
-              provider: "apple",
-              providerId: profile.id,
-              email: profile.email || "",
-              firstName: profile.name?.firstName,
-              lastName: profile.name?.lastName,
-            };
-
-            let user = await storage.getUserByEmail(oauthData.email);
-            
-            if (!user) {
-              // Create new user
-              user = await storage.createOAuthUser(oauthData);
-            } else if (user.provider === "email" && !user.providerId) {
-              // Link existing email account with Apple
-              user = await storage.linkOAuthAccount(user.id, oauthData);
-            }
-
-            const { password: _, ...userWithoutPassword } = user;
-            return done(null, userWithoutPassword as any);
-          } catch (error) {
-            return done(error);
-          }
-        }
-      )
-    );
-  }
 
   passport.serializeUser((user, done) => done(null, user.id));
   
@@ -307,32 +223,6 @@ export function setupAuth(app: Express) {
     }
     res.json(req.user);
   });
-
-  // Google OAuth routes
-  app.get("/api/auth/google", 
-    passport.authenticate("google", { scope: ["profile", "email"] })
-  );
-
-  app.get("/api/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/auth" }),
-    (req, res) => {
-      // Successful authentication, redirect to home
-      res.redirect("/");
-    }
-  );
-
-  // Apple OAuth routes
-  app.get("/api/auth/apple",
-    passport.authenticate("apple", { scope: ["name", "email"] })
-  );
-
-  app.get("/api/auth/apple/callback",
-    passport.authenticate("apple", { failureRedirect: "/auth" }),
-    (req, res) => {
-      // Successful authentication, redirect to home
-      res.redirect("/");
-    }
-  );
 }
 
 export const isAuthenticated = (req: any, res: any, next: any) => {

@@ -37,8 +37,6 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: User): Promise<User>;
-  createOAuthUser(oauthData: any): Promise<User>;
-  linkOAuthAccount(userId: string, oauthData: any): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   
   // Household operations
@@ -106,37 +104,6 @@ export class DatabaseStorage implements IStorage {
   async createUser(user: User): Promise<User> {
     const [result] = await db.insert(users).values(user).returning();
     return result;
-  }
-
-  async createOAuthUser(oauthData: any): Promise<User> {
-    const newUser = {
-      id: `${oauthData.provider}_${oauthData.providerId}`,
-      email: oauthData.email,
-      provider: oauthData.provider,
-      providerId: oauthData.providerId,
-      firstName: oauthData.firstName,
-      lastName: oauthData.lastName,
-      profileImageUrl: oauthData.profileImageUrl,
-      verified: true, // OAuth users are considered verified
-      password: null, // OAuth users don't have passwords
-    };
-
-    const [user] = await db.insert(users).values(newUser).returning();
-    return user;
-  }
-
-  async linkOAuthAccount(userId: string, oauthData: any): Promise<User> {
-    const [user] = await db
-      .update(users)
-      .set({
-        provider: oauthData.provider,
-        providerId: oauthData.providerId,
-        profileImageUrl: oauthData.profileImageUrl || null,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.id, userId))
-      .returning();
-    return user;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
