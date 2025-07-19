@@ -38,7 +38,7 @@ export const PersistentLoading = {
       // Auto-hide after timeout to prevent infinite loading
       setTimeout(() => {
         PersistentLoading.hide();
-      }, 3000);
+      }, 5000);
     }
   }
 };
