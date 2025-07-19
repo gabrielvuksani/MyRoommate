@@ -17,7 +17,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 
-// Session storage table for myRoommate Auth
+// Session storage table for Replit Auth
 export const sessions = pgTable(
   "sessions",
   {
@@ -28,7 +28,7 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table for myRoommate Auth
+// User storage table for Replit Auth
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
   email: varchar("email").unique(),

@@ -88,7 +88,7 @@ export async function setupAuth(app: Express) {
     .REPLIT_DOMAINS!.split(",")) {
     const strategy = new Strategy(
       {
-        name: `myroommate:${domain}`,
+        name: `replitauth:${domain}`,
         config,
         scope: "openid email profile offline_access",
         callbackURL: `https://${domain}/api/callback`,
@@ -102,20 +102,20 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    passport.authenticate(`myroommate:${req.hostname}`, {
+    passport.authenticate(`replitauth:${req.hostname}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    passport.authenticate(`myroommate:${req.hostname}`, {
-      successReturnToOrRedirect: "/auth?success=true",
-      failureRedirect: "/auth?error=true",
+    passport.authenticate(`replitauth:${req.hostname}`, {
+      successReturnToOrRedirect: "/auth/success",
+      failureRedirect: "/api/login",
     })(req, res, next);
   });
 
-  // Add premium authentication success page
+  // Add iOS deep link callback
   app.get("/auth/success", (req, res) => {
     const userAgent = req.get('User-Agent') || '';
     const isCapacitor = userAgent.includes('Capacitor') || req.get('X-Capacitor') === 'true';
@@ -124,26 +124,10 @@ export async function setupAuth(app: Express) {
       // For iOS app, use custom URL scheme to return to app
       res.send(`
         <html>
-          <head>
-            <title>Welcome to myRoommate</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              body { 
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                display: flex; align-items: center; justify-content: center;
-                min-height: 100vh; margin: 0; color: white; text-align: center;
-              }
-              .container { padding: 2rem; }
-              h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
-              p { opacity: 0.9; }
-            </style>
-          </head>
+          <head><title>Authentication Successful</title></head>
           <body>
-            <div class="container">
-              <h2>Welcome to myRoommate!</h2>
-              <p>Authentication successful. Returning to app...</p>
-            </div>
+            <h2>Authentication Successful!</h2>
+            <p>Redirecting back to app...</p>
             <script>
               setTimeout(() => {
                 window.location.href = 'myroommate://auth/success';
@@ -153,72 +137,8 @@ export async function setupAuth(app: Express) {
         </html>
       `);
     } else {
-      // For web browser, show premium success page then redirect
-      res.send(`
-        <html>
-          <head>
-            <title>Welcome to myRoommate</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              body { 
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                display: flex; align-items: center; justify-content: center;
-                min-height: 100vh; margin: 0; color: white; text-align: center;
-                overflow: hidden;
-              }
-              .container { 
-                padding: 3rem; 
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(20px);
-                border-radius: 24px;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-                max-width: 400px;
-                animation: slideIn 0.6s ease-out;
-              }
-              @keyframes slideIn {
-                from { opacity: 0; transform: translateY(30px); }
-                to { opacity: 1; transform: translateY(0); }
-              }
-              h1 { 
-                font-size: 2rem; 
-                margin-bottom: 0.5rem; 
-                font-weight: 600;
-                background: linear-gradient(45deg, #fff, #e0e7ff);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-              }
-              p { opacity: 0.9; font-size: 1.1rem; margin-bottom: 1.5rem; }
-              .loading { 
-                width: 40px; 
-                height: 40px; 
-                border: 3px solid rgba(255,255,255,0.3); 
-                border-top: 3px solid white; 
-                border-radius: 50%; 
-                animation: spin 1s linear infinite; 
-                margin: 0 auto;
-              }
-              @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <h1>Welcome to myRoommate!</h1>
-              <p>Authentication successful.<br>Taking you to your dashboard...</p>
-              <div class="loading"></div>
-            </div>
-            <script>
-              setTimeout(() => {
-                window.location.href = '/';
-              }, 2000);
-            </script>
-          </body>
-        </html>
-      `);
+      // For web browser, redirect normally
+      res.redirect('/');
     }
   });
 
