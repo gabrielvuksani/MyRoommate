@@ -31,33 +31,58 @@ export default function Home() {
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: chores = [] } = useQuery({
     queryKey: ["/api/chores"],
+    enabled: !!household,
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: messages = [] } = useQuery({
     queryKey: ["/api/messages"],
+    enabled: !!household,
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: calendarEvents = [] } = useQuery({
     queryKey: ["/api/calendar"],
+    enabled: !!household,
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: balance } = useQuery({
     queryKey: ["/api/balance"],
+    enabled: !!household,
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
   });
 
   // Fetch featured roommate listings for all users
   const { data: featuredListings = [] } = useQuery({
     queryKey: ['/api/roommate-listings', { featured: true }],
     queryFn: () => fetch('/api/roommate-listings?featured=true').then(res => res.json()),
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: myListings = [] } = useQuery({
     queryKey: ['/api/roommate-listings/my'],
     enabled: !!user, // Fetch when user is logged in
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
   });
 
   useEffect(() => {

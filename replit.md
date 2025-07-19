@@ -130,6 +130,7 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ **Streamlined authentication flow**: Fixed 404 errors during login/signup by using window.location.href redirects (consistent with logout), works seamlessly for both PWA and browser environments
 - ✓ **Enhanced landing page dark mode**: Added comprehensive dark mode support for landing page with proper gradients, text colors, and glass morphism effects  
 - ✓ **Fixed authentication 404 flash**: Added proper loading states for household query to prevent brief 404 error page visibility during login/signup process
+- ✓ **Fixed infinite loading and API requests**: Properly conditioned household-dependent queries to only run when household exists, preventing continuous 404 requests and loading states
 - ✓ Fixed listing detail page to properly handle multiple images with carousel interface
 - ✓ Added navigation arrows and image indicators for multi-image galleries following iOS design patterns
 - ✓ Updated price color from blue to theme-aware (white/black) for consistency across light/dark modes

@@ -42,10 +42,14 @@ function Router() {
     queryKey: ["/api/households/current"],
     enabled: !!user,
     retry: false, // Don't retry 404s
+    refetchOnWindowFocus: false, // Don't refetch when window gets focus
+    refetchOnMount: false, // Don't refetch on component mount
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   }) as { data: any, isLoading: boolean, error: any };
 
-  // Show loading during auth or initial household check
-  if (isLoading || (user && isHouseholdLoading)) {
+  // Show loading only during initial auth
+  // Once we have user data, proceed immediately (404 for household is expected for new users)
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <div className="w-8 h-8 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
@@ -53,15 +57,8 @@ function Router() {
     );
   }
 
-  // Only get user flags once we have definitive household data
-  // (either exists or confirmed 404 error)
-  const householdDataReady = !user || !isHouseholdLoading;
-  const userFlags = householdDataReady ? getUserFlags(user, household, !!user, location) : {
-    isNewUser: false,
-    isExistingUser: false,
-    needsOnboarding: false,
-    hasHousehold: false
-  };
+  // Get user flags immediately - treat 404 household as no household
+  const userFlags = getUserFlags(user, household, !!user, location);
   const { needsOnboarding, hasHousehold } = userFlags;
   
   // Check if we should skip landing page for PWA/native apps
