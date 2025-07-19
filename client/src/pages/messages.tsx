@@ -8,8 +8,9 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { notificationService } from "@/lib/notifications";
-import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
+import { MessageCircle, Coffee, Home, ShoppingCart, Calendar, Hash, Users } from "lucide-react";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
+import { useLocation } from "wouter";
 
 interface WebSocketMessage {
   type: string;
@@ -40,6 +41,7 @@ export default function Messages() {
   const [isTyping, setIsTyping] = useState(false);
   // Connection status - starts optimistic when user and household are available
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -48,6 +50,16 @@ export default function Messages() {
   const { user } = useAuth() as { user: any };
   const queryClient = useQueryClient();
   const { keyboardHeight, isKeyboardVisible } = useKeyboardHeight();
+  const [location] = useLocation();
+  
+  // Get conversation ID from URL query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const conversationId = params.get('conversation');
+    if (conversationId) {
+      setSelectedConversationId(conversationId);
+    }
+  }, [location]);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -55,9 +67,30 @@ export default function Messages() {
     retryDelay: 1000,
   }) as { data: any };
 
+  const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
+    queryKey: ["/api/conversations"],
+    enabled: !!user,
+    refetchInterval: 5000,
+  });
+
+  // Select household conversation by default if no conversation is selected
+  useEffect(() => {
+    if (!selectedConversationId && conversations.length > 0 && household) {
+      const householdConversation = conversations.find((conv: any) => 
+        conv.type === 'household' && conv.householdId === household.id
+      );
+      if (householdConversation) {
+        setSelectedConversationId(householdConversation.id);
+      } else {
+        // If no household conversation, select the first one
+        setSelectedConversationId(conversations[0].id);
+      }
+    }
+  }, [conversations, household, selectedConversationId]);
+
   const { data: serverMessages = [], isLoading } = useQuery({
-    queryKey: ["/api/messages"],
-    enabled: !!household && !!user,
+    queryKey: [`/api/conversations/${selectedConversationId}/messages`],
+    enabled: !!selectedConversationId && !!user,
     refetchInterval: connectionStatus === 'connected' ? 5000 : 2000, // Slower polling when connected via WebSocket
     refetchIntervalInBackground: true,
     staleTime: connectionStatus === 'connected' ? 30000 : 1000, // Longer stale time when WebSocket is active
@@ -95,19 +128,22 @@ export default function Messages() {
       if (data.type === "new_message" && data.message) {
         console.log('Real-time message received:', data.message.id || 'unknown');
         
-        queryClient.setQueryData(["/api/messages"], (old: any) => {
-          const currentMessages = old || [];
-          
-          const messageExists = data.message?.id ? currentMessages.some((msg: any) => msg.id === data.message!.id) : false;
-          if (messageExists) {
-            console.log('Message already exists in cache, skipping duplicate');
-            return currentMessages;
-          }
-          
-          const updatedMessages = [...currentMessages, data.message];
-          console.log('Cache updated with new message:', updatedMessages.length, 'total messages');
-          return updatedMessages;
-        });
+        // Update the specific conversation's messages
+        if (data.message.conversationId) {
+          queryClient.setQueryData([`/api/conversations/${data.message.conversationId}/messages`], (old: any) => {
+            const currentMessages = old || [];
+            
+            const messageExists = data.message?.id ? currentMessages.some((msg: any) => msg.id === data.message!.id) : false;
+            if (messageExists) {
+              console.log('Message already exists in cache, skipping duplicate');
+              return currentMessages;
+            }
+            
+            const updatedMessages = [...currentMessages, data.message];
+            console.log('Cache updated with new message:', updatedMessages.length, 'total messages');
+            return updatedMessages;
+          });
+        }
         
         // Send notification for new messages (only if not from current user)
         if (data.message && data.message.userId !== user?.id) {
@@ -117,7 +153,7 @@ export default function Messages() {
         }
         
         queryClient.invalidateQueries({ 
-          queryKey: ["/api/messages"], 
+          queryKey: [`/api/conversations/${data.message.conversationId}/messages`], 
           refetchType: 'active' 
         });
         
@@ -347,14 +383,10 @@ export default function Messages() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (content: string) => {
-      const response = await fetch("/api/messages", {
+      const response = await fetch(`/api/conversations/${selectedConversationId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content,
-          householdId: household?.id,
-          userId: user?.id,
-        }),
+        body: JSON.stringify({ content }),
       });
       if (!response.ok) {
         const errorText = await response.text();
@@ -367,7 +399,7 @@ export default function Messages() {
       
       // If WebSocket is not connected, update cache directly for immediate UI feedback
       if (connectionStatus !== 'connected') {
-        queryClient.setQueryData(["/api/messages"], (old: any) => {
+        queryClient.setQueryData([`/api/conversations/${selectedConversationId}/messages`], (old: any) => {
           const currentMessages = old || [];
           // Check if message already exists to prevent duplicates
           const messageExists = currentMessages.some((msg: any) => msg.id === newMessage.id);
@@ -399,7 +431,7 @@ export default function Messages() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !household || !user || sendMessageMutation.isPending) return;
+    if (!newMessage.trim() || !selectedConversationId || !user || sendMessageMutation.isPending) return;
 
     const messageContent = newMessage.trim();
     
@@ -460,6 +492,9 @@ export default function Messages() {
     );
   }
 
+  // Find the current conversation
+  const currentConversation = conversations.find((conv: any) => conv.id === selectedConversationId);
+  
   return (
     <div className="h-screen flex flex-col page-transition">
       {/* Fixed Header */}
@@ -471,45 +506,123 @@ export default function Messages() {
           WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
         }}
       >
-        <div className="max-w-3xl mx-auto">
-          <div className="page-header bg-transparent">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="page-title" style={{ color: 'var(--text-primary)' }}>Messages</h1>
-                <p className="page-subtitle" style={{ color: 'var(--text-secondary)' }}>Chat with your household</p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  connectionStatus === 'connected' ? 'bg-green-500 shadow-green-500/50 shadow-lg' : 
-                  connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse shadow-yellow-500/50 shadow-lg' : 
-                  'bg-red-500 shadow-red-500/50 shadow-lg'
-                }`}></div>
-                <span className="text-xs font-medium transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>
-                  {connectionStatus === 'connected' ? 'Real-time' : 
-                   connectionStatus === 'connecting' ? 'Connecting...' : 
-                   'Syncing messages'}
-                </span>
-              </div>
+        <div className="page-header bg-transparent">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="page-title" style={{ color: 'var(--text-primary)' }}>Messages</h1>
+              <p className="page-subtitle" style={{ color: 'var(--text-secondary)' }}>
+                {currentConversation?.type === 'household' 
+                  ? `Chat with ${currentConversation.household?.name || 'your household'}`
+                  : currentConversation?.listing
+                  ? `About: ${currentConversation.listing.title}`
+                  : 'Direct message'}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                connectionStatus === 'connected' ? 'bg-green-500 shadow-green-500/50 shadow-lg' : 
+                connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse shadow-yellow-500/50 shadow-lg' : 
+                'bg-red-500 shadow-red-500/50 shadow-lg'
+              }`}></div>
+              <span className="text-xs font-medium transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>
+                {connectionStatus === 'connected' ? 'Real-time' : 
+                 connectionStatus === 'connecting' ? 'Connecting...' : 
+                 'Syncing messages'}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Scrollable Messages Container - Premium spacing */}
-      <div 
-        ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto transition-all duration-500 ease-out"
-        style={{ 
-          paddingTop: '140px', 
-          paddingBottom: isKeyboardVisible 
-            ? '160px'  // Extra space for short conversations when keyboard is visible
-            : '200px', // Normal space above tab bar
-          transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
-          filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`,
-          minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto' // Ensure scrollable area for short conversations
-        }}
-      >
-        <div className="max-w-3xl mx-auto px-6">
+      {/* Main content area with sidebar and messages */}
+      <div className="flex-1 flex overflow-hidden pt-36">
+        {/* Conversations Sidebar */}
+        <div className="w-80 border-r overflow-y-auto" style={{ borderColor: 'var(--border)' }}>
+          <div className="p-4">
+            <h2 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-secondary)' }}>
+              Conversations
+            </h2>
+            <div className="space-y-2">
+              {conversationsLoading ? (
+                <div className="flex justify-center py-4">
+                  <div className="w-6 h-6 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                conversations.map((conversation: any) => {
+                  const isSelected = conversation.id === selectedConversationId;
+                  const otherParticipant = conversation.participants?.find((p: any) => p.userId !== user?.id);
+                  const displayName = conversation.type === 'household' 
+                    ? conversation.household?.name || 'Household Chat'
+                    : otherParticipant 
+                    ? formatDisplayName(otherParticipant.user?.firstName, otherParticipant.user?.lastName, 'User')
+                    : 'Direct Message';
+                  
+                  return (
+                    <button
+                      key={conversation.id}
+                      onClick={() => setSelectedConversationId(conversation.id)}
+                      className={`w-full text-left p-3 rounded-xl transition-all ${
+                        isSelected 
+                          ? 'bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20' 
+                          : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium ${
+                          conversation.type === 'household' 
+                            ? 'bg-gradient-to-br from-emerald-500 to-cyan-500'
+                            : 'bg-gradient-to-br from-blue-500 to-blue-600'
+                        }`}>
+                          {conversation.type === 'household' ? (
+                            <Home className="w-5 h-5" />
+                          ) : (
+                            <span className="text-sm">
+                              {otherParticipant 
+                                ? getProfileInitials(otherParticipant.user?.firstName, otherParticipant.user?.lastName)
+                                : <Users className="w-5 h-5" />}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                            {displayName}
+                          </h3>
+                          {conversation.lastMessage && (
+                            <p className="text-sm truncate" style={{ color: 'var(--text-secondary)' }}>
+                              {conversation.lastMessage.content}
+                            </p>
+                          )}
+                          {conversation.listing && (
+                            <p className="text-xs truncate" style={{ color: 'var(--text-tertiary)' }}>
+                              Re: {conversation.listing.title}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Messages Area */}
+        <div className="flex-1 flex flex-col">
+          {/* Scrollable Messages Container - Premium spacing */}
+          <div 
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto transition-all duration-500 ease-out"
+            style={{ 
+              paddingBottom: isKeyboardVisible 
+                ? '160px'  // Extra space for short conversations when keyboard is visible
+                : '200px', // Normal space above tab bar
+              transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
+              filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`,
+              minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto' // Ensure scrollable area for short conversations
+            }}
+          >
+            <div className="px-6 pt-4">
           <div className="space-y-4 min-h-full">
             {isLoading ? (
               <div className="flex justify-center py-8">
@@ -575,24 +688,24 @@ export default function Messages() {
                 <div ref={messagesEndRef} />
               </div>
             )}
+            </div>
           </div>
         </div>
-      </div>
-      {/* Premium Message Input - Advanced keyboard adaptation */}
-      <div 
-        className="fixed left-0 right-0 z-40 px-4 transition-all duration-500 ease-out"
-        style={{ 
-          bottom: isKeyboardVisible ? '20px' : '108px',
-          transform: `translateY(${isKeyboardVisible ? '-2px' : '0px'}) scale(${isKeyboardVisible ? '1.015' : '1'})`,
-          transformOrigin: 'bottom center'
-        }}
-      >
-        <div 
-          className="max-w-3xl mx-auto transition-all duration-500 ease-out"
-          style={{
-            filter: `brightness(${isKeyboardVisible ? '1.04' : '1'}) saturate(${isKeyboardVisible ? '1.1' : '1'})`
-          }}
-        >
+          
+          {/* Premium Message Input - Inside messages area */}
+          <div 
+            className="border-t px-4 py-3 transition-all duration-500 ease-out"
+            style={{ 
+              borderColor: 'var(--border)',
+              transform: `translateY(${isKeyboardVisible ? '-2px' : '0px'})`,
+            }}
+          >
+            <div 
+              className="transition-all duration-500 ease-out"
+              style={{
+                filter: `brightness(${isKeyboardVisible ? '1.04' : '1'}) saturate(${isKeyboardVisible ? '1.1' : '1'})`
+              }}
+            >
           <div 
             className="glass-card rounded-3xl shadow-lg border-0 transition-all duration-500 ease-out" 
             style={{ 

@@ -389,7 +389,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Message routes - Optimized for real-time performance
+  // Conversation routes
+  app.get('/api/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const conversations = await storage.getUserConversations(userId);
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Failed to fetch conversations" });
+    }
+  });
+
+  app.post('/api/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { type, participants, householdId, listingId } = req.body;
+      
+      // Ensure current user is included in participants
+      const allParticipants = participants.includes(userId) ? participants : [...participants, userId];
+      
+      const conversation = await storage.getOrCreateConversation(type, allParticipants, householdId, listingId);
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      res.status(500).json({ message: "Failed to create conversation" });
+    }
+  });
+
+  app.get('/api/conversations/:conversationId/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const { conversationId } = req.params;
+      const limit = parseInt(req.query.limit as string) || 50;
+      
+      // Add cache headers for optimal performance
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
+      
+      const messages = await storage.getConversationMessages(conversationId, limit);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching conversation messages:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  app.post('/api/conversations/:conversationId/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { conversationId } = req.params;
+      const { content } = req.body;
+      
+      if (!content || !content.trim()) {
+        return res.status(400).json({ message: "Message content is required" });
+      }
+      
+      const messageData = {
+        content: content.trim(),
+        conversationId,
+        userId,
+        type: 'text'
+      };
+      
+      const message = await storage.createMessage(messageData);
+      res.json(message);
+    } catch (error) {
+      console.error("Error creating message:", error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  app.post('/api/conversations/:conversationId/read', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { conversationId } = req.params;
+      
+      await storage.updateConversationLastRead(conversationId, userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating last read:", error);
+      res.status(500).json({ message: "Failed to update last read" });
+    }
+  });
+
+  // Legacy message routes for backward compatibility
   app.get('/api/messages', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;

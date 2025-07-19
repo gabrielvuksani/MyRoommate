@@ -9,6 +9,8 @@ import {
   messages,
   shoppingItems,
   roommateListings,
+  conversations,
+  conversationParticipants,
   type User,
   type UpsertUser,
   type Household,
@@ -28,6 +30,10 @@ import {
   type InsertShoppingItem,
   type RoommateListing,
   type InsertRoommateListing,
+  type Conversation,
+  type InsertConversation,
+  type ConversationParticipant,
+  type InsertConversationParticipant,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, sql } from "drizzle-orm";
@@ -71,6 +77,19 @@ export interface IStorage {
   // Message operations
   createMessage(message: InsertMessage, user?: User): Promise<Message & { user: User }>;
   getMessages(householdId: string, limit?: number): Promise<(Message & { user: User })[]>;
+  
+  // Conversation operations
+  createConversation(conversation: InsertConversation): Promise<Conversation>;
+  getOrCreateConversation(type: string, participants: string[], householdId?: string, listingId?: string): Promise<Conversation>;
+  getUserConversations(userId: string): Promise<(Conversation & { 
+    participants: (ConversationParticipant & { user: User })[];
+    listing?: RoommateListing | null;
+    household?: Household | null;
+    lastMessage?: Message | null;
+  })[]>;
+  getConversationMessages(conversationId: string, limit?: number): Promise<(Message & { user: User })[]>;
+  createConversationParticipant(participant: InsertConversationParticipant): Promise<ConversationParticipant>;
+  updateConversationLastRead(conversationId: string, userId: string): Promise<void>;
   
   // Shopping operations
   createShoppingItem(item: InsertShoppingItem): Promise<ShoppingItem>;
@@ -416,6 +435,7 @@ export class DatabaseStorage implements IStorage {
     const [result] = await db
       .select({
         id: messages.id,
+        conversationId: messages.conversationId,
         householdId: messages.householdId,
         userId: messages.userId,
         content: messages.content,
@@ -438,6 +458,7 @@ export class DatabaseStorage implements IStorage {
       .select({
         id: messages.id,
         householdId: messages.householdId,
+        conversationId: messages.conversationId,
         userId: messages.userId,
         content: messages.content,
         type: messages.type,
@@ -453,6 +474,195 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
 
     return result.reverse();
+  }
+
+  async createConversation(conversation: InsertConversation): Promise<Conversation> {
+    const [created] = await db.insert(conversations).values(conversation).returning();
+    return created;
+  }
+
+  async getOrCreateConversation(type: string, participants: string[], householdId?: string, listingId?: string): Promise<Conversation> {
+    // For household conversations, use the existing household
+    if (type === 'household' && householdId) {
+      const existing = await db
+        .select()
+        .from(conversations)
+        .where(and(
+          eq(conversations.type, 'household'),
+          eq(conversations.householdId, householdId)
+        ))
+        .limit(1);
+      
+      if (existing.length > 0) {
+        return existing[0];
+      }
+    }
+    
+    // For direct messages, check if conversation already exists
+    if (type === 'direct' && participants.length === 2) {
+      const existingConversations = await db
+        .select({
+          conversation: conversations,
+          participantCount: sql<number>`COUNT(DISTINCT ${conversationParticipants.userId})`,
+        })
+        .from(conversations)
+        .innerJoin(conversationParticipants, eq(conversations.id, conversationParticipants.conversationId))
+        .where(and(
+          eq(conversations.type, 'direct'),
+          listingId ? eq(conversations.listingId, listingId) : sql`true`
+        ))
+        .groupBy(conversations.id)
+        .having(sql`COUNT(DISTINCT ${conversationParticipants.userId}) = 2`);
+      
+      // Check if both participants are in any of these conversations
+      for (const row of existingConversations) {
+        const conversationParticipantIds = await db
+          .select({ userId: conversationParticipants.userId })
+          .from(conversationParticipants)
+          .where(eq(conversationParticipants.conversationId, row.conversation.id));
+        
+        const participantIds = conversationParticipantIds.map(p => p.userId);
+        if (participants.every(p => participantIds.includes(p))) {
+          return row.conversation;
+        }
+      }
+    }
+    
+    // Create new conversation
+    const conversation = await this.createConversation({
+      type,
+      householdId,
+      listingId,
+    });
+    
+    // Add participants
+    for (const userId of participants) {
+      await this.createConversationParticipant({
+        conversationId: conversation.id,
+        userId,
+        lastRead: null,
+      });
+    }
+    
+    return conversation;
+  }
+
+  async getUserConversations(userId: string): Promise<(Conversation & { 
+    participants: (ConversationParticipant & { user: User })[];
+    listing?: RoommateListing | null;
+    household?: Household | null;
+    lastMessage?: Message | null;
+  })[]> {
+    // Get all conversations the user is part of
+    const userConversations = await db
+      .select({
+        conversation: conversations,
+        participant: conversationParticipants,
+      })
+      .from(conversationParticipants)
+      .innerJoin(conversations, eq(conversationParticipants.conversationId, conversations.id))
+      .where(eq(conversationParticipants.userId, userId));
+    
+    const result = [];
+    
+    for (const { conversation } of userConversations) {
+      // Get all participants for this conversation
+      const participants = await db
+        .select({
+          id: conversationParticipants.id,
+          conversationId: conversationParticipants.conversationId,
+          userId: conversationParticipants.userId,
+          joinedAt: conversationParticipants.joinedAt,
+          lastRead: conversationParticipants.lastRead,
+          user: users,
+        })
+        .from(conversationParticipants)
+        .innerJoin(users, eq(conversationParticipants.userId, users.id))
+        .where(eq(conversationParticipants.conversationId, conversation.id));
+      
+      // Get listing if applicable
+      let listing = null;
+      if (conversation.listingId) {
+        const [listingData] = await db
+          .select()
+          .from(roommateListings)
+          .where(eq(roommateListings.id, conversation.listingId));
+        listing = listingData || null;
+      }
+      
+      // Get household if applicable
+      let household = null;
+      if (conversation.householdId) {
+        const [householdData] = await db
+          .select()
+          .from(households)
+          .where(eq(households.id, conversation.householdId));
+        household = householdData || null;
+      }
+      
+      // Get last message
+      const [lastMessage] = await db
+        .select()
+        .from(messages)
+        .where(eq(messages.conversationId, conversation.id))
+        .orderBy(desc(messages.createdAt))
+        .limit(1);
+      
+      result.push({
+        ...conversation,
+        participants,
+        listing,
+        household,
+        lastMessage: lastMessage || null,
+      });
+    }
+    
+    // Sort by last message timestamp or conversation creation time
+    result.sort((a, b) => {
+      const aTime = a.lastMessage?.createdAt || a.createdAt;
+      const bTime = b.lastMessage?.createdAt || b.createdAt;
+      return bTime!.getTime() - aTime!.getTime();
+    });
+    
+    return result;
+  }
+
+  async getConversationMessages(conversationId: string, limit: number = 50): Promise<(Message & { user: User })[]> {
+    const result = await db
+      .select({
+        id: messages.id,
+        conversationId: messages.conversationId,
+        householdId: messages.householdId,
+        userId: messages.userId,
+        content: messages.content,
+        type: messages.type,
+        linkedTo: messages.linkedTo,
+        linkedType: messages.linkedType,
+        createdAt: messages.createdAt,
+        user: users,
+      })
+      .from(messages)
+      .innerJoin(users, eq(messages.userId, users.id))
+      .where(eq(messages.conversationId, conversationId))
+      .orderBy(desc(messages.createdAt))
+      .limit(limit);
+    
+    return result.reverse();
+  }
+
+  async createConversationParticipant(participant: InsertConversationParticipant): Promise<ConversationParticipant> {
+    const [created] = await db.insert(conversationParticipants).values(participant).returning();
+    return created;
+  }
+
+  async updateConversationLastRead(conversationId: string, userId: string): Promise<void> {
+    await db
+      .update(conversationParticipants)
+      .set({ lastRead: new Date() })
+      .where(and(
+        eq(conversationParticipants.conversationId, conversationId),
+        eq(conversationParticipants.userId, userId)
+      ));
   }
 
   async createShoppingItem(item: InsertShoppingItem): Promise<ShoppingItem> {
