@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 
 import { useAuth } from "@/hooks/use-auth";
 import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle } from "lucide-react";
+import { FaGoogle, FaApple } from "react-icons/fa";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
@@ -144,6 +145,10 @@ export default function AuthPage() {
     if (authError) {
       setAuthError("");
     }
+  };
+
+  const handleOAuthLogin = (provider: "google" | "apple") => {
+    window.location.href = `/api/auth/${provider}`;
   };
 
   return (
@@ -353,6 +358,52 @@ export default function AuthPage() {
                       {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
                     </div>
                   )}
+
+                  {/* OAuth Section */}
+                  <div className="pt-2">
+                    {/* Divider */}
+                    <div className="relative my-6">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t" style={{ borderColor: 'var(--border)' }}></div>
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-3" style={{ background: 'var(--background)', color: 'var(--text-secondary)' }}>
+                          Or continue with
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* OAuth Buttons */}
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      <button
+                        type="button"
+                        onClick={() => handleOAuthLogin("google")}
+                        className="flex items-center justify-center py-3 px-4 border rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                        style={{
+                          background: 'var(--surface)',
+                          borderColor: 'var(--border)',
+                          color: 'var(--text-primary)',
+                        }}
+                      >
+                        <FaGoogle className="w-5 h-5 text-red-500 mr-2" />
+                        <span className="text-sm font-medium">Google</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleOAuthLogin("apple")}
+                        className="flex items-center justify-center py-3 px-4 border rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                        style={{
+                          background: 'var(--surface)',
+                          borderColor: 'var(--border)',
+                          color: 'var(--text-primary)',
+                        }}
+                      >
+                        <FaApple className="w-5 h-5 text-gray-900 dark:text-white mr-2" />
+                        <span className="text-sm font-medium">Apple</span>
+                      </button>
+                    </div>
+                  </div>
 
                   {/* Submit Button */}
                   <div className="pt-4">

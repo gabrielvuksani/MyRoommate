@@ -28,11 +28,11 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table for Custom Auth
+// User storage table for Custom Auth + OAuth
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
   email: varchar("email").unique().notNull(),
-  password: varchar("password").notNull(),
+  password: varchar("password"), // Made optional for OAuth users
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
@@ -41,6 +41,9 @@ export const users = pgTable("users", {
   phoneNumber: varchar("phone_number"),
   dateOfBirth: date("date_of_birth"),
   idVerified: boolean("id_verified").default(false),
+  // OAuth fields
+  provider: varchar("provider").default("email"), // email, google, apple
+  providerId: varchar("provider_id"), // OAuth provider user ID
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -368,12 +371,22 @@ export const registerSchema = insertUserSchema.extend({
   path: ["confirmPassword"],
 });
 
+export const oauthSchema = z.object({
+  provider: z.enum(["google", "apple"]),
+  providerId: z.string(),
+  email: z.string().email(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  profileImageUrl: z.string().optional(),
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type RegisterData = z.infer<typeof registerSchema>;
+export type OAuthData = z.infer<typeof oauthSchema>;
 export type Household = typeof households.$inferSelect;
 export type InsertHousehold = z.infer<typeof insertHouseholdSchema>;
 export type HouseholdMember = typeof householdMembers.$inferSelect;
