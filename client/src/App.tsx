@@ -23,6 +23,7 @@ import Onboarding from "@/pages/onboarding";
 import Dashboard from "@/pages/dashboard";
 import Roommates from "@/pages/roommates";
 import ListingDetail from "@/pages/listing-detail";
+import AddListing from "@/pages/add-listing";
 import AddExpense from "@/pages/add-expense";
 import BottomNavigation from "@/components/bottom-navigation";
 
@@ -87,6 +88,7 @@ function Router() {
 
             <Route path="/roommates" component={Roommates} />
             <Route path="/listings/:id" component={ListingDetail} />
+            <Route path="/add-listing" component={AddListing} />
             <Route path="/add-expense" component={hasHousehold ? AddExpense : Home} />
           </>
         )}
