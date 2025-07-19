@@ -39,10 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
-      // Small delay to let loading overlay show, then redirect
+      // Longer delay to cover the entire transition including page load
       setTimeout(() => {
         window.location.href = "/";
-      }, 200);
+      }, 800);
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -60,10 +60,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
-      // Small delay to let loading overlay show, then redirect
+      // Longer delay to cover the entire transition including page load
       setTimeout(() => {
         window.location.href = "/";
-      }, 200);
+      }, 800);
     },
     onError: (error: Error) => {
       console.error("Registration failed:", error.message);
