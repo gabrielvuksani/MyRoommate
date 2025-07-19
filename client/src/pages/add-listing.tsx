@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { ArrowLeft, Home, MapPin, Calendar, Users, GraduationCap, Heart, Camera, X } from "lucide-react";
 import { apiRequest } from "../lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +19,7 @@ import {
 export default function AddListing() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [headerScrolled, setHeaderScrolled] = useState(false);
   
   const [newListing, setNewListing] = useState({
@@ -45,6 +47,16 @@ export default function AddListing() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Auto-populate contact info with user's email
+  useEffect(() => {
+    if (user?.email && !newListing.contactInfo) {
+      setNewListing(prev => ({
+        ...prev,
+        contactInfo: user.email
+      }));
+    }
+  }, [user?.email, newListing.contactInfo]);
 
   // Handle scroll for floating header
   useEffect(() => {

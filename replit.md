@@ -124,6 +124,8 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ **Disabled email verification**: Commented out email verification checks in auth system while keeping verifiedtoken field for future use
 - ✓ **Clean authentication experience**: No resend API keys or email verification calls - simplified sign-up process
 - ✓ **Updated button design**: Modernized authentication form buttons to match app-wide design patterns with proper gradient styling, rounded corners, hover effects, and consistent sizing
+- ✓ **Auto-populated contact email**: Contact information field in listing form now auto-fills with user's email but remains editable
+- ✓ **PWA detection and landing page skip**: Added comprehensive PWA/native app detection that automatically skips landing page and goes directly to auth for better app-like experience
 - ✓ Fixed listing detail page to properly handle multiple images with carousel interface
 - ✓ Added navigation arrows and image indicators for multi-image galleries following iOS design patterns
 - ✓ Updated price color from blue to theme-aware (white/black) for consistency across light/dark modes

@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserFlags } from "@/lib/userUtils";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { PersistentLoading } from "@/lib/persistentLoading";
+import { shouldSkipLanding } from "@/lib/pwaUtils";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import Home from "@/pages/home";
@@ -53,6 +54,9 @@ function Router() {
   // Get comprehensive user flags using centralized logic
   const userFlags = getUserFlags(user, household, !!user, location);
   const { needsOnboarding, hasHousehold } = userFlags;
+  
+  // Check if we should skip landing page for PWA/native apps
+  const skipLanding = shouldSkipLanding();
 
   return (
     <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
@@ -61,7 +65,7 @@ function Router() {
           <>
             <Route path="/landing" component={Landing} />
             <Route path="/auth" component={AuthPage} />
-            <Route path="/" component={Landing} />
+            <Route path="/" component={skipLanding ? AuthPage : Landing} />
           </>
         ) : needsOnboarding ? (
           <>
