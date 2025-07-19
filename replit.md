@@ -111,6 +111,10 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 19, 2025 (Latest):**
+- ✓ REMOVED separation between featured and regular listings - all listings now shown under "All Listings" with featured ones sorted to top
+- ✓ Enhanced listing detail page with featured badge, comprehensive lifestyle preferences display, and improved contact functionality
+- ✓ Added smart contact button that opens email for email addresses or copies phone numbers to clipboard
+- ✓ Improved listing detail page design language consistency with proper glass morphism cards and organized sections
 - ✓ FIXED CRITICAL LISTING CREATION BUG: Updated Zod validation schema to properly handle date strings and null values
 - ✓ Added comprehensive location fields: state, zip code, neighborhood, university, distance to campus, transportation notes
 - ✓ Made contact information field required with proper form validation throughout

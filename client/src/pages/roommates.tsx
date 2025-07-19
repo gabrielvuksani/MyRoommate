@@ -43,8 +43,12 @@ export default function Roommates() {
   const listingsArray = Array.isArray(listings) ? listings : [];
   const myListingsArray = Array.isArray(myListings) ? myListings : [];
   
-  const featuredListings = listingsArray.filter((listing: any) => listing.featured);
-  const regularListings = listingsArray.filter((listing: any) => !listing.featured);
+  // Sort all listings: featured first, then by creation date
+  const sortedListings = [...listingsArray].sort((a: any, b: any) => {
+    if (a.featured && !b.featured) return -1;
+    if (!a.featured && b.featured) return 1;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
 
 
 
@@ -108,34 +112,7 @@ export default function Roommates() {
           </TabsList>
 
           <TabsContent value="browse" className="space-y-6">
-
-            {/* Featured Listings */}
-            {featuredListings.length > 0 && (
-              <div>
-                <div className="flex items-center space-x-2 mb-4">
-                  <Star className="w-5 h-5 text-yellow-500" />
-                  <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                    Featured Listings
-                  </h2>
-                </div>
-                <div className="space-y-4">
-                  {featuredListings.map((listing: any) => (
-                    <RoommateListingCard
-                      key={listing.id}
-                      listing={listing}
-                      compact={false}
-                      onContact={(listing) => {
-                        if (listing.contactInfo) {
-                          window.open(`mailto:${listing.contactInfo}`, '_blank');
-                        }
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* All Listings */}
+            {/* All Listings (Featured at top) */}
             <div>
               <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
                 {searchCity ? `Listings in ${searchCity}` : "All Listings"}
@@ -159,9 +136,9 @@ export default function Roommates() {
                     </Card>
                   ))}
                 </div>
-              ) : regularListings.length > 0 ? (
+              ) : sortedListings.length > 0 ? (
                 <div className="space-y-4">
-                  {regularListings.map((listing: any) => (
+                  {sortedListings.map((listing: any) => (
                     <RoommateListingCard
                       key={listing.id}
                       listing={listing}

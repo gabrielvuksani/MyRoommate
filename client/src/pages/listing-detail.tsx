@@ -123,20 +123,32 @@ export default function ListingDetail() {
       </div>
 
       <div className="pt-36 px-6 max-w-3xl mx-auto space-y-6 page-enter">
-        {/* Image or Placeholder */}
-        {typedListing.images && typedListing.images.length > 0 ? (
-          <div className="rounded-3xl overflow-hidden h-64 shadow-lg">
-            <img 
-              src={typedListing.images[0]} 
-              alt={typedListing.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ) : (
-          <div className="h-64 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-3xl flex items-center justify-center shadow-lg">
-            <Home className="w-20 h-20 text-blue-400" />
-          </div>
-        )}
+        {/* Image or Placeholder with Featured Badge */}
+        <div className="relative">
+          {typedListing.images && typedListing.images.length > 0 ? (
+            <div className="rounded-3xl overflow-hidden h-64 shadow-lg">
+              <img 
+                src={typedListing.images[0]} 
+                alt={typedListing.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="h-64 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-3xl flex items-center justify-center shadow-lg">
+              <Home className="w-20 h-20 text-blue-400" />
+            </div>
+          )}
+          
+          {/* Featured Badge */}
+          {typedListing.featured && (
+            <div className="absolute top-4 right-4">
+              <Badge className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white border-0 shadow-lg px-3 py-1">
+                <Star className="w-4 h-4 mr-1" />
+                Featured
+              </Badge>
+            </div>
+          )}
+        </div>
 
         {/* Main Details Card */}
         <Card className="glass-card">
@@ -243,17 +255,59 @@ export default function ListingDetail() {
               </>
             )}
 
-            {/* Preferences */}
-            {typedListing.preferences && (
+            {/* Lifestyle Preferences */}
+            {(typedListing.genderPreference || typedListing.studentYear || typedListing.studyHabits || typedListing.socialPreferences || (typedListing.lifestylePreferences && typedListing.lifestylePreferences.length > 0)) && (
               <>
                 <Separator />
                 <div>
                   <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
-                    Roommate Preferences
+                    Lifestyle Preferences
                   </h3>
-                  <p style={{ color: 'var(--text-secondary)' }} className="leading-relaxed">
-                    {typedListing.preferences}
-                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {typedListing.genderPreference && (
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {typedListing.genderPreference.charAt(0).toUpperCase() + typedListing.genderPreference.slice(1)} roommates
+                        </span>
+                      </div>
+                    )}
+                    {typedListing.studentYear && typedListing.studentYear !== 'any' && (
+                      <div className="flex items-center gap-2">
+                        <Home className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {typedListing.studentYear.charAt(0).toUpperCase() + typedListing.studentYear.slice(1)} students
+                        </span>
+                      </div>
+                    )}
+                    {typedListing.studyHabits && (
+                      <div className="flex items-center gap-2">
+                        <Shield className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {typedListing.studyHabits.charAt(0).toUpperCase() + typedListing.studyHabits.slice(1)} study habits
+                        </span>
+                      </div>
+                    )}
+                    {typedListing.socialPreferences && (
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {typedListing.socialPreferences.charAt(0).toUpperCase() + typedListing.socialPreferences.slice(1)} social style
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  {typedListing.lifestylePreferences && typedListing.lifestylePreferences.length > 0 && (
+                    <div className="mt-3">
+                      <div className="flex flex-wrap gap-2">
+                        {typedListing.lifestylePreferences.map((pref: string, index: number) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {pref.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -310,28 +364,47 @@ export default function ListingDetail() {
           </Card>
         )}
 
-        {/* Contact Button */}
+        {/* Contact Information */}
         <Card className="glass-card">
           <CardContent className="p-6">
-            <Button 
-              className="w-full h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
-              onClick={() => {
-                // In a real app, this would open a chat or contact form
-                alert(typedListing.contactInfo || "Contact the poster through the app");
-              }}
-            >
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Contact Poster
-            </Button>
-            {user ? (
-              <p className="text-xs text-center mt-3" style={{ color: 'var(--text-secondary)' }}>
-                You'll be connected through the app's messaging system
-              </p>
-            ) : (
-              <p className="text-xs text-center mt-3" style={{ color: 'var(--text-secondary)' }}>
-                Sign in to contact the poster
-              </p>
-            )}
+            <div className="space-y-4">
+              <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+                Contact Information
+              </h3>
+              {typedListing.contactInfo && (
+                <div className="p-4 rounded-xl" style={{ background: 'var(--surface-secondary)' }}>
+                  <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    {typedListing.contactInfo}
+                  </p>
+                </div>
+              )}
+              <Button 
+                className="w-full h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
+                onClick={() => {
+                  // In a real app, this would open a chat or contact form
+                  if (typedListing.contactInfo) {
+                    if (typedListing.contactInfo.includes('@')) {
+                      window.open(`mailto:${typedListing.contactInfo}`, '_blank');
+                    } else {
+                      navigator.clipboard.writeText(typedListing.contactInfo);
+                      alert('Contact info copied to clipboard!');
+                    }
+                  }
+                }}
+              >
+                <MessageCircle className="w-5 h-5 mr-2" />
+                Contact Poster
+              </Button>
+              {user ? (
+                <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
+                  Click to email or copy contact information
+                </p>
+              ) : (
+                <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
+                  Sign in to contact the poster
+                </p>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
