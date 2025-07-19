@@ -122,30 +122,10 @@ export const calendarEvents = pgTable("calendar_events", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Conversations (for multi-chat support)
-export const conversations = pgTable("conversations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  type: varchar("type", { length: 20 }).notNull(), // 'household' or 'direct'
-  householdId: uuid("household_id").references(() => households.id, { onDelete: 'cascade' }), // for household chats
-  listingId: text("listing_id").references(() => roommateListings.id, { onDelete: 'cascade' }), // for listing inquiries
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Conversation Participants
-export const conversationParticipants = pgTable("conversation_participants", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  conversationId: uuid("conversation_id").references(() => conversations.id, { onDelete: 'cascade' }),
-  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }),
-  joinedAt: timestamp("joined_at").defaultNow(),
-  lastRead: timestamp("last_read"),
-});
-
-// Messages table (updated for multi-chat)
+// Messages table
 export const messages = pgTable("messages", {
   id: uuid("id").primaryKey().defaultRandom(),
-  conversationId: uuid("conversation_id").references(() => conversations.id, { onDelete: 'cascade' }),
-  householdId: uuid("household_id").references(() => households.id), // kept for backward compatibility
+  householdId: uuid("household_id").references(() => households.id),
   userId: varchar("user_id").references(() => users.id),
   content: text("content").notNull(),
   type: varchar("type").default("text"), // text, system, attachment
@@ -209,7 +189,6 @@ export const usersRelations = relations(users, ({ many }) => ({
   messages: many(messages),
   shoppingItems: many(shoppingItems),
   roommateListings: many(roommateListings),
-  conversationParticipants: many(conversationParticipants),
 }));
 
 export const householdsRelations = relations(households, ({ many }) => ({
@@ -219,7 +198,6 @@ export const householdsRelations = relations(households, ({ many }) => ({
   calendarEvents: many(calendarEvents),
   messages: many(messages),
   shoppingItems: many(shoppingItems),
-  conversations: many(conversations),
 }));
 
 export const householdMembersRelations = relations(householdMembers, ({ one }) => ({
@@ -278,35 +256,7 @@ export const calendarEventsRelations = relations(calendarEvents, ({ one }) => ({
   }),
 }));
 
-export const conversationsRelations = relations(conversations, ({ one, many }) => ({
-  household: one(households, {
-    fields: [conversations.householdId],
-    references: [households.id],
-  }),
-  listing: one(roommateListings, {
-    fields: [conversations.listingId],
-    references: [roommateListings.id],
-  }),
-  participants: many(conversationParticipants),
-  messages: many(messages),
-}));
-
-export const conversationParticipantsRelations = relations(conversationParticipants, ({ one }) => ({
-  conversation: one(conversations, {
-    fields: [conversationParticipants.conversationId],
-    references: [conversations.id],
-  }),
-  user: one(users, {
-    fields: [conversationParticipants.userId],
-    references: [users.id],
-  }),
-}));
-
 export const messagesRelations = relations(messages, ({ one }) => ({
-  conversation: one(conversations, {
-    fields: [messages.conversationId],
-    references: [conversations.id],
-  }),
   household: one(households, {
     fields: [messages.householdId],
     references: [households.id],
@@ -332,12 +282,11 @@ export const shoppingItemsRelations = relations(shoppingItems, ({ one }) => ({
   }),
 }));
 
-export const roommateListingsRelations = relations(roommateListings, ({ one, many }) => ({
+export const roommateListingsRelations = relations(roommateListings, ({ one }) => ({
   creator: one(users, {
     fields: [roommateListings.createdBy],
     references: [users.id],
   }),
-  conversations: many(conversations),
 }));
 
 // Insert schemas
@@ -368,17 +317,6 @@ export const insertExpenseSplitSchema = createInsertSchema(expenseSplits).omit({
 export const insertCalendarEventSchema = createInsertSchema(calendarEvents).omit({
   id: true,
   createdAt: true,
-});
-
-export const insertConversationSchema = createInsertSchema(conversations).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertConversationParticipantSchema = createInsertSchema(conversationParticipants).omit({
-  id: true,
-  joinedAt: true,
 });
 
 export const insertMessageSchema = createInsertSchema(messages).omit({
@@ -453,7 +391,3 @@ export type ShoppingItem = typeof shoppingItems.$inferSelect;
 export type InsertShoppingItem = z.infer<typeof insertShoppingItemSchema>;
 export type RoommateListing = typeof roommateListings.$inferSelect;
 export type InsertRoommateListing = z.infer<typeof insertRoommateListingSchema>;
-export type Conversation = typeof conversations.$inferSelect;
-export type InsertConversation = z.infer<typeof insertConversationSchema>;
-export type ConversationParticipant = typeof conversationParticipants.$inferSelect;
-export type InsertConversationParticipant = z.infer<typeof insertConversationParticipantSchema>;

@@ -408,55 +408,20 @@ export default function ListingDetail() {
               )}
               <Button 
                 className="w-full h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
-                onClick={async () => {
-                  // Create or get conversation with the listing owner
-                  if (typedListing.createdBy) {
-                    try {
-                      // Create a conversation for this listing
-                      const response = await fetch('/api/conversations', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include',
-                        body: JSON.stringify({
-                          type: 'direct',
-                          participants: [user?.id, typedListing.createdBy],
-                          listingId: typedListing.id
-                        })
-                      });
-                      
-                      if (response.ok) {
-                        const conversation = await response.json();
-                        // Navigate to messages page with the conversation ID
-                        navigate(`/messages?conversation=${conversation.id}`);
-                      } else {
-                        console.error('Failed to create conversation');
-                        // Fallback to email/copy contact info
-                        if (typedListing.contactInfo) {
-                          if (typedListing.contactInfo.includes('@')) {
-                            window.open(`mailto:${typedListing.contactInfo}`, '_blank');
-                          } else {
-                            navigator.clipboard.writeText(typedListing.contactInfo);
-                            alert('Contact info copied to clipboard!');
-                          }
-                        }
-                      }
-                    } catch (error) {
-                      console.error('Error creating conversation:', error);
-                      // Fallback to email/copy contact info
-                      if (typedListing.contactInfo) {
-                        if (typedListing.contactInfo.includes('@')) {
-                          window.open(`mailto:${typedListing.contactInfo}`, '_blank');
-                        } else {
-                          navigator.clipboard.writeText(typedListing.contactInfo);
-                          alert('Contact info copied to clipboard!');
-                        }
-                      }
+                onClick={() => {
+                  // In a real app, this would open a chat or contact form
+                  if (typedListing.contactInfo) {
+                    if (typedListing.contactInfo.includes('@')) {
+                      window.open(`mailto:${typedListing.contactInfo}`, '_blank');
+                    } else {
+                      navigator.clipboard.writeText(typedListing.contactInfo);
+                      alert('Contact info copied to clipboard!');
                     }
                   }
                 }}
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
-                Message Seller
+                Contact Poster
               </Button>
               {user ? (
                 <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
