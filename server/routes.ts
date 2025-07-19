@@ -444,6 +444,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Conversation routes
+  app.get('/api/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const conversations = await storage.getConversations(userId);
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Failed to fetch conversations" });
+    }
+  });
+
+  app.get('/api/conversations/:conversationId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { conversationId } = req.params;
+      const userId = req.user.id;
+      
+      const conversation = await storage.getConversation(conversationId);
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      // Verify user is a participant
+      const isParticipant = conversation.participants.some(p => p.userId === userId);
+      if (!isParticipant) {
+        return res.status(403).json({ message: "Not authorized to view this conversation" });
+      }
+
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error fetching conversation:", error);
+      res.status(500).json({ message: "Failed to fetch conversation" });
+    }
+  });
+
+  app.post('/api/conversations/listing', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { listingId, recipientId } = req.body;
+      
+      if (!listingId || !recipientId) {
+        return res.status(400).json({ message: "listingId and recipientId are required" });
+      }
+
+      const conversation = await storage.getOrCreateListingConversation(listingId, userId, recipientId);
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error creating listing conversation:", error);
+      res.status(500).json({ message: "Failed to create conversation" });
+    }
+  });
+
+  app.get('/api/conversations/:conversationId/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const { conversationId } = req.params;
+      const userId = req.user.id;
+      const limit = parseInt(req.query.limit as string) || 50;
+      
+      // Verify user is a participant
+      const conversation = await storage.getConversation(conversationId);
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      const isParticipant = conversation.participants.some(p => p.userId === userId);
+      if (!isParticipant) {
+        return res.status(403).json({ message: "Not authorized to view these messages" });
+      }
+
+      const messages = await storage.getConversationMessages(conversationId, limit);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching conversation messages:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  app.post('/api/conversations/:conversationId/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const { conversationId } = req.params;
+      const userId = req.user.id;
+      const { content } = req.body;
+      
+      if (!content || !content.trim()) {
+        return res.status(400).json({ message: "Message content is required" });
+      }
+      
+      // Verify user is a participant
+      const conversation = await storage.getConversation(conversationId);
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      const isParticipant = conversation.participants.some(p => p.userId === userId);
+      if (!isParticipant) {
+        return res.status(403).json({ message: "Not authorized to send messages in this conversation" });
+      }
+
+      const message = await storage.createConversationMessage(conversationId, userId, content.trim());
+      res.json(message);
+    } catch (error) {
+      console.error("Error creating conversation message:", error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  app.post('/api/conversations/:conversationId/read', isAuthenticated, async (req: any, res) => {
+    try {
+      const { conversationId } = req.params;
+      const userId = req.user.id;
+      
+      await storage.markConversationAsRead(conversationId, userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error marking conversation as read:", error);
+      res.status(500).json({ message: "Failed to mark conversation as read" });
+    }
+  });
+
   // Shopping routes
   app.get('/api/shopping', isAuthenticated, async (req: any, res) => {
     try {
@@ -730,6 +849,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const userCache = new Map<string, any>();
   const clientsById = new Map<string, WebSocket>();
   const householdClients = new Map<string, Set<WebSocket>>();
+  const conversationClients = new Map<string, Set<WebSocket>>();
   
   // Performance monitoring
   let messageCount = 0;
@@ -741,30 +861,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('New WebSocket connection established');
     let userId: string | null = null;
     let householdId: string | null = null;
+    let conversationId: string | null = null;
     
     ws.on('message', async (data: any) => {
       try {
         const message = JSON.parse(data.toString());
         
-        // Cache user info on first connection
-        if (message.type === 'connect' && message.userId && message.householdId) {
-          console.log(`WebSocket connect: userId=${message.userId}, householdId=${message.householdId}`);
+        // Cache user info on first connection - support both household and conversation
+        if (message.type === 'connect' && message.userId) {
+          console.log(`WebSocket connect: userId=${message.userId}, householdId=${message.householdId}, conversationId=${message.conversationId}`);
           userId = message.userId;
           householdId = message.householdId;
-          if (userId && householdId) {
+          conversationId = message.conversationId;
+          
+          if (userId) {
             clientsById.set(userId, ws);
             
             // Store client metadata for targeted broadcasting
             (ws as any)._userId = userId;
             (ws as any)._householdId = householdId;
+            (ws as any)._conversationId = conversationId;
             
-            // Add to household client set for fast broadcasting
-            if (!householdClients.has(householdId)) {
-              householdClients.set(householdId, new Set());
+            // Add to household client set if household connection
+            if (householdId) {
+              if (!householdClients.has(householdId)) {
+                householdClients.set(householdId, new Set());
+              }
+              const householdSet = householdClients.get(householdId);
+              if (householdSet) {
+                householdSet.add(ws);
+              }
             }
-            const householdSet = householdClients.get(householdId);
-            if (householdSet) {
-              householdSet.add(ws);
+            
+            // Add to conversation client set if conversation connection
+            if (conversationId) {
+              if (!conversationClients.has(conversationId)) {
+                conversationClients.set(conversationId, new Set());
+              }
+              const conversationSet = conversationClients.get(conversationId);
+              if (conversationSet) {
+                conversationSet.add(ws);
+              }
             }
             
             // Cache user data for fast message creation
@@ -785,7 +922,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ws.send(JSON.stringify({
             type: 'connection_confirmed',
             userId,
-            householdId
+            householdId,
+            conversationId
           }));
         }
         
@@ -803,64 +941,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (message.type === 'send_message') {
           const startTime = Date.now();
-          const { content, householdId: msgHouseholdId, userId: msgUserId, linkedTo, linkedType, tempId } = message;
+          const { content, householdId: msgHouseholdId, conversationId: msgConversationId, userId: msgUserId, linkedTo, linkedType, tempId } = message;
           
           try {
-            // Get cached user for ultra-fast message creation
-            const cachedUser = userCache.get(msgUserId);
+            let newMessage;
             
-            // Create message in database
-            const newMessage = await storage.createMessage({
-              content,
-              householdId: msgHouseholdId,
-              userId: msgUserId,
-              linkedTo,
-              linkedType,
-            }, cachedUser);
-            
-            console.log(`Message created in ${Date.now() - startTime}ms:`, newMessage.id);
-            
-            // Immediate broadcast to all household clients for real-time sync
-            const householdClientSet = householdClients.get(msgHouseholdId);
-            if (householdClientSet) {
-              const broadcastData = JSON.stringify({
-                type: 'new_message',
-                message: newMessage,
-                tempId: tempId, // Include temp ID for optimistic update replacement
-                timestamp: Date.now()
-              });
+            // Handle conversation messages
+            if (msgConversationId) {
+              newMessage = await storage.createConversationMessage(msgConversationId, msgUserId, content);
+              console.log(`Conversation message created in ${Date.now() - startTime}ms:`, newMessage.id);
               
-              // Broadcast with immediate delivery and connection cleanup
-              const deadConnections = new Set();
-              let successfulBroadcasts = 0;
-              
-              householdClientSet.forEach((client: any) => {
-                try {
-                  if (client.readyState === WebSocket.OPEN) {
-                    client.send(broadcastData);
-                    successfulBroadcasts++;
-                  } else {
+              // Broadcast to conversation participants
+              const conversationClientSet = conversationClients.get(msgConversationId);
+              if (conversationClientSet) {
+                const broadcastData = JSON.stringify({
+                  type: 'new_message',
+                  message: newMessage,
+                  conversationId: msgConversationId,
+                  tempId: tempId,
+                  timestamp: Date.now()
+                });
+                
+                const deadConnections = new Set();
+                let successfulBroadcasts = 0;
+                
+                conversationClientSet.forEach((client: any) => {
+                  try {
+                    if (client.readyState === WebSocket.OPEN) {
+                      client.send(broadcastData);
+                      successfulBroadcasts++;
+                    } else {
+                      deadConnections.add(client);
+                    }
+                  } catch (error) {
+                    console.error('Broadcast error:', error);
                     deadConnections.add(client);
                   }
-                } catch (error) {
-                  console.error('Broadcast error:', error);
-                  deadConnections.add(client);
-                }
-              });
+                });
+                
+                // Cleanup dead connections
+                deadConnections.forEach((conn: any) => {
+                  conversationClientSet.delete(conn);
+                });
+                
+                console.log(`Broadcasted to ${successfulBroadcasts} conversation clients`);
+              }
+            } 
+            // Handle household messages (legacy support)
+            else if (msgHouseholdId) {
+              const cachedUser = userCache.get(msgUserId);
+              newMessage = await storage.createMessage({
+                content,
+                householdId: msgHouseholdId,
+                userId: msgUserId,
+                linkedTo,
+                linkedType,
+              }, cachedUser);
               
-              // Cleanup dead connections
-              deadConnections.forEach((conn: any) => {
-                householdClientSet.delete(conn);
-                // Also remove from clientsById if it exists
-                for (const [id, client] of Array.from(clientsById.entries())) {
-                  if (client === conn) {
-                    clientsById.delete(id);
-                    break;
+              console.log(`Household message created in ${Date.now() - startTime}ms:`, newMessage.id);
+              
+              // Broadcast to household members
+              const householdClientSet = householdClients.get(msgHouseholdId);
+              if (householdClientSet) {
+                const broadcastData = JSON.stringify({
+                  type: 'new_message',
+                  message: newMessage,
+                  tempId: tempId,
+                  timestamp: Date.now()
+                });
+                
+                const deadConnections = new Set();
+                let successfulBroadcasts = 0;
+                
+                householdClientSet.forEach((client: any) => {
+                  try {
+                    if (client.readyState === WebSocket.OPEN) {
+                      client.send(broadcastData);
+                      successfulBroadcasts++;
+                    } else {
+                      deadConnections.add(client);
+                    }
+                  } catch (error) {
+                    console.error('Broadcast error:', error);
+                    deadConnections.add(client);
                   }
-                }
-              });
-              
-              console.log(`Broadcasted to ${successfulBroadcasts} clients, cleaned ${deadConnections.size} dead connections`);
+                });
+                
+                // Cleanup dead connections
+                deadConnections.forEach((conn: any) => {
+                  householdClientSet.delete(conn);
+                });
+                
+                console.log(`Broadcasted to ${successfulBroadcasts} household clients`);
+              }
             }
             
             // Performance tracking
@@ -868,14 +1041,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const processingTime = Date.now() - startTime;
             totalProcessingTime += processingTime;
             
-            // Log performance every 5 messages for real-time monitoring
             if (messageCount % 5 === 0) {
               console.log(`Real-time Performance: ${messageCount} messages, avg ${(totalProcessingTime/messageCount).toFixed(1)}ms, last: ${processingTime}ms`);
             }
             
           } catch (error) {
             console.error('Message processing error:', error);
-            // Send error back to sender with temp ID for cleanup
             if (ws.readyState === WebSocket.OPEN) {
               ws.send(JSON.stringify({
                 type: 'message_error',
@@ -893,43 +1064,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         if (message.type === 'user_typing') {
-          const { householdId: msgHouseholdId, userId: msgUserId, userName } = message;
+          const { householdId: msgHouseholdId, conversationId: msgConversationId, userId: msgUserId, userName } = message;
           
-          // Broadcast typing indicator only to other clients in same household
+          // Broadcast typing indicator
           const broadcastData = JSON.stringify({
             type: 'user_typing',
             householdId: msgHouseholdId,
+            conversationId: msgConversationId,
             userId: msgUserId,
             userName,
           });
           
-          wss.clients.forEach((client: any) => {
-            if (client.readyState === WebSocket.OPEN && 
-                client._householdId === msgHouseholdId && 
-                client._userId !== msgUserId) {
-              client.send(broadcastData);
+          // For conversation typing
+          if (msgConversationId) {
+            const conversationClientSet = conversationClients.get(msgConversationId);
+            if (conversationClientSet) {
+              conversationClientSet.forEach((client: any) => {
+                if (client.readyState === WebSocket.OPEN && client._userId !== msgUserId) {
+                  client.send(broadcastData);
+                }
+              });
             }
-          });
+          } 
+          // For household typing (legacy)
+          else if (msgHouseholdId) {
+            wss.clients.forEach((client: any) => {
+              if (client.readyState === WebSocket.OPEN && 
+                  client._householdId === msgHouseholdId && 
+                  client._userId !== msgUserId) {
+                client.send(broadcastData);
+              }
+            });
+          }
         }
         
         if (message.type === 'user_stopped_typing') {
-          const { householdId: msgHouseholdId, userId: msgUserId, userName } = message;
+          const { householdId: msgHouseholdId, conversationId: msgConversationId, userId: msgUserId, userName } = message;
           
-          // Broadcast stop typing indicator only to other clients in same household
+          // Broadcast stop typing indicator
           const broadcastData = JSON.stringify({
             type: 'user_stopped_typing',
             householdId: msgHouseholdId,
+            conversationId: msgConversationId,
             userId: msgUserId,
             userName,
           });
           
-          wss.clients.forEach((client: any) => {
-            if (client.readyState === WebSocket.OPEN && 
-                client._householdId === msgHouseholdId && 
-                client._userId !== msgUserId) {
-              client.send(broadcastData);
+          // For conversation typing
+          if (msgConversationId) {
+            const conversationClientSet = conversationClients.get(msgConversationId);
+            if (conversationClientSet) {
+              conversationClientSet.forEach((client: any) => {
+                if (client.readyState === WebSocket.OPEN && client._userId !== msgUserId) {
+                  client.send(broadcastData);
+                }
+              });
             }
-          });
+          } 
+          // For household typing (legacy)
+          else if (msgHouseholdId) {
+            wss.clients.forEach((client: any) => {
+              if (client.readyState === WebSocket.OPEN && 
+                  client._householdId === msgHouseholdId && 
+                  client._userId !== msgUserId) {
+                client.send(broadcastData);
+              }
+            });
+          }
         }
         
         if (message.type === 'chore_update') {
@@ -954,7 +1155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
     
     ws.on('close', () => {
-      console.log('WebSocket client disconnected', { userId, householdId });
+      console.log('WebSocket client disconnected', { userId, householdId, conversationId });
       
       // Comprehensive cleanup for production stability
       if (userId) {
@@ -968,6 +1169,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           householdSet.delete(ws);
           if (householdSet.size === 0) {
             householdClients.delete(householdId);
+          }
+        }
+      }
+      
+      // Remove from conversation client set
+      if (conversationId) {
+        const conversationSet = conversationClients.get(conversationId);
+        if (conversationSet) {
+          conversationSet.delete(ws);
+          if (conversationSet.size === 0) {
+            conversationClients.delete(conversationId);
           }
         }
       }

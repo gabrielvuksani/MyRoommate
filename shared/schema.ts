@@ -122,10 +122,32 @@ export const calendarEvents = pgTable("calendar_events", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Messages table
+// Conversations table for multi-chat support
+export const conversations = pgTable("conversations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  type: varchar("type", { enum: ["household", "direct", "listing"] }).notNull(), // Type of conversation
+  householdId: uuid("household_id").references(() => households.id), // For household chats
+  listingId: text("listing_id").references(() => roommateListings.id), // For listing inquiries
+  name: varchar("name"), // Optional custom name for the conversation
+  lastMessageAt: timestamp("last_message_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Conversation participants
+export const conversationParticipants = pgTable("conversation_participants", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  conversationId: uuid("conversation_id").references(() => conversations.id),
+  userId: varchar("user_id").references(() => users.id),
+  unreadCount: integer("unread_count").default(0),
+  lastReadAt: timestamp("last_read_at"),
+  joinedAt: timestamp("joined_at").defaultNow(),
+});
+
+// Messages table - updated to support conversations
 export const messages = pgTable("messages", {
   id: uuid("id").primaryKey().defaultRandom(),
-  householdId: uuid("household_id").references(() => households.id),
+  conversationId: uuid("conversation_id").references(() => conversations.id), // New: reference to conversation
+  householdId: uuid("household_id").references(() => households.id), // Keep for backward compatibility
   userId: varchar("user_id").references(() => users.id),
   content: text("content").notNull(),
   type: varchar("type").default("text"), // text, system, attachment
@@ -189,6 +211,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   messages: many(messages),
   shoppingItems: many(shoppingItems),
   roommateListings: many(roommateListings),
+  conversationParticipants: many(conversationParticipants),
 }));
 
 export const householdsRelations = relations(households, ({ many }) => ({
@@ -257,12 +280,40 @@ export const calendarEventsRelations = relations(calendarEvents, ({ one }) => ({
 }));
 
 export const messagesRelations = relations(messages, ({ one }) => ({
+  conversation: one(conversations, {
+    fields: [messages.conversationId],
+    references: [conversations.id],
+  }),
   household: one(households, {
     fields: [messages.householdId],
     references: [households.id],
   }),
   user: one(users, {
     fields: [messages.userId],
+    references: [users.id],
+  }),
+}));
+
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
+  household: one(households, {
+    fields: [conversations.householdId],
+    references: [households.id],
+  }),
+  listing: one(roommateListings, {
+    fields: [conversations.listingId],
+    references: [roommateListings.id],
+  }),
+  participants: many(conversationParticipants),
+  messages: many(messages),
+}));
+
+export const conversationParticipantsRelations = relations(conversationParticipants, ({ one }) => ({
+  conversation: one(conversations, {
+    fields: [conversationParticipants.conversationId],
+    references: [conversations.id],
+  }),
+  user: one(users, {
+    fields: [conversationParticipants.userId],
     references: [users.id],
   }),
 }));
@@ -340,6 +391,17 @@ export const insertRoommateListingSchema = createInsertSchema(roommateListings).
   contactInfo: z.string().email("Please enter a valid email address for contact"),
 });
 
+export const insertConversationSchema = createInsertSchema(conversations).omit({
+  id: true,
+  createdAt: true,
+  lastMessageAt: true,
+});
+
+export const insertConversationParticipantSchema = createInsertSchema(conversationParticipants).omit({
+  id: true,
+  joinedAt: true,
+});
+
 // Authentication schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -391,3 +453,7 @@ export type ShoppingItem = typeof shoppingItems.$inferSelect;
 export type InsertShoppingItem = z.infer<typeof insertShoppingItemSchema>;
 export type RoommateListing = typeof roommateListings.$inferSelect;
 export type InsertRoommateListing = z.infer<typeof insertRoommateListingSchema>;
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertConversation = z.infer<typeof insertConversationSchema>;
+export type ConversationParticipant = typeof conversationParticipants.$inferSelect;
+export type InsertConversationParticipant = z.infer<typeof insertConversationParticipantSchema>;
