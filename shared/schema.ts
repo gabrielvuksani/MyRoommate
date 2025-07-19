@@ -330,6 +330,9 @@ export const insertRoommateListingSchema = createInsertSchema(roommateListings).
   createdBy: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  availableFrom: z.string().transform((val) => new Date(val)),
+  availableTo: z.string().optional().transform((val) => val ? new Date(val) : undefined),
 });
 
 // Types
