@@ -165,13 +165,23 @@ export function setupAuth(app: Express) {
     }
   });
 
-  // Logout endpoint
-  app.post("/api/logout", (req, res, next) => {
-    req.logout((err) => {
+  // Logout endpoint - support both POST (for app) and GET (for direct browser access)
+  const handleLogout = (req: any, res: any, next: any) => {
+    req.logout((err: any) => {
       if (err) return next(err);
+      
+      // If it's a direct browser request (GET), redirect to landing page
+      if (req.method === 'GET') {
+        return res.redirect('/');
+      }
+      
+      // For API requests (POST), return JSON
       res.sendStatus(200);
     });
-  });
+  };
+
+  app.post("/api/logout", handleLogout);
+  app.get("/api/logout", handleLogout);
 
   // Get current user
   app.get("/api/user", (req, res) => {

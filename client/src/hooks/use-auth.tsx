@@ -73,6 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/user"], null);
       // Clear all cached data on logout
       queryClient.clear();
+      // Redirect to landing page after logout
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Logout failed:", error.message);
