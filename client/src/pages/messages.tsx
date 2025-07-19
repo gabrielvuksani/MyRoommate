@@ -597,18 +597,14 @@ export default function Messages() {
             className="glass-card rounded-3xl shadow-lg border-0 transition-all duration-500 ease-out" 
             style={{ 
               padding: isKeyboardVisible ? '14px 16px' : '12px',
-              background: isKeyboardVisible 
-                ? 'rgba(255, 255, 255, 0.95)' 
-                : 'rgba(255, 255, 255, 0.9)',
+              background: 'var(--surface)',
               backdropFilter: isKeyboardVisible 
                 ? 'blur(30px) saturate(2.2) brightness(1.05)' 
                 : 'blur(25px) saturate(1.9)',
-              border: isKeyboardVisible 
-                ? '1px solid rgba(255, 255, 255, 0.4)' 
-                : '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid var(--border)',
               boxShadow: isKeyboardVisible 
-                ? '0 12px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 1px 0 rgba(255, 255, 255, 0.3) inset' 
-                : '0 8px 25px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+                ? 'var(--shadow-lg)' 
+                : 'var(--shadow-md)'
             }}
           >
             <form onSubmit={handleSendMessage} className="flex items-end gap-3">
