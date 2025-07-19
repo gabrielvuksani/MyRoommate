@@ -38,12 +38,14 @@ function Router() {
     PersistentLoading.checkAndShow();
   }, []);
   
-  const { data: household } = useQuery({
+  const { data: household, isLoading: isHouseholdLoading, error: householdError } = useQuery({
     queryKey: ["/api/households/current"],
     enabled: !!user,
-  }) as { data: any };
+    retry: false, // Don't retry 404s
+  }) as { data: any, isLoading: boolean, error: any };
 
-  if (isLoading) {
+  // Show loading during auth or initial household check
+  if (isLoading || (user && isHouseholdLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <div className="w-8 h-8 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
@@ -51,8 +53,15 @@ function Router() {
     );
   }
 
-  // Get comprehensive user flags using centralized logic
-  const userFlags = getUserFlags(user, household, !!user, location);
+  // Only get user flags once we have definitive household data
+  // (either exists or confirmed 404 error)
+  const householdDataReady = !user || !isHouseholdLoading;
+  const userFlags = householdDataReady ? getUserFlags(user, household, !!user, location) : {
+    isNewUser: false,
+    isExistingUser: false,
+    needsOnboarding: false,
+    hasHousehold: false
+  };
   const { needsOnboarding, hasHousehold } = userFlags;
   
   // Check if we should skip landing page for PWA/native apps
