@@ -1,6 +1,6 @@
 import { Home, Calendar, DollarSign, MessageSquare, User, CheckSquare } from "lucide-react";
 import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useEffect } from "react";
 

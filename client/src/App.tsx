@@ -5,13 +5,14 @@ import { useEffect } from "react";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/ThemeProvider";
-import { useAuth } from "@/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { getUserFlags } from "@/lib/userUtils";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { PersistentLoading } from "@/lib/persistentLoading";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
+import AuthPage from "@/pages/auth-page";
 import Home from "@/pages/home";
 import Chores from "@/pages/chores";
 import Expenses from "@/pages/expenses";
@@ -28,18 +29,15 @@ import AddExpense from "@/pages/add-expense";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const [location] = useLocation();
   const { isKeyboardVisible } = useKeyboardHeight();
+  const isAuthenticated = !!user;
 
   // Check for persistent loading on page load
   useEffect(() => {
     PersistentLoading.checkAndShow();
   }, []);
-  const { data: user } = useQuery({
-    queryKey: ["/api/auth/user"],
-    enabled: isAuthenticated,
-  }) as { data: any };
   
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -63,8 +61,9 @@ function Router() {
       <Switch>
         {!isAuthenticated ? (
           <>
+            <Route path="/auth" component={AuthPage} />
             <Route path="/landing" component={Landing} />
-            <Route path="/" component={Landing} />
+            <Route path="/" component={AuthPage} />
           </>
         ) : needsOnboarding ? (
           <>
@@ -103,11 +102,13 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <TooltipProvider>
+            <Router />
+          </TooltipProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

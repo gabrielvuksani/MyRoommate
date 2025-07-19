@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import {
   insertHouseholdSchema,
   insertChoreSchema,
@@ -17,21 +17,11 @@ import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
-
+  // Auth routes are now handled by setupAuth() - includes /api/register, /api/login, /api/logout, /api/user
+  
   app.patch('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { firstName, lastName } = req.body;
       
       const updatedUser = await storage.upsertUser({
@@ -50,7 +40,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Household routes
   app.post('/api/households', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const data = insertHouseholdSchema.parse(req.body);
       
       // Generate invite code
@@ -74,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/households/join', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { inviteCode } = req.body;
       
       console.log("Join household attempt:", { userId, inviteCode, codeLength: inviteCode?.length });
@@ -111,7 +101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/households/leave', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       await storage.leaveHousehold(userId);
       res.json({ message: "Successfully left household" });
     } catch (error) {
@@ -122,7 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/households/current', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { name } = req.body;
       
       if (!name || !name.trim()) {
@@ -144,7 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/households/current', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -161,7 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Chore routes
   app.get('/api/chores', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -177,7 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/chores', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -236,7 +226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Expense routes
   app.get('/api/expenses', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -252,7 +242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/expenses', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -282,7 +272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/expenses/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { id } = req.params;
       
       // Verify user has access to delete this expense
@@ -301,7 +291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/expense-splits/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const splitId = req.params.id;
       const { settled } = req.body;
       
@@ -321,7 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/balance', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -338,7 +328,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Calendar routes
   app.get('/api/calendar', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -354,7 +344,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/calendar', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -381,7 +371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/calendar-events/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { id } = req.params;
       
       // Verify user has access to delete this calendar event
@@ -401,7 +391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Message routes - Optimized for real-time performance
   app.get('/api/messages', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -425,7 +415,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/messages', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { content, householdId } = req.body;
       
       if (!content || !content.trim()) {
@@ -456,7 +446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Shopping routes
   app.get('/api/shopping', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -472,7 +462,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/shopping', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -600,7 +590,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/roommate-listings', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const data = insertRoommateListingSchema.parse(req.body);
       
       // First, unfeature all existing listings
@@ -622,7 +612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/roommate-listings/my', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const listings = await storage.getUserRoommateListings(userId);
       res.json(listings);
     } catch (error) {
@@ -709,7 +699,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Developer Tools API - Delete All Data
   app.delete('/api/dev/delete-all-data', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // For security, only allow the current user's household data to be deleted
       const membership = await storage.getUserHousehold(userId);
