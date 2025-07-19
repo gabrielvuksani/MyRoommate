@@ -136,7 +136,8 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Updated database schema with password reset tokens and expiration fields
 - ✓ Enhanced server-side endpoints for email verification and password reset functionality
 - ✓ Maintained exact onboarding flow: Landing page → Auth page → (email verification for new users) → Onboarding/Home
-- ✓ Note: Email delivery requires valid RESEND_API_KEY - current key shows as invalid
+- ✓ **FIXED: Valid RESEND_API_KEY configured - email delivery now fully functional**
+- ✓ Note: Resend free tier restricts emails to verified sender address - upgrade/verify domain for production use
 
 **July 19, 2025 (Earlier):**
 - ✓ **MAJOR: Completed transition to custom premium authentication system**
