@@ -111,11 +111,14 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 19, 2025 (Latest Updates):**
-- ✓ **COMPLETED: Comprehensive email verification and password reset system**
+- ✓ **COMPLETED: Comprehensive email verification and password reset system with working email delivery**
 - ✓ **FIXED: Authentication errors now show inline instead of redirecting to error pages**
+- ✓ **FIXED: "String did not match expected pattern" error by correcting regex validation and improving error messages**
 - ✓ Updated authentication mutations to use proper API calls instead of form submission for better error handling
 - ✓ Added enhanced frontend password validation (uppercase, lowercase, number, special character) to catch errors before submission
 - ✓ Fixed registration and login flows to display validation errors inline in the form
+- ✓ Moved error messages to top of forms for better visibility and professional appearance
+- ✓ Streamlined error messages to show only clean, user-friendly text without error codes or brackets
 - ✓ Added email verification requirement before user registration completion using Resend API
 - ✓ Implemented password reset functionality with dedicated reset page at `/reset-password`
 - ✓ Enhanced authentication flow with proper error handling for unverified users during login

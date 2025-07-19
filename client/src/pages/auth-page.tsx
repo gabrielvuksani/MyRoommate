@@ -260,6 +260,15 @@ export default function AuthPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Error Display - Moved to top */}
+                    {(loginMutation.error || registerMutation.error) && (
+                      <div className="p-4 rounded-2xl bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm border border-red-200/50 dark:border-red-800/50">
+                        <p className="text-red-600 dark:text-red-400 text-sm">
+                          {loginMutation.error?.message || registerMutation.error?.message}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Email */}
                     <div>
                       <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
@@ -387,14 +396,7 @@ export default function AuthPage() {
                       )}
                     </Button>
 
-                    {/* Error Display */}
-                    {(loginMutation.error || registerMutation.error) && (
-                      <div className="p-4 rounded-2xl bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm border border-red-200/50 dark:border-red-800/50">
-                        <p className="text-red-600 dark:text-red-400 text-sm">
-                          {loginMutation.error?.message || registerMutation.error?.message}
-                        </p>
-                      </div>
-                    )}
+
 
                     {/* Forgot Password Link - Only for login */}
                     {isLogin && (
