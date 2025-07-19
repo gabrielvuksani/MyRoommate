@@ -14,14 +14,23 @@ export interface EmailParams {
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
+    console.log('Attempting to send email to:', params.to);
+    
     const result = await resend.emails.send({
-      from: 'myRoommate <noreply@resend.dev>', // Use Resend's default domain for now
+      from: 'myRoommate <onboarding@resend.dev>', // Use Resend's verified domain
       to: params.to,
       subject: params.subject,
       html: params.html,
     });
 
-    console.log('Email sent successfully:', result.data?.id);
+    console.log('Email send result:', result);
+    
+    if (result.error) {
+      console.error('Email send error:', result.error);
+      return false;
+    }
+
+    console.log('Email sent successfully! ID:', result.data?.id);
     return true;
   } catch (error) {
     console.error('Resend email error:', error);
@@ -30,7 +39,13 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
 }
 
 export function generateVerificationEmailTemplate(firstName: string, verificationToken: string): string {
-  const verificationUrl = `${process.env.NODE_ENV === 'production' ? 'https://' + process.env.REPL_SLUG + '.' + process.env.REPL_OWNER + '.repl.co' : 'http://localhost:5000'}/api/verify-email?token=${verificationToken}`;
+  // Generate verification URL - always use the current domain
+  const baseUrl = process.env.NODE_ENV === 'production' 
+    ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
+    : 'http://localhost:5000';
+  const verificationUrl = `${baseUrl}/api/verify-email?token=${verificationToken}`;
+  
+  console.log('Generated verification URL:', verificationUrl);
   
   return `
     <!DOCTYPE html>
