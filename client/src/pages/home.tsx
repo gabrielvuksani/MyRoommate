@@ -308,82 +308,6 @@ export default function Home() {
         </div>
       </div>
       <div className="pt-44 px-6 space-y-6">
-        {/* Find Roommates Section - Moved to Top */}
-        <div className="border-b pb-8" style={{ borderColor: 'var(--border-color)' }}>
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>Find Roommates</h2>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Discover your roommate match</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setLocation("/roommates")}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
-              style={{ 
-                background: 'var(--surface-secondary)',
-                color: 'var(--text-secondary)'
-              }}
-            >
-              <span className="text-sm font-medium">View All</span>
-              <ArrowRight size={14} />
-            </button>
-          </div>
-
-          {featuredListings.length > 0 ? (
-            <div className="space-y-4 mb-6">
-              {featuredListings.slice(0, 3).map((listing: any) => (
-                <RoommateListingCard
-                  key={listing.id}
-                  listing={listing}
-                  compact={true}
-                  onContact={(listing) => {
-                    if (listing.contactInfo) {
-                      window.open(`mailto:${listing.contactInfo}`, '_blank');
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          ) : (
-            <Card className="glass-card">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>No listings yet</h3>
-                <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Be the first to post a roommate listing in your area</p>
-                <button
-                  onClick={() => setLocation("/roommates")}
-                  className="px-6 py-3 bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-2xl font-semibold transition-all hover:scale-[1.02] btn-animated"
-                >
-                  <Plus className="w-4 h-4 mr-2 inline" />
-                  Post Listing
-                </button>
-              </CardContent>
-            </Card>
-          )}
-
-          {featuredListings.length > 3 && (
-            <div className="text-center">
-              <button
-                onClick={() => setLocation("/roommates")}
-                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
-                style={{ 
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                <span className="text-sm font-medium">View All</span>
-                <ArrowRight size={14} />
-              </button>
-            </div>
-          )}
-        </div>
-
         {/* Hero Stats */}
         <div className="grid grid-cols-2 gap-4">
           <Card className="glass-card">
@@ -828,7 +752,81 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Roommate Marketplace Section */}
+        <div className="mt-12 border-t pt-8" style={{ borderColor: 'var(--border-color)' }}>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>Find Roommates</h2>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Discover your roommate match</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setLocation("/roommates")}
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+              style={{ 
+                background: 'var(--surface-secondary)',
+                color: 'var(--text-secondary)'
+              }}
+            >
+              <span className="text-sm font-medium">View All</span>
+              <ArrowRight size={14} />
+            </button>
+          </div>
 
+          {featuredListings.length > 0 ? (
+            <div className="space-y-4 mb-6">
+              {featuredListings.slice(0, 3).map((listing: any) => (
+                <RoommateListingCard
+                  key={listing.id}
+                  listing={listing}
+                  compact={true}
+                  onContact={(listing) => {
+                    if (listing.contactInfo) {
+                      window.open(`mailto:${listing.contactInfo}`, '_blank');
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="glass-card">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>No listings yet</h3>
+                <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Be the first to post a roommate listing in your area</p>
+                <button
+                  onClick={() => setLocation("/roommates")}
+                  className="px-6 py-3 bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-2xl font-semibold transition-all hover:scale-[1.02] btn-animated"
+                >
+                  <Plus className="w-4 h-4 mr-2 inline" />
+                  Post Listing
+                </button>
+              </CardContent>
+            </Card>
+          )}
+
+          {featuredListings.length > 3 && (
+            <div className="text-center">
+              <button
+                onClick={() => setLocation("/roommates")}
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+                style={{ 
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                <span className="text-sm font-medium">View All</span>
+                <ArrowRight size={14} />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
