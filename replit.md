@@ -139,6 +139,9 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Updated authentication strategy names from replitauth to myroommate for seamless branding
 - ✓ Removed Replit development banner for cleaner professional appearance
 - ✓ Enhanced authentication flow documentation to reflect myRoommate branding throughout
+- ✓ Note: Replit banners still appear due to Vite plugins that cannot be modified (technical limitation)
+- ✓ Updated schema comments to reference myRoommate Auth instead of Replit Auth
+- ✓ Core authentication flow now branded as myRoommate with custom success pages
 - ✓ Fixed tab bar design in roommates page to match established glass morphism design language with sliding indicator
 - ✓ Updated + button in roommates page to match chores page style with proper gradient and animations
 - ✓ Enhanced listing detail page pills/badges to work properly in both dark and light modes using CSS variables
