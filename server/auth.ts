@@ -154,13 +154,7 @@ export function setupAuth(app: Express) {
       }
     } catch (error: any) {
       if (error.name === "ZodError") {
-        let cleanMessage = error.errors[0].message;
-        // Clean up common Zod error patterns to make them more user-friendly
-        cleanMessage = cleanMessage
-          .replace(/String must contain at least \d+ character\(s\)/gi, 'This field is required')
-          .replace(/Invalid email/gi, 'Please enter a valid email address')
-          .replace(/The string did not match the expected pattern/gi, 'Password must contain uppercase, lowercase, number, and special character');
-        return res.status(400).json({ message: cleanMessage });
+        return res.status(400).json({ message: error.errors[0].message });
       }
       console.error("Registration error:", error);
       res.status(500).json({ message: "Registration failed" });
@@ -184,30 +178,24 @@ export function setupAuth(app: Express) {
       passport.authenticate("local", (err: any, user: any, info: any) => {
         if (err) return next(err);
         if (!user) {
-          return res.status(401).json({ message: info?.message || "Invalid email or password" });
+          return res.status(401).json({ message: info?.message || "Invalid credentials" });
         }
         
         // Check if user is verified
         if (!user.verified) {
           return res.status(401).json({ 
-            message: "Please verify your email address before signing in"
+            message: "Please verify your email address before signing in. Check your email for a verification link."
           });
         }
         
         req.login(user, (err) => {
           if (err) return next(err);
-          res.json(user);
+          res.redirect('/');
         });
       })(req, res, next);
     } catch (error: any) {
       if (error.name === "ZodError") {
-        let cleanMessage = error.errors[0].message;
-        // Clean up common Zod error patterns to make them more user-friendly
-        cleanMessage = cleanMessage
-          .replace(/String must contain at least \d+ character\(s\)/gi, 'This field is required')
-          .replace(/Invalid email/gi, 'Please enter a valid email address')
-          .replace(/The string did not match the expected pattern/gi, 'Password must contain uppercase, lowercase, number, and special character');
-        return res.status(400).json({ message: cleanMessage });
+        return res.status(400).json({ message: error.errors[0].message });
       }
       next(error);
     }

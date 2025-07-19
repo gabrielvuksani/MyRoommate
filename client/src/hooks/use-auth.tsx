@@ -36,18 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const user = await res.json();
         return user;
       } else {
-        const errorText = await res.text();
-        let errorMessage = 'Login failed';
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          // If response isn't JSON, use the text directly or default message
-          errorMessage = errorText.includes('message') ? errorText : errorMessage;
-        }
-        // Clean up error message - remove error codes and extra formatting
-        errorMessage = errorMessage.replace(/^\d+:\s*/, '').replace(/[{}]/g, '').replace(/^"|"$/g, '');
-        throw new Error(errorMessage);
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Login failed');
       }
     },
     onSuccess: (user: User) => {
@@ -77,17 +67,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         return data;
       } else {
-        const errorText = await res.text();
-        let errorMessage = 'Registration failed';
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          errorMessage = errorText.includes('message') ? errorText : errorMessage;
-        }
-        // Clean up error message - remove error codes and extra formatting
-        errorMessage = errorMessage.replace(/^\d+:\s*/, '').replace(/[{}]/g, '').replace(/^"|"$/g, '');
-        throw new Error(errorMessage);
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Registration failed');
       }
     },
     onSuccess: (data: any) => {
