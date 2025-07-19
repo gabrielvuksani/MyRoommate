@@ -127,16 +127,31 @@ export function setupAuth(app: Express) {
         phoneNumber: validatedData.phoneNumber,
         dateOfBirth: validatedData.dateOfBirth ? new Date(validatedData.dateOfBirth) : null,
         verificationToken,
-        verified: true, // Auto-verify for now
+        verified: false, // Require email verification
         idVerified: false,
         profileImageUrl: null,
       });
 
-      // Auto login after registration
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.redirect('/');
-      });
+      // Send verification email instead of auto-login
+      try {
+        const { sendEmail, generateVerificationEmailTemplate } = await import('./email');
+        await sendEmail({
+          to: user.email,
+          subject: 'Verify your email - myRoommate',
+          html: generateVerificationEmailTemplate(user.firstName, user.verificationToken!)
+        });
+        
+        res.status(201).json({ 
+          message: 'Registration successful! Please check your email to verify your account.',
+          requiresVerification: true 
+        });
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError);
+        res.status(201).json({ 
+          message: 'Registration successful, but we could not send verification email. Please contact support.',
+          requiresVerification: true 
+        });
+      }
     } catch (error: any) {
       if (error.name === "ZodError") {
         return res.status(400).json({ message: error.errors[0].message });
@@ -164,6 +179,13 @@ export function setupAuth(app: Express) {
         if (err) return next(err);
         if (!user) {
           return res.status(401).json({ message: info?.message || "Invalid credentials" });
+        }
+        
+        // Check if user is verified
+        if (!user.verified) {
+          return res.status(401).json({ 
+            message: "Please verify your email address before signing in. Check your email for a verification link."
+          });
         }
         
         req.login(user, (err) => {
@@ -199,6 +221,84 @@ export function setupAuth(app: Express) {
 
   app.post("/api/logout", handleLogout);
   app.get("/api/logout", handleLogout);
+
+  // Email verification endpoint
+  app.get("/api/verify-email", async (req, res) => {
+    const token = req.query.token as string;
+    if (!token) {
+      return res.redirect('/auth?error=invalid-token');
+    }
+
+    try {
+      const user = await storage.getUserByVerificationToken(token);
+      if (!user) {
+        return res.redirect('/auth?error=invalid-token');
+      }
+
+      await storage.verifyUser(user.id);
+      return res.redirect('/auth?verified=true');
+    } catch (error) {
+      console.error('Email verification error:', error);
+      return res.redirect('/auth?error=verification-failed');
+    }
+  });
+
+  // Request password reset
+  app.post("/api/request-password-reset", async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if email exists for security
+        return res.json({ message: "If an account with that email exists, you will receive a password reset link." });
+      }
+
+      const resetToken = nanoid(32);
+      const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      await storage.setPasswordResetToken(user.id, resetToken, resetExpires);
+
+      const { sendEmail, generatePasswordResetEmailTemplate } = await import('./email');
+      await sendEmail({
+        to: user.email,
+        subject: 'Reset your password - myRoommate',
+        html: generatePasswordResetEmailTemplate(user.firstName || 'User', resetToken)
+      });
+
+      res.json({ message: "If an account with that email exists, you will receive a password reset link." });
+    } catch (error) {
+      console.error('Password reset request error:', error);
+      res.status(500).json({ message: "Failed to process password reset request" });
+    }
+  });
+
+  // Reset password with token
+  app.post("/api/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      if (!token || !newPassword) {
+        return res.status(400).json({ message: "Token and new password are required" });
+      }
+
+      const user = await storage.getUserByPasswordResetToken(token);
+      if (!user || !user.passwordResetExpires || user.passwordResetExpires < new Date()) {
+        return res.status(400).json({ message: "Invalid or expired reset token" });
+      }
+
+      const hashedPassword = await hashPassword(newPassword);
+      await storage.updatePassword(user.id, hashedPassword);
+      await storage.clearPasswordResetToken(user.id);
+
+      res.json({ message: "Password reset successful" });
+    } catch (error) {
+      console.error('Password reset error:', error);
+      res.status(500).json({ message: "Failed to reset password" });
+    }
+  });
 
   // Get current user
   app.get("/api/user", (req, res) => {

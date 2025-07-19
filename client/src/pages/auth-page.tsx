@@ -20,10 +20,26 @@ export default function AuthPage() {
     lastName: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
 
-  // Scroll to top on page load
+  // Check URL params for verification status and scroll to top
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('verified') === 'true') {
+      setVerificationMessage('Email verified successfully! You can now sign in.');
+      setIsLogin(true); // Switch to login form
+    } else if (urlParams.get('error') === 'invalid-token') {
+      setVerificationMessage('Invalid verification link. Please sign up again or contact support.');
+    } else if (urlParams.get('error') === 'verification-failed') {
+      setVerificationMessage('Email verification failed. Please try again or contact support.');
+    }
   }, []);
 
   // Only redirect if user was already logged in when page loaded (not after auth mutations)
@@ -100,6 +116,36 @@ export default function AuthPage() {
     }
   };
 
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail) {
+      setErrors({ resetEmail: "Email is required" });
+      return;
+    }
+
+    setResetLoading(true);
+    setErrors({});
+
+    try {
+      const response = await fetch('/api/request-password-reset', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: resetEmail }),
+      });
+
+      const result = await response.json();
+      setResetMessage(result.message);
+      setResetEmail("");
+    } catch (error) {
+      console.error('Password reset error:', error);
+      setErrors({ resetEmail: "Failed to send reset email. Please try again." });
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="min-h-screen flex">
@@ -122,143 +168,238 @@ export default function AuthPage() {
             {/* Form Card */}
             <Card className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-white/30 dark:border-slate-700/30 rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-slate-900/50">
               <CardContent className="p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Email */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                      Email Address
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <Input
-                        type="email"
-                        placeholder="your@email.com"
-                        value={formData.email}
-                        onChange={(e) => updateFormData("email", e.target.value)}
-                        className={`pl-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.email ? 'border-red-500' : ''}`}
-                      />
+                {/* Verification Messages */}
+                {verificationMessage && (
+                  <div className={`p-4 rounded-xl mb-6 ${
+                    verificationMessage.includes('successfully') 
+                      ? 'bg-green-50 border border-green-200' 
+                      : 'bg-red-50 border border-red-200'
+                  }`}>
+                    <div className="flex items-center">
+                      <CheckCircle className={`h-5 w-5 mr-2 ${
+                        verificationMessage.includes('successfully') 
+                          ? 'text-green-600' 
+                          : 'text-red-600'
+                      }`} />
+                      <p className={`text-sm ${
+                        verificationMessage.includes('successfully') 
+                          ? 'text-green-800' 
+                          : 'text-red-800'
+                      }`}>
+                        {verificationMessage}
+                      </p>
                     </div>
-                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                   </div>
+                )}
 
-                  {/* Names (Register only) */}
-                  {!isLogin && (
-                    <div className="grid grid-cols-2 gap-4">
+                {/* Password Reset Form */}
+                {showForgotPassword ? (
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        Reset Password
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        Enter your email to receive a password reset link
+                      </p>
+                    </div>
+
+                    {resetMessage && (
+                      <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+                        <p className="text-sm text-blue-800">{resetMessage}</p>
+                      </div>
+                    )}
+
+                    <form onSubmit={handlePasswordReset} className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                          First Name
+                          Email Address
                         </label>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
-                            placeholder="John"
-                            value={formData.firstName}
-                            onChange={(e) => updateFormData("firstName", e.target.value)}
-                            className={`pl-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.firstName ? 'border-red-500' : ''}`}
+                            type="email"
+                            placeholder="your@email.com"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
+                            className={`pl-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.resetEmail ? 'border-red-500' : ''}`}
                           />
                         </div>
-                        {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+                        {errors.resetEmail && <p className="text-red-500 text-sm mt-1">{errors.resetEmail}</p>}
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                          Last Name
-                        </label>
-                        <Input
-                          placeholder="Doe"
-                          value={formData.lastName}
-                          onChange={(e) => updateFormData("lastName", e.target.value)}
-                          className={`h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.lastName ? 'border-red-500' : ''}`}
-                        />
-                        {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
-                      </div>
-                    </div>
-                  )}
 
-                  {/* Password */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={formData.password}
-                        onChange={(e) => updateFormData("password", e.target.value)}
-                        className={`pl-10 pr-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.password ? 'border-red-500' : ''}`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                    {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                      <div className="space-y-3">
+                        <Button
+                          type="submit"
+                          disabled={resetLoading}
+                          className="w-full h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-medium rounded-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
+                        >
+                          {resetLoading ? 'Sending...' : 'Send Reset Link'}
+                        </Button>
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowForgotPassword(false)}
+                          className="w-full h-12 rounded-xl"
+                        >
+                          Back to Sign In
+                        </Button>
+                      </div>
+                    </form>
                   </div>
-
-                  {/* Confirm Password (Register only) */}
-                  {!isLogin && (
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Email */}
                     <div>
                       <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                        Confirm Password
+                        Email Address
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <Input
+                          type="email"
+                          placeholder="your@email.com"
+                          value={formData.email}
+                          onChange={(e) => updateFormData("email", e.target.value)}
+                          className={`pl-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.email ? 'border-red-500' : ''}`}
+                        />
+                      </div>
+                      {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                    </div>
+
+                    {/* Names (Register only) */}
+                    {!isLogin && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                            First Name
+                          </label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <Input
+                              placeholder="John"
+                              value={formData.firstName}
+                              onChange={(e) => updateFormData("firstName", e.target.value)}
+                              className={`pl-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.firstName ? 'border-red-500' : ''}`}
+                            />
+                          </div>
+                          {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                            Last Name
+                          </label>
+                          <Input
+                            placeholder="Doe"
+                            value={formData.lastName}
+                            onChange={(e) => updateFormData("lastName", e.target.value)}
+                            className={`h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.lastName ? 'border-red-500' : ''}`}
+                          />
+                          {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Password */}
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                        Password
                       </label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <Input
-                          type={showConfirmPassword ? "text" : "password"}
+                          type={showPassword ? "text" : "password"}
                           placeholder="••••••••"
-                          value={formData.confirmPassword}
-                          onChange={(e) => updateFormData("confirmPassword", e.target.value)}
-                          className={`pl-10 pr-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                          value={formData.password}
+                          onChange={(e) => updateFormData("password", e.target.value)}
+                          className={`pl-10 pr-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.password ? 'border-red-500' : ''}`}
                         />
                         <button
                           type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
-                          {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
                       </div>
-                      {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+                      {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
                     </div>
-                  )}
 
-                  {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    disabled={loginMutation.isPending || registerMutation.isPending}
-                    className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white border-0 rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
-                  >
-                    {(loginMutation.isPending || registerMutation.isPending) ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                        <span>Please wait...</span>
-                      </div>
-                    ) : isLogin ? (
-                      <div className="flex items-center space-x-2">
-                        <Sparkles size={20} />
-                        <span>Sign In</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle size={20} />
-                        <span>Create Account</span>
+                    {/* Confirm Password (Register only) */}
+                    {!isLogin && (
+                      <div>
+                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                          Confirm Password
+                        </label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            value={formData.confirmPassword}
+                            onChange={(e) => updateFormData("confirmPassword", e.target.value)}
+                            className={`pl-10 pr-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          >
+                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                        {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
                       </div>
                     )}
-                  </Button>
 
-                  {/* Error Display */}
-                  {(loginMutation.error || registerMutation.error) && (
-                    <div className="p-4 rounded-2xl bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm border border-red-200/50 dark:border-red-800/50">
-                      <p className="text-red-600 dark:text-red-400 text-sm">
-                        {loginMutation.error?.message || registerMutation.error?.message}
-                      </p>
-                    </div>
-                  )}
-                </form>
+                    {/* Submit Button */}
+                    <Button
+                      type="submit"
+                      disabled={loginMutation.isPending || registerMutation.isPending}
+                      className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white border-0 rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
+                    >
+                      {(loginMutation.isPending || registerMutation.isPending) ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                          <span>Please wait...</span>
+                        </div>
+                      ) : isLogin ? (
+                        <div className="flex items-center space-x-2">
+                          <Sparkles size={20} />
+                          <span>Sign In</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle size={20} />
+                          <span>Create Account</span>
+                        </div>
+                      )}
+                    </Button>
+
+                    {/* Error Display */}
+                    {(loginMutation.error || registerMutation.error) && (
+                      <div className="p-4 rounded-2xl bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm border border-red-200/50 dark:border-red-800/50">
+                        <p className="text-red-600 dark:text-red-400 text-sm">
+                          {loginMutation.error?.message || registerMutation.error?.message}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Forgot Password Link - Only for login */}
+                    {isLogin && (
+                      <div className="text-center">
+                        <button
+                          type="button"
+                          onClick={() => setShowForgotPassword(true)}
+                          className="text-sm text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors"
+                        >
+                          Forgot your password?
+                        </button>
+                      </div>
+                    )}
+                  </form>
+                )}
 
                 {/* Toggle Form */}
                 <div className="mt-8 text-center">

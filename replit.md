@@ -110,7 +110,20 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**July 19, 2025 (Latest):**
+**July 19, 2025 (Latest Updates):**
+- ✓ **COMPLETED: Comprehensive email verification and password reset system**
+- ✓ Added email verification requirement before user registration completion using Resend API
+- ✓ Implemented password reset functionality with dedicated reset page at `/reset-password`
+- ✓ Enhanced authentication flow with proper error handling for unverified users during login
+- ✓ Added verification success/error message handling with URL parameters in auth page
+- ✓ Created "Forgot Password?" link in login form for password recovery access
+- ✓ Updated bottom navigation to hide tabs for users without households (non-household users)
+- ✓ Added comprehensive email service with verification and password reset email templates
+- ✓ Updated database schema with password reset tokens and expiration fields
+- ✓ Enhanced server-side endpoints for email verification and password reset functionality
+- ✓ Maintained exact onboarding flow: Landing page → Auth page → (email verification for new users) → Onboarding/Home
+
+**July 19, 2025 (Earlier):**
 - ✓ **MAJOR: Completed transition to custom premium authentication system**
 - ✓ Replaced Replit OIDC with secure email/password authentication using Passport.js
 - ✓ Fixed all authentication references across the entire application (landing page, profile, onboarding, home, messages, listing-detail, bottom-navigation)

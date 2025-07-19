@@ -14,6 +14,11 @@ export default function BottomNavigation() {
     enabled: !!user,
   });
 
+  // Hide bottom navigation if user doesn't have a household
+  if (!household) {
+    return null;
+  }
+
   const tabs = [
     { id: 'home', path: '/', label: 'Home', Icon: Home },
     { id: 'chores', path: '/chores', label: 'Chores', Icon: CheckSquare },

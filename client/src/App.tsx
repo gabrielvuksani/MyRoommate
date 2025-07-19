@@ -25,6 +25,7 @@ import Roommates from "@/pages/roommates";
 import ListingDetail from "@/pages/listing-detail";
 import AddListing from "@/pages/add-listing";
 import AddExpense from "@/pages/add-expense";
+import ResetPassword from "@/pages/reset-password";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
@@ -61,6 +62,7 @@ function Router() {
           <>
             <Route path="/landing" component={Landing} />
             <Route path="/auth" component={AuthPage} />
+            <Route path="/reset-password" component={ResetPassword} />
             <Route path="/" component={Landing} />
           </>
         ) : needsOnboarding ? (
