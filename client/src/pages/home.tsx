@@ -130,12 +130,54 @@ export default function Home() {
         </div>
 
         <div className="pt-48 px-6 space-y-6">
+          {/* Quick Stats */}
+          {(myListings as any[])?.length > 0 && (
+            <Card className="glass-card">
+              <CardContent className="p-6">
+                <h4 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                  Your Activity
+                </h4>
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                      {Array.isArray(myListings) ? myListings.length : 0}
+                    </p>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      Active Listings
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                      {Array.isArray(featuredListings) ? featuredListings.length : 0}
+                    </p>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      Available Matches
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
           {/* My Activity Section */}
           {(myListings as any[])?.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Your Listings
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  Your Listings
+                </h3>
+                <button
+                  onClick={() => setLocation("/roommates")}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+                  style={{ 
+                    background: 'var(--surface-secondary)',
+                    color: 'var(--text-secondary)'
+                  }}
+                >
+                  <span className="text-sm font-medium">View All</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+              
               <div className="space-y-4">
                 {(myListings as any[]).slice(0, 2).map((listing: any) => (
                   <RoommateListingCard
@@ -146,23 +188,57 @@ export default function Home() {
                   />
                 ))}
               </div>
-              <Card className="glass-card">
-                <CardContent className="p-4 text-center">
-                  <button
-                    onClick={() => setLocation("/roommates")}
-                    className="w-full transition-all btn-animated"
-                  >
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-2">
-                      <ArrowRight className="text-white" size={16} />
-                    </div>
-                    <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                      Manage All Listings
-                    </p>
-                  </button>
-                </CardContent>
-              </Card>
             </div>
           )}
+
+          {/* Featured Listings Section */}
+          {(myListings as any[])?.length < 0 && (
+          <div className="space-y-4 pb-6 border-b" style={{ borderColor: 'var(--border-color)' }}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                Featured Listings
+              </h3>
+              <button
+                onClick={() => setLocation("/roommates")}
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+                style={{ 
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                <span className="text-sm font-medium">View All</span>
+                <ArrowRight size={14} />
+              </button>
+            </div>
+
+            {featuredListings && featuredListings.length > 0 ? (
+              <div className="space-y-4">
+                {featuredListings.slice(0, 3).map((listing: any) => (
+                  <RoommateListingCard
+                    key={listing.id}
+                    listing={listing}
+                    compact={true}
+                    onContact={() => setLocation("/roommates")}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card className="glass-card">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                    <Search size={24} style={{ color: 'var(--text-secondary)' }} />
+                  </div>
+                  <h4 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                    No listings yet
+                  </h4>
+                  <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+                    Be the first to post a listing in your area
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -203,82 +279,6 @@ export default function Home() {
               </CardContent>
             </Card>
           </div>
-
-          {/* Featured Listings Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Featured Listings
-              </h3>
-              <button
-                onClick={() => setLocation("/roommates")}
-                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
-                style={{ 
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                <span className="text-sm font-medium">View All</span>
-                <ArrowRight size={14} />
-              </button>
-            </div>
-            
-            {featuredListings && featuredListings.length > 0 ? (
-              <div className="space-y-4">
-                {featuredListings.slice(0, 3).map((listing: any) => (
-                  <RoommateListingCard
-                    key={listing.id}
-                    listing={listing}
-                    compact={true}
-                    onContact={() => setLocation("/roommates")}
-                  />
-                ))}
-              </div>
-            ) : (
-              <Card className="glass-card">
-                <CardContent className="p-8 text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                    <Search size={24} style={{ color: 'var(--text-secondary)' }} />
-                  </div>
-                  <h4 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                    No listings yet
-                  </h4>
-                  <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                    Be the first to post a listing in your area
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Quick Stats */}
-          {(myListings as any[])?.length > 0 && (
-            <Card className="glass-card">
-              <CardContent className="p-6">
-                <h4 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
-                  Your Activity
-                </h4>
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                      {Array.isArray(myListings) ? myListings.length : 0}
-                    </p>
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      Active Listings
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                      {Array.isArray(featuredListings) ? featuredListings.length : 0}
-                    </p>
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      Available Matches
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
     );
@@ -394,6 +394,35 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Quick Stats */}
+        {(myListings as any[])?.length > 0 && (
+          <Card className="glass-card">
+            <CardContent className="p-6">
+              <h4 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Your Activity
+              </h4>
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                    {Array.isArray(myListings) ? myListings.length : 0}
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    Active Listings
+                  </p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                    {Array.isArray(featuredListings) ? featuredListings.length : 0}
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    Available Matches
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* AI-Powered Today's Priority */}
         <div className="mb-8">
