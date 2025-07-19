@@ -39,6 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
+      // Force redirect to home page after successful login
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -56,6 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
+      // Force redirect to home page after successful registration
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Registration failed:", error.message);

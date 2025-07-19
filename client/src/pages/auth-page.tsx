@@ -77,6 +77,7 @@ export default function AuthPage() {
           email: formData.email,
           password: formData.password,
         });
+        // Redirect handled in mutation onSuccess
       } else {
         await registerMutation.mutateAsync({
           email: formData.email,
@@ -85,9 +86,11 @@ export default function AuthPage() {
           firstName: formData.firstName,
           lastName: formData.lastName,
         });
+        // Redirect handled in mutation onSuccess
       }
     } catch (error) {
       console.error("Auth error:", error);
+      // Error is handled in mutation onError
     }
   };
 
