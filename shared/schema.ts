@@ -284,6 +284,7 @@ export const roommateListingsRelations = relations(roommateListings, ({ one }) =
 export const insertHouseholdSchema = createInsertSchema(households).omit({
   id: true,
   inviteCode: true,
+  createdBy: true,
   createdAt: true,
   updatedAt: true,
 });
@@ -321,6 +322,7 @@ export const insertShoppingItemSchema = createInsertSchema(shoppingItems).omit({
 
 export const insertRoommateListingSchema = createInsertSchema(roommateListings).omit({
   id: true,
+  createdBy: true,
   createdAt: true,
   updatedAt: true,
 });
