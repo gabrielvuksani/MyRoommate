@@ -135,8 +135,7 @@ export function setupAuth(app: Express) {
       // Auto login after registration
       req.login(user, (err) => {
         if (err) return next(err);
-        const { password: _, ...userWithoutPassword } = user;
-        res.status(201).json(userWithoutPassword);
+        res.redirect('/');
       });
     } catch (error: any) {
       if (error.name === "ZodError") {
@@ -169,7 +168,7 @@ export function setupAuth(app: Express) {
         
         req.login(user, (err) => {
           if (err) return next(err);
-          res.json(user);
+          res.redirect('/');
         });
       })(req, res, next);
     } catch (error: any) {

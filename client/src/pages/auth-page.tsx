@@ -20,7 +20,6 @@ export default function AuthPage() {
     lastName: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Scroll to top on page load
   useEffect(() => {
@@ -73,28 +72,23 @@ export default function AuthPage() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    setIsRedirecting(true);
-
     try {
       if (isLogin) {
-        await loginMutation.mutateAsync({
+        loginMutation.mutate({
           email: formData.email,
           password: formData.password,
         });
-        // Redirect handled in mutation onSuccess
       } else {
-        await registerMutation.mutateAsync({
+        registerMutation.mutate({
           email: formData.email,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
           firstName: formData.firstName,
           lastName: formData.lastName,
         });
-        // Redirect handled in mutation onSuccess
       }
     } catch (error) {
       console.error("Auth error:", error);
-      setIsRedirecting(false); // Reset loading on error
     }
   };
 
@@ -107,19 +101,8 @@ export default function AuthPage() {
   };
 
   return (
-    <>
-      {/* Loading Overlay */}
-      {isRedirecting && (
-        <div className="fixed inset-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Signing you in...</p>
-          </div>
-        </div>
-      )}
-      
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <div className="min-h-screen flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="min-h-screen flex">
         {/* Left Column - Form */}
         <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
           <div className="w-full max-w-md space-y-8">
@@ -388,6 +371,5 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
-    </>
   );
 }
