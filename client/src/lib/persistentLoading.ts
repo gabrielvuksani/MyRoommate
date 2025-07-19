@@ -1,56 +1,56 @@
 // Persistent loading overlay that survives page refreshes
-const LOADING_KEY = 'app_loading';
-const LOADING_MESSAGE_KEY = 'app_loading_message';
+const LOADING_KEY = "app_loading";
+const LOADING_MESSAGE_KEY = "app_loading_message";
 
 export const PersistentLoading = {
   show: (message?: string) => {
-    sessionStorage.setItem(LOADING_KEY, 'true');
+    sessionStorage.setItem(LOADING_KEY, "true");
     if (message) {
       sessionStorage.setItem(LOADING_MESSAGE_KEY, message);
     }
-    
+
     // Immediately show loading overlay
     showLoadingOverlay(message);
   },
-  
+
   hide: () => {
     sessionStorage.removeItem(LOADING_KEY);
     sessionStorage.removeItem(LOADING_MESSAGE_KEY);
-    
+
     // Remove loading overlay
     hideLoadingOverlay();
   },
-  
+
   isShowing: () => {
-    return sessionStorage.getItem(LOADING_KEY) === 'true';
+    return sessionStorage.getItem(LOADING_KEY) === "true";
   },
-  
+
   getMessage: () => {
-    return sessionStorage.getItem(LOADING_MESSAGE_KEY) || '';
+    return sessionStorage.getItem(LOADING_MESSAGE_KEY) || "";
   },
-  
+
   // Check and show on page load
   checkAndShow: () => {
     if (PersistentLoading.isShowing()) {
       const message = PersistentLoading.getMessage();
       showLoadingOverlay(message);
-      
+
       // Auto-hide after timeout to prevent infinite loading
       setTimeout(() => {
         PersistentLoading.hide();
-      }, 3000);
+      }, 2000);
     }
-  }
+  },
 };
 
 // DOM manipulation for loading overlay
 function showLoadingOverlay(message?: string) {
   // Remove existing overlay if any
   hideLoadingOverlay();
-  
+
   // Create overlay element
-  const overlay = document.createElement('div');
-  overlay.id = 'persistent-loading-overlay';
+  const overlay = document.createElement("div");
+  overlay.id = "persistent-loading-overlay";
   overlay.style.cssText = `
     position: fixed;
     top: 0;
@@ -65,9 +65,9 @@ function showLoadingOverlay(message?: string) {
     align-items: center;
     justify-content: center;
   `;
-  
+
   // Create content container
-  const content = document.createElement('div');
+  const content = document.createElement("div");
   content.style.cssText = `
     background: rgba(255, 255, 255, 0.9);
     border-radius: 24px;
@@ -76,9 +76,9 @@ function showLoadingOverlay(message?: string) {
     text-align: center;
     min-width: 200px;
   `;
-  
+
   // Add spinner
-  const spinner = document.createElement('div');
+  const spinner = document.createElement("div");
   spinner.style.cssText = `
     width: 48px;
     height: 48px;
@@ -88,10 +88,10 @@ function showLoadingOverlay(message?: string) {
     margin: 0 auto 16px;
     animation: spin 0.8s linear infinite;
   `;
-  
+
   // Add message
   if (message) {
-    const text = document.createElement('p');
+    const text = document.createElement("p");
     text.style.cssText = `
       color: #1a1a1a;
       font-size: 16px;
@@ -101,9 +101,9 @@ function showLoadingOverlay(message?: string) {
     text.textContent = message;
     content.appendChild(text);
   }
-  
+
   // Add CSS animation
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.textContent = `
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -119,14 +119,14 @@ function showLoadingOverlay(message?: string) {
     }
   `;
   document.head.appendChild(style);
-  
+
   content.prepend(spinner);
   overlay.appendChild(content);
   document.body.appendChild(overlay);
 }
 
 function hideLoadingOverlay() {
-  const overlay = document.getElementById('persistent-loading-overlay');
+  const overlay = document.getElementById("persistent-loading-overlay");
   if (overlay) {
     overlay.remove();
   }
