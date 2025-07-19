@@ -2,8 +2,17 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Users, Plus, Search, MapPin, Clock, Star, Heart, Home, RefreshCw, Filter } from "lucide-react";
 import BackButton from "../components/back-button";
 import { useLocation } from "wouter";
@@ -13,7 +22,7 @@ import RoommateListingCard from "@/components/roommate-listing-card";
 export default function Roommates() {
   const [location, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("browse");
-
+  const [showPostForm, setShowPostForm] = useState(false);
   const [searchCity, setSearchCity] = useState("");
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const queryClient = useQueryClient();
@@ -48,9 +57,65 @@ export default function Roommates() {
   const featuredListings = listingsArray.filter((listing: any) => listing.featured);
   const regularListings = listingsArray.filter((listing: any) => !listing.featured);
 
+  const [newListing, setNewListing] = useState({
+    title: "",
+    description: "",
+    rent: "",
+    location: "",
+    city: "",
+    availableFrom: "",
+    roomType: "private",
+    housingType: "apartment",
+    bedrooms: "2",
+    bathrooms: "1",
+    amenities: [] as string[],
+    utilitiesIncluded: [] as string[],
+    preferences: "",
+    petPolicy: "no-pets",
+    smokingPolicy: "no-smoking",
+    contactInfo: "",
+    featured: false
+  });
 
+  const createListingMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/roommate-listings', 'POST', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/roommate-listings'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/roommate-listings/my'] });
+      setNewListing({
+        title: "",
+        description: "",
+        rent: "",
+        location: "",
+        city: "",
+        availableFrom: "",
+        roomType: "private",
+        housingType: "apartment",
+        bedrooms: "2",
+        bathrooms: "1",
+        amenities: [],
+        utilitiesIncluded: [],
+        preferences: "",
+        petPolicy: "no-pets",
+        smokingPolicy: "no-smoking",
+        contactInfo: "",
+        featured: false
+      });
+      setShowPostForm(false);
+      setActiveTab("my-listings");
+    },
+  });
 
-
+  const handleCreateListing = () => {
+    if (!newListing.title || !newListing.rent || !newListing.location || !newListing.city) return;
+    
+    createListingMutation.mutate({
+      ...newListing,
+      rent: parseFloat(newListing.rent),
+      availableFrom: newListing.availableFrom ? new Date(newListing.availableFrom) : new Date(),
+      amenities: newListing.amenities
+    });
+  };
 
   return (
     <div className="page-container page-transition">
@@ -66,7 +131,7 @@ export default function Roommates() {
               </div>
             </div>
             <button
-              onClick={() => setLocation("/add-listing")}
+              onClick={() => setShowPostForm(true)}
               className="w-12 h-12 bg-[var(--surface-secondary)] rounded-full flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05]"
             >
               <Plus size={20} className="text-primary" />
@@ -113,7 +178,136 @@ export default function Roommates() {
 
           <TabsContent value="browse" className="space-y-6">
 
+            {/* Post Listing Form */}
+            {showPostForm && (
+              <Card className="glass-card" style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)'
+              }}>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      Create Roommate Listing
+                    </h2>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowPostForm(false)}
+                      className="w-8 h-8 rounded-xl transition-all duration-200 hover:scale-[1.05] btn-animated backdrop-blur-sm"
+                      style={{ 
+                        background: 'var(--surface-glass)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-secondary)',
+                        backdropFilter: 'blur(8px) saturate(1.2)'
+                      }}
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <Input
+                      placeholder="Listing title"
+                      value={newListing.title}
+                      onChange={(e) => setNewListing({ ...newListing, title: e.target.value })}
+                      className="input-modern"
+                      style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}
+                    />
+                    
+                    <textarea
+                      placeholder="Description"
+                      value={newListing.description}
+                      onChange={(e) => setNewListing({ ...newListing, description: e.target.value })}
+                      className="w-full p-3 rounded-xl resize-none h-24"
+                      style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}
+                    />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        placeholder="Monthly rent ($)"
+                        type="number"
+                        value={newListing.rent}
+                        onChange={(e) => setNewListing({ ...newListing, rent: e.target.value })}
+                        className="input-modern"
+                        style={{
+                          background: 'var(--surface-secondary)',
+                          border: '1px solid var(--border)',
+                          color: 'var(--text-primary)'
+                        }}
+                      />
+                      
+                      <Input
+                        placeholder="Available from"
+                        type="date"
+                        value={newListing.availableFrom}
+                        onChange={(e) => setNewListing({ ...newListing, availableFrom: e.target.value })}
+                        className="input-modern"
+                        style={{
+                          background: 'var(--surface-secondary)',
+                          border: '1px solid var(--border)',
+                          color: 'var(--text-primary)'
+                        }}
+                      />
+                    </div>
 
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        placeholder="Location"
+                        value={newListing.location}
+                        onChange={(e) => setNewListing({ ...newListing, location: e.target.value })}
+                        className="input-modern"
+                        style={{
+                          background: 'var(--surface-secondary)',
+                          border: '1px solid var(--border)',
+                          color: 'var(--text-primary)'
+                        }}
+                      />
+                      
+                      <Input
+                        placeholder="City"
+                        value={newListing.city}
+                        onChange={(e) => setNewListing({ ...newListing, city: e.target.value })}
+                        className="input-modern"
+                        style={{
+                          background: 'var(--surface-secondary)',
+                          border: '1px solid var(--border)',
+                          color: 'var(--text-primary)'
+                        }}
+                      />
+                    </div>
+                    
+                    <Input
+                      placeholder="Contact email"
+                      type="email"
+                      value={newListing.contactInfo}
+                      onChange={(e) => setNewListing({ ...newListing, contactInfo: e.target.value })}
+                      className="input-modern"
+                      style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}
+                    />
+                    
+                    <Button
+                      onClick={handleCreateListing}
+                      disabled={!newListing.title || !newListing.rent || !newListing.location || createListingMutation.isPending}
+                      className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
+                    >
+                      {createListingMutation.isPending ? "Posting..." : "Post Listing"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Featured Listings */}
             {featuredListings.length > 0 && (
@@ -196,7 +390,7 @@ export default function Roommates() {
                       {searchCity ? `No listings found in ${searchCity}` : "Be the first to post a listing!"}
                     </p>
                     <Button
-                      onClick={() => setLocation("/add-listing")}
+                      onClick={() => setShowPostForm(true)}
                       className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
                     >
                       <Plus className="w-4 h-4 mr-2" />
@@ -223,7 +417,7 @@ export default function Roommates() {
                   </div>
                   <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>No listings yet</h3>
                   <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Create your first roommate listing to get started</p>
-                  <Button onClick={() => setLocation("/add-listing")}>
+                  <Button onClick={() => setShowPostForm(true)}>
                     <Plus className="w-4 h-4 mr-2" />
                     Create Listing
                   </Button>
