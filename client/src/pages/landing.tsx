@@ -9,10 +9,15 @@ import {
   Calendar,
   Sparkles,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { PersistentLoading } from "@/lib/persistentLoading";
 
 export default function Landing() {
+  const [isLoading, setIsLoading] = useState(false);
+  
   const handleLogin = () => {
+    setIsLoading(true);
+    PersistentLoading.show("Taking you to sign in...");
     window.location.href = "/auth";
   };
 
@@ -86,10 +91,17 @@ export default function Landing() {
           {/* Main CTA */}
           <Button
             onClick={handleLogin}
-            className="w-full max-w-sm mx-auto h-14 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02] mb-12"
+            disabled={isLoading}
+            className="w-full max-w-sm mx-auto h-14 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02] mb-12 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Sparkles size={20} className="mr-2" />
-            Get Started Free
+            {isLoading ? (
+              <span>Loading...</span>
+            ) : (
+              <>
+                <Sparkles size={20} className="mr-2" />
+                Get Started Free
+              </>
+            )}
           </Button>
 
           {/* Trust Indicators */}
@@ -163,9 +175,10 @@ export default function Landing() {
           </p>
           <Button
             onClick={handleLogin}
-            className="h-12 px-8 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
+            disabled={isLoading}
+            className="h-12 px-8 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Start Your Journey
+            {isLoading ? "Loading..." : "Start Your Journey"}
           </Button>
         </div>
       </div>
