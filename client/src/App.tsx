@@ -1,7 +1,7 @@
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/ThemeProvider";
@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserFlags } from "@/lib/userUtils";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { PersistentLoading } from "@/lib/persistentLoading";
-import { isPWA, getInitialRoute } from "@/lib/pwaUtils";
+import { isPWA, getInitialRoute, setupPWADebugTools } from "@/lib/pwaUtils";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import Home from "@/pages/home";
@@ -36,10 +36,22 @@ function Router() {
   // Check for persistent loading on page load
   useEffect(() => {
     PersistentLoading.checkAndShow();
+    
+    // Setup PWA debug tools in development
+    if (process.env.NODE_ENV === 'development') {
+      setupPWADebugTools();
+    }
   }, []);
 
-  // Detect PWA mode
-  const isInPWAMode = isPWA();
+  // Detect PWA mode with error handling
+  const isInPWAMode = React.useMemo(() => {
+    try {
+      return isPWA();
+    } catch (error) {
+      console.warn('PWA detection failed, defaulting to web mode:', error);
+      return false;
+    }
+  }, []);
   
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],

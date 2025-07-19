@@ -2,7 +2,7 @@
   "name": "myRoommate - Roommate Management",
   "short_name": "myRoommate",
   "description": "Your premium roommate management companion for seamless shared living",
-  "start_url": "/",
+  "start_url": "/?pwa=true",
   "display": "standalone",
   "background_color": "#f7f8fa",
   "theme_color": "#f7f8fa",
