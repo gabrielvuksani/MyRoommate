@@ -223,44 +223,22 @@ export default function AddListing() {
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                   City *
                 </label>
-                <Select value={newListing.city} onValueChange={(value) => setNewListing({ ...newListing, city: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select city" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Berkeley">Berkeley</SelectItem>
-                    <SelectItem value="San Francisco">San Francisco</SelectItem>
-                    <SelectItem value="Palo Alto">Palo Alto</SelectItem>
-                    <SelectItem value="Stanford">Stanford</SelectItem>
-                    <SelectItem value="Oakland">Oakland</SelectItem>
-                    <SelectItem value="San Jose">San Jose</SelectItem>
-                    <SelectItem value="Santa Clara">Santa Clara</SelectItem>
-                    <SelectItem value="Fremont">Fremont</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  placeholder="e.g., Berkeley"
+                  value={newListing.city}
+                  onChange={(e) => setNewListing({ ...newListing, city: e.target.value })}
+                />
               </div>
               
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                   University/School
                 </label>
-                <Select value={newListing.university} onValueChange={(value) => setNewListing({ ...newListing, university: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select university" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="UC Berkeley">UC Berkeley</SelectItem>
-                    <SelectItem value="Stanford University">Stanford University</SelectItem>
-                    <SelectItem value="UCSF">UCSF</SelectItem>
-                    <SelectItem value="San Francisco State University">San Francisco State University</SelectItem>
-                    <SelectItem value="Santa Clara University">Santa Clara University</SelectItem>
-                    <SelectItem value="San Jose State University">San Jose State University</SelectItem>
-                    <SelectItem value="Golden Gate University">Golden Gate University</SelectItem>
-                    <SelectItem value="Academy of Art University">Academy of Art University</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  placeholder="e.g., UC Berkeley, Stanford University"
+                  value={newListing.university}
+                  onChange={(e) => setNewListing({ ...newListing, university: e.target.value })}
+                />
               </div>
             </div>
           </CardContent>
