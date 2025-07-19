@@ -28,20 +28,25 @@ export function getUserFlags(user: any, household: any, isAuthenticated: boolean
     };
   }
 
-  // Check if user is new (no firstName indicates incomplete profile)
-  const isNewUser = !user.firstName;
+  // Check if user is a new signup (flag set during registration)
+  const isNewSignup = sessionStorage.getItem('is_new_signup') === 'true';
   
-  // Check if user is existing but without household
-  const isExistingUser = !!user.firstName && !household;
+  // User needs onboarding if they are a new signup
+  const needsOnboarding = isNewSignup;
   
-  // User needs onboarding if they are a new user (no firstName)
-  const needsOnboarding = isNewUser;
+  // Clear the flag after checking (but only if they've completed onboarding)
+  if (isNewSignup && location !== '/onboarding' && household) {
+    sessionStorage.removeItem('is_new_signup');
+  }
   
   // User has household if household object exists
   const hasHousehold = !!household;
+  
+  // Check if user is existing but without household
+  const isExistingUser = !isNewSignup && !household;
 
   return {
-    isNewUser,
+    isNewUser: isNewSignup,
     isExistingUser,
     needsOnboarding,
     hasHousehold
@@ -51,11 +56,11 @@ export function getUserFlags(user: any, household: any, isAuthenticated: boolean
 /**
  * Determine which onboarding step to show for different user types
  * @param stepNumber - The step number to check
- * @param isNewUser - Whether user is new (no firstName)
+ * @param isNewUser - Whether user is a new signup
  * @returns Whether the step should be shown
  */
 export function shouldShowOnboardingStep(stepNumber: number, isNewUser: boolean): boolean {
-  if (stepNumber === 2) return isNewUser; // Only new users see name entry step
+  if (stepNumber === 2) return isNewUser; // Only new signups see name entry step
   return true; // All other steps visible to both user types
 }
 

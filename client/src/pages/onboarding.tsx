@@ -46,6 +46,8 @@ export default function Onboarding() {
       PersistentLoading.show("Setting up your household...");
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
       localStorage.setItem('onboarding_completed', 'true');
+      // Clear new signup flag
+      sessionStorage.removeItem('is_new_signup');
       // Refresh the page to ensure all state is properly reset
       window.location.href = '/';
     },
@@ -70,6 +72,8 @@ export default function Onboarding() {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       localStorage.setItem('onboarding_completed', 'true');
+      // Clear new signup flag
+      sessionStorage.removeItem('is_new_signup');
       // Refresh the page to ensure all state is properly reset
       window.location.href = '/';
     },
@@ -122,14 +126,6 @@ export default function Onboarding() {
   const handleNext = () => {
     const nextStep = getNextOnboardingStep(step, isNewUser, isReturningUser);
     
-    if (step === 2 && isNewUser) {
-      // New users: Update name before proceeding to household setup
-      updateUserMutation.mutate({
-        firstName: userData.firstName,
-        lastName: userData.lastName
-      });
-    }
-    
     if (nextStep !== step) {
       setStep(nextStep);
     }
@@ -153,17 +149,9 @@ export default function Onboarding() {
 
   const firstName = userData.firstName || (user as any)?.firstName || (user as any)?.email?.split('@')[0] || 'there';
   
-  // Track initial user state when onboarding starts
-  const [initialUserState] = useState(() => {
-    const hasFirstName = !!(user as any)?.firstName;
-    return {
-      isNewUser: !hasFirstName,
-      isReturningUser: hasFirstName
-    };
-  });
-  
-  // Use initial state for onboarding flow to prevent mid-onboarding state changes
-  const { isNewUser, isReturningUser } = initialUserState;
+  // Check if this is a new signup
+  const isNewUser = sessionStorage.getItem('is_new_signup') === 'true';
+  const isReturningUser = !isNewUser;
 
   return (
     <div className="min-h-screen page-container page-transition flex items-center justify-center p-6">
@@ -226,8 +214,8 @@ export default function Onboarding() {
           </Card>
         )}
 
-        {/* Step 2: Name Selection - Only for new users */}
-        {step === 2 && (
+        {/* Step 2: Name Selection - Only for new signups */}
+        {step === 2 && isNewUser && (
           <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
             <CardContent className="p-8 flex flex-col">
             <div className="text-center mb-6">
@@ -491,6 +479,8 @@ export default function Onboarding() {
                     // Show persistent loading
                     PersistentLoading.show("Taking you to roommate listings...");
                     localStorage.setItem('onboarding_completed', 'true');
+                    // Clear new signup flag
+                    sessionStorage.removeItem('is_new_signup');
                     window.location.href = "/roommates";
                   }}
                   className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white font-semibold rounded-2xl btn-animated shadow-lg shadow-purple-500/25 transition-all duration-200 hover:scale-[1.02]"

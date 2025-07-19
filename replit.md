@@ -118,7 +118,11 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ **Reduced auto-timeout from 5 seconds to 3 seconds** for better user experience
 - ✓ **Added empty state for household performance** when no chores/expenses exist with helpful CTA buttons
 - ✓ **Re-enabled portrait mode restriction** with CSS forcing portrait orientation on mobile devices
-- ✓ User routing logic maintained: new users (no firstName) → onboarding, returning users → home page
+- ✓ **Fixed user routing logic** - now uses sessionStorage flag 'is_new_signup' set during registration
+- ✓ New signups are directed to onboarding, returning logins go directly to home page
+- ✓ Both new and returning users now have firstName/lastName from auth form
+- ✓ Onboarding step 2 (name entry) only shows for new signups, not returning users
+- ✓ New signup flag is properly cleared after onboarding completion
 
 **July 19, 2025 (Earlier):**
 - ✓ **MAJOR: Completed transition to custom premium authentication system**

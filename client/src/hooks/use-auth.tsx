@@ -68,6 +68,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       PersistentLoading.show("Setting up your account...");
       // Mark authentication transition in progress
       AuthTransition.setInProgress();
+      // Set flag for new user signup
+      sessionStorage.setItem('is_new_signup', 'true');
       // Set user data immediately for instant UI update
       queryClient.setQueryData(["/api/user"], user);
       // Redirect using window.location (consistent with logout, works for PWA and browser)
