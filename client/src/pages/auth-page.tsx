@@ -179,7 +179,16 @@ export default function AuthPage() {
                       placeholder="your@email.com"
                       value={formData.email}
                       onChange={(e) => updateFormData("email", e.target.value)}
-                      className={errors.email ? 'border-red-500' : ''}
+                      className={`input-modern h-12 ${errors.email ? 'border-red-500 focus:border-red-500' : ''}`}
+                      style={{
+                        background: 'var(--surface)',
+                        borderColor: errors.email ? '#ef4444' : 'var(--border)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '16px 20px',
+                        fontSize: '16px',
+                        color: 'var(--text-primary)',
+                        transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                      }}
                     />
                     {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                   </div>
@@ -196,7 +205,16 @@ export default function AuthPage() {
                           placeholder="John"
                           value={formData.firstName}
                           onChange={(e) => updateFormData("firstName", e.target.value)}
-                          className={errors.firstName ? 'border-red-500' : ''}
+                          className={`input-modern h-12 ${errors.firstName ? 'border-red-500 focus:border-red-500' : ''}`}
+                          style={{
+                            background: 'var(--surface)',
+                            borderColor: errors.firstName ? '#ef4444' : 'var(--border)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: '16px 20px',
+                            fontSize: '16px',
+                            color: 'var(--text-primary)',
+                            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                          }}
                         />
                         {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
                       </div>
@@ -209,7 +227,16 @@ export default function AuthPage() {
                           placeholder="Doe"
                           value={formData.lastName}
                           onChange={(e) => updateFormData("lastName", e.target.value)}
-                          className={errors.lastName ? 'border-red-500' : ''}
+                          className={`input-modern h-12 ${errors.lastName ? 'border-red-500 focus:border-red-500' : ''}`}
+                          style={{
+                            background: 'var(--surface)',
+                            borderColor: errors.lastName ? '#ef4444' : 'var(--border)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: '16px 20px',
+                            fontSize: '16px',
+                            color: 'var(--text-primary)',
+                            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                          }}
                         />
                         {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
                       </div>
@@ -227,13 +254,25 @@ export default function AuthPage() {
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={(e) => updateFormData("password", e.target.value)}
-                        className={`pr-10 ${errors.password ? 'border-red-500' : ''}`}
+                        className={`input-modern h-12 pr-12 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
+                        style={{
+                          background: 'var(--surface)',
+                          borderColor: errors.password ? '#ef4444' : 'var(--border)',
+                          borderRadius: 'var(--radius-md)',
+                          padding: '16px 48px 16px 20px',
+                          fontSize: '16px',
+                          color: 'var(--text-primary)',
+                          transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                        }}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:scale-105 transition-transform"
-                        style={{ color: 'var(--text-secondary)' }}
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:scale-105 transition-all duration-200 rounded-lg p-1"
+                        style={{ 
+                          color: 'var(--text-tertiary)',
+                          background: 'transparent'
+                        }}
                       >
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
@@ -253,13 +292,25 @@ export default function AuthPage() {
                           placeholder="••••••••"
                           value={formData.confirmPassword}
                           onChange={(e) => updateFormData("confirmPassword", e.target.value)}
-                          className={`pr-10 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                          className={`input-modern h-12 pr-12 ${errors.confirmPassword ? 'border-red-500 focus:border-red-500' : ''}`}
+                          style={{
+                            background: 'var(--surface)',
+                            borderColor: errors.confirmPassword ? '#ef4444' : 'var(--border)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: '16px 48px 16px 20px',
+                            fontSize: '16px',
+                            color: 'var(--text-primary)',
+                            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                          }}
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:scale-105 transition-transform"
-                          style={{ color: 'var(--text-secondary)' }}
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:scale-105 transition-all duration-200 rounded-lg p-1"
+                          style={{ 
+                            color: 'var(--text-tertiary)',
+                            background: 'transparent'
+                          }}
                         >
                           {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
