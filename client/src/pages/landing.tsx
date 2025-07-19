@@ -63,10 +63,10 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 dark:from-blue-600/10 dark:to-purple-600/10"></div>
 
         <div className="relative max-w-3xl mx-auto px-6 pt-20 pb-16 text-center">
           {/* Logo/Brand */}
@@ -74,10 +74,10 @@ export default function Landing() {
             <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center shadow-2xl shadow-emerald-500/25">
               <Home size={32} className="text-white" />
             </div>
-            <h1 className="font-bold text-[#1a1a1a] text-[32px] leading-tight mb-4">
+            <h1 className="font-bold text-[#1a1a1a] dark:text-white text-[32px] leading-tight mb-4">
               myRoommate
             </h1>
-            <p className="text-lg text-gray-600 max-w-md mx-auto leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mx-auto leading-relaxed">
               Transform shared living into a seamless, intelligent experience.
               One app that removes every roommate headache.
             </p>
@@ -93,7 +93,7 @@ export default function Landing() {
           </Button>
 
           {/* Trust Indicators */}
-          <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
+          <div className="flex items-center justify-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
               <span>Free to use</span>
@@ -113,10 +113,10 @@ export default function Landing() {
       {/* Features Grid */}
       <div className="max-w-4xl mx-auto px-6 pb-20">
         <div className="max-w-3xl mx-auto px-6 py-12 text-center">
-          <h2 className="font-semibold text-[#1a1a1a] text-[24px] mb-4">
+          <h2 className="font-semibold text-[#1a1a1a] dark:text-white text-[24px] mb-4">
             Everything you need for perfect roommate harmony
           </h2>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600 dark:text-gray-300 text-lg">
             Inspired by the best productivity and lifestyle apps
           </p>
         </div>
@@ -127,7 +127,7 @@ export default function Landing() {
             return (
               <Card
                 key={index}
-                className="bg-white/70 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl shadow-gray-200/50 hover:scale-[1.02] transition-all duration-200 group"
+                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-white/30 dark:border-slate-700/30 rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-slate-900/50 hover:scale-[1.02] transition-all duration-200 group"
                 style={{
                   animationDelay: `${index * 0.1}s`,
                 }}
@@ -138,10 +138,10 @@ export default function Landing() {
                   >
                     <IconComponent size={20} className="text-white" />
                   </div>
-                  <h3 className="font-semibold text-[#1a1a1a] text-[18px] mb-2">
+                  <h3 className="font-semibold text-[#1a1a1a] dark:text-white text-[18px] mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
                     {feature.description}
                   </p>
                 </CardContent>
@@ -152,12 +152,12 @@ export default function Landing() {
       </div>
 
       {/* Bottom CTA */}
-      <div className="bg-white/60 backdrop-blur-lg border-t border-white/20">
+      <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-lg border-t border-white/20 dark:border-slate-700/20">
         <div className="max-w-3xl mx-auto px-6 py-12 text-center">
-          <h3 className="font-semibold text-[#1a1a1a] text-[20px] mb-3">
+          <h3 className="font-semibold text-[#1a1a1a] dark:text-white text-[20px] mb-3">
             Ready to transform your living experience?
           </h3>
-          <p className="text-gray-600 mb-8">
+          <p className="text-gray-600 dark:text-gray-300 mb-8">
             Join thousands of happy roommates who've simplified their shared
             living
           </p>
