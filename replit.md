@@ -129,6 +129,10 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ **Portrait mode restriction**: Implemented comprehensive portrait mode enforcement with meta tags, CSS media queries, and PWA manifest settings to prevent landscape usage and show rotation message
 - ✓ **Streamlined authentication flow**: Eliminated 404 flash during login/signup by implementing AuthTransition state management using sessionStorage, showing loading state during redirect, works seamlessly for both PWA and browser environments
 - ✓ **Enhanced landing page dark mode**: Added comprehensive dark mode support for landing page with proper gradients, text colors, and glass morphism effects
+- ✓ **App-wide persistent loading overlay**: Created PersistentLoading module that shows beautiful glass morphism overlays during navigation with emerald-cyan spinner, persists across page refreshes using sessionStorage
+- ✓ **Instant navigation feedback**: Loading overlays added to all major navigation points (login, logout, household operations, browsing roommates) with custom messages
+- ✓ **Reduced loading timeout**: Auto-timeout for persistent loading reduced from 5 seconds to 3 seconds for better user experience
+- ✓ **Household performance empty state**: Added visual empty state card for household performance section when no data exists, matching design pattern of recent activity section
 - ✓ Fixed listing detail page to properly handle multiple images with carousel interface
 - ✓ Added navigation arrows and image indicators for multi-image galleries following iOS design patterns
 - ✓ Updated price color from blue to theme-aware (white/black) for consistency across light/dark modes
