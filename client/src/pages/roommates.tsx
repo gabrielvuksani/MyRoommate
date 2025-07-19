@@ -85,8 +85,8 @@ export default function Roommates() {
             <div className="flex items-center space-x-5 flex-1 min-w-0">
               <BackButton to="/" className="bg-transparent flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <h1 className="page-title truncate">Find Your Roommates</h1>
-                <p className="page-subtitle truncate">Discover your perfect living situation</p>
+                <h1 className="page-title">Find Your Roommates</h1>
+                <p className="page-subtitle">Discover your perfect living situation</p>
               </div>
             </div>
             <div className="flex-shrink-0 ml-4">
@@ -101,7 +101,7 @@ export default function Roommates() {
         </div>
       </div>
 
-      <div className="pt-36 px-6 pb-24 space-y-6">
+      <div className="pt-48 px-6 pb-24 space-y-6">
         {/* Glass Morphism Tab Bar */}
         <div className="relative">
           <div 

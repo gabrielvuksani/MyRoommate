@@ -662,7 +662,7 @@ export default function AddListing() {
           {/* Validation Helper */}
           {(!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom || !newListing.contactInfo || newListing.images.length === 0) && (
             <p className="text-center text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
-              Please fill in all required fields (*) {newListing.images.length === 0 && "and add at least one photo"}
+              Please fill in all required fields (*)
             </p>
           )}
           <button

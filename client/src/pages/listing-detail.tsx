@@ -126,7 +126,7 @@ export default function ListingDetail() {
         </div>
       </div>
 
-      <div className="pt-36 px-6 max-w-3xl mx-auto space-y-6 page-enter">
+      <div className="pt-44 px-6 max-w-3xl mx-auto space-y-6 page-enter">
         {/* Image Gallery with Featured Badge */}
         <div className="relative">
           {typedListing.images && typedListing.images.length > 0 ? (
