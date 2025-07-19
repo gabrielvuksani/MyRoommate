@@ -621,102 +621,80 @@ export default function Home() {
               <ArrowRight size={14} />
             </button>
           </div>
-          {((chores as any[])?.length > 0 || (household as any)?.members?.length > 0) ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {(() => {
-                const completedChores = (chores as any[])?.filter(
-                  (c: any) => c.status === "done",
-                ) || [];
-                const totalChores = (chores as any[])?.length || 0;
-                const completionRate =
-                  totalChores > 0
-                    ? (completedChores.length / totalChores) * 100
-                    : 0;
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {(() => {
+              const completedChores = (chores as any[])?.filter(
+                (c: any) => c.status === "done",
+              ) || [];
+              const totalChores = (chores as any[])?.length || 0;
+              const completionRate =
+                totalChores > 0
+                  ? (completedChores.length / totalChores) * 100
+                  : 0;
 
-                const memberPerformance =
-                  (household as any)?.members?.map((member: any) => {
-                    const memberChores = (chores as any[])?.filter(
-                      (c: any) => c.assignedTo === member.userId,
-                    ) || [];
-                    const completedMemberChores = memberChores.filter(
-                      (c: any) => c.status === "done",
-                    );
-                    return {
-                      ...member,
-                      completionRate:
-                        memberChores.length > 0
-                          ? (completedMemberChores.length / memberChores.length) *
-                            100
-                          : 0,
-                    };
-                  }) || [];
+              const memberPerformance =
+                (household as any)?.members?.map((member: any) => {
+                  const memberChores = (chores as any[])?.filter(
+                    (c: any) => c.assignedTo === member.userId,
+                  ) || [];
+                  const completedMemberChores = memberChores.filter(
+                    (c: any) => c.status === "done",
+                  );
+                  return {
+                    ...member,
+                    completionRate:
+                      memberChores.length > 0
+                        ? (completedMemberChores.length / memberChores.length) *
+                          100
+                        : 0,
+                  };
+                }) || [];
 
-                const topPerformer = memberPerformance.sort(
-                  (a: any, b: any) => b.completionRate - a.completionRate,
-                )[0];
+              const topPerformer = memberPerformance.sort(
+                (a: any, b: any) => b.completionRate - a.completionRate,
+              )[0];
 
-                return (
-                  <>
-                    <Card className="glass-card">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                          <TrendingUp className="w-6 h-6 text-white" />
-                        </div>
-                        <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                          {completionRate.toFixed(0)}%
-                        </p>
-                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Completion Rate</p>
-                      </CardContent>
-                    </Card>
+              return (
+                <>
+                  <Card className="glass-card">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <TrendingUp className="w-6 h-6 text-white" />
+                      </div>
+                      <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                        {completionRate.toFixed(0)}%
+                      </p>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Completion Rate</p>
+                    </CardContent>
+                  </Card>
 
-                    <Card className="glass-card">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                          <Award className="w-6 h-6 text-white" />
-                        </div>
-                        <p className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
-                          {topPerformer?.user?.firstName || "Team"}
-                        </p>
-                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Top Performer</p>
-                      </CardContent>
-                    </Card>
+                  <Card className="glass-card">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <Award className="w-6 h-6 text-white" />
+                      </div>
+                      <p className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+                        {topPerformer?.user?.firstName || "Team"}
+                      </p>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Top Performer</p>
+                    </CardContent>
+                  </Card>
 
-                    <Card className="glass-card">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                          <CheckSquare className="w-6 h-6 text-white" />
-                        </div>
-                        <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                          {activeChores.length}
-                        </p>
-                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Active Tasks</p>
-                      </CardContent>
-                    </Card>
-                  </>
-                );
-              })()}
-            </div>
-          ) : (
-            <Card className="glass-card">
-              <CardContent className="p-12 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="w-8 h-8" style={{ color: 'var(--text-secondary)' }} />
-                </div>
-                <p className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                  No performance data yet
-                </p>
-                <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-                  Start tracking tasks to see your household's performance
-                </p>
-                <button
-                  onClick={() => setLocation("/chores")}
-                  className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-medium rounded-xl transition-all hover:scale-[1.02] btn-animated"
-                >
-                  Create Your First Task
-                </button>
-              </CardContent>
-            </Card>
-          )}
+                  <Card className="glass-card">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <CheckSquare className="w-6 h-6 text-white" />
+                      </div>
+                      <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                        {activeChores.length}
+                      </p>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Active Tasks</p>
+                    </CardContent>
+                  </Card>
+                </>
+              );
+            })()}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
