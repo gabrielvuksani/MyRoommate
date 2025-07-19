@@ -332,7 +332,8 @@ export const insertRoommateListingSchema = createInsertSchema(roommateListings).
   updatedAt: true,
 }).extend({
   availableFrom: z.string().transform((val) => new Date(val)),
-  availableTo: z.string().optional().transform((val) => val ? new Date(val) : undefined),
+  availableTo: z.union([z.string(), z.null()]).optional().transform((val) => val ? new Date(val) : null),
+  contactInfo: z.string().min(1, "Contact information is required"),
 });
 
 // Types

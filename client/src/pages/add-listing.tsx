@@ -79,7 +79,7 @@ export default function AddListing() {
   });
 
   const handleCreateListing = () => {
-    if (!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom) {
+    if (!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom || !newListing.contactInfo) {
       return;
     }
     
@@ -582,7 +582,7 @@ export default function AddListing() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                  Contact Information
+                  Contact Information *
                 </label>
                 <Input
                   placeholder="Email or phone number for interested roommates"
@@ -597,14 +597,14 @@ export default function AddListing() {
         {/* Submit Button */}
         <div className="sticky bottom-0 pt-4 pb-8" style={{ background: 'var(--background)' }}>
           {/* Validation Helper */}
-          {(!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom) && (
+          {(!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom || !newListing.contactInfo) && (
             <p className="text-center text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
               Please fill in all required fields (*)
             </p>
           )}
           <button
             onClick={handleCreateListing}
-            disabled={createListingMutation.isPending || !newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom}
+            disabled={createListingMutation.isPending || !newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom || !newListing.contactInfo}
             className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl font-semibold text-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {createListingMutation.isPending ? "Creating Listing..." : "Create Listing"}

@@ -111,6 +111,12 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 19, 2025 (Latest):**
+- ✓ FIXED CRITICAL LISTING CREATION BUG: Updated Zod validation schema to properly handle date strings and null values
+- ✓ Added comprehensive location fields: state, zip code, neighborhood, university, distance to campus, transportation notes
+- ✓ Made contact information field required with proper form validation throughout
+- ✓ Enhanced listing detail page to display ALL form fields including location details, utilities, and transportation info
+- ✓ Fixed database schema by manually adding missing columns that weren't migrated properly
+- ✓ Streamlined both add-listing and listing-detail pages with consistent design language
 - ✓ Completely reverted city and university fields to manual text inputs per user preference
 - ✓ Removed limited address autocomplete functionality completely for cleaner user experience
 - ✓ Made all dropdown components dark mode compatible app-wide using CSS variables

@@ -149,10 +149,21 @@ export default function ListingDetail() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-lg" style={{ color: 'var(--text-secondary)' }}>
                   <MapPin className="w-5 h-5" />
-                  <span>{typedListing.location}, {typedListing.city}</span>
+                  <span>
+                    {typedListing.location}, {typedListing.city}
+                    {typedListing.state && `, ${typedListing.state}`}
+                    {typedListing.zipCode && ` ${typedListing.zipCode}`}
+                  </span>
                 </div>
-                <div className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>
-                  {formatRent(typedListing.rent)}/mo
+                <div className="text-right">
+                  <div className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>
+                    {formatRent(typedListing.rent)}/mo
+                  </div>
+                  {typedListing.utilities && (
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      + ${typedListing.utilities} utilities
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -170,6 +181,52 @@ export default function ListingDetail() {
                 Available {format(new Date(typedListing.availableFrom), 'MMM d, yyyy')}
               </Badge>
             </div>
+
+            {/* Location Details */}
+            {(typedListing.neighborhood || typedListing.university || typedListing.distanceToCampus || typedListing.transportationNotes) && (
+              <>
+                <Separator />
+                <div>
+                  <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+                    Location Details
+                  </h3>
+                  <div className="space-y-2">
+                    {typedListing.neighborhood && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {typedListing.neighborhood} neighborhood
+                        </span>
+                      </div>
+                    )}
+                    {typedListing.university && (
+                      <div className="flex items-center gap-2">
+                        <Home className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          Near {typedListing.university}
+                        </span>
+                      </div>
+                    )}
+                    {typedListing.distanceToCampus && (
+                      <div className="flex items-center gap-2">
+                        <ArrowRight className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {typedListing.distanceToCampus} to campus
+                        </span>
+                      </div>
+                    )}
+                    {typedListing.transportationNotes && (
+                      <div className="flex items-center gap-2">
+                        <Car className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {typedListing.transportationNotes}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Description */}
             {typedListing.description && (
