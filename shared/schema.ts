@@ -41,8 +41,6 @@ export const users = pgTable("users", {
   phoneNumber: varchar("phone_number"),
   dateOfBirth: date("date_of_birth"),
   idVerified: boolean("id_verified").default(false),
-  passwordResetToken: varchar("password_reset_token"),
-  passwordResetExpires: timestamp("password_reset_expires"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -354,7 +352,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
 
 export const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export const registerSchema = insertUserSchema.extend({

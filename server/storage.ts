@@ -36,14 +36,8 @@ export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
-  getUserByVerificationToken(token: string): Promise<User | undefined>;
-  getUserByPasswordResetToken(token: string): Promise<User | undefined>;
   createUser(user: User): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
-  verifyUser(id: string): Promise<void>;
-  setPasswordResetToken(id: string, token: string, expires: Date): Promise<void>;
-  updatePassword(id: string, hashedPassword: string): Promise<void>;
-  clearPasswordResetToken(id: string): Promise<void>;
   
   // Household operations
   createHousehold(household: InsertHousehold & { inviteCode: string }): Promise<Household>;
@@ -125,59 +119,6 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
-  }
-
-  async getUserByVerificationToken(token: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.verificationToken, token));
-    return user;
-  }
-
-  async getUserByPasswordResetToken(token: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.passwordResetToken, token));
-    return user;
-  }
-
-  async verifyUser(id: string): Promise<void> {
-    await db
-      .update(users)
-      .set({ 
-        verified: true, 
-        verificationToken: null,
-        updatedAt: new Date() 
-      })
-      .where(eq(users.id, id));
-  }
-
-  async setPasswordResetToken(id: string, token: string, expires: Date): Promise<void> {
-    await db
-      .update(users)
-      .set({
-        passwordResetToken: token,
-        passwordResetExpires: expires,
-        updatedAt: new Date()
-      })
-      .where(eq(users.id, id));
-  }
-
-  async updatePassword(id: string, hashedPassword: string): Promise<void> {
-    await db
-      .update(users)
-      .set({
-        password: hashedPassword,
-        updatedAt: new Date()
-      })
-      .where(eq(users.id, id));
-  }
-
-  async clearPasswordResetToken(id: string): Promise<void> {
-    await db
-      .update(users)
-      .set({
-        passwordResetToken: null,
-        passwordResetExpires: null,
-        updatedAt: new Date()
-      })
-      .where(eq(users.id, id));
   }
 
   async createHousehold(household: InsertHousehold & { inviteCode: string, createdBy: string }): Promise<Household> {
