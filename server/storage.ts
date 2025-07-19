@@ -6,7 +6,6 @@ import {
   expenses,
   expenseSplits,
   calendarEvents,
-  conversations,
   messages,
   shoppingItems,
   roommateListings,
@@ -23,8 +22,6 @@ import {
   type InsertExpenseSplit,
   type CalendarEvent,
   type InsertCalendarEvent,
-  type Conversation,
-  type InsertConversation,
   type Message,
   type InsertMessage,
   type ShoppingItem,
@@ -71,16 +68,9 @@ export interface IStorage {
   updateCalendarEvent(id: string, updates: Partial<InsertCalendarEvent>): Promise<CalendarEvent>;
   deleteCalendarEvent(id: string): Promise<void>;
   
-  // Conversation operations
-  createConversation(conversation: InsertConversation): Promise<Conversation>;
-  getConversations(userId: string): Promise<(Conversation & { lastMessage?: Message & { user: User } })[]>;
-  getConversation(id: string): Promise<Conversation | undefined>;
-  findOrCreateConversation(type: string, participantIds: string[], householdId?: string, listingId?: string): Promise<Conversation>;
-  
   // Message operations
   createMessage(message: InsertMessage, user?: User): Promise<Message & { user: User }>;
-  getMessages(conversationId: string, limit?: number): Promise<(Message & { user: User })[]>;
-  getMessagesByHousehold(householdId: string, limit?: number): Promise<(Message & { user: User })[]>;
+  getMessages(householdId: string, limit?: number): Promise<(Message & { user: User })[]>;
   
   // Shopping operations
   createShoppingItem(item: InsertShoppingItem): Promise<ShoppingItem>;
@@ -411,119 +401,8 @@ export class DatabaseStorage implements IStorage {
     await db.delete(calendarEvents).where(eq(calendarEvents.id, id));
   }
 
-  async createConversation(conversation: InsertConversation): Promise<Conversation> {
-    const [created] = await db.insert(conversations).values(conversation).returning();
-    return created;
-  }
-
-  async getConversations(userId: string): Promise<(Conversation & { lastMessage?: Message & { user: User } })[]> {
-    // Get all conversations where user is a participant
-    const allConversations = await db
-      .select()
-      .from(conversations)
-      .where(sql`${userId} = ANY(${conversations.participantIds})`)
-      .orderBy(desc(conversations.lastMessageAt));
-
-    // Get last message for each conversation
-    const conversationsWithLastMessage = await Promise.all(
-      allConversations.map(async (conv) => {
-        const lastMessageResult = await db
-          .select({
-            id: messages.id,
-            conversationId: messages.conversationId,
-            userId: messages.userId,
-            content: messages.content,
-            type: messages.type,
-            linkedTo: messages.linkedTo,
-            linkedType: messages.linkedType,
-            createdAt: messages.createdAt,
-            user: users,
-          })
-          .from(messages)
-          .innerJoin(users, eq(messages.userId, users.id))
-          .where(eq(messages.conversationId, conv.id))
-          .orderBy(desc(messages.createdAt))
-          .limit(1);
-
-        return {
-          ...conv,
-          lastMessage: lastMessageResult[0],
-        };
-      })
-    );
-
-    return conversationsWithLastMessage;
-  }
-
-  async getConversation(id: string): Promise<Conversation | undefined> {
-    const [conversation] = await db
-      .select()
-      .from(conversations)
-      .where(eq(conversations.id, id));
-    return conversation;
-  }
-
-  async findOrCreateConversation(
-    type: string,
-    participantIds: string[],
-    householdId?: string,
-    listingId?: string
-  ): Promise<Conversation> {
-    // For household conversations, just find by householdId
-    if (type === 'household' && householdId) {
-      const [existing] = await db
-        .select()
-        .from(conversations)
-        .where(and(
-          eq(conversations.type, 'household'),
-          eq(conversations.householdId, householdId)
-        ));
-      
-      if (existing) return existing;
-    }
-
-    // For direct/listing conversations, check if one exists with the same participants
-    if (type === 'direct' || type === 'listing') {
-      // Sort participant IDs for consistent comparison
-      const sortedParticipantIds = [...participantIds].sort();
-      
-      const existingConversations = await db
-        .select()
-        .from(conversations)
-        .where(and(
-          eq(conversations.type, type),
-          listingId ? eq(conversations.listingId, listingId) : sql`${conversations.listingId} IS NULL`
-        ));
-      
-      // Check if any conversation has the exact same participants
-      const existing = existingConversations.find(conv => {
-        const convParticipants = [...conv.participantIds].sort();
-        return JSON.stringify(convParticipants) === JSON.stringify(sortedParticipantIds);
-      });
-      
-      if (existing) return existing;
-    }
-
-    // Create new conversation
-    return this.createConversation({
-      type: type as any,
-      participantIds,
-      householdId,
-      listingId,
-      name: type === 'listing' ? 'Listing Inquiry' : undefined,
-    });
-  }
-
   async createMessage(message: InsertMessage, user?: User): Promise<Message & { user: User }> {
     const [created] = await db.insert(messages).values(message).returning();
-    
-    // Update conversation's lastMessageAt
-    if (message.conversationId) {
-      await db
-        .update(conversations)
-        .set({ lastMessageAt: new Date() })
-        .where(eq(conversations.id, message.conversationId));
-    }
     
     // If user is provided (from cache), avoid database lookup
     if (user) {
@@ -537,7 +416,7 @@ export class DatabaseStorage implements IStorage {
     const [result] = await db
       .select({
         id: messages.id,
-        conversationId: messages.conversationId,
+        householdId: messages.householdId,
         userId: messages.userId,
         content: messages.content,
         type: messages.type,
@@ -553,12 +432,12 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async getMessages(conversationId: string, limit: number = 50): Promise<(Message & { user: User })[]> {
+  async getMessages(householdId: string, limit: number = 50): Promise<(Message & { user: User })[]> {
     // Optimized query with index hints and reduced data transfer
     const result = await db
       .select({
         id: messages.id,
-        conversationId: messages.conversationId,
+        householdId: messages.householdId,
         userId: messages.userId,
         content: messages.content,
         type: messages.type,
@@ -569,28 +448,11 @@ export class DatabaseStorage implements IStorage {
       })
       .from(messages)
       .innerJoin(users, eq(messages.userId, users.id))
-      .where(eq(messages.conversationId, conversationId))
+      .where(eq(messages.householdId, householdId))
       .orderBy(desc(messages.createdAt))
       .limit(limit);
 
     return result.reverse();
-  }
-
-  async getMessagesByHousehold(householdId: string, limit: number = 50): Promise<(Message & { user: User })[]> {
-    // Get household conversation first
-    const [householdConversation] = await db
-      .select()
-      .from(conversations)
-      .where(and(
-        eq(conversations.type, 'household'),
-        eq(conversations.householdId, householdId)
-      ));
-
-    if (!householdConversation) {
-      return [];
-    }
-
-    return this.getMessages(householdConversation.id, limit);
   }
 
   async createShoppingItem(item: InsertShoppingItem): Promise<ShoppingItem> {

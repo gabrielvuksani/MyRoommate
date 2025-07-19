@@ -4,29 +4,17 @@ interface UseWebSocketProps {
   onMessage?: (data: any) => void;
   onConnect?: () => void;
   onDisconnect?: () => void;
-  onStatusChange?: (status: 'connecting' | 'connected' | 'disconnected') => void;
-  enabled?: boolean;
   userId?: string;
   householdId?: string;
-  conversationId?: string | null;
 }
 
-export function useWebSocket({ 
-  onMessage, 
-  onConnect, 
-  onDisconnect, 
-  onStatusChange,
-  enabled = true,
-  userId, 
-  householdId,
-  conversationId 
-}: UseWebSocketProps = {}) {
+export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, householdId }: UseWebSocketProps = {}) {
   const ws = useRef<WebSocket | null>(null);
   const connectionSent = useRef(false);
 
   useEffect(() => {
-    if (!enabled || !userId) {
-      console.log('WebSocket not connecting:', { enabled, userId: !!userId });
+    if (!userId || !householdId) {
+      console.log('WebSocket not connecting - missing userId or householdId:', { userId: !!userId, householdId: !!householdId });
       return;
     }
 
@@ -34,7 +22,7 @@ export function useWebSocket({
     const host = window.location.host;
     const wsUrl = `${protocol}//${host}/ws`;
     
-    console.log('WebSocket attempting to connect to:', wsUrl, 'for user:', userId);
+    console.log('WebSocket attempting to connect to:', wsUrl, 'for user:', userId, 'household:', householdId);
     
     let reconnectTimeout: NodeJS.Timeout;
     let heartbeatInterval: NodeJS.Timeout;
@@ -54,12 +42,11 @@ export function useWebSocket({
         connectionSent.current = false;
         
         // Send connection info for user caching
-        if (userId && !connectionSent.current) {
+        if (userId && householdId && !connectionSent.current) {
           const connectMessage = {
             type: 'connect',
             userId,
-            householdId: householdId || null,
-            conversationId: conversationId || null,
+            householdId,
           };
           console.log('Sending connect message:', connectMessage);
           ws.current?.send(JSON.stringify(connectMessage));
@@ -67,7 +54,6 @@ export function useWebSocket({
         }
         
         onConnect?.();
-        onStatusChange?.('connected');
         
         // Reset reconnect attempts on successful connection
         reconnectAttempts = 0;
@@ -93,7 +79,6 @@ export function useWebSocket({
         console.log('WebSocket disconnected:', event.code, event.reason, 'attempts:', reconnectAttempts);
         connectionSent.current = false;
         onDisconnect?.();
-        onStatusChange?.('disconnected');
 
         // Auto-reconnect unless manually closed or max attempts reached
         if (!isManualClose && reconnectAttempts < maxReconnectAttempts) {
@@ -119,11 +104,9 @@ export function useWebSocket({
           host, 
           readyState: ws.current?.readyState,
           userId,
-          householdId,
-          conversationId 
+          householdId 
         });
         onDisconnect?.();
-        onStatusChange?.('disconnected');
       };
     };
 
@@ -136,7 +119,7 @@ export function useWebSocket({
       ws.current?.close();
       connectionSent.current = false;
     };
-  }, [userId, householdId, conversationId, enabled]);
+  }, [userId, householdId]);
 
   const sendMessage = (message: any) => {
     if (ws.current?.readyState === WebSocket.OPEN) {

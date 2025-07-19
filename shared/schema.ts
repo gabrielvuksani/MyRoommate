@@ -122,23 +122,10 @@ export const calendarEvents = pgTable("calendar_events", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Conversations table for multi-chat support
-export const conversations = pgTable("conversations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  type: varchar("type", { enum: ["household", "direct", "listing"] }).notNull(), // household chat, direct message, or listing inquiry
-  householdId: uuid("household_id").references(() => households.id), // for household conversations
-  listingId: text("listing_id").references(() => roommateListings.id), // for listing conversations
-  participantIds: text("participant_ids").array().notNull(), // Array of user IDs
-  name: varchar("name"), // Optional name for the conversation
-  lastMessageAt: timestamp("last_message_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
 // Messages table
 export const messages = pgTable("messages", {
   id: uuid("id").primaryKey().defaultRandom(),
-  conversationId: uuid("conversation_id").references(() => conversations.id).notNull(),
+  householdId: uuid("household_id").references(() => households.id),
   userId: varchar("user_id").references(() => users.id),
   content: text("content").notNull(),
   type: varchar("type").default("text"), // text, system, attachment
@@ -209,7 +196,7 @@ export const householdsRelations = relations(households, ({ many }) => ({
   chores: many(chores),
   expenses: many(expenses),
   calendarEvents: many(calendarEvents),
-  conversations: many(conversations),
+  messages: many(messages),
   shoppingItems: many(shoppingItems),
 }));
 
@@ -269,22 +256,10 @@ export const calendarEventsRelations = relations(calendarEvents, ({ one }) => ({
   }),
 }));
 
-export const conversationsRelations = relations(conversations, ({ one, many }) => ({
-  household: one(households, {
-    fields: [conversations.householdId],
-    references: [households.id],
-  }),
-  listing: one(roommateListings, {
-    fields: [conversations.listingId],
-    references: [roommateListings.id],
-  }),
-  messages: many(messages),
-}));
-
 export const messagesRelations = relations(messages, ({ one }) => ({
-  conversation: one(conversations, {
-    fields: [messages.conversationId],
-    references: [conversations.id],
+  household: one(households, {
+    fields: [messages.householdId],
+    references: [households.id],
   }),
   user: one(users, {
     fields: [messages.userId],
@@ -342,13 +317,6 @@ export const insertExpenseSplitSchema = createInsertSchema(expenseSplits).omit({
 export const insertCalendarEventSchema = createInsertSchema(calendarEvents).omit({
   id: true,
   createdAt: true,
-});
-
-export const insertConversationSchema = createInsertSchema(conversations).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  lastMessageAt: true,
 });
 
 export const insertMessageSchema = createInsertSchema(messages).omit({
@@ -417,8 +385,6 @@ export type ExpenseSplit = typeof expenseSplits.$inferSelect;
 export type InsertExpenseSplit = z.infer<typeof insertExpenseSplitSchema>;
 export type CalendarEvent = typeof calendarEvents.$inferSelect;
 export type InsertCalendarEvent = z.infer<typeof insertCalendarEventSchema>;
-export type Conversation = typeof conversations.$inferSelect;
-export type InsertConversation = z.infer<typeof insertConversationSchema>;
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type ShoppingItem = typeof shoppingItems.$inferSelect;

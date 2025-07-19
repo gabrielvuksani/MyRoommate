@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,15 +21,12 @@ import {
   ArrowRight,
   Star,
   ChevronLeft,
-  ChevronRight,
-  Send
+  ChevronRight
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
-import { apiRequest } from "@/lib/queryClient";
-import { showPersistentLoading, hidePersistentLoading } from "@/lib/persistentLoading";
 
 export default function ListingDetail() {
   const [match, params] = useRoute("/listings/:id");
@@ -37,7 +34,6 @@ export default function ListingDetail() {
   const { user } = useAuth();
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const queryClient = useQueryClient();
 
   const { data: listing, isLoading } = useQuery({
     queryKey: [`/api/roommate-listings/${params?.id}`],
@@ -67,34 +63,6 @@ export default function ListingDetail() {
     "Central AC/Heating": Shield,
     "Dishwasher": Home,
   };
-
-  // Contact seller mutation
-  const contactSellerMutation = useMutation({
-    mutationFn: async () => {
-      if (!typedListing?.userId) throw new Error("Cannot contact seller - no user ID");
-      if (!user) throw new Error("Please log in to contact sellers");
-      if (typedListing.userId === user.id) throw new Error("You cannot contact yourself");
-      
-      // Create conversation
-      const response = await apiRequest("POST", "/api/conversations", {
-        type: 'direct',
-        participantId: typedListing.userId,
-        name: typedListing.title // Use listing title as conversation name
-      });
-      
-      return response.json();
-    },
-    onSuccess: (conversation) => {
-      // Navigate to messages page with the new conversation selected
-      hidePersistentLoading();
-      navigate(`/messages?conversationId=${conversation.id}`);
-    },
-    onError: (error: any) => {
-      hidePersistentLoading();
-      console.error("Failed to create conversation:", error);
-      alert(error.message || "Failed to contact seller. Please try again.");
-    }
-  });
 
   if (isLoading) {
     return (
@@ -441,44 +409,27 @@ export default function ListingDetail() {
               <Button 
                 className="w-full h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
                 onClick={() => {
-                  if (!user) {
-                    navigate('/auth');
-                    return;
+                  // In a real app, this would open a chat or contact form
+                  if (typedListing.contactInfo) {
+                    if (typedListing.contactInfo.includes('@')) {
+                      window.open(`mailto:${typedListing.contactInfo}`, '_blank');
+                    } else {
+                      navigator.clipboard.writeText(typedListing.contactInfo);
+                      alert('Contact info copied to clipboard!');
+                    }
                   }
-                  
-                  // Check if user is contacting themselves
-                  if (typedListing.userId === user.id) {
-                    alert('You cannot contact yourself about your own listing.');
-                    return;
-                  }
-                  
-                  // Show loading and create conversation
-                  showPersistentLoading('Connecting with seller...');
-                  contactSellerMutation.mutate();
                 }}
-                disabled={contactSellerMutation.isPending}
               >
-                {contactSellerMutation.isPending ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    Connecting...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5 mr-2" />
-                    Contact Seller
-                  </>
-                )}
+                <MessageCircle className="w-5 h-5 mr-2" />
+                Contact Poster
               </Button>
               {user ? (
                 <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
-                  {typedListing.userId === user.id ? 
-                    'This is your listing' : 
-                    'Click to start a conversation with the seller'}
+                  Click to email or copy contact information
                 </p>
               ) : (
                 <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
-                  Sign in to contact the seller
+                  Sign in to contact the poster
                 </p>
               )}
             </div>
