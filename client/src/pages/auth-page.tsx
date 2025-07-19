@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+
 import { useAuth } from "@/hooks/use-auth";
 import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle } from "lucide-react";
 
@@ -155,7 +155,7 @@ export default function AuthPage() {
                 <Home size={32} className="text-white" />
               </div>
               <h1 className="text-3xl font-bold text-[#1a1a1a] dark:text-white mb-3">
-                Welcome to myRoommate
+                myRoommate
               </h1>
               <p className="text-lg text-gray-600 dark:text-gray-300">
                 {isLogin ? "Sign in to your account" : "Create your account"}
@@ -195,7 +195,7 @@ export default function AuthPage() {
                       {isLogin ? "Sign In" : "Create Account"}
                     </h2>
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      {isLogin ? "Welcome back to myRoommate" : "Join the myRoommate community"}
+                      {isLogin ? "Welcome back" : "There's always room for one more"}
                     </p>
                   </div>
                 </div>
@@ -352,15 +352,15 @@ export default function AuthPage() {
                   )}
 
                   {/* Submit Button */}
-                  <div className="pt-2">
-                    <Button
+                  <div className="pt-4">
+                    <button
                       type="submit"
                       disabled={loginMutation.isPending || registerMutation.isPending}
-                      className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
+                      className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-2xl font-semibold text-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
                       {(loginMutation.isPending || registerMutation.isPending) ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                        <div className="flex items-center justify-center space-x-2">
+                          <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                           <span>Please wait...</span>
                         </div>
                       ) : isLogin ? (
@@ -368,7 +368,7 @@ export default function AuthPage() {
                       ) : (
                         "Create Account"
                       )}
-                    </Button>
+                    </button>
                   </div>
                 </form>
 
@@ -385,13 +385,33 @@ export default function AuthPage() {
                         firstName: "",
                         lastName: "",
                       });
+                      setAuthError("");
                     }}
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                    className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"
+                    style={{ 
+                      color: 'var(--text-secondary)',
+                    }}
                   >
                     {isLogin ? (
-                      <>Don't have an account? <span className="font-semibold text-emerald-500 hover:text-emerald-600">Sign up</span></>
+                      <>
+                        Don't have an account?{" "}
+                        <span 
+                          className="font-semibold transition-colors duration-200"
+                          style={{ color: 'var(--primary)' }}
+                        >
+                          Sign up
+                        </span>
+                      </>
                     ) : (
-                      <>Already have an account? <span className="font-semibold text-emerald-500 hover:text-emerald-600">Sign in</span></>
+                      <>
+                        Already have an account?{" "}
+                        <span 
+                          className="font-semibold transition-colors duration-200"
+                          style={{ color: 'var(--primary)' }}
+                        >
+                          Sign in
+                        </span>
+                      </>
                     )}
                   </button>
                 </div>
@@ -441,46 +461,6 @@ export default function AuthPage() {
           </div>
         </div>
 
-        {/* Right Column - Hero */}
-        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-emerald-50/80 to-cyan-50/80 dark:from-emerald-950/80 dark:to-cyan-950/80 backdrop-blur-lg items-center justify-center p-8">
-          <div className="max-w-md text-center">
-            <div className="w-32 h-32 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-emerald-500/25">
-              <Home className="w-16 h-16 text-white" />
-            </div>
-            <h2 className="text-4xl font-bold mb-4 text-[#1a1a1a] dark:text-white">
-              Your roommate journey starts here
-            </h2>
-            <p className="text-xl mb-8 text-gray-600 dark:text-gray-300 leading-relaxed">
-              Manage chores, split expenses, coordinate schedules, and find the perfect roommate match.
-            </p>
-            <div className="space-y-4 text-left">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-emerald-100/70 dark:bg-emerald-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                </div>
-                <span className="text-gray-700 dark:text-gray-300 font-medium">Smart expense splitting</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-cyan-100/70 dark:bg-cyan-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                  <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
-                </div>
-                <span className="text-gray-700 dark:text-gray-300 font-medium">Chore management system</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-emerald-100/70 dark:bg-emerald-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                </div>
-                <span className="text-gray-700 dark:text-gray-300 font-medium">Real-time messaging</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-cyan-100/70 dark:bg-cyan-900/40 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                  <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
-                </div>
-                <span className="text-gray-700 dark:text-gray-300 font-medium">Roommate marketplace</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
