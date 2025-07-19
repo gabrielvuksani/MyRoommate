@@ -105,9 +105,6 @@ export async function setupAuth(app: Express) {
     passport.authenticate(`replitauth:${req.hostname}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
-      // Custom authentication parameters to personalize the experience
-      display: "page",
-      ui_locales: "en",
     })(req, res, next);
   });
 
@@ -118,40 +115,19 @@ export async function setupAuth(app: Express) {
     })(req, res, next);
   });
 
-  // Custom authentication success page
+  // Add iOS deep link callback
   app.get("/auth/success", (req, res) => {
     const userAgent = req.get('User-Agent') || '';
     const isCapacitor = userAgent.includes('Capacitor') || req.get('X-Capacitor') === 'true';
     
     if (isCapacitor) {
-      // For mobile app, use custom URL scheme to return to app
+      // For iOS app, use custom URL scheme to return to app
       res.send(`
         <html>
-          <head>
-            <title>Welcome to myRoommate</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              body { 
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                text-align: center; 
-                padding: 2rem; 
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                margin: 0;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-              }
-              .logo { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; }
-              .message { font-size: 1.1rem; margin-bottom: 0.5rem; }
-              .subtitle { opacity: 0.8; }
-            </style>
-          </head>
+          <head><title>Authentication Successful</title></head>
           <body>
-            <div class="logo">myRoommate</div>
-            <h2 class="message">Welcome aboard!</h2>
-            <p class="subtitle">Redirecting you back to the app...</p>
+            <h2>Authentication Successful!</h2>
+            <p>Redirecting back to app...</p>
             <script>
               setTimeout(() => {
                 window.location.href = 'myroommate://auth/success';
@@ -161,42 +137,8 @@ export async function setupAuth(app: Express) {
         </html>
       `);
     } else {
-      // For web browser, custom success page then redirect
-      res.send(`
-        <html>
-          <head>
-            <title>Welcome to myRoommate</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              body { 
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                text-align: center; 
-                padding: 2rem; 
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                margin: 0;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-              }
-              .logo { font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; }
-              .message { font-size: 1.2rem; margin-bottom: 0.5rem; }
-              .subtitle { opacity: 0.8; font-size: 1rem; }
-            </style>
-          </head>
-          <body>
-            <div class="logo">myRoommate</div>
-            <h2 class="message">Successfully signed in!</h2>
-            <p class="subtitle">Taking you to your dashboard...</p>
-            <script>
-              setTimeout(() => {
-                window.location.href = '/';
-              }, 1500);
-            </script>
-          </body>
-        </html>
-      `);
+      // For web browser, redirect normally
+      res.redirect('/');
     }
   });
 
