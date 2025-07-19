@@ -8,23 +8,20 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { notificationService } from "@/lib/notifications";
-import { MessageCircle, Coffee, Home, ShoppingCart, Calendar, Users, Search, ChevronLeft, Send } from "lucide-react";
+import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
-import { apiRequest } from "@/lib/queryClient";
 
 interface WebSocketMessage {
   type: string;
   message?: {
     id?: string;
     userId?: string;
-    conversationId?: string;
     content?: string;
     user?: {
       firstName?: string;
       lastName?: string;
     };
   };
-  conversationId?: string;
   userId?: string;
   userName?: string;
   user?: {
@@ -36,46 +33,11 @@ interface WebSocketMessage {
   error?: string;
 }
 
-interface Conversation {
-  id: string;
-  type: 'household' | 'listing' | 'direct';
-  householdId?: string;
-  listingId?: string;
-  lastMessageAt?: string;
-  participants: Array<{
-    id: string;
-    userId: string;
-    unreadCount: number;
-    user: {
-      id: string;
-      firstName: string;
-      lastName?: string;
-      email: string;
-    };
-  }>;
-  listing?: {
-    id: string;
-    title: string;
-    location: string;
-  };
-  lastMessage?: {
-    id: string;
-    content: string;
-    createdAt: string;
-    user: {
-      firstName: string;
-      lastName?: string;
-    };
-  };
-}
-
 export default function Messages() {
   const [newMessage, setNewMessage] = useState("");
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
   // Connection status - starts optimistic when user and household are available
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
 
@@ -93,54 +55,12 @@ export default function Messages() {
     retryDelay: 1000,
   }) as { data: any };
 
-  // Fetch conversations
-  const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
-    queryKey: ["/api/conversations"],
-    enabled: !!user,
-    refetchInterval: 10000,
-  });
-
-  // Filter conversations based on search
-  const filteredConversations = useMemo(() => {
-    if (!searchQuery) return conversations;
-    
-    return conversations.filter((conv: Conversation) => {
-      const searchLower = searchQuery.toLowerCase();
-      
-      // Search by participant names
-      const participantMatch = conv.participants.some(p => 
-        p.user.firstName.toLowerCase().includes(searchLower) ||
-        (p.user.lastName?.toLowerCase().includes(searchLower) || false)
-      );
-      
-      // Search by listing title
-      const listingMatch = conv.listing?.title.toLowerCase().includes(searchLower);
-      
-      // Search by last message
-      const messageMatch = conv.lastMessage?.content.toLowerCase().includes(searchLower);
-      
-      return participantMatch || listingMatch || messageMatch;
-    });
-  }, [conversations, searchQuery]);
-
-  // Always default to household chat - create one if it doesn't exist
-  useEffect(() => {
-    if (user && household) {
-      // Set household as default conversation type
-      setSelectedConversation(`household_${household.id}`);
-    }
-  }, [user, household]);
-
-  // Get selected conversation details
-  const currentConversation = conversations.find((c: Conversation) => c.id === selectedConversation);
-
-  // Fetch messages for selected conversation
-  const { data: serverMessages = [], isLoading: messagesLoading } = useQuery({
-    queryKey: [`/api/conversations/${selectedConversation}/messages`],
-    enabled: !!selectedConversation && !!user,
-    refetchInterval: connectionStatus === 'connected' ? 5000 : 2000,
+  const { data: serverMessages = [], isLoading } = useQuery({
+    queryKey: ["/api/messages"],
+    enabled: !!household && !!user,
+    refetchInterval: connectionStatus === 'connected' ? 5000 : 2000, // Slower polling when connected via WebSocket
     refetchIntervalInBackground: true,
-    staleTime: connectionStatus === 'connected' ? 30000 : 1000,
+    staleTime: connectionStatus === 'connected' ? 30000 : 1000, // Longer stale time when WebSocket is active
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -154,9 +74,7 @@ export default function Messages() {
     onConnect: () => {
       console.log('WebSocket connected successfully');
       setConnectionStatus('connected');
-      if (selectedConversation) {
-        queryClient.invalidateQueries({ queryKey: [`/api/conversations/${selectedConversation}/messages`] });
-      }
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
     },
     onDisconnect: () => {
       console.log('WebSocket disconnected');
@@ -166,54 +84,42 @@ export default function Messages() {
       if (data.type === 'connection_confirmed') {
         setConnectionStatus('connected');
         console.log('WebSocket connection confirmed:', data);
-        if (selectedConversation) {
-          queryClient.invalidateQueries({ queryKey: [`/api/conversations/${selectedConversation}/messages`] });
-        }
+        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
         return;
       }
       if (data.type === 'message_error') {
         console.error('Message error:', data.error);
-        if (selectedConversation) {
-          queryClient.invalidateQueries({ queryKey: [`/api/conversations/${selectedConversation}/messages`] });
-        }
+        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
         return;
       }
       if (data.type === "new_message" && data.message) {
         console.log('Real-time message received:', data.message.id || 'unknown');
         
-        // Update conversation messages if it matches current conversation
-        if (data.conversationId === selectedConversation) {
-          queryClient.setQueryData([`/api/conversations/${selectedConversation}/messages`], (old: any) => {
-            const currentMessages = old || [];
-            
-            const messageExists = data.message?.id ? currentMessages.some((msg: any) => msg.id === data.message!.id) : false;
-            if (messageExists) {
-              console.log('Message already exists in cache, skipping duplicate');
-              return currentMessages;
-            }
-            
-            const updatedMessages = [...currentMessages, data.message];
-            console.log('Cache updated with new message:', updatedMessages.length, 'total messages');
-            return updatedMessages;
-          });
-        }
-        
-        // Update conversations list (last message)
-        queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
+        queryClient.setQueryData(["/api/messages"], (old: any) => {
+          const currentMessages = old || [];
+          
+          const messageExists = data.message?.id ? currentMessages.some((msg: any) => msg.id === data.message!.id) : false;
+          if (messageExists) {
+            console.log('Message already exists in cache, skipping duplicate');
+            return currentMessages;
+          }
+          
+          const updatedMessages = [...currentMessages, data.message];
+          console.log('Cache updated with new message:', updatedMessages.length, 'total messages');
+          return updatedMessages;
+        });
         
         // Send notification for new messages (only if not from current user)
         if (data.message && data.message.userId !== user?.id) {
           const userName = formatDisplayName(data.message.user?.firstName || null, data.message.user?.lastName || null);
-          const convTitle = currentConversation?.listing?.title || 'Message';
-          notificationService.showMessageNotification(userName, data.message.content || '', convTitle);
+          const householdName = household?.name;
+          notificationService.showMessageNotification(userName, data.message.content || '', householdName);
         }
         
-        if (data.conversationId === selectedConversation) {
-          queryClient.invalidateQueries({ 
-            queryKey: [`/api/conversations/${selectedConversation}/messages`], 
-            refetchType: 'active' 
-          });
-        }
+        queryClient.invalidateQueries({ 
+          queryKey: ["/api/messages"], 
+          refetchType: 'active' 
+        });
         
         requestAnimationFrame(() => {
           setTimeout(() => {
@@ -245,8 +151,7 @@ export default function Messages() {
       }
     },
     userId: user?.id,
-    householdId: currentConversation?.type === 'household' ? household?.id : undefined,
-    conversationId: currentConversation?.type !== 'household' ? selectedConversation : undefined,
+    householdId: household?.id,
   });
 
   // Premium scroll system - ensures latest message is always fully visible
@@ -390,12 +295,12 @@ export default function Messages() {
 
   // Single effect to handle all scroll scenarios
   useEffect(() => {
-    if (!messagesLoading && messages) {
+    if (!isLoading && messages) {
       // Initial delay for DOM updates, then ensure latest message is visible
       const delay = isKeyboardVisible ? 250 : 100;
       setTimeout(masterScrollHandler, delay);
     }
-  }, [messagesLoading, messages?.length, isKeyboardVisible, masterScrollHandler]);
+  }, [isLoading, messages?.length, isKeyboardVisible, masterScrollHandler]);
 
   // Update connection status when user/household data becomes available
   useEffect(() => {
@@ -407,7 +312,7 @@ export default function Messages() {
   const handleTyping = (value: string) => {
     setNewMessage(value);
     
-    if (!currentConversation || !user) return;
+    if (!household || !user) return;
     
     const userName = formatDisplayName(user?.firstName, user?.lastName, user?.email);
     
@@ -415,8 +320,7 @@ export default function Messages() {
       setIsTyping(true);
       sendMessage?.({
         type: "user_typing",
-        householdId: currentConversation.type === 'household' ? household?.id : undefined,
-        conversationId: currentConversation.type !== 'household' ? selectedConversation : undefined,
+        householdId: household?.id,
         userId: user?.id,
         userName,
       });
@@ -433,8 +337,7 @@ export default function Messages() {
         setIsTyping(false);
         sendMessage?.({
           type: "user_stopped_typing",
-          householdId: currentConversation.type === 'household' ? household?.id : undefined,
-          conversationId: currentConversation.type !== 'household' ? selectedConversation : undefined,
+          householdId: household?.id,
           userId: user?.id,
           userName,
         });
@@ -444,23 +347,27 @@ export default function Messages() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (content: string) => {
-      const endpoint = selectedConversation 
-        ? `/api/conversations/${selectedConversation}/messages`
-        : "/api/messages";
-        
-      const response = await apiRequest("POST", endpoint, {
-        content,
-        householdId: currentConversation?.type === 'household' ? household?.id : undefined,
-        userId: user?.id,
+      const response = await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content,
+          householdId: household?.id,
+          userId: user?.id,
+        }),
       });
-      return response;
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to send message: ${response.status} ${errorText}`);
+      }
+      return response.json();
     },
     onSuccess: (newMessage: any) => {
       console.log('Message sent via API fallback:', newMessage.id);
       
       // If WebSocket is not connected, update cache directly for immediate UI feedback
-      if (connectionStatus !== 'connected' && selectedConversation) {
-        queryClient.setQueryData([`/api/conversations/${selectedConversation}/messages`], (old: any) => {
+      if (connectionStatus !== 'connected') {
+        queryClient.setQueryData(["/api/messages"], (old: any) => {
           const currentMessages = old || [];
           // Check if message already exists to prevent duplicates
           const messageExists = currentMessages.some((msg: any) => msg.id === newMessage.id);
@@ -472,15 +379,12 @@ export default function Messages() {
       }
       
       // Force immediate refresh to show the new message
-      if (selectedConversation) {
-        queryClient.invalidateQueries({ queryKey: [`/api/conversations/${selectedConversation}/messages`] });
-      }
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
       
       // Send via WebSocket for other clients
       sendMessage?.({
         type: "new_message",
         message: newMessage,
-        conversationId: selectedConversation,
       });
       
       // Auto-scroll to new message
@@ -495,7 +399,7 @@ export default function Messages() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !currentConversation || !user || sendMessageMutation.isPending) return;
+    if (!newMessage.trim() || !household || !user || sendMessageMutation.isPending) return;
 
     const messageContent = newMessage.trim();
     
@@ -507,8 +411,7 @@ export default function Messages() {
       setIsTyping(false);
       sendMessage?.({
         type: "user_stopped_typing",
-        householdId: currentConversation.type === 'household' ? household?.id : undefined,
-        conversationId: currentConversation.type !== 'household' ? selectedConversation : undefined,
+        householdId: household?.id,
         userId: user?.id,
         userName: formatDisplayName(user?.firstName, user?.lastName, user?.email),
       });
@@ -523,8 +426,7 @@ export default function Messages() {
         sendMessage({
           type: "send_message",
           content: messageContent,
-          householdId: currentConversation.type === 'household' ? household?.id : undefined,
-          conversationId: currentConversation.type !== 'household' ? selectedConversation : undefined,
+          householdId: household.id,
           userId: user.id,
         });
         console.log('Message sent via WebSocket');
@@ -560,7 +462,7 @@ export default function Messages() {
 
   return (
     <div className="h-screen flex flex-col page-transition">
-      {/* Main Chat Header */}
+      {/* Fixed Header */}
       <div 
         className="fixed top-0 left-0 right-0 z-50"
         style={{
@@ -572,64 +474,44 @@ export default function Messages() {
         <div className="max-w-3xl mx-auto">
           <div className="page-header bg-transparent">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                {/* Chat Avatar */}
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center ring-2 ring-white/20 shadow-lg">
-                  <Users className="w-5 h-5 text-white" />
-                </div>
-                
-                <div>
-                  <h1 className="page-title" style={{ color: 'var(--text-primary)' }}>
-                    {household?.name || 'Household Chat'}
-                  </h1>
-                  <div className="flex items-center space-x-2">
-                    <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      connectionStatus === 'connected' ? 'bg-green-500 shadow-green-500/50 shadow-lg' : 
-                      connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse shadow-yellow-500/50 shadow-lg' : 
-                      'bg-red-500 shadow-red-500/50 shadow-lg'
-                    }`}></div>
-                    <span className="text-xs font-medium transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>
-                      {connectionStatus === 'connected' ? 'Real-time' : 
-                       connectionStatus === 'connecting' ? 'Connecting...' : 
-                       'Syncing messages'}
-                    </span>
-                  </div>
-                </div>
+              <div>
+                <h1 className="page-title" style={{ color: 'var(--text-primary)' }}>Messages</h1>
+                <p className="page-subtitle" style={{ color: 'var(--text-secondary)' }}>Chat with your household</p>
               </div>
-              
-              {/* Conversation Switcher - Only show if other conversations exist */}
-              {conversations.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="icon" 
-                  className="rounded-xl"
-                  onClick={() => setSearchQuery(searchQuery ? "" : " ")} // Toggle to show conversation list
-                >
-                  <MessageCircle className="w-5 h-5" />
-                </Button>
-              )}
+              <div className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  connectionStatus === 'connected' ? 'bg-green-500 shadow-green-500/50 shadow-lg' : 
+                  connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse shadow-yellow-500/50 shadow-lg' : 
+                  'bg-red-500 shadow-red-500/50 shadow-lg'
+                }`}></div>
+                <span className="text-xs font-medium transition-colors duration-300" style={{ color: 'var(--text-secondary)' }}>
+                  {connectionStatus === 'connected' ? 'Real-time' : 
+                   connectionStatus === 'connecting' ? 'Connecting...' : 
+                   'Syncing messages'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Scrollable Messages Container */}
+
+      {/* Scrollable Messages Container - Premium spacing */}
       <div 
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto transition-all duration-500 ease-out"
         style={{ 
           paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
-            ? '160px'
-            : '200px',
+            ? '160px'  // Extra space for short conversations when keyboard is visible
+            : '200px', // Normal space above tab bar
           transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
           filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`,
-          minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto'
+          minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto' // Ensure scrollable area for short conversations
         }}
       >
         <div className="max-w-3xl mx-auto px-6">
           <div className="space-y-4 min-h-full">
-            {messagesLoading ? (
+            {isLoading ? (
               <div className="flex justify-center py-8">
                 <div className="w-6 h-6 border-2 border-ios-blue border-t-transparent rounded-full animate-spin"></div>
               </div>
@@ -637,12 +519,10 @@ export default function Messages() {
               <Card className="glass-card">
                 <CardContent className="p-6">
                   <div className="text-center space-y-4">
-                    <Users className="w-16 h-16 text-gray-400 mx-auto" />
+                    <MessageCircle className="w-12 h-12 text-gray-400 mx-auto" />
                     <div>
-                      <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Welcome to your household chat!</h3>
-                      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-                        Connect with your housemates, coordinate activities, and keep everyone in the loop.
-                      </p>
+                      <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Start the conversation</h3>
+                      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Be the first to send a message to your household</p>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       {conversationStarters.map((starter, index) => (
@@ -691,103 +571,108 @@ export default function Messages() {
                     </div>
                   </div>
                 )}
+                
+                <div ref={messagesEndRef} />
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
         </div>
       </div>
-      
-      {/* Message Input Section */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 pb-20">
-        <div className={`transition-all duration-500 ease-out ${
-          isKeyboardVisible 
-            ? 'transform scale-[1.015] -translate-y-[2px]' 
-            : ''
-        }`}>
-          <div className="max-w-3xl mx-auto">
-            <div className={`mx-6 relative transition-all duration-500 ${
-              isKeyboardVisible 
-                ? 'backdrop-blur-[30px] backdrop-saturate-[2.2] backdrop-brightness-[1.05] rounded-2xl' 
-                : ''
-            }`}>
-              <form onSubmit={handleSendMessage} className="relative">
-                <div className={`flex items-end space-x-3 p-3 rounded-2xl transition-all duration-500 ${
-                  isKeyboardVisible 
-                    ? 'bg-gradient-to-br from-white/25 via-white/20 to-white/15 shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] ring-1 ring-white/20' 
-                    : 'bg-surface-secondary shadow-lg'
-                }`}>
-                  <div className="flex-1 relative">
-                    <textarea
-                      ref={textareaRef}
-                      value={newMessage}
-                      onChange={(e) => handleTyping(e.target.value)}
-                      placeholder="Message your household..."
-                      className={`w-full px-4 py-2 bg-transparent rounded-xl resize-none focus:outline-none transition-all duration-500 input-modern ${
-                        isKeyboardVisible 
-                          ? 'placeholder:text-gray-500 text-gray-900 tracking-wide' 
-                          : ''
-                      }`}
-                      style={{ 
-                        minHeight: '36px',
-                        maxHeight: isKeyboardVisible ? '100px' : '120px',
-                        color: 'var(--text-primary)'
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage(e);
-                        }
-                      }}
-                    />
-                    
-                    {isKeyboardVisible && (
-                      <div className="absolute inset-0 rounded-xl pointer-events-none overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
-                        <div className="absolute -inset-px bg-gradient-to-br from-white/10 to-transparent opacity-50 blur-sm"></div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <Button
-                    type="submit"
-                    disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                    size="icon"
-                    className={`rounded-xl transition-all duration-500 relative overflow-hidden ${
-                      isKeyboardVisible 
-                        ? 'bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 shadow-[0_10px_40px_-10px_rgba(16,185,129,0.5)] transform hover:scale-[1.08] active:scale-[1.02]' 
-                        : 'bg-gradient-to-br from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95'
-                    } ${
-                      !newMessage.trim() || sendMessageMutation.isPending 
-                        ? 'opacity-50 cursor-not-allowed' 
-                        : ''
-                    }`}
-                    style={{ marginBottom: '3px' }}
-                  >
-                    {sendMessageMutation.isPending ? (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <Send className="w-4 h-4 text-white" />
-                    )}
-                    
-                    {isKeyboardVisible && newMessage.trim() && !sendMessageMutation.isPending && (
-                      <>
-                        <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent animate-shimmer"></div>
-                      </>
-                    )}
-                  </Button>
-                </div>
-                
-                {isKeyboardVisible && (
-                  <div className="absolute -inset-1 bg-gradient-to-br from-emerald-400/20 via-cyan-400/10 to-emerald-400/20 rounded-2xl blur-xl opacity-50 -z-10 animate-pulse"></div>
-                )}
-              </form>
-            </div>
+      {/* Premium Message Input - Advanced keyboard adaptation */}
+      <div 
+        className="fixed left-0 right-0 z-40 px-4 transition-all duration-500 ease-out"
+        style={{ 
+          bottom: isKeyboardVisible ? '20px' : '108px',
+          transform: `translateY(${isKeyboardVisible ? '-2px' : '0px'}) scale(${isKeyboardVisible ? '1.015' : '1'})`,
+          transformOrigin: 'bottom center'
+        }}
+      >
+        <div 
+          className="max-w-3xl mx-auto transition-all duration-500 ease-out"
+          style={{
+            filter: `brightness(${isKeyboardVisible ? '1.04' : '1'}) saturate(${isKeyboardVisible ? '1.1' : '1'})`
+          }}
+        >
+          <div 
+            className="glass-card rounded-3xl shadow-lg border-0 transition-all duration-500 ease-out" 
+            style={{ 
+              padding: isKeyboardVisible ? '14px 16px' : '12px',
+              background: 'var(--surface)',
+              backdropFilter: isKeyboardVisible 
+                ? 'blur(30px) saturate(2.2) brightness(1.05)' 
+                : 'blur(25px) saturate(1.9)',
+              border: '1px solid var(--border)',
+              boxShadow: isKeyboardVisible 
+                ? 'var(--shadow-lg)' 
+                : 'var(--shadow-md)'
+            }}
+          >
+            <form onSubmit={handleSendMessage} className="flex items-end gap-3">
+              <div className="flex-1 relative">
+                <textarea
+                  ref={textareaRef}
+                  placeholder="Type a message..."
+                  value={newMessage}
+                  onChange={(e) => handleTyping(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      if (newMessage.trim()) {
+                        handleSendMessage(e as any);
+                      }
+                    }
+                  }}
+                  onFocus={() => {
+                    // Enhanced focus scroll with keyboard awareness
+                    scrollToBottom({ force: true, smooth: false, keyboardAware: true });
+                  }}
+                  rows={1}
+                  className="message-input w-full text-base resize-none border-0 outline-0 transition-all duration-400 ease-out"
+                  style={{ 
+                    background: 'transparent',
+                    backgroundColor: 'transparent',
+                    color: 'var(--text-primary)',
+                    border: 'none',
+                    outline: 'none',
+                    boxShadow: 'none',
+                    padding: isKeyboardVisible ? '10px 14px' : '8px 12px',
+                    minHeight: '40px',
+                    maxHeight: isKeyboardVisible ? '100px' : '120px',
+                    lineHeight: '22px',
+                    overflowY: 'auto',
+                    fontSize: '16px',
+                    transform: `scale(${isKeyboardVisible ? '1.005' : '1'})`,
+                    letterSpacing: isKeyboardVisible ? '0.01em' : '0em'
+                  }}
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={!newMessage.trim()}
+                className="rounded-full w-11 h-11 p-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex-shrink-0 transition-all duration-400 ease-out"
+                style={{
+                  transform: `scale(${isKeyboardVisible ? '1.08' : '1'}) translateY(${isKeyboardVisible ? '-1px' : '0px'})`,
+                  boxShadow: isKeyboardVisible 
+                    ? '0 8px 25px rgba(16, 185, 129, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 1px 0 rgba(255, 255, 255, 0.2) inset' 
+                    : '0 4px 15px rgba(16, 185, 129, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+                }}
+              >
+                <svg 
+                  className="w-5 h-5 text-white transition-transform duration-300" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  style={{
+                    transform: `scale(${isKeyboardVisible ? '1.05' : '1'})`
+                  }}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </Button>
+            </form>
           </div>
         </div>
       </div>
-
     </div>
   );
 }
