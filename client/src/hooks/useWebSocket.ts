@@ -4,17 +4,29 @@ interface UseWebSocketProps {
   onMessage?: (data: any) => void;
   onConnect?: () => void;
   onDisconnect?: () => void;
+  onStatusChange?: (status: 'connecting' | 'connected' | 'disconnected') => void;
+  enabled?: boolean;
   userId?: string;
   householdId?: string;
+  conversationId?: string | null;
 }
 
-export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, householdId }: UseWebSocketProps = {}) {
+export function useWebSocket({ 
+  onMessage, 
+  onConnect, 
+  onDisconnect, 
+  onStatusChange,
+  enabled = true,
+  userId, 
+  householdId,
+  conversationId 
+}: UseWebSocketProps = {}) {
   const ws = useRef<WebSocket | null>(null);
   const connectionSent = useRef(false);
 
   useEffect(() => {
-    if (!userId || !householdId) {
-      console.log('WebSocket not connecting - missing userId or householdId:', { userId: !!userId, householdId: !!householdId });
+    if (!enabled || !userId) {
+      console.log('WebSocket not connecting:', { enabled, userId: !!userId });
       return;
     }
 
@@ -22,7 +34,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
     const host = window.location.host;
     const wsUrl = `${protocol}//${host}/ws`;
     
-    console.log('WebSocket attempting to connect to:', wsUrl, 'for user:', userId, 'household:', householdId);
+    console.log('WebSocket attempting to connect to:', wsUrl, 'for user:', userId);
     
     let reconnectTimeout: NodeJS.Timeout;
     let heartbeatInterval: NodeJS.Timeout;
@@ -42,11 +54,12 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
         connectionSent.current = false;
         
         // Send connection info for user caching
-        if (userId && householdId && !connectionSent.current) {
+        if (userId && !connectionSent.current) {
           const connectMessage = {
             type: 'connect',
             userId,
-            householdId,
+            householdId: householdId || null,
+            conversationId: conversationId || null,
           };
           console.log('Sending connect message:', connectMessage);
           ws.current?.send(JSON.stringify(connectMessage));
@@ -54,6 +67,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
         }
         
         onConnect?.();
+        onStatusChange?.('connected');
         
         // Reset reconnect attempts on successful connection
         reconnectAttempts = 0;
@@ -79,6 +93,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
         console.log('WebSocket disconnected:', event.code, event.reason, 'attempts:', reconnectAttempts);
         connectionSent.current = false;
         onDisconnect?.();
+        onStatusChange?.('disconnected');
 
         // Auto-reconnect unless manually closed or max attempts reached
         if (!isManualClose && reconnectAttempts < maxReconnectAttempts) {
@@ -104,9 +119,11 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
           host, 
           readyState: ws.current?.readyState,
           userId,
-          householdId 
+          householdId,
+          conversationId 
         });
         onDisconnect?.();
+        onStatusChange?.('disconnected');
       };
     };
 
@@ -119,7 +136,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
       ws.current?.close();
       connectionSent.current = false;
     };
-  }, [userId, householdId]);
+  }, [userId, householdId, conversationId, enabled]);
 
   const sendMessage = (message: any) => {
     if (ws.current?.readyState === WebSocket.OPEN) {

@@ -389,7 +389,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Conversation routes
+  app.get('/api/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const conversations = await storage.getConversations(userId);
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Failed to fetch conversations" });
+    }
+  });
+
+  app.post('/api/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { type, participantIds, householdId, listingId } = req.body;
+      
+      // Ensure user is included in participants
+      const allParticipants = participantIds.includes(userId) 
+        ? participantIds 
+        : [...participantIds, userId];
+      
+      const conversation = await storage.findOrCreateConversation(
+        type,
+        allParticipants,
+        householdId,
+        listingId
+      );
+      
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      res.status(500).json({ message: "Failed to create conversation" });
+    }
+  });
+
   // Message routes - Optimized for real-time performance
+  app.get('/api/messages/:conversationId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { conversationId } = req.params;
+      const limit = parseInt(req.query.limit as string) || 50;
+      
+      // Verify user has access to this conversation
+      const conversation = await storage.getConversation(conversationId);
+      if (!conversation || !conversation.participantIds.includes(userId)) {
+        return res.status(403).json({ message: "Not authorized to view this conversation" });
+      }
+      
+      // Add cache headers for optimal performance
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
+      
+      const messages = await storage.getMessages(conversationId, limit);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  // Legacy endpoint for backward compatibility - gets household messages
   app.get('/api/messages', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
@@ -406,7 +470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const limit = parseInt(req.query.limit as string) || 50;
-      const messages = await storage.getMessages(membership.household.id, limit);
+      const messages = await storage.getMessagesByHousehold(membership.household.id, limit);
       res.json(messages);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -417,21 +481,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/messages', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
-      const { content, householdId } = req.body;
+      const { content, conversationId } = req.body;
       
       if (!content || !content.trim()) {
         return res.status(400).json({ message: "Message content is required" });
       }
       
-      // Verify user is member of the household
-      const membership = await storage.getUserHousehold(userId);
-      if (!membership || membership.household.id !== householdId) {
-        return res.status(403).json({ message: "Not authorized to send message to this household" });
+      // Verify user has access to this conversation
+      const conversation = await storage.getConversation(conversationId);
+      if (!conversation || !conversation.participantIds.includes(userId)) {
+        return res.status(403).json({ message: "Not authorized to send message to this conversation" });
       }
       
       const messageData = {
         content: content.trim(),
-        householdId,
+        conversationId,
         userId,
         type: 'text'
       };
