@@ -13,8 +13,11 @@ export async function apiRequest(
   data?: unknown | undefined,
 ): Promise<Response> {
   let processedData = data;
+  
+  // Ensure we're using the correct port in development
+  const apiUrl = url.startsWith('/') ? `http://localhost:5000${url}` : url;
 
-  const res = await fetch(url, {
+  const res = await fetch(apiUrl, {
     method,
     headers: processedData ? { "Content-Type": "application/json" } : {},
     body: processedData ? JSON.stringify(processedData) : undefined,
@@ -31,7 +34,10 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    const url = queryKey[0] as string;
+    // Ensure we're using the correct port in development
+    const apiUrl = url.startsWith('/') ? `http://localhost:5000${url}` : url;
+    const res = await fetch(apiUrl, {
       credentials: "include",
     });
 
