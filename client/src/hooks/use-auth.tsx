@@ -7,6 +7,7 @@ import {
 import { User, LoginData, RegisterData } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { AuthTransition } from "../lib/authTransition";
+import { PersistentLoading } from "../lib/persistentLoading";
 
 type AuthContextType = {
   user: User | null;
@@ -39,6 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (user: User) => {
+      // Show persistent loading overlay
+      PersistentLoading.show("Setting up your account...");
       // Mark authentication transition in progress
       AuthTransition.setInProgress();
       // Set user data immediately for instant UI update
@@ -61,6 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (user: User) => {
+      // Show persistent loading overlay
+      PersistentLoading.show("Setting up your account...");
       // Mark authentication transition in progress
       AuthTransition.setInProgress();
       // Set user data immediately for instant UI update
@@ -81,6 +86,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     },
     onSuccess: () => {
+      // Show persistent loading overlay
+      PersistentLoading.show("Signing out...");
       queryClient.setQueryData(["/api/user"], null);
       // Clear all cached data on logout
       queryClient.clear();

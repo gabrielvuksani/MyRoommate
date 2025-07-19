@@ -27,6 +27,40 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Check for persistent loading early
+      (function() {
+        if (sessionStorage.getItem('app_loading') === 'true') {
+          const message = sessionStorage.getItem('app_loading_message') || '';
+          
+          // Create overlay immediately
+          const overlay = document.createElement('div');
+          overlay.id = 'persistent-loading-overlay';
+          overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;';
+          
+          const content = document.createElement('div');
+          content.style.cssText = 'background:rgba(255,255,255,0.9);border-radius:24px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.15);text-align:center;min-width:200px;';
+          
+          const spinner = document.createElement('div');
+          spinner.style.cssText = 'width:48px;height:48px;border:3px solid rgba(79,209,197,0.2);border-top-color:rgb(79,209,197);border-radius:50%;margin:0 auto 16px;animation:spin 0.8s linear infinite;';
+          
+          if (message) {
+            const text = document.createElement('p');
+            text.style.cssText = 'color:#1a1a1a;font-size:16px;margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;';
+            text.textContent = message;
+            content.appendChild(text);
+          }
+          
+          const style = document.createElement('style');
+          style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}@media(prefers-color-scheme:dark){#persistent-loading-overlay>div{background:rgba(30,30,30,0.9)!important}#persistent-loading-overlay p{color:white!important}}';
+          document.head.appendChild(style);
+          
+          content.prepend(spinner);
+          overlay.appendChild(content);
+          document.body.appendChild(overlay);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>

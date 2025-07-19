@@ -37,9 +37,13 @@ function Router() {
   // Check for persistent loading on page load
   useEffect(() => {
     PersistentLoading.checkAndShow();
-    // Clear auth transition when component mounts with a user
+    // Clear auth transition and loading when component mounts with a user
     if (user && AuthTransition.isInProgress()) {
       AuthTransition.clear();
+      // Hide loading after a short delay to ensure smooth transition
+      setTimeout(() => {
+        PersistentLoading.hide();
+      }, 500);
     }
   }, [user]);
   

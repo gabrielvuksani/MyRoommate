@@ -10,6 +10,7 @@ import { useLocation } from "wouter";
 import { CheckCircle, Users, Home, ArrowRight, User, Search } from "lucide-react";
 import BackButton from "@/components/back-button";
 import { getUserFlags, shouldShowOnboardingStep, getNextOnboardingStep, getPreviousOnboardingStep } from "@/lib/userUtils";
+import { PersistentLoading } from "@/lib/persistentLoading";
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
@@ -41,6 +42,8 @@ export default function Onboarding() {
       return apiRequest("POST", "/api/households", data);
     },
     onSuccess: () => {
+      // Show persistent loading
+      PersistentLoading.show("Setting up your household...");
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
       localStorage.setItem('onboarding_completed', 'true');
       // Refresh the page to ensure all state is properly reset
@@ -62,6 +65,8 @@ export default function Onboarding() {
     },
     onSuccess: (data) => {
       console.log("Frontend: Join mutation success, invalidating queries");
+      // Show persistent loading
+      PersistentLoading.show("Joining household...");
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       localStorage.setItem('onboarding_completed', 'true');
@@ -483,8 +488,10 @@ export default function Onboarding() {
               {householdData.action === 'browse' ? (
                 <Button
                   onClick={() => {
+                    // Show persistent loading
+                    PersistentLoading.show("Taking you to roommate listings...");
                     localStorage.setItem('onboarding_completed', 'true');
-                    setLocation("/roommates");
+                    window.location.href = "/roommates";
                   }}
                   className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white font-semibold rounded-2xl btn-animated shadow-lg shadow-purple-500/25 transition-all duration-200 hover:scale-[1.02]"
                 >

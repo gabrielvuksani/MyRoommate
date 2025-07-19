@@ -125,6 +125,8 @@ export default function Profile() {
   };
 
   const logout = () => {
+    // Show persistent loading overlay
+    PersistentLoading.show("Signing out...");
     window.location.href = "/api/logout";
   };
 
