@@ -111,14 +111,12 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 19, 2025 (Latest):**
-- ✓ Completely reverted city and university fields to manual text inputs per user preference
-- ✓ Removed limited address autocomplete functionality completely for cleaner user experience
-- ✓ Made all dropdown components dark mode compatible app-wide using CSS variables
-- ✓ Updated Select component styling for proper theming (trigger, content, items, separators)
-- ✓ Enhanced form with auto-selected today's date for "Available From" field
-- ✓ Fixed header design consistency across all pages using established patterns
-- ✓ Added comprehensive form validation and helper text for required fields
-- ✓ Maintained all dropdown functionality for other form sections (room type, housing type, preferences)
+- ✓ Fixed tab bar design in roommates page to match established glass morphism design language with sliding indicator
+- ✓ Updated + button in roommates page to match chores page style with proper gradient and animations
+- ✓ Enhanced listing detail page pills/badges to work properly in both dark and light modes using CSS variables
+- ✓ Added comprehensive image upload functionality to listing creation form with preview and delete capabilities
+- ✓ Removed neighborhood field from add listing form per user feedback for cleaner interface
+- ✓ Updated demo listing with complete new schema including utilities, location details, and proper contact info
 - ✓ REMOVED separation between featured and regular listings - all listings now shown under "All Listings" with featured ones sorted to top
 - ✓ Enhanced listing detail page with featured badge, comprehensive lifestyle preferences display, and improved contact functionality
 - ✓ Added smart contact button that opens email for email addresses or copies phone numbers to clipboard

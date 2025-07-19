@@ -59,7 +59,7 @@ export default function Roommates() {
         <div className="page-header">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <BackButton to="/" className="!bg-transparent !border-transparent !shadow-none" />
+              <BackButton to="/" className="bg-transparent" />
               <div>
                 <h1 className="page-title">Find Your Roommates</h1>
                 <p className="page-subtitle">Discover your perfect living situation</p>
@@ -67,10 +67,9 @@ export default function Roommates() {
             </div>
             <button
               onClick={() => setLocation("/add-listing")}
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-              style={{ color: 'var(--primary)' }}
+              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated"
             >
-              <Plus size={24} />
+              <Plus size={24} className="text-white" />
             </button>
           </div>
         </div>

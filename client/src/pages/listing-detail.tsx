@@ -182,24 +182,15 @@ export default function ListingDetail() {
 
             {/* Room Details */}
             <div className="flex gap-3 flex-wrap">
-              <Badge className="text-sm px-3 py-1 border-0" style={{ 
-                background: 'var(--surface-secondary)', 
-                color: 'var(--text-primary)' 
-              }}>
+              <Badge variant="secondary" className="text-sm px-3 py-1">
                 {typedListing.roomType.charAt(0).toUpperCase() + typedListing.roomType.slice(1)} Room
               </Badge>
-              <Badge className="text-sm px-3 py-1 border-0" style={{ 
-                background: 'var(--surface-secondary)', 
-                color: 'var(--text-primary)' 
-              }}>
+              <Badge variant="secondary" className="text-sm px-3 py-1">
                 {typedListing.housingType.charAt(0).toUpperCase() + typedListing.housingType.slice(1)}
               </Badge>
-              <Badge className="text-sm px-3 py-1 border-0" style={{ 
-                background: 'var(--surface-secondary)', 
-                color: 'var(--text-primary)' 
-              }}>
+              <Badge variant="secondary" className="text-sm px-3 py-1">
                 <Calendar className="w-3 h-3 mr-1" />
-                Available from {format(new Date(typedListing.availableFrom), 'MMM d, yyyy')}
+                Available {format(new Date(typedListing.availableFrom), 'MMM d, yyyy')}
               </Badge>
             </div>
 
@@ -310,10 +301,14 @@ export default function ListingDetail() {
                     <div className="mt-3">
                       <div className="flex flex-wrap gap-2">
                         {typedListing.lifestylePreferences.map((pref: string, index: number) => (
-                          <Badge key={index} className="text-xs border-0" style={{ 
-                            background: 'var(--surface-secondary)', 
-                            color: 'var(--text-secondary)' 
-                          }}>
+                          <Badge 
+                            key={index} 
+                            className="text-xs border-0" 
+                            style={{
+                              background: 'var(--surface-secondary)',
+                              color: 'var(--text-primary)'
+                            }}
+                          >
                             {pref.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                           </Badge>
                         ))}
