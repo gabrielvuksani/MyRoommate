@@ -45,9 +45,11 @@ export function setupAuth(app: Express) {
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
+    name: "sessionId", // Custom session name for security
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
       maxAge: sessionTtl,
     },
   };
@@ -136,14 +138,21 @@ export function setupAuth(app: Express) {
       // Auto login after registration
       req.login(user, (err) => {
         if (err) return next(err);
-        res.redirect('/');
+        
+        // Return JSON for API calls, redirect for browser requests
+        if (req.headers['content-type']?.includes('application/json') || req.headers['accept']?.includes('application/json')) {
+          const { password: _, ...userWithoutPassword } = user;
+          res.status(201).json(userWithoutPassword);
+        } else {
+          res.redirect('/');
+        }
       });
     } catch (error: any) {
       if (error.name === "ZodError") {
         return res.status(400).json({ message: error.errors[0].message });
       }
       console.error("Registration error:", error);
-      res.status(500).json({ message: "Registration failed" });
+      res.status(500).json({ message: "Registration failed. Please try again." });
     }
   };
 
@@ -169,7 +178,14 @@ export function setupAuth(app: Express) {
         
         req.login(user, (err) => {
           if (err) return next(err);
-          res.redirect('/');
+          
+          // Return JSON for API calls, redirect for browser requests
+          if (req.headers['content-type']?.includes('application/json') || req.headers['accept']?.includes('application/json')) {
+            const { password: _, ...userWithoutPassword } = user;
+            res.status(200).json(userWithoutPassword);
+          } else {
+            res.redirect('/');
+          }
         });
       })(req, res, next);
     } catch (error: any) {
@@ -188,13 +204,12 @@ export function setupAuth(app: Express) {
     req.logout((err: any) => {
       if (err) return next(err);
       
-      // If it's a direct browser request (GET), redirect to landing page
-      if (req.method === 'GET') {
-        return res.redirect('/');
+      // Return JSON for API calls, redirect for browser requests
+      if (req.headers['content-type']?.includes('application/json') || req.headers['accept']?.includes('application/json')) {
+        res.status(200).json({ message: "Logged out successfully" });
+      } else {
+        res.redirect('/');
       }
-      
-      // For API requests (POST), return JSON
-      res.sendStatus(200);
     });
   };
 
