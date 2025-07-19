@@ -30,25 +30,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      // Use form submission to let server handle redirect
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/api/login';
-      
-      const emailInput = document.createElement('input');
-      emailInput.type = 'hidden';
-      emailInput.name = 'email';
-      emailInput.value = credentials.email;
-      
-      const passwordInput = document.createElement('input');
-      passwordInput.type = 'hidden';
-      passwordInput.name = 'password';
-      passwordInput.value = credentials.password;
-      
-      form.appendChild(emailInput);
-      form.appendChild(passwordInput);
-      document.body.appendChild(form);
-      form.submit();
+      const res = await apiRequest("POST", "/api/login", credentials);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Login failed");
+      }
+      return await res.json();
+    },
+    onSuccess: (user: User) => {
+      queryClient.setQueryData(["/api/user"], user);
+      // Redirect to home after successful login
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -57,21 +49,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (credentials: RegisterData) => {
-      // Use form submission to let server handle redirect
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/api/register';
-      
-      Object.entries(credentials).forEach(([key, value]) => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        form.appendChild(input);
-      });
-      
-      document.body.appendChild(form);
-      form.submit();
+      const res = await apiRequest("POST", "/api/register", credentials);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Registration failed");
+      }
+      return await res.json();
+    },
+    onSuccess: (user: User) => {
+      queryClient.setQueryData(["/api/user"], user);
+      // Redirect to home after successful registration
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Registration failed:", error.message);
