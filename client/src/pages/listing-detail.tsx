@@ -18,9 +18,7 @@ import {
   Sparkles,
   Cat,
   Shield,
-  ArrowRight,
-  GraduationCap,
-  Star
+  ArrowRight
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
@@ -182,44 +180,62 @@ export default function ListingDetail() {
               </div>
             </div>
 
-            {/* Quick Info Pills */}
-            {(typedListing.roomType || typedListing.housingType || typedListing.availableFrom) && (
+            {/* Room Details */}
+            <div className="flex gap-3 flex-wrap">
+              <Badge variant="secondary" className="text-sm px-3 py-1">
+                {typedListing.roomType.charAt(0).toUpperCase() + typedListing.roomType.slice(1)} Room
+              </Badge>
+              <Badge variant="secondary" className="text-sm px-3 py-1">
+                {typedListing.housingType.charAt(0).toUpperCase() + typedListing.housingType.slice(1)}
+              </Badge>
+              <Badge variant="secondary" className="text-sm px-3 py-1">
+                <Calendar className="w-3 h-3 mr-1" />
+                Available {format(new Date(typedListing.availableFrom), 'MMM d, yyyy')}
+              </Badge>
+            </div>
+
+            {/* Location Details */}
+            {(typedListing.neighborhood || typedListing.university || typedListing.distanceToCampus || typedListing.transportationNotes) && (
               <>
                 <Separator />
-                <div className="flex flex-wrap gap-3">
-                  {typedListing.roomType && (
-                    <Badge 
-                      className="text-xs border-0" 
-                      style={{
-                        background: 'var(--surface-secondary)',
-                        color: 'var(--text-primary)'
-                      }}
-                    >
-                      {typedListing.roomType.charAt(0).toUpperCase() + typedListing.roomType.slice(1)} Room
-                    </Badge>
-                  )}
-                  {typedListing.housingType && (
-                    <Badge 
-                      className="text-xs border-0" 
-                      style={{
-                        background: 'var(--surface-secondary)',
-                        color: 'var(--text-primary)'
-                      }}
-                    >
-                      {typedListing.housingType.charAt(0).toUpperCase() + typedListing.housingType.slice(1)}
-                    </Badge>
-                  )}
-                  {typedListing.availableFrom && (
-                    <Badge 
-                      className="text-xs border-0" 
-                      style={{
-                        background: 'var(--surface-secondary)',
-                        color: 'var(--text-primary)'
-                      }}
-                    >
-                      Available from {format(new Date(typedListing.availableFrom), 'MMM d, yyyy')}
-                    </Badge>
-                  )}
+                <div>
+                  <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+                    Location Details
+                  </h3>
+                  <div className="space-y-2">
+                    {typedListing.neighborhood && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {typedListing.neighborhood} neighborhood
+                        </span>
+                      </div>
+                    )}
+                    {typedListing.university && (
+                      <div className="flex items-center gap-2">
+                        <Home className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          Near {typedListing.university}
+                        </span>
+                      </div>
+                    )}
+                    {typedListing.distanceToCampus && (
+                      <div className="flex items-center gap-2">
+                        <ArrowRight className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {typedListing.distanceToCampus} to campus
+                        </span>
+                      </div>
+                    )}
+                    {typedListing.transportationNotes && (
+                      <div className="flex items-center gap-2">
+                        <Car className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {typedListing.transportationNotes}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </>
             )}
@@ -230,41 +246,11 @@ export default function ListingDetail() {
                 <Separator />
                 <div>
                   <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
-                    About This Place
+                    About this Place
                   </h3>
-                  <p style={{ color: 'var(--text-secondary)' }}>
+                  <p style={{ color: 'var(--text-secondary)' }} className="leading-relaxed">
                     {typedListing.description}
                   </p>
-                </div>
-              </>
-            )}
-
-            {/* Location Details */}
-            {(typedListing.university || typedListing.distanceToCampus) && (
-              <>
-                <Separator />
-                <div>
-                  <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
-                    Location Details
-                  </h3>
-                  <div className="space-y-3">
-                    {typedListing.university && (
-                      <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4" style={{ color: 'var(--primary)' }} />
-                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                          Near {typedListing.university}
-                        </span>
-                      </div>
-                    )}
-                    {typedListing.distanceToCampus && (
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4" style={{ color: 'var(--primary)' }} />
-                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                          {typedListing.distanceToCampus} to campus
-                        </span>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </>
             )}
@@ -277,8 +263,8 @@ export default function ListingDetail() {
                   <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
                     Lifestyle Preferences
                   </h3>
-                  <div className="space-y-3">
-                    {typedListing.genderPreference && typedListing.genderPreference !== 'any' && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {typedListing.genderPreference && (
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -288,7 +274,7 @@ export default function ListingDetail() {
                     )}
                     {typedListing.studentYear && typedListing.studentYear !== 'any' && (
                       <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <Home className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {typedListing.studentYear.charAt(0).toUpperCase() + typedListing.studentYear.slice(1)} students
                         </span>
