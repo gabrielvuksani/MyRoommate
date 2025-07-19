@@ -132,39 +132,55 @@ export default function AuthPage() {
 
             {/* Error Message */}
             {authError && (
-              <Card className="bg-red-50/90 dark:bg-red-900/30 backdrop-blur-xl border border-red-200/50 dark:border-red-700/50 rounded-2xl shadow-lg">
-                <CardContent className="p-4">
+              <Card className="glass-card border-red-200 dark:border-red-700">
+                <CardContent className="p-6">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <p className="text-red-700 dark:text-red-300 font-medium">{authError}</p>
+                    <div>
+                      <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Authentication Error</h3>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {authError.replace(/^\d+:\s*/, '').replace(/[{}]/g, '').replace(/^"/, '').replace(/"$/, '')}
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             )}
 
             {/* Form Card */}
-            <Card className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-white/30 dark:border-slate-700/30 rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-slate-900/50">
-              <CardContent className="p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
+            <Card className="glass-card">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-10 h-10 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-xl flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      {isLogin ? "Sign In" : "Create Account"}
+                    </h2>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      {isLogin ? "Welcome back to myRoommate" : "Join the myRoommate community"}
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Email */}
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                      Email Address
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                      Email Address *
                     </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <Input
-                        type="email"
-                        placeholder="your@email.com"
-                        value={formData.email}
-                        onChange={(e) => updateFormData("email", e.target.value)}
-                        className={`pl-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.email ? 'border-red-500' : ''}`}
-                      />
-                    </div>
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={formData.email}
+                      onChange={(e) => updateFormData("email", e.target.value)}
+                      className={errors.email ? 'border-red-500' : ''}
+                    />
                     {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                   </div>
 
@@ -172,29 +188,28 @@ export default function AuthPage() {
                   {!isLogin && (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                          First Name
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                          First Name *
                         </label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <Input
-                            placeholder="John"
-                            value={formData.firstName}
-                            onChange={(e) => updateFormData("firstName", e.target.value)}
-                            className={`pl-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.firstName ? 'border-red-500' : ''}`}
-                          />
-                        </div>
+                        <Input
+                          type="text"
+                          placeholder="John"
+                          value={formData.firstName}
+                          onChange={(e) => updateFormData("firstName", e.target.value)}
+                          className={errors.firstName ? 'border-red-500' : ''}
+                        />
                         {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                          Last Name
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                          Last Name *
                         </label>
                         <Input
+                          type="text"
                           placeholder="Doe"
                           value={formData.lastName}
                           onChange={(e) => updateFormData("lastName", e.target.value)}
-                          className={`h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.lastName ? 'border-red-500' : ''}`}
+                          className={errors.lastName ? 'border-red-500' : ''}
                         />
                         {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
                       </div>
@@ -203,22 +218,22 @@ export default function AuthPage() {
 
                   {/* Password */}
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                      Password
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                      Password *
                     </label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <Input
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={(e) => updateFormData("password", e.target.value)}
-                        className={`pl-10 pr-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.password ? 'border-red-500' : ''}`}
+                        className={`pr-10 ${errors.password ? 'border-red-500' : ''}`}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:scale-105 transition-transform"
+                        style={{ color: 'var(--text-secondary)' }}
                       >
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
@@ -229,22 +244,22 @@ export default function AuthPage() {
                   {/* Confirm Password (Register only) */}
                   {!isLogin && (
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                        Confirm Password
+                      <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                        Confirm Password *
                       </label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <Input
                           type={showConfirmPassword ? "text" : "password"}
                           placeholder="••••••••"
                           value={formData.confirmPassword}
                           onChange={(e) => updateFormData("confirmPassword", e.target.value)}
-                          className={`pl-10 pr-10 h-12 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border-gray-200/50 dark:border-slate-600/50 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                          className={`pr-10 ${errors.confirmPassword ? 'border-red-500' : ''}`}
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:scale-105 transition-transform"
+                          style={{ color: 'var(--text-secondary)' }}
                         >
                           {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
@@ -254,37 +269,24 @@ export default function AuthPage() {
                   )}
 
                   {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    disabled={loginMutation.isPending || registerMutation.isPending}
-                    className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white border-0 rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
-                  >
-                    {(loginMutation.isPending || registerMutation.isPending) ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                        <span>Please wait...</span>
-                      </div>
-                    ) : isLogin ? (
-                      <div className="flex items-center space-x-2">
-                        <Sparkles size={20} />
-                        <span>Sign In</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle size={20} />
-                        <span>Create Account</span>
-                      </div>
-                    )}
-                  </Button>
-
-                  {/* Error Display */}
-                  {(loginMutation.error || registerMutation.error) && (
-                    <div className="p-4 rounded-2xl bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm border border-red-200/50 dark:border-red-800/50">
-                      <p className="text-red-600 dark:text-red-400 text-sm">
-                        {loginMutation.error?.message || registerMutation.error?.message}
-                      </p>
-                    </div>
-                  )}
+                  <div className="pt-2">
+                    <Button
+                      type="submit"
+                      disabled={loginMutation.isPending || registerMutation.isPending}
+                      className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
+                    >
+                      {(loginMutation.isPending || registerMutation.isPending) ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                          <span>Please wait...</span>
+                        </div>
+                      ) : isLogin ? (
+                        "Sign In"
+                      ) : (
+                        "Create Account"
+                      )}
+                    </Button>
+                  </div>
                 </form>
 
                 {/* Toggle Form */}
