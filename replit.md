@@ -119,6 +119,10 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ All pages now use new use-auth.tsx hook with secure session management
 - ✓ Custom authentication provides login/registration with form validation and error handling
 - ✓ Authentication system fully operational with proper TypeScript type safety
+- ✓ **Enhanced authentication forms with visionOS/iOS 26/Airbnb aesthetic**: Updated input styling to match app-wide design with input-modern class, CSS variables, and glass morphism effects
+- ✓ **Streamlined error messages**: Implemented user-friendly error formatting (e.g., "Invalid email or password, please try again" instead of raw API messages)
+- ✓ **Disabled email verification**: Commented out email verification checks in auth system while keeping verifiedtoken field for future use
+- ✓ **Clean authentication experience**: No resend API keys or email verification calls - simplified sign-up process
 - ✓ Fixed listing detail page to properly handle multiple images with carousel interface
 - ✓ Added navigation arrows and image indicators for multi-image galleries following iOS design patterns
 - ✓ Updated price color from blue to theme-aware (white/black) for consistency across light/dark modes

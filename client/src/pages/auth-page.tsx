@@ -175,7 +175,7 @@ export default function AuthPage() {
                     <div>
                       <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Authentication Error</h3>
                       <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        {authError}
+                        {formatErrorMessage(authError)}
                       </p>
                     </div>
                   </div>

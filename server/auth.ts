@@ -67,9 +67,10 @@ export function setupAuth(app: Express) {
             return done(null, false, { message: "Invalid email or password" });
           }
           
-          if (!user.verified) {
-            return done(null, false, { message: "Please verify your email address" });
-          }
+          // Skip email verification for now
+          // if (!user.verified) {
+          //   return done(null, false, { message: "Please verify your email address" });
+          // }
           
           // Don't return password in user object
           const { password: _, ...userWithoutPassword } = user;
