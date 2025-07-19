@@ -63,6 +63,16 @@ export default function AuthPage() {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
+    } else if (!isLogin) {
+      // Enhanced password validation for registration
+      const hasUppercase = /[A-Z]/.test(formData.password);
+      const hasLowercase = /[a-z]/.test(formData.password);
+      const hasNumber = /\d/.test(formData.password);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(formData.password);
+      
+      if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecialChar) {
+        newErrors.password = "Password must contain uppercase, lowercase, number, and special character";
+      }
     }
 
     if (!isLogin) {

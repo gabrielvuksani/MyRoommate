@@ -30,25 +30,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      // Use form submission to let server handle redirect
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/api/login';
+      const res = await apiRequest("POST", "/api/login", credentials);
       
-      const emailInput = document.createElement('input');
-      emailInput.type = 'hidden';
-      emailInput.name = 'email';
-      emailInput.value = credentials.email;
-      
-      const passwordInput = document.createElement('input');
-      passwordInput.type = 'hidden';
-      passwordInput.name = 'password';
-      passwordInput.value = credentials.password;
-      
-      form.appendChild(emailInput);
-      form.appendChild(passwordInput);
-      document.body.appendChild(form);
-      form.submit();
+      if (res.ok) {
+        const user = await res.json();
+        return user;
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+    },
+    onSuccess: (user: User) => {
+      queryClient.setQueryData(["/api/user"], user);
+      // Redirect to home page after successful login
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -57,24 +52,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (credentials: RegisterData) => {
-      // Use form submission to let server handle redirect
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/api/register';
+      const res = await apiRequest("POST", "/api/register", credentials);
       
-      Object.entries(credentials).forEach(([key, value]) => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        form.appendChild(input);
-      });
-      
-      document.body.appendChild(form);
-      form.submit();
+      if (res.status === 201) {
+        const data = await res.json();
+        
+        if (data.requiresVerification) {
+          return { 
+            requiresVerification: true, 
+            message: data.message,
+            email: credentials.email 
+          };
+        }
+        
+        return data;
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Registration failed');
+      }
+    },
+    onSuccess: (data: any) => {
+      if (data.requiresVerification) {
+        // Don't set user data yet, show verification message instead
+        alert(`Please check your email (${data.email}) and click the verification link to complete your account setup.`);
+      } else {
+        queryClient.setQueryData(["/api/user"], data);
+      }
     },
     onError: (error: Error) => {
-      console.error("Registration failed:", error.message);
+      console.error('Registration error:', error);
     },
   });
 
