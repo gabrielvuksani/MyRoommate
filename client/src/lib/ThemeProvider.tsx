@@ -1,111 +1,41 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-type Theme = "light" | "dark" | "auto";
+type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
-  effectiveTheme: "light" | "dark";
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("auto");
-  const [effectiveTheme, setEffectiveTheme] = useState<"light" | "dark">("light");
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    // Initialize theme from localStorage or default to auto
+    // Initialize theme from localStorage
     const saved = localStorage.getItem("theme") as Theme;
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    
-    if (saved && (saved === "light" || saved === "dark" || saved === "auto")) {
+    if (saved === "light" || saved === "dark") {
       setTheme(saved);
-    } else {
-      setTheme("auto");
     }
-
-    // Set initial effective theme
-    setEffectiveTheme(mediaQuery.matches ? "dark" : "light");
-
-    // Listen for system theme changes
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      setEffectiveTheme(e.matches ? "dark" : "light");
-    };
-
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-    
-    return () => {
-      mediaQuery.removeEventListener('change', handleSystemThemeChange);
-    };
   }, []);
 
   useEffect(() => {
-    const root = document.documentElement;
-    const appliedTheme = theme === 'auto' ? effectiveTheme : theme;
-    
-    // Remove both classes first
-    root.classList.remove("light", "dark");
-    
-    // Add the current theme class
-    root.classList.add(appliedTheme);
-    
-    // Update theme-color meta tag for iPhone status bar
-    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (themeColorMeta) {
-      themeColorMeta.setAttribute('content', appliedTheme === 'dark' ? '#1c1c1e' : '#f7f8fa');
-    }
-    
-    // Update apple-mobile-web-app-status-bar-style for iPhone
-    const statusBarMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-    if (statusBarMeta) {
-      statusBarMeta.setAttribute('content', appliedTheme === 'dark' ? 'black-translucent' : 'default');
-    }
-    
-    // Update PWA manifest theme-color dynamically
-    const manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement;
-    if (manifestLink) {
-      // Create a new manifest with updated theme color
-      fetch(manifestLink.href)
-        .then(response => response.json())
-        .then(manifest => {
-          manifest.theme_color = appliedTheme === 'dark' ? '#1c1c1e' : '#f7f8fa';
-          manifest.background_color = appliedTheme === 'dark' ? '#1c1c1e' : '#f7f8fa';
-          
-          const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-          const newManifestURL = URL.createObjectURL(blob);
-          manifestLink.href = newManifestURL;
-        })
-        .catch(() => {
-          // Fallback: just update the theme-color meta tag
-        });
-    }
-    
-    // Notify service worker of theme change
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        type: 'THEME_CHANGED',
-        theme: appliedTheme
-      });
-    }
+    // Update document class
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(theme);
     
     // Save to localStorage
     localStorage.setItem("theme", theme);
-  }, [theme, effectiveTheme]);
+  }, [theme]);
 
   const toggleTheme = () => {
-    if (theme === "auto") {
-      setTheme("light");
-    } else if (theme === "light") {
-      setTheme("dark");
-    } else {
-      setTheme("auto");
-    }
+    setTheme(theme === "light" ? "dark" : "light");
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, effectiveTheme, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

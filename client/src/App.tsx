@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ThemeProvider } from "@/lib/ThemeProvider";
+
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { getUserFlags } from "@/lib/userUtils";
@@ -24,6 +24,7 @@ import Dashboard from "@/pages/dashboard";
 import Roommates from "@/pages/roommates";
 import ListingDetail from "@/pages/listing-detail";
 import AddExpense from "@/pages/add-expense";
+import AddListing from "@/pages/add-listing";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
@@ -70,6 +71,7 @@ function Router() {
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/roommates" component={Roommates} />
             <Route path="/listings/:id" component={ListingDetail} />
+            <Route path="/add-listing" component={AddListing} />
             <Route path="/" component={Onboarding} />
           </>
         ) : (
@@ -87,6 +89,7 @@ function Router() {
 
             <Route path="/roommates" component={Roommates} />
             <Route path="/listings/:id" component={ListingDetail} />
+            <Route path="/add-listing" component={AddListing} />
             <Route path="/add-expense" component={hasHousehold ? AddExpense : Home} />
           </>
         )}
@@ -101,11 +104,9 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+      <TooltipProvider>
+        <Router />
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }
