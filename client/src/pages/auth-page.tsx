@@ -27,13 +27,19 @@ export default function AuthPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Only redirect if user was already logged in when page loaded (not after auth mutations)
+  // Redirect after successful authentication
   React.useEffect(() => {
-    if (user && !loginMutation.isPending && !registerMutation.isPending && !loginMutation.isSuccess && !registerMutation.isSuccess) {
+    if (user && (loginMutation.isSuccess || registerMutation.isSuccess)) {
+      // Successful auth - add small delay to ensure state is properly updated
+      const timer = setTimeout(() => {
+        setLocation("/");
+      }, 100);
+      return () => clearTimeout(timer);
+    } else if (user && !loginMutation.isPending && !registerMutation.isPending && !loginMutation.isSuccess && !registerMutation.isSuccess) {
       // User was already logged in when they accessed this page
-      window.location.href = "/";
+      setLocation("/");
     }
-  }, [user, loginMutation.isPending, registerMutation.isPending, loginMutation.isSuccess, registerMutation.isSuccess]);
+  }, [user, loginMutation.isSuccess, registerMutation.isSuccess, loginMutation.isPending, registerMutation.isPending, setLocation]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -78,18 +84,20 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-        await loginMutation.mutateAsync({
+        const result = await loginMutation.mutateAsync({
           email: formData.email,
           password: formData.password,
         });
+        // Login successful - the useEffect will handle navigation
       } else {
-        await registerMutation.mutateAsync({
+        const result = await registerMutation.mutateAsync({
           email: formData.email,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
           firstName: formData.firstName,
           lastName: formData.lastName,
         });
+        // Registration successful - the useEffect will handle navigation
       }
     } catch (error: any) {
       console.error("Auth error:", error);

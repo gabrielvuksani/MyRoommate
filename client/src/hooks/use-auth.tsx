@@ -38,9 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (user: User) => {
+      // Set user data immediately for instant UI update
       queryClient.setQueryData(["/api/user"], user);
-      // Redirect to home after successful login
-      window.location.href = "/";
+      // Invalidate to refresh any other dependent queries
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -57,9 +59,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (user: User) => {
+      // Set user data immediately for instant UI update
       queryClient.setQueryData(["/api/user"], user);
-      // Redirect to home after successful registration
-      window.location.href = "/";
+      // Invalidate to refresh any other dependent queries
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
     },
     onError: (error: Error) => {
       console.error("Registration failed:", error.message);
