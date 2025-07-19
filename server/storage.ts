@@ -509,6 +509,13 @@ export class DatabaseStorage implements IStorage {
     await db.delete(shoppingItems).where(eq(shoppingItems.id, id));
   }
 
+  async unfeatueAllRoommateListings(): Promise<void> {
+    await db
+      .update(roommateListings)
+      .set({ featured: false })
+      .where(eq(roommateListings.featured, true));
+  }
+
   async createRoommateListing(listing: InsertRoommateListing): Promise<RoommateListing> {
     const [created] = await db.insert(roommateListings).values(listing).returning();
     return created;

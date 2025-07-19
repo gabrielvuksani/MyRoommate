@@ -80,7 +80,7 @@ export default function AddListing() {
   });
 
   const handleCreateListing = () => {
-    if (!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom || !newListing.contactInfo) {
+    if (!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom || !newListing.contactInfo || newListing.images.length === 0) {
       return;
     }
     
@@ -195,10 +195,10 @@ export default function AddListing() {
               {/* Image Upload Section */}
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                  Photos (Optional)
+                  Photos *
                 </label>
                 <p className="text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>
-                  Add photos to make your listing stand out
+                  Add at least one photo to showcase your space
                 </p>
                 
                 <div className="space-y-3">
@@ -660,14 +660,14 @@ export default function AddListing() {
         {/* Submit Button */}
         <div className="sticky bottom-0 pt-4 pb-8" style={{ background: 'var(--background)' }}>
           {/* Validation Helper */}
-          {(!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom || !newListing.contactInfo) && (
+          {(!newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom || !newListing.contactInfo || newListing.images.length === 0) && (
             <p className="text-center text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
-              Please fill in all required fields (*)
+              Please fill in all required fields (*) {newListing.images.length === 0 && "and add at least one photo"}
             </p>
           )}
           <button
             onClick={handleCreateListing}
-            disabled={createListingMutation.isPending || !newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom || !newListing.contactInfo}
+            disabled={createListingMutation.isPending || !newListing.title || !newListing.rent || !newListing.location || !newListing.city || !newListing.availableFrom || !newListing.contactInfo || newListing.images.length === 0}
             className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl font-semibold text-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {createListingMutation.isPending ? "Creating Listing..." : "Create Listing"}

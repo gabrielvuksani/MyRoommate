@@ -569,9 +569,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const data = insertRoommateListingSchema.parse(req.body);
       
+      // First, unfeature all existing listings
+      await storage.unfeatueAllRoommateListings();
+      
+      // Create the new listing as featured
       const listing = await storage.createRoommateListing({
         ...data,
         createdBy: userId,
+        featured: true, // Auto-feature the latest listing
       });
       
       res.json(listing);

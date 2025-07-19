@@ -49,16 +49,15 @@ export default function Home() {
     queryKey: ["/api/balance"],
   });
 
-  // Fetch roommate listings for users without households
+  // Fetch featured roommate listings for all users
   const { data: featuredListings = [] } = useQuery({
     queryKey: ['/api/roommate-listings', { featured: true }],
     queryFn: () => fetch('/api/roommate-listings?featured=true').then(res => res.json()),
-    enabled: !household, // Only fetch when user has no household
   });
 
   const { data: myListings = [] } = useQuery({
     queryKey: ['/api/roommate-listings/my'],
-    enabled: !household, // Only fetch when user has no household
+    enabled: !!user, // Fetch when user is logged in
   });
 
   useEffect(() => {
