@@ -363,16 +363,7 @@ export default function AddListing() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                  Transportation Notes
-                </label>
-                <Input
-                  placeholder="e.g., Near BART station, bus routes available"
-                  value={newListing.transportationNotes || ""}
-                  onChange={(e) => setNewListing({ ...newListing, transportationNotes: e.target.value })}
-                />
-              </div>
+
             </div>
           </CardContent>
         </Card>

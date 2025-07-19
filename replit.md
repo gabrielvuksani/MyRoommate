@@ -111,20 +111,28 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 19, 2025 (Latest):**
+- ✓ Fixed listing detail page badges to work properly in both dark and light modes with explicit color styling
+- ✓ Updated badges with specific blue, purple, and green themes for room type, housing type, and availability
+- ✓ Removed neighborhood and transportation notes fields from add listing form for cleaner interface
+- ✓ Updated listing detail page to no longer display neighborhood and transportation notes
+- ✓ Removed neighborhood and transportationNotes from database schema for cleaner data model
+- ✓ Fixed "Available" badge text to include "from" for better clarity
+- ✓ Ensured image consistency between roommate listing cards and detail pages
+- ✓ Both card and detail views now use same image display logic and placeholder styling
+- ✓ Applied database migration to remove unused schema columns for neighborhood and transportation notes
 - ✓ Fixed tab bar design in roommates page to match established glass morphism design language with sliding indicator
 - ✓ Updated + button in roommates page to match chores page style with proper gradient and animations
 - ✓ Enhanced listing detail page pills/badges to work properly in both dark and light modes using CSS variables
 - ✓ Added comprehensive image upload functionality to listing creation form with preview and delete capabilities
-- ✓ Removed neighborhood field from add listing form per user feedback for cleaner interface
 - ✓ Updated demo listing with complete new schema including utilities, location details, and proper contact info
 - ✓ REMOVED separation between featured and regular listings - all listings now shown under "All Listings" with featured ones sorted to top
 - ✓ Enhanced listing detail page with featured badge, comprehensive lifestyle preferences display, and improved contact functionality
 - ✓ Added smart contact button that opens email for email addresses or copies phone numbers to clipboard
 - ✓ Improved listing detail page design language consistency with proper glass morphism cards and organized sections
 - ✓ FIXED CRITICAL LISTING CREATION BUG: Updated Zod validation schema to properly handle date strings and null values
-- ✓ Added comprehensive location fields: state, zip code, neighborhood, university, distance to campus, transportation notes
+- ✓ Added comprehensive location fields: state, zip code, university, distance to campus
 - ✓ Made contact information field required with proper form validation throughout
-- ✓ Enhanced listing detail page to display ALL form fields including location details, utilities, and transportation info
+- ✓ Enhanced listing detail page to display ALL relevant form fields including location details and utilities
 - ✓ Fixed database schema by manually adding missing columns that weren't migrated properly
 - ✓ Streamlined both add-listing and listing-detail pages with consistent design language
 - ✓ Completely reverted city and university fields to manual text inputs per user preference

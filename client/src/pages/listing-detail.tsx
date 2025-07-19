@@ -182,20 +182,20 @@ export default function ListingDetail() {
 
             {/* Room Details */}
             <div className="flex gap-3 flex-wrap">
-              <Badge variant="secondary" className="text-sm px-3 py-1">
+              <Badge className="text-sm px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-0">
                 {typedListing.roomType.charAt(0).toUpperCase() + typedListing.roomType.slice(1)} Room
               </Badge>
-              <Badge variant="secondary" className="text-sm px-3 py-1">
+              <Badge className="text-sm px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0">
                 {typedListing.housingType.charAt(0).toUpperCase() + typedListing.housingType.slice(1)}
               </Badge>
-              <Badge variant="secondary" className="text-sm px-3 py-1">
+              <Badge className="text-sm px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
                 <Calendar className="w-3 h-3 mr-1" />
-                Available {format(new Date(typedListing.availableFrom), 'MMM d, yyyy')}
+                Available from {format(new Date(typedListing.availableFrom), 'MMM d, yyyy')}
               </Badge>
             </div>
 
             {/* Location Details */}
-            {(typedListing.neighborhood || typedListing.university || typedListing.distanceToCampus || typedListing.transportationNotes) && (
+            {(typedListing.university || typedListing.distanceToCampus) && (
               <>
                 <Separator />
                 <div>
@@ -203,14 +203,6 @@ export default function ListingDetail() {
                     Location Details
                   </h3>
                   <div className="space-y-2">
-                    {typedListing.neighborhood && (
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4" style={{ color: 'var(--primary)' }} />
-                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                          {typedListing.neighborhood} neighborhood
-                        </span>
-                      </div>
-                    )}
                     {typedListing.university && (
                       <div className="flex items-center gap-2">
                         <Home className="w-4 h-4" style={{ color: 'var(--primary)' }} />
@@ -224,14 +216,6 @@ export default function ListingDetail() {
                         <ArrowRight className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {typedListing.distanceToCampus} to campus
-                        </span>
-                      </div>
-                    )}
-                    {typedListing.transportationNotes && (
-                      <div className="flex items-center gap-2">
-                        <Car className="w-4 h-4" style={{ color: 'var(--primary)' }} />
-                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                          {typedListing.transportationNotes}
                         </span>
                       </div>
                     )}
