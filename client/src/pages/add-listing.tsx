@@ -62,8 +62,8 @@ export default function AddListing() {
         ...listingData,
         rent: parseInt(listingData.rent),
         utilities: listingData.utilities ? parseInt(listingData.utilities) : null,
-        availableFrom: new Date(listingData.availableFrom),
-        availableTo: listingData.availableTo ? new Date(listingData.availableTo) : null,
+        availableFrom: listingData.availableFrom,
+        availableTo: listingData.availableTo || null,
       };
       
       await apiRequest("POST", "/api/roommate-listings", data);
@@ -207,37 +207,98 @@ export default function AddListing() {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                  Street Address *
-                </label>
-                <Input
-                  placeholder="e.g., 123 Telegraph Ave"
-                  value={newListing.location}
-                  onChange={(e) => setNewListing({ ...newListing, location: e.target.value })}
-                />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                    Street Address *
+                  </label>
+                  <Input
+                    placeholder="e.g., 123 Telegraph Ave"
+                    value={newListing.location}
+                    onChange={(e) => setNewListing({ ...newListing, location: e.target.value })}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                    City *
+                  </label>
+                  <Input
+                    placeholder="e.g., Berkeley"
+                    value={newListing.city}
+                    onChange={(e) => setNewListing({ ...newListing, city: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                    State/Province
+                  </label>
+                  <Input
+                    placeholder="e.g., CA"
+                    value={newListing.state || ""}
+                    onChange={(e) => setNewListing({ ...newListing, state: e.target.value })}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                    ZIP/Postal Code
+                  </label>
+                  <Input
+                    placeholder="e.g., 94704"
+                    value={newListing.zipCode || ""}
+                    onChange={(e) => setNewListing({ ...newListing, zipCode: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                    Neighborhood
+                  </label>
+                  <Input
+                    placeholder="e.g., Downtown, Northside"
+                    value={newListing.neighborhood || ""}
+                    onChange={(e) => setNewListing({ ...newListing, neighborhood: e.target.value })}
+                  />
+                </div>
               </div>
               
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                    University/School
+                  </label>
+                  <Input
+                    placeholder="e.g., UC Berkeley, Stanford University"
+                    value={newListing.university}
+                    onChange={(e) => setNewListing({ ...newListing, university: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                    Distance to Campus
+                  </label>
+                  <Input
+                    placeholder="e.g., 5 min walk, 2 miles"
+                    value={newListing.distanceToCampus || ""}
+                    onChange={(e) => setNewListing({ ...newListing, distanceToCampus: e.target.value })}
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                  City *
+                  Transportation Notes
                 </label>
                 <Input
-                  placeholder="e.g., Berkeley"
-                  value={newListing.city}
-                  onChange={(e) => setNewListing({ ...newListing, city: e.target.value })}
-                />
-              </div>
-              
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                  University/School
-                </label>
-                <Input
-                  placeholder="e.g., UC Berkeley, Stanford University"
-                  value={newListing.university}
-                  onChange={(e) => setNewListing({ ...newListing, university: e.target.value })}
+                  placeholder="e.g., Near BART station, bus routes available"
+                  value={newListing.transportationNotes || ""}
+                  onChange={(e) => setNewListing({ ...newListing, transportationNotes: e.target.value })}
                 />
               </div>
             </div>
@@ -263,7 +324,7 @@ export default function AddListing() {
                   Monthly Rent *
                 </label>
                 <div className="relative">
-                  <div className="absolute left-3 top-3 text-gray-500">$</div>
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }}>$</div>
                   <Input
                     type="number"
                     placeholder="950"
@@ -279,7 +340,7 @@ export default function AddListing() {
                   Monthly Utilities
                 </label>
                 <div className="relative">
-                  <div className="absolute left-3 top-3 text-gray-500">$</div>
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }}>$</div>
                   <Input
                     type="number"
                     placeholder="75"

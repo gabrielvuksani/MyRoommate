@@ -149,7 +149,12 @@ export const roommateListings = pgTable("roommate_listings", {
   utilities: integer("utilities"), // Separate utilities cost
   location: text("location").notNull(), // Street address
   city: text("city").notNull(),
+  state: text("state"),
+  zipCode: text("zip_code"),
+  neighborhood: text("neighborhood"),
   university: text("university"), // University name
+  distanceToCampus: text("distance_to_campus"),
+  transportationNotes: text("transportation_notes"),
   availableFrom: timestamp("available_from", { withTimezone: true }).notNull(),
   availableTo: timestamp("available_to", { withTimezone: true }), // Lease end date
   roomType: text("room_type", { enum: ["private", "shared", "studio"] }).notNull(),
