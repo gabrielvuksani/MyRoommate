@@ -67,49 +67,68 @@ export default function Roommates() {
             </div>
             <button
               onClick={() => setLocation("/add-listing")}
-              className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-[1.05]"
+              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated"
             >
-              <Plus size={20} className="text-white" />
+              <Plus size={24} className="text-white" />
             </button>
           </div>
         </div>
       </div>
 
       <div className="pt-44 px-6 pb-24 space-y-6">
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList 
-            className="grid w-full grid-cols-2 backdrop-blur-sm"
-            style={{ 
+        {/* Glass Morphism Tab Bar */}
+        <div className="relative">
+          <div 
+            className="flex rounded-2xl p-1 backdrop-blur-xl border"
+            style={{
               background: 'var(--surface-secondary)',
-              border: '1px solid var(--border)'
+              border: '1px solid var(--border)',
+              backdropFilter: 'blur(20px) saturate(1.8)',
             }}
           >
-            <TabsTrigger 
-              value="browse" 
-              className="transition-all duration-200"
+            {/* Tab Background Indicator */}
+            <div 
+              className="absolute top-1 bottom-1 rounded-xl transition-all duration-500 ease-out"
               style={{
-                color: activeTab === 'browse' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                background: activeTab === 'browse' ? 'var(--surface)' : 'transparent',
-                boxShadow: activeTab === 'browse' ? 'var(--shadow-soft)' : 'none'
+                background: 'var(--surface)',
+                boxShadow: 'var(--shadow-soft)',
+                width: 'calc(50% - 4px)',
+                transform: `translateX(${activeTab === 'browse' ? '2px' : 'calc(100% + 2px)'})`,
               }}
+            />
+            
+            {/* Browse Tab */}
+            <button
+              onClick={() => setActiveTab("browse")}
+              className="relative flex-1 flex items-center justify-center py-3 px-4 rounded-xl transition-all duration-300 z-10"
             >
-              <Search className="w-4 h-4 mr-2" />
-              Browse ({listingsArray.length})
-            </TabsTrigger>
-            <TabsTrigger 
-              value="my-listings" 
-              className="transition-all duration-200"
-              style={{
-                color: activeTab === 'my-listings' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                background: activeTab === 'my-listings' ? 'var(--surface)' : 'transparent',
-                boxShadow: activeTab === 'my-listings' ? 'var(--shadow-soft)' : 'none'
-              }}
+              <Search className="w-4 h-4 mr-2" style={{ color: activeTab === 'browse' ? 'var(--primary)' : 'var(--text-secondary)' }} />
+              <span 
+                className="font-medium"
+                style={{ color: activeTab === 'browse' ? 'var(--text-primary)' : 'var(--text-secondary)' }}
+              >
+                Browse ({listingsArray.length})
+              </span>
+            </button>
+            
+            {/* My Listings Tab */}
+            <button
+              onClick={() => setActiveTab("my-listings")}
+              className="relative flex-1 flex items-center justify-center py-3 px-4 rounded-xl transition-all duration-300 z-10"
             >
-              <Home className="w-4 h-4 mr-2" />
-              My Listings ({myListingsArray.length})
-            </TabsTrigger>
-          </TabsList>
+              <Home className="w-4 h-4 mr-2" style={{ color: activeTab === 'my-listings' ? 'var(--primary)' : 'var(--text-secondary)' }} />
+              <span 
+                className="font-medium"
+                style={{ color: activeTab === 'my-listings' ? 'var(--text-primary)' : 'var(--text-secondary)' }}
+              >
+                My Listings ({myListingsArray.length})
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
 
           <TabsContent value="browse" className="space-y-6">
             {/* All Listings (Featured at top) */}
