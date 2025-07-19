@@ -38,17 +38,11 @@ function Router() {
     PersistentLoading.checkAndShow();
   }, []);
   
-  const { data: household, isLoading: isHouseholdLoading, error: householdError } = useQuery({
+  const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
     enabled: !!user,
-    retry: false, // Don't retry 404s
-    refetchOnWindowFocus: false, // Don't refetch when window gets focus
-    refetchOnMount: false, // Don't refetch on component mount
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-  }) as { data: any, isLoading: boolean, error: any };
+  }) as { data: any };
 
-  // Show loading only during initial auth
-  // Once we have user data, proceed immediately (404 for household is expected for new users)
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
@@ -57,7 +51,7 @@ function Router() {
     );
   }
 
-  // Get user flags immediately - treat 404 household as no household
+  // Get comprehensive user flags using centralized logic
   const userFlags = getUserFlags(user, household, !!user, location);
   const { needsOnboarding, hasHousehold } = userFlags;
   

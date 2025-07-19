@@ -160,6 +160,9 @@ export default function AuthPage() {
               <h1 className="text-3xl font-bold text-[#1a1a1a] dark:text-white mb-3">
                 myRoommate
               </h1>
+              <p className="text-lg text-gray-600 dark:text-gray-300">
+                {isLogin ? "Sign in to your account" : "Create your account"}
+              </p>
             </div>
 
             {/* Error Message */}
