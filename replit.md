@@ -115,8 +115,11 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ Updated + button in roommates page to match chores page style with proper gradient and animations
 - ✓ Enhanced listing detail page pills/badges to work properly in both dark and light modes using CSS variables
 - ✓ Added comprehensive image upload functionality to listing creation form with preview and delete capabilities
-- ✓ Removed neighborhood field from add listing form per user feedback for cleaner interface
+- ✓ Removed neighborhood and transportation notes fields from add listing form per user feedback for cleaner interface
 - ✓ Updated demo listing with complete new schema including utilities, location details, and proper contact info
+- ✓ Fixed listing detail pills text to use proper CSS variables for dark/light mode compatibility
+- ✓ Made images work consistently across roommates page and listing detail page
+- ✓ Created comprehensive demo listing with all form fields filled out, lifestyle preferences, amenities, and sample image
 - ✓ REMOVED separation between featured and regular listings - all listings now shown under "All Listings" with featured ones sorted to top
 - ✓ Enhanced listing detail page with featured badge, comprehensive lifestyle preferences display, and improved contact functionality
 - ✓ Added smart contact button that opens email for email addresses or copies phone numbers to clipboard
