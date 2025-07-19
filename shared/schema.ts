@@ -30,10 +30,8 @@ export const sessions = pgTable(
 
 // User storage table for myRoommate Auth
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull().$defaultFn(() => nanoid()),
-  username: varchar("username").unique().notNull(),
+  id: varchar("id").primaryKey().notNull(),
   email: varchar("email").unique(),
-  password: varchar("password").notNull(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),

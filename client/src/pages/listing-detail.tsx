@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 
 export default function ListingDetail() {

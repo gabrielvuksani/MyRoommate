@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide any Replit branding globally */
+[src*="replit.com/public/js"], 
+[src*="replit-dev-banner"],
+.replit-banner,
+.replit-dev-banner,
+iframe[src*="replit"],
+div[class*="replit"]:not([class*="glass"]):not([class*="card"]),
+div[id*="replit"],
+.auth0-lock,
+.auth0-lock-container,
+[class*="auth0"],
+[id*="auth0"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /* Hide scrollbars throughout the app */
 * {
   scrollbar-width: none; /* Firefox */
