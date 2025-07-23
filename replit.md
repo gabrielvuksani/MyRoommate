@@ -22,9 +22,9 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - **Session Management**: Express sessions with PostgreSQL storage
 
 ### Database Design
-- **Primary Database**: PostgreSQL with Drizzle ORM
+- **Primary Database**: PostgreSQL with Drizzle ORM (Supabase)
 - **Schema Management**: Drizzle Kit for migrations and type-safe queries
-- **Connection**: Neon serverless PostgreSQL adapter
+- **Connection**: Supabase PostgreSQL with transaction pooler
 - **Session Storage**: Connect-pg-simple for session persistence
 
 ## Key Components
@@ -94,12 +94,12 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 3. **Database Setup**: Drizzle migrations ensure schema is up-to-date
 
 ### Environment Configuration
-- **Development**: Local PostgreSQL with Vite dev server
-- **Production**: Neon serverless PostgreSQL with built static assets
-- **Required Variables**: `DATABASE_URL`, `SESSION_SECRET`, `REPL_ID`
+- **Development**: Supabase PostgreSQL with Vite dev server
+- **Production**: Supabase PostgreSQL with built static assets
+- **Required Variables**: `DATABASE_URL` (Supabase), `SESSION_SECRET`, `REPL_ID`
 
 ### Scaling Considerations
-- **Database**: Serverless PostgreSQL scales automatically
+- **Database**: Supabase PostgreSQL scales automatically with connection pooling
 - **Sessions**: Stored in database for multi-instance support
 - **WebSockets**: Single-instance limitation, requires sticky sessions for horizontal scaling
 
@@ -110,7 +110,14 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**July 19, 2025 (Latest - Part 2):**
+**July 19, 2025 (Latest - Part 3):**
+- ✓ **Migrated database from Neon to Supabase** for better PostgreSQL hosting and scaling
+- ✓ Updated database configuration to use Supabase transaction pooler connection
+- ✓ Maintained all existing Drizzle ORM functionality and schema compatibility
+- ✓ Added loading state to landing page "Get Started Free" buttons with persistent overlay
+- ✓ Updated documentation to reflect Supabase as primary database provider
+
+**July 19, 2025 (Earlier - Part 2):**
 - ✓ Implemented comprehensive app-wide loading overlay system using PersistentLoading module
 - ✓ Loading overlay persists across page refreshes with beautiful glass morphism design
 - ✓ Added loading to all major navigation points (login, logout, household operations, browsing)
