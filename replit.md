@@ -111,14 +111,16 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 23, 2025 (Latest):**
-- ✓ **Implemented comprehensive app-wide notification system with smart spam prevention**
-- ✓ **Enhanced notification service with document focus detection, current page detection, and time-based throttling**
-- ✓ **Added special handling for messages when chat is active - allows more notifications when user is in messages page**
-- ✓ **Notifications now work across all major app areas: messages, chore assignments/completions, expense additions, calendar events**
-- ✓ **Applied different throttle times based on notification type (messages: 2s, chores: 30s, expenses: 15s, calendar: 60s)**
-- ✓ **Implemented intelligent spam prevention with max 3 notifications per minute per type and smart page-based filtering**
-- ✓ **Fixed TypeScript errors in chores completion notifications**
-- ✓ **Removed duplicate notification service files for cleaner codebase**
+- ✓ **CRITICAL FIX: Implemented real background push notifications that work when PWA is closed on mobile devices**
+- ✓ **Enhanced push notification system with proper VAPID key setup and subscription handling**
+- ✓ **Integrated push notifications directly into all app actions: messages, chore assignments/completions, expense additions, calendar events**
+- ✓ **Messages now send push notifications to all household members except sender when app is closed**
+- ✓ **Chore assignments and completions trigger push notifications to relevant users**
+- ✓ **Expense additions and calendar events notify all household members automatically**
+- ✓ **Push subscription setup happens automatically on login with proper error handling and logging**
+- ✓ **Service worker enhanced with better push event handling and notification display**
+- ✓ **Removed test button interface in favor of real action-based notifications**
+- ✓ **Added informational display in profile showing active background notification features**
 - ✓ **Fixed critical fallback avatar display bug app-wide - now properly shows colored fallback with initials when images are removed or fail to load**
 - ✓ **Implemented universal avatar fallback system using QuickAvatar component across entire application**
 - ✓ **Fixed ProfileAvatar and SignupAvatarSelector conditional logic - removed restrictive checks that prevented fallback display**

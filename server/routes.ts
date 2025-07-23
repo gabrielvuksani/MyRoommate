@@ -248,6 +248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/chores/:id', isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.id;
       const { id } = req.params;
       const updates = req.body;
       
@@ -261,6 +262,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const chore = await storage.updateChore(id, processedUpdates);
+
+      // Send push notification for chore completion
+      if (processedUpdates.status === 'done' || processedUpdates.completedAt) {
+        const membership = await storage.getUserHousehold(userId);
+        if (membership) {
+          const householdMembers = await storage.getHouseholdMembers(membership.household.id);
+          const completer = await storage.getUser(userId);
+          const completerName = completer ? `${completer.firstName || 'Someone'}` : 'Someone';
+          
+          const pushPayload = {
+            title: '✅ Chore Completed',
+            body: `${completerName} completed: ${chore.title}`,
+            icon: '/icon-192x192.png',
+            badge: '/icon-72x72.png',
+            tag: 'chore-completed',
+            data: {
+              type: 'chore',
+              choreId: chore.id,
+              url: '/chores'
+            }
+          };
+
+          for (const member of householdMembers) {
+            if (member.userId !== userId) { // Don't notify the completer
+              sendPushNotification(member.userId, pushPayload)
+                .then(sent => {
+                  if (sent) {
+                    console.log(`Chore completion push notification sent to user: ${member.userId}`);
+                  }
+                })
+                .catch(error => console.error('Error sending chore completion push notification:', error));
+            }
+          }
+        }
+      }
+
       res.json(chore);
     } catch (error) {
       console.error("Error updating chore:", error);
@@ -1091,6 +1128,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
               
               console.log(`Broadcasted to ${successfulBroadcasts} clients, cleaned ${deadConnections.size} dead connections`);
+            }
+
+            // Send push notifications to all household members except the sender (background notifications)
+            const householdMembers = await storage.getHouseholdMembers(msgHouseholdId);
+            const senderName = cachedUser ? `${cachedUser.firstName || 'Someone'}` : 'Someone';
+            const pushPayload = {
+              title: `💬 ${senderName}`,
+              body: content.length > 50 ? content.substring(0, 50) + '...' : content,
+              icon: '/icon-192x192.png',
+              badge: '/icon-72x72.png',
+              tag: 'new-message',
+              data: {
+                type: 'message',
+                messageId: newMessage.id,
+                householdId: msgHouseholdId,
+                url: '/messages'
+              }
+            };
+
+            for (const member of householdMembers) {
+              if (member.userId !== msgUserId) { // Don't notify the sender
+                sendPushNotification(member.userId, pushPayload)
+                  .then(sent => {
+                    if (sent) {
+                      console.log(`Message push notification sent to user: ${member.userId}`);
+                    }
+                  })
+                  .catch(error => console.error('Error sending message push notification:', error));
+              }
             }
             
             // Performance tracking

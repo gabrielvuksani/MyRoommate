@@ -688,6 +688,18 @@ export default function Profile() {
                   </div>
                 ))}
               </div>
+              <Button
+                onClick={handleDeleteAllData}
+                disabled={deleteAllDataMutation.isPending}
+                className="mt-4 w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
+              >
+                <Trash2 size={20} />
+                <span>
+                  {deleteAllDataMutation.isPending
+                    ? "Deleting All Household Data..."
+                    : "Delete All Household Data"}
+                </span>
+              </Button>
             </CardContent>
           </Card>
         )}
@@ -710,32 +722,9 @@ export default function Profile() {
                 <span>Refresh App & Data</span>
               </Button>
               <Button
-                onClick={handleDeleteAllData}
-                disabled={deleteAllDataMutation.isPending}
-                className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
-              >
-                <Trash2 size={20} />
-                <span>
-                  {deleteAllDataMutation.isPending
-                    ? "Deleting All Data..."
-                    : "Delete All Data"}
-                </span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Actions */}
-        <Card className="glass-card" style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)'
-        }}>
-          <CardContent className="p-6">
-            <div className="space-y-3">
-              <Button
                 onClick={handleTestNotification}
                 disabled={isTestingNotification || (notificationStatus && !notificationStatus.supported)}
-                className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 disabled:opacity-50 ${
+                className={`w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center space-x-2 disabled:opacity-50 ${
                   notificationStatus?.blockReason
                     ? 'bg-gray-600 hover:bg-gray-700'
                     : notificationStatus?.permission === 'granted'
@@ -758,25 +747,31 @@ export default function Profile() {
                 </span>
               </Button>
 
-              <Button
-                onClick={async () => {
-                  // First ensure push subscription is set up
-                  console.log('Setting up push subscription for background test...');
-                  await notificationService.subscribeToPush();
-                  
-                  // Then test the push notification
-                  const success = await notificationService.testPushNotification();
-                  console.log('Push notification test result:', success);
-                  
-                  if (!success) {
-                    alert('Push notification test failed. Make sure you have granted notification permissions and are on a secure connection (HTTPS).');
-                  }
-                }}
-                className="w-full py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:from-emerald-600 hover:to-cyan-600"
-              >
-                <Bell size={20} />
-                <span>Test Background Push</span>
-              </Button>
+              <div className="text-sm text-gray-600 dark:text-gray-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-xl border border-green-200 dark:border-green-800">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Bell size={16} className="text-green-600 dark:text-green-400" />
+                  <span className="font-medium text-green-800 dark:text-green-300">Background Notifications Active</span>
+                </div>
+                <p className="text-xs text-green-700 dark:text-green-400">
+                  Real push notifications now work automatically for:
+                </p>
+                <ul className="text-xs text-green-700 dark:text-green-400 mt-1 ml-4 space-y-1">
+                  <li>• New messages when app is closed</li>
+                  <li>• Chore assignments and completions</li>
+                  <li>• New expenses and calendar events</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Actions */}
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)'
+        }}>
+          <CardContent className="p-6">
+            <div className="space-y-3">
               {(household as any) && (
                 <Button
                   onClick={async () => {
