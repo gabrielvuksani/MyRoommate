@@ -36,8 +36,8 @@ export function ProfileColorPicker({
       <p className="text-sm font-medium text-center" style={{ color: 'var(--text-primary)' }}>
         Avatar Color
       </p>
-      <div className="w-full">
-        <div className={`grid gap-4 w-full ${fullWidth ? 'grid-cols-8' : 'grid-cols-4'}`}>
+      <div className="w-full flex justify-center">
+        <div className={`grid gap-4 ${fullWidth ? 'grid-cols-8 w-full' : 'grid-cols-4 w-auto'}`}>
           {colorOptions.map((color) => (
             <button
               key={color.name}

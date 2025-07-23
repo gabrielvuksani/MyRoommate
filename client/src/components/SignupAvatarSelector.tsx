@@ -41,10 +41,14 @@ export function SignupAvatarSelector({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   
-  // Effect to sync imagePreviewUrl with profileImage prop
+  // Effect to sync imagePreviewUrl with profileImage prop and ensure fallback display
   React.useEffect(() => {
     if (!profileImage && imagePreviewUrl) {
       URL.revokeObjectURL(imagePreviewUrl);
+      setImagePreviewUrl(null);
+    }
+    // Force re-render when profileImage is removed to show fallback immediately
+    if (!profileImage) {
       setImagePreviewUrl(null);
     }
   }, [profileImage, imagePreviewUrl]);
@@ -92,6 +96,11 @@ export function SignupAvatarSelector({
     if (fileInput) {
       fileInput.value = '';
     }
+    
+    // Force immediate fallback display
+    setTimeout(() => {
+      setImagePreviewUrl(null);
+    }, 0);
   };
 
   if (compact) {
@@ -101,7 +110,7 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {imagePreviewUrl ? (
+              {imagePreviewUrl && profileImage ? (
                 <AvatarImage 
                   src={imagePreviewUrl} 
                   alt="Profile preview"
@@ -311,13 +320,17 @@ export function SignupAvatarSelector({
 
           {/* Color picker */}
           {showColorPicker && (
-            <div className="pt-2 w-full -mx-4 px-4">
-              <ProfileColorPicker
-                selectedColor={profileColor}
-                onColorChange={onColorChange}
-                size="md"
-                fullWidth={true}
-              />
+            <div className="pt-3 w-full">
+              <div className="flex justify-center">
+                <div className="px-4">
+                  <ProfileColorPicker
+                    selectedColor={profileColor}
+                    onColorChange={onColorChange}
+                    size="md"
+                    fullWidth={false}
+                  />
+                </div>
+              </div>
             </div>
           )}
         </div>

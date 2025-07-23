@@ -70,7 +70,10 @@ export function ProfileAvatar({
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate all user-related queries for real-time updates everywhere
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/households/current'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       setShowUploadOptions(false);
       setImageRemoved(false); // Reset after successful deletion
     },
@@ -98,7 +101,10 @@ export function ProfileAvatar({
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate all user-related queries for real-time updates everywhere
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/households/current'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       setShowUploadOptions(false);
       setUploading(false);
       setLocalImageUrl(null); // Clear local preview after successful upload
@@ -130,12 +136,15 @@ export function ProfileAvatar({
       return apiRequest('PATCH', '/api/user', { profileColor: color });
     },
     onSuccess: () => {
+      // Invalidate all user-related queries for real-time updates everywhere
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       queryClient.invalidateQueries({ queryKey: ['/api/households/current'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       setShowColorPicker(false);
       // Reset success state after 2 seconds
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/households/current'] });
       }, 2000);
     },
     onError: (error) => {
@@ -172,7 +181,10 @@ export function ProfileAvatar({
     // Immediately show fallback for real-time feedback
     setImageRemoved(true);
     setLocalImageUrl(null);
-    deleteMutation.mutate();
+    // Force React to re-render with fallback immediately
+    setTimeout(() => {
+      deleteMutation.mutate();
+    }, 0);
   };
 
   const handleColorChange = (color: string) => {
@@ -192,11 +204,16 @@ export function ProfileAvatar({
   return (
     <div className="relative inline-block">
       <Avatar className={`${sizeClasses[size]} ${className}`}>
-        {displayImageUrl ? (
+        {displayImageUrl && !imageRemoved ? (
           <AvatarImage 
             src={displayImageUrl} 
             alt={`${user.firstName || user.email}'s profile`}
             className="object-cover"
+            onError={() => {
+              // If image fails to load, show fallback
+              setImageRemoved(true);
+              setLocalImageUrl(null);
+            }}
           />
         ) : (
           <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[colorKey]} text-white font-bold border-0`}>
