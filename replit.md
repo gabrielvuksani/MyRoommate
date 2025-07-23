@@ -111,14 +111,19 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 23, 2025 (Latest):**
-- ✓ **Created unified signup form layout integrating profile picture with name fields**
-- ✓ Enhanced SignupAvatarSelector component with compact mode for better space utilization
-- ✓ Added side-by-side layout with avatar preview on left and name fields on right
-- ✓ Updated ProfileAvatar dropdowns to match established glass morphism design language
-- ✓ Added real-time visual feedback with success/error states for color updates and auto-reset timeouts
-- ✓ Enhanced updateColorMutation with proper cache invalidation across all app instances
-- ✓ Replaced hardcoded home page header avatar with universal ProfileAvatar system
-- ✓ Applied consistent design styling throughout avatar editing interface with glass morphism effects
+- ✓ **Centered avatar color picker alignment for premium visual appeal**
+- ✓ **Enhanced SignupAvatarSelector with improved styling and glass morphism design language**
+- ✓ **Completely removed "what should we call you" step from onboarding for streamlined user experience**
+- ✓ **Fixed profile image upload functionality in both signup form and profile page**
+- ✓ **Implemented real-time avatar updates when changing colors or names in signup form**
+- ✓ Fixed photo upload in signup form to prevent form validation trigger - now prevents event propagation
+- ✓ Restored profile page upload photo button functionality with proper event handling
+- ✓ Updated userUtils.ts navigation logic to skip removed step 2 completely
+- ✓ Enhanced all upload/color buttons to match established glass morphism UI design language
+- ✓ Applied consistent "type=button" and event prevention to all form buttons to prevent unwanted submissions
+- ✓ Updated step indicators in onboarding to show only 3 steps (1, 3, 4) instead of 4
+- ✓ ProfileColorPicker now centers avatar colors with proper grid alignment for premium look
+- ✓ All avatar selector buttons now prevent form submission and use proper glass morphism styling
 
 **July 19, 2025 (Earlier - Part 4):**
 - ✓ **Completed full Supabase migration with proper PostgreSQL driver (pg instead of neon-serverless)**

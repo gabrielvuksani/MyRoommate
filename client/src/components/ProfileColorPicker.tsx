@@ -27,24 +27,26 @@ const sizeClasses = {
 export function ProfileColorPicker({ selectedColor, onColorChange, size = 'md' }: ProfileColorPickerProps) {
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+      <p className="text-sm font-medium text-center" style={{ color: 'var(--text-primary)' }}>
         Avatar Color
       </p>
-      <div className="grid grid-cols-4 gap-3">
-        {colorOptions.map((color) => (
-          <button
-            key={color.name}
-            onClick={() => onColorChange(color.name)}
-            className={`${sizeClasses[size]} ${color.bg} rounded-full relative transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-            title={color.name}
-          >
-            {selectedColor === color.name && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Check size={size === 'sm' ? 14 : size === 'md' ? 16 : 18} className="text-white drop-shadow-lg" />
-              </div>
-            )}
-          </button>
-        ))}
+      <div className="flex justify-center">
+        <div className="grid grid-cols-4 gap-3 max-w-fit">
+          {colorOptions.map((color) => (
+            <button
+              key={color.name}
+              onClick={() => onColorChange(color.name)}
+              className={`${sizeClasses[size]} ${color.bg} rounded-full relative transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+              title={color.name}
+            >
+              {selectedColor === color.name && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Check size={size === 'sm' ? 14 : size === 'md' ? 16 : 18} className="text-white drop-shadow-lg" />
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -44,6 +44,9 @@ export function SignupAvatarSelector({
   const initials = getProfileInitials(firstName, lastName, email);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
     const file = event.target.files?.[0];
     if (file) {
       // Validate file type and size
@@ -61,6 +64,9 @@ export function SignupAvatarSelector({
       setImagePreviewUrl(previewUrl);
       onImageChange(file);
     }
+    
+    // Reset the input value to allow selecting the same file again
+    event.target.value = '';
   };
 
   const handleRemoveImage = () => {
@@ -92,7 +98,12 @@ export function SignupAvatarSelector({
             </Avatar>
             
             <button
-              onClick={() => document.getElementById('signup-avatar-input')?.click()}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('signup-avatar-input')?.click();
+              }}
               className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full p-0 shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
               style={{
                 background: 'var(--surface)',
@@ -118,7 +129,12 @@ export function SignupAvatarSelector({
         <div className="space-y-2">
           {imagePreviewUrl ? (
             <button 
-              onClick={handleRemoveImage}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleRemoveImage();
+              }}
               className="w-full flex items-center justify-center px-3 py-2 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] text-red-500 hover:text-red-600"
               style={{
                 background: 'var(--surface)',
@@ -130,7 +146,12 @@ export function SignupAvatarSelector({
             </button>
           ) : (
             <button 
-              onClick={() => document.getElementById('signup-avatar-input')?.click()}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('signup-avatar-input')?.click();
+              }}
               className="w-full flex items-center justify-center px-3 py-2 rounded-xl text-sm font-medium transition-all hover:scale-[1.02]"
               style={{
                 background: 'var(--surface)',
@@ -139,12 +160,17 @@ export function SignupAvatarSelector({
               }}
             >
               <Upload className="w-3 h-3 mr-2" />
-              Upload
+              Upload Photo
             </button>
           )}
           
           <button 
-            onClick={() => setShowColorPicker(!showColorPicker)}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowColorPicker(!showColorPicker);
+            }}
             className="w-full flex items-center justify-center px-3 py-2 rounded-xl text-sm font-medium transition-all hover:scale-[1.02]"
             style={{
               background: 'var(--surface)',
@@ -152,7 +178,7 @@ export function SignupAvatarSelector({
               border: '1px solid var(--border)'
             }}
           >
-            {showColorPicker ? 'Hide Colors' : 'Colors'}
+            {showColorPicker ? 'Hide Colors' : 'Choose Color'}
           </button>
         </div>
 

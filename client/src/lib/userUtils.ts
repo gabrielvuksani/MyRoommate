@@ -60,8 +60,8 @@ export function getUserFlags(user: any, household: any, isAuthenticated: boolean
  * @returns Whether the step should be shown
  */
 export function shouldShowOnboardingStep(stepNumber: number, isNewUser: boolean): boolean {
-  if (stepNumber === 2) return isNewUser; // Only new signups see name entry step
-  return true; // All other steps visible to both user types
+  // Step 2 (name entry) has been removed - all users use their signup names
+  return stepNumber !== 2;
 }
 
 /**
@@ -72,11 +72,11 @@ export function shouldShowOnboardingStep(stepNumber: number, isNewUser: boolean)
  * @returns Next step number or navigation instruction
  */
 export function getNextOnboardingStep(currentStep: number, isNewUser: boolean, isReturningUser: boolean): number {
-  if (currentStep === 1 && isReturningUser) {
-    // Returning users skip name step and go directly to household choice
+  // Skip step 2 entirely - go directly from step 1 to step 3
+  if (currentStep === 1) {
     return 3;
-  } else if (currentStep < 4) {
-    return currentStep + 1;
+  } else if (currentStep === 3) {
+    return 4;
   }
   return currentStep;
 }
@@ -88,9 +88,11 @@ export function getNextOnboardingStep(currentStep: number, isNewUser: boolean, i
  * @returns Previous step number
  */
 export function getPreviousOnboardingStep(currentStep: number, isReturningUser: boolean): number {
-  if (currentStep === 3 && isReturningUser) {
-    // Returning users go back to step 1 (skip name step)
+  // Skip step 2 entirely - go directly from step 3 back to step 1
+  if (currentStep === 3) {
     return 1;
+  } else if (currentStep === 4) {
+    return 3;
   } else if (currentStep > 1) {
     return currentStep - 1;
   }

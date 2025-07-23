@@ -118,6 +118,7 @@ export function ProfileAvatar({
   });
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
     const file = event.target.files?.[0];
     if (file) {
       // Validate file type and size
@@ -133,6 +134,8 @@ export function ProfileAvatar({
       setUploading(true);
       uploadMutation.mutate(file);
     }
+    // Reset the input value to allow selecting the same file again
+    event.target.value = '';
   };
 
   const handleRemoveImage = () => {

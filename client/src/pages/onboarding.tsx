@@ -214,85 +214,6 @@ export default function Onboarding() {
           </Card>
         )}
 
-        {/* Step 2: Name Selection - Only for new signups */}
-        {step === 2 && isNewUser && (
-          <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
-            <CardContent className="p-8 flex flex-col">
-            <div className="text-center mb-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/25">
-                <User size={32} className="text-white" />
-              </div>
-              <h1 className="font-bold text-[22px] leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>What should we call you?</h1>
-              <p className="text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>Choose how you'd like to appear to your roommates</p>
-            </div>
-
-            <div className="space-y-4 mb-8">
-              <div>
-                <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
-                  First Name
-                </label>
-                <Input
-                  placeholder="Enter your first name"
-                  value={userData.firstName}
-                  onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
-                  className="w-full h-12 rounded-xl border-0 backdrop-blur-sm shadow-sm"
-                  style={{ 
-                    background: 'var(--surface-secondary)',
-                    color: 'var(--text-primary)'
-                  }}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
-                  Last Name
-                </label>
-                <Input
-                  placeholder="Enter your last name"
-                  value={userData.lastName}
-                  onChange={(e) => setUserData({ ...userData, lastName: e.target.value })}
-                  className="w-full h-12 rounded-xl border-0 backdrop-blur-sm shadow-sm"
-                  style={{ 
-                    background: 'var(--surface-secondary)',
-                    color: 'var(--text-primary)'
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="flex space-x-3">
-              {isNewUser && (
-                <Button
-                  onClick={handleBack}
-                  className="flex-1 h-12 border-0 rounded-2xl transition-all btn-animated hover:scale-[1.02]"
-                  style={{
-                    background: 'var(--surface-secondary)',
-                    color: 'var(--text-secondary)',
-                    border: '1px solid var(--border)',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-                  }}
-                >
-                  Back
-                </Button>
-              )}
-              <Button
-                onClick={handleNext}
-                disabled={!userData.firstName.trim() || updateUserMutation.isPending}
-                className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold btn-animated rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
-              >
-                {updateUserMutation.isPending ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Saving...</span>
-                  </div>
-                ) : (
-                  "Continue"
-                )}
-              </Button>
-            </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Step 3: Household Setup */}
         {step === 3 && (
           <Card className="glass-card page-enter" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
@@ -596,11 +517,11 @@ export default function Onboarding() {
           </Card>
         )}
 
-        {/* Step indicator */}
+        {/* Step indicator - Only shows 3 steps (1, 3, 4) since step 2 was removed */}
         <div className="flex justify-center mt-8 space-x-3">
           {(() => {
-            // Get visible steps based on user type
-            const visibleSteps = isNewUser ? [1, 2, 3, 4] : [1, 3, 4];
+            // Get visible steps - now only [1, 3, 4] for all users
+            const visibleSteps = [1, 3, 4];
             
             // Map current step to indicator position
             const currentIndicatorPosition = visibleSteps.indexOf(step) + 1;
