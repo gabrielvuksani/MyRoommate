@@ -262,68 +262,78 @@ export default function AuthPage() {
                     {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                   </div>
 
-                  {/* Names (Register only) */}
+                  {/* Names and Profile Picture (Register only) */}
                   {!isLogin && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                          First Name *
-                        </label>
-                        <Input
-                          type="text"
-                          placeholder="John"
-                          value={formData.firstName}
-                          onChange={(e) => updateFormData("firstName", e.target.value)}
-                          className={`input-modern h-12 ${errors.firstName ? 'border-red-500 focus:border-red-500' : ''}`}
-                          style={{
-                            background: 'var(--surface)',
-                            borderColor: errors.firstName ? '#ef4444' : 'var(--border)',
-                            borderRadius: 'var(--radius-md)',
-                            padding: '16px 20px',
-                            fontSize: '16px',
-                            color: 'var(--text-primary)',
-                            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
-                          }}
-                        />
-                        {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+                    <div className="space-y-4">
+                      {/* Unified Profile Section */}
+                      <div className="rounded-2xl p-4" style={{ 
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)'
+                      }}>
+                        <div className="flex items-start space-x-4">
+                          {/* Profile Picture */}
+                          <div className="flex-shrink-0">
+                            <SignupAvatarSelector
+                              firstName={formData.firstName}
+                              lastName={formData.lastName}
+                              email={formData.email}
+                              profileColor={formData.profileColor}
+                              profileImage={profileImage}
+                              onColorChange={(color) => updateFormData("profileColor", color)}
+                              onImageChange={setProfileImage}
+                              compact={true}
+                            />
+                          </div>
+                          
+                          {/* Name Fields */}
+                          <div className="flex-1 space-y-3">
+                            <div>
+                              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                                First Name *
+                              </label>
+                              <Input
+                                type="text"
+                                placeholder="John"
+                                value={formData.firstName}
+                                onChange={(e) => updateFormData("firstName", e.target.value)}
+                                className={`input-modern h-10 ${errors.firstName ? 'border-red-500 focus:border-red-500' : ''}`}
+                                style={{
+                                  background: 'var(--surface)',
+                                  borderColor: errors.firstName ? '#ef4444' : 'var(--border)',
+                                  borderRadius: 'var(--radius-md)',
+                                  padding: '12px 16px',
+                                  fontSize: '16px',
+                                  color: 'var(--text-primary)',
+                                  transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                                }}
+                              />
+                              {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                                Last Name *
+                              </label>
+                              <Input
+                                type="text"
+                                placeholder="Doe"
+                                value={formData.lastName}
+                                onChange={(e) => updateFormData("lastName", e.target.value)}
+                                className={`input-modern h-10 ${errors.lastName ? 'border-red-500 focus:border-red-500' : ''}`}
+                                style={{
+                                  background: 'var(--surface)',
+                                  borderColor: errors.lastName ? '#ef4444' : 'var(--border)',
+                                  borderRadius: 'var(--radius-md)',
+                                  padding: '12px 16px',
+                                  fontSize: '16px',
+                                  color: 'var(--text-primary)',
+                                  transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                                }}
+                              />
+                              {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                          Last Name *
-                        </label>
-                        <Input
-                          type="text"
-                          placeholder="Doe"
-                          value={formData.lastName}
-                          onChange={(e) => updateFormData("lastName", e.target.value)}
-                          className={`input-modern h-12 ${errors.lastName ? 'border-red-500 focus:border-red-500' : ''}`}
-                          style={{
-                            background: 'var(--surface)',
-                            borderColor: errors.lastName ? '#ef4444' : 'var(--border)',
-                            borderRadius: 'var(--radius-md)',
-                            padding: '16px 20px',
-                            fontSize: '16px',
-                            color: 'var(--text-primary)',
-                            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
-                          }}
-                        />
-                        {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Avatar Selector (Register only) */}
-                  {!isLogin && formData.firstName && formData.lastName && (
-                    <div className="mt-6">
-                      <SignupAvatarSelector
-                        firstName={formData.firstName}
-                        lastName={formData.lastName}
-                        email={formData.email}
-                        profileColor={formData.profileColor}
-                        profileImage={profileImage}
-                        onColorChange={(color) => updateFormData("profileColor", color)}
-                        onImageChange={setProfileImage}
-                      />
                     </div>
                   )}
 

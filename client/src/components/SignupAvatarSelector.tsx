@@ -14,6 +14,7 @@ interface SignupAvatarSelectorProps {
   profileImage: File | null;
   onColorChange: (color: string) => void;
   onImageChange: (file: File | null) => void;
+  compact?: boolean;
 }
 
 const gradientClasses = {
@@ -34,7 +35,8 @@ export function SignupAvatarSelector({
   profileColor,
   profileImage,
   onColorChange,
-  onImageChange
+  onImageChange,
+  compact = false
 }: SignupAvatarSelectorProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -68,6 +70,105 @@ export function SignupAvatarSelector({
     }
     onImageChange(null);
   };
+
+  if (compact) {
+    return (
+      <div className="space-y-3">
+        {/* Avatar Preview */}
+        <div className="flex justify-center">
+          <div className="relative">
+            <Avatar className="w-16 h-16">
+              {imagePreviewUrl ? (
+                <AvatarImage 
+                  src={imagePreviewUrl} 
+                  alt="Profile preview"
+                  className="object-cover"
+                />
+              ) : (
+                <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-lg border-0`}>
+                  {initials}
+                </AvatarFallback>
+              )}
+            </Avatar>
+            
+            <button
+              onClick={() => document.getElementById('signup-avatar-input')?.click()}
+              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full p-0 shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
+              style={{
+                background: 'var(--surface)',
+                border: '2px solid var(--surface)',
+                color: 'var(--text-secondary)'
+              }}
+            >
+              <Camera className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+
+        {/* Hidden file input */}
+        <input
+          id="signup-avatar-input"
+          type="file"
+          accept="image/*"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+
+        {/* Compact action buttons */}
+        <div className="space-y-2">
+          {imagePreviewUrl ? (
+            <button 
+              onClick={handleRemoveImage}
+              className="w-full flex items-center justify-center px-3 py-2 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] text-red-500 hover:text-red-600"
+              style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)'
+              }}
+            >
+              <X className="w-3 h-3 mr-2" />
+              Remove
+            </button>
+          ) : (
+            <button 
+              onClick={() => document.getElementById('signup-avatar-input')?.click()}
+              className="w-full flex items-center justify-center px-3 py-2 rounded-xl text-sm font-medium transition-all hover:scale-[1.02]"
+              style={{
+                background: 'var(--surface)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border)'
+              }}
+            >
+              <Upload className="w-3 h-3 mr-2" />
+              Upload
+            </button>
+          )}
+          
+          <button 
+            onClick={() => setShowColorPicker(!showColorPicker)}
+            className="w-full flex items-center justify-center px-3 py-2 rounded-xl text-sm font-medium transition-all hover:scale-[1.02]"
+            style={{
+              background: 'var(--surface)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border)'
+            }}
+          >
+            {showColorPicker ? 'Hide Colors' : 'Colors'}
+          </button>
+        </div>
+
+        {/* Color picker */}
+        {showColorPicker && (
+          <div className="pt-2">
+            <ProfileColorPicker
+              selectedColor={profileColor}
+              onColorChange={onColorChange}
+              size="sm"
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <Card className="glass-card">
