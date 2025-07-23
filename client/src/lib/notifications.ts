@@ -46,40 +46,80 @@ export class NotificationService {
   private async registerServiceWorker(): Promise<void> {
     if ('serviceWorker' in navigator) {
       try {
-        // Force service worker update on every load for reliability
+        // Enhanced iOS PWA registration with update handling
         this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js', {
           updateViaCache: 'none'
+        });
+        
+        // Handle service worker updates immediately (iOS requirement)
+        this.serviceWorkerRegistration.addEventListener('updatefound', () => {
+          const newWorker = this.serviceWorkerRegistration?.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New service worker is ready - skip waiting for iOS compatibility
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          }
+        });
+
+        // Listen for service worker controller change (iOS PWA critical)
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          // Force reload to ensure proper PWA functionality on iOS
+          window.location.reload();
         });
         
         // Wait for service worker to be ready and active
         await navigator.serviceWorker.ready;
         
-        // Ensure service worker is controlling the page
+        // iOS-specific: Ensure service worker is controlling the page
         if (!navigator.serviceWorker.controller) {
-          // Reload to ensure service worker controls the page
+          // Critical for iOS PWA - must have controlling service worker
+          console.log('Service worker not controlling page - reloading for iOS PWA');
           window.location.reload();
           return;
         }
         
-        // Set up push subscription with retry mechanism
+        // Set up push subscription with enhanced iOS compatibility
         await this.setupPushSubscriptionWithRetry();
+        
+        // Set up message listener for notification clicks
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data?.type === 'NOTIFICATION_CLICKED') {
+            // Handle notification clicks from service worker
+            const { url, data } = event.data;
+            if (url && url !== '/') {
+              window.location.href = url;
+            }
+          }
+        });
+        
       } catch (error) {
-        // Silent fail but retry after delay
-        setTimeout(() => this.registerServiceWorker(), 2000);
+        console.error('Service worker registration failed:', error);
+        // Retry after delay for iOS reliability
+        setTimeout(() => this.registerServiceWorker(), 3000);
       }
     }
   }
 
   private async setupPushSubscriptionWithRetry(): Promise<void> {
-    let retries = 3;
+    let retries = 5; // More retries for iOS PWA reliability
     while (retries > 0) {
       try {
         await this.setupPushSubscription();
         return;
       } catch (error) {
         retries--;
-        if (retries > 0) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+        console.error(`Push subscription setup failed, ${retries} retries left:`, error);
+        if (retries === 0) {
+          console.error('Failed to set up push subscription after all retries');
+          // For iOS, try one more time with longer delay
+          setTimeout(() => this.setupPushSubscription().catch(() => {}), 5000);
+          return;
+        } else {
+          // Exponential backoff for iOS reliability
+          await new Promise(resolve => setTimeout(resolve, (6 - retries) * 1000));
         }
       }
     }

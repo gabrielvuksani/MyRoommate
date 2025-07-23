@@ -318,8 +318,9 @@ export class EnterpriseNotificationService {
         });
 
         // Clean up inactive subscriptions
-        for (const [userId, userSubs] of this.subscriptions.entries()) {
-          const activeSubs = userSubs.filter(sub => {
+        const subscriptionEntries = Array.from(this.subscriptions.entries());
+        for (const [userId, userSubs] of subscriptionEntries) {
+          const activeSubs = userSubs.filter((sub: StoredSubscription) => {
             if (!sub.isActive && sub.lastUsed < thirtyDaysAgo) {
               return false; // Remove very old inactive subscriptions
             }

@@ -1,12 +1,18 @@
 // Service Worker for myRoommate PWA
 // Handles background push notifications, caching, and offline functionality
 
-const CACHE_NAME = 'myroommate-v1';
+const CACHE_NAME = 'myroommate-enterprise-v1';
 const STATIC_CACHE_URLS = [
   '/',
   '/auth',
-  '/manifest.json'
+  '/manifest.json',
+  '/icon-192x192.png',
+  '/icon-512x512.png'
 ];
+
+// Enhanced iOS compatibility and background sync
+const isIOSDevice = /iPad|iPhone|iPod/.test(self.navigator.userAgent || '');
+let notificationPermissionGranted = false;
 
 // Install event - cache static resources
 self.addEventListener('install', (event) => {
@@ -32,7 +38,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Push event - handle background push notifications
+// Enhanced push event handler for iOS background notifications
 self.addEventListener('push', (event) => {
   let notificationData = {};
   
@@ -41,6 +47,7 @@ self.addEventListener('push', (event) => {
       notificationData = event.data.json();
     }
   } catch (error) {
+    // Fallback notification
     notificationData = {
       title: 'myRoommate',
       body: 'You have a new notification',
@@ -48,62 +55,141 @@ self.addEventListener('push', (event) => {
     };
   }
 
+  // Enhanced iOS-compatible notification options
   const options = {
     body: notificationData.body || 'You have a new notification',
     icon: notificationData.icon || '/icon-192x192.png',
-    badge: '/icon-72x72.png',
-    tag: notificationData.tag || Date.now().toString(), // Unique tag for each notification
-    data: notificationData.data || {},
+    badge: notificationData.badge || '/icon-72x72.png',
+    tag: notificationData.tag || `notification-${Date.now()}`,
+    data: notificationData.data || { url: '/' },
     requireInteraction: true,
-    vibrate: [300, 100, 300, 100, 300],
     silent: false,
     renotify: true,
     timestamp: Date.now(),
     dir: 'ltr',
     lang: 'en',
-    actions: [
+    actions: notificationData.actions || [
       {
         action: 'open',
-        title: 'Open App'
+        title: 'Open App',
+        icon: '/icon-72x72.png'
       }
     ]
   };
 
-  // Always show notification immediately
+  // iOS-specific enhancements
+  if (isIOSDevice) {
+    options.vibrate = [200, 100, 200];
+    options.requireInteraction = true;
+    // Force immediate display on iOS
+    options.tag = `ios-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  } else {
+    options.vibrate = [300, 100, 300, 100, 300];
+  }
+
+  // Enhanced promise handling for iOS reliability
   event.waitUntil(
-    Promise.resolve(
+    new Promise((resolve, reject) => {
+      // Force immediate notification display
       self.registration.showNotification(
         notificationData.title || 'myRoommate',
         options
-      )
-    )
+      ).then(() => {
+        // Keep service worker alive for iOS
+        setTimeout(resolve, 100);
+      }).catch((error) => {
+        console.error('Notification display failed:', error);
+        resolve(); // Don't fail the entire event
+      });
+    })
   );
 });
 
-// Notification click event - handle user interaction
+// Enhanced notification click handler for iOS PWA compatibility
 self.addEventListener('notificationclick', (event) => {
-  console.log('Notification clicked:', event.notification.tag);
-  
   event.notification.close();
 
-  if (event.action === 'dismiss') {
+  const notificationData = event.notification.data || {};
+  const urlToOpen = notificationData.url || '/';
+  const action = event.action;
+
+  // Skip if dismiss action
+  if (action === 'dismiss') {
     return;
   }
 
-  // Focus or open the app when notification is clicked
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clients) => {
-        // Try to focus existing window
-        for (const client of clients) {
-          if (client.url.includes(self.location.origin)) {
-            return client.focus();
+    (async () => {
+      try {
+        // Get all window clients
+        const windowClients = await self.clients.matchAll({ 
+          type: 'window', 
+          includeUncontrolled: true 
+        });
+
+        // iOS-specific handling for PWA focus
+        if (isIOSDevice) {
+          // On iOS, always try to focus existing client first
+          for (const client of windowClients) {
+            if (client.url.includes(self.location.origin)) {
+              try {
+                await client.focus();
+                // Send navigation message to existing client
+                client.postMessage({
+                  type: 'NOTIFICATION_CLICKED',
+                  data: notificationData,
+                  action: action,
+                  url: urlToOpen
+                });
+                return;
+              } catch (error) {
+                console.error('Focus failed on iOS:', error);
+              }
+            }
+          }
+        } else {
+          // Standard handling for other platforms
+          for (const client of windowClients) {
+            if (client.url.includes(self.location.origin)) {
+              try {
+                await client.focus();
+                return;
+              } catch (error) {
+                console.error('Focus failed:', error);
+              }
+            }
           }
         }
         
-        // Open new window if none exists
-        return self.clients.openWindow('/');
-      })
+        // If no existing window or focus failed, open new window
+        if (self.clients.openWindow) {
+          try {
+            const newClient = await self.clients.openWindow(urlToOpen);
+            // Send notification data to new window after it loads
+            if (newClient) {
+              setTimeout(() => {
+                newClient.postMessage({
+                  type: 'NOTIFICATION_CLICKED',
+                  data: notificationData,
+                  action: action,
+                  url: urlToOpen
+                });
+              }, 1500); // Wait longer for client to fully load
+            }
+          } catch (error) {
+            console.error('Failed to open window:', error);
+            // Fallback - try to open root
+            try {
+              await self.clients.openWindow('/');
+            } catch (fallbackError) {
+              console.error('Fallback window open failed:', fallbackError);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Notification click handler error:', error);
+      }
+    })()
   );
 });
 
