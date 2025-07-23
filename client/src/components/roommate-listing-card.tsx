@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Home, User, DollarSign, Star } from "lucide-react";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
+import { QuickAvatar } from "@/components/ProfileAvatar";
 import { format } from "date-fns";
 import { useLocation } from "wouter";
 import { memo } from "react";
@@ -103,9 +104,11 @@ function RoommateListingCard({ listing, onContact, compact = false }: RoommateLi
           {/* Creator Info and Contact */}
           <div className="flex items-center justify-between pt-2" style={{ borderTop: '1px solid var(--border)' }}>
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white text-xs font-semibold">
-                {getProfileInitials(listing.creator?.firstName, listing.creator?.lastName, listing.creator?.email)}
-              </div>
+              <QuickAvatar 
+                user={listing.creator} 
+                size="sm" 
+                gradientType="blue"
+              />
               <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 {formatDisplayName(listing.creator?.firstName, listing.creator?.lastName, "Host")}
               </span>

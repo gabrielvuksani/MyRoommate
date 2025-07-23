@@ -27,6 +27,7 @@ import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
+import { QuickAvatar } from "@/components/ProfileAvatar";
 
 export default function ListingDetail() {
   const [match, params] = useRoute("/listings/:id");
@@ -155,7 +156,7 @@ export default function ListingDetail() {
                   
                   {/* Image Indicators */}
                   <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-2">
-                    {typedListing.images.map((_, index: number) => (
+                    {typedListing.images.map((_: any, index: number) => (
                       <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
@@ -375,9 +376,11 @@ export default function ListingDetail() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium">
-                    {getProfileInitials(typedListing.creator.firstName, typedListing.creator.lastName, typedListing.creator.email)}
-                  </div>
+                  <QuickAvatar 
+                    user={typedListing.creator} 
+                    size="lg" 
+                    gradientType="blue"
+                  />
                   <div>
                     <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
                       Posted by {formatDisplayName(typedListing.creator.firstName, typedListing.creator.lastName, "User")}
