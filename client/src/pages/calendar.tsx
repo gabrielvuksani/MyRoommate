@@ -54,7 +54,10 @@ export default function Calendar() {
       
       // Send notification for new calendar event
       if (eventData && eventData.title && eventData.startDate) {
-        notificationService.showCalendarNotification(eventData.title, eventData.startDate);
+        console.log('Attempting to show calendar notification:', { title: eventData.title, startDate: eventData.startDate });
+        notificationService.showCalendarNotification(eventData.title, eventData.startDate)
+          .then(success => console.log('Calendar notification result:', success))
+          .catch(error => console.error('Calendar notification error:', error));
       }
       
       setIsCreateOpen(false);
