@@ -9,7 +9,7 @@ import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { QuickAvatar } from "@/components/ProfileAvatar";
 import { notificationService } from "@/lib/notifications";
-import { useWebSocketNotifications } from "@/hooks/use-websocket-notifications";
+import { useUnifiedNotifications } from "@/hooks/use-unified-notifications";
 import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
@@ -56,12 +56,8 @@ export default function Messages() {
   const queryClient = useQueryClient();
   const { keyboardHeight, isKeyboardVisible } = useKeyboardHeight();
   
-  // Use WebSocket notifications instead of polling
-  const { isConnected: notificationConnected } = useWebSocketNotifications({
-    user,
-    household,
-    enabled: !!user?.id && !!household?.id
-  });
+  // Unified notification system - handles ALL notifications when app is closed
+  const { isReady } = useUnifiedNotifications();
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -72,12 +68,12 @@ export default function Messages() {
   const { data: serverMessages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household && !!user,
-    refetchInterval: false, // Completely disable polling - WebSocket only
+    refetchInterval: false,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: false,
-    staleTime: Infinity, // Never auto-refetch, only via WebSocket updates
+    staleTime: Infinity,
     gcTime: 30 * 60 * 1000,
-    retry: 1,
+    retry: false,
   });
 
   // Use server messages directly for reliable message display
@@ -129,20 +125,9 @@ export default function Messages() {
           return updatedMessages;
         });
         
-        // Send notification for new messages (only if not from current user)
-        if (data.message && data.message.userId !== user?.id) {
-          const userName = formatDisplayName(data.message.user?.firstName || null, data.message.user?.lastName || null);
-          const householdName = household?.name;
-          console.log('Attempting to show notification for message from:', userName);
-          notificationService.showMessageNotification(userName, data.message.content || '', householdName)
-            .then(success => console.log('Message notification result:', success))
-            .catch(error => console.error('Message notification error:', error));
-        }
+        // Unified notification system handles all notifications via WebSocket
         
-        queryClient.invalidateQueries({ 
-          queryKey: ["/api/messages"], 
-          refetchType: 'active' 
-        });
+        // No need to invalidate - cache updated directly via WebSocket
         
         requestAnimationFrame(() => {
           setTimeout(() => {
