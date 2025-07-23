@@ -186,41 +186,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       if (error) throw error;
     },
-    onError: (error: Error) => {
-      console.error('Password reset failed:', error.message);
-    },
-  });
-
-  const signInWithGoogleMutation = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-      if (error) throw error;
-      return data;
-    },
-    onError: (error: Error) => {
-      console.error('Google sign-in failed:', error.message);
-    },
-  });
-
-  const signInWithAppleMutation = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-      if (error) throw error;
-      return data;
-    },
-    onError: (error: Error) => {
-      console.error('Apple sign-in failed:', error.message);
-    },
   });
 
   const resetPasswordMutation = useMutation({
