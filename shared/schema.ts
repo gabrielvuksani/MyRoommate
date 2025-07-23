@@ -36,6 +36,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  profileColor: varchar("profile_color").default('blue'),
   verified: boolean("verified").default(false),
   verificationToken: varchar("verification_token"),
   phoneNumber: varchar("phone_number"),

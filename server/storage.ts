@@ -38,7 +38,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: User): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
-  updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
+  updateUser(id: string, updates: Partial<InsertUser>): Promise<User | undefined>;
   updateUserProfileImage(id: string, profileImageUrl: string | null): Promise<User | undefined>;
   
   // Household operations
@@ -123,7 +123,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
+  async updateUser(id: string, updates: Partial<InsertUser>): Promise<User | undefined> {
     const [user] = await db
       .update(users)
       .set({
@@ -595,6 +595,7 @@ export class DatabaseStorage implements IStorage {
         firstName: "Anonymous",
         lastName: "User",
         profileImageUrl: null,
+        profileColor: "blue",
         verified: false,
         verificationToken: null,
         phoneNumber: null,
@@ -657,6 +658,7 @@ export class DatabaseStorage implements IStorage {
         firstName: "Anonymous",
         lastName: "User",
         profileImageUrl: null,
+        profileColor: "blue",
         verified: false,
         verificationToken: null,
         phoneNumber: null,

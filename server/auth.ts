@@ -181,6 +181,7 @@ export function setupAuth(app: Express) {
         verified: true, // Auto-verify for now
         idVerified: false,
         profileImageUrl: null,
+        profileColor: 'blue', // Default avatar color
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -272,6 +273,42 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     res.json(req.user);
+  });
+
+  // Update user profile
+  app.patch("/api/user", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const user = req.user as Express.User;
+      const allowedFields = ['firstName', 'lastName', 'profileColor'];
+      const updateData: any = {};
+      
+      // Only allow specific fields to be updated
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) {
+          updateData[field] = req.body[field];
+        }
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: "No valid fields to update" });
+      }
+
+      const updatedUser = await storage.updateUser(user.id, updateData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("User update error:", error);
+      res.status(500).json({ message: "Failed to update user profile" });
+    }
   });
 
   // Profile image upload endpoint

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 
 import { useAuth } from "@/hooks/use-auth";
 import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle } from "lucide-react";
+import { SignupAvatarSelector } from "@/components/SignupAvatarSelector";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
@@ -18,7 +19,9 @@ export default function AuthPage() {
     confirmPassword: "",
     firstName: "",
     lastName: "",
+    profileColor: "blue",
   });
+  const [profileImage, setProfileImage] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [authError, setAuthError] = useState("");
 
@@ -84,13 +87,47 @@ export default function AuthPage() {
         });
         // Login successful - onSuccess will handle navigation
       } else {
-        await registerMutation.mutateAsync({
+        // First register the user
+        const registerData = {
           email: formData.email,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
           firstName: formData.firstName,
           lastName: formData.lastName,
-        });
+        };
+        
+        await registerMutation.mutateAsync(registerData);
+        
+        // After successful registration, upload profile image and update color if needed
+        if (profileImage || formData.profileColor !== 'blue') {
+          try {
+            // Upload profile image if provided
+            if (profileImage) {
+              const imageFormData = new FormData();
+              imageFormData.append('profileImage', profileImage);
+              
+              await fetch('/api/user/profile-image', {
+                method: 'POST',
+                body: imageFormData,
+                credentials: 'include'
+              });
+            }
+            
+            // Update profile color if not default
+            if (formData.profileColor !== 'blue') {
+              await fetch('/api/user', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ profileColor: formData.profileColor }),
+                credentials: 'include'
+              });
+            }
+          } catch (profileError) {
+            // Don't fail registration if profile updates fail
+            console.log('Profile update after registration failed:', profileError);
+          }
+        }
+        
         // Registration successful - onSuccess will handle navigation
       }
     } catch (error: any) {
@@ -275,6 +312,21 @@ export default function AuthPage() {
                     </div>
                   )}
 
+                  {/* Avatar Selector (Register only) */}
+                  {!isLogin && formData.firstName && formData.lastName && (
+                    <div className="mt-6">
+                      <SignupAvatarSelector
+                        firstName={formData.firstName}
+                        lastName={formData.lastName}
+                        email={formData.email}
+                        profileColor={formData.profileColor}
+                        profileImage={profileImage}
+                        onColorChange={(color) => updateFormData("profileColor", color)}
+                        onImageChange={setProfileImage}
+                      />
+                    </div>
+                  )}
+
                   {/* Password */}
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
@@ -384,7 +436,9 @@ export default function AuthPage() {
                         confirmPassword: "",
                         firstName: "",
                         lastName: "",
+                        profileColor: "blue",
                       });
+                      setProfileImage(null);
                       setAuthError("");
                     }}
                     className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"

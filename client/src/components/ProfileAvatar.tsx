@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Camera, X, Upload } from 'lucide-react';
+import { Camera, X, Upload, Palette } from 'lucide-react';
 import { getProfileInitials } from '@/lib/nameUtils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { ProfileColorPicker } from './ProfileColorPicker';
 
 interface User {
   id: string;
@@ -12,6 +13,7 @@ interface User {
   lastName: string | null;
   email: string;
   profileImageUrl: string | null;
+  profileColor?: string | null;
 }
 
 interface ProfileAvatarProps {
@@ -19,7 +21,7 @@ interface ProfileAvatarProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   editable?: boolean;
   className?: string;
-  gradientType?: 'emerald' | 'blue' | 'purple' | 'orange';
+  gradientType?: 'blue' | 'emerald' | 'purple' | 'orange' | 'indigo' | 'green' | 'pink' | 'teal';
 }
 
 const sizeClasses = {
@@ -30,10 +32,14 @@ const sizeClasses = {
 };
 
 const gradientClasses = {
-  emerald: 'from-emerald-400 to-cyan-400',
   blue: 'from-blue-400 to-blue-600',
+  emerald: 'from-emerald-400 to-cyan-400',
   purple: 'from-purple-400 to-pink-600',
-  orange: 'from-orange-400 to-red-500'
+  orange: 'from-orange-400 to-red-500',
+  indigo: 'from-indigo-400 to-purple-600',
+  green: 'from-green-400 to-emerald-600',
+  pink: 'from-pink-400 to-rose-600',
+  teal: 'from-teal-400 to-cyan-600'
 };
 
 export function ProfileAvatar({ 
@@ -45,6 +51,7 @@ export function ProfileAvatar({
 }: ProfileAvatarProps) {
   const [uploading, setUploading] = useState(false);
   const [showUploadOptions, setShowUploadOptions] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const queryClient = useQueryClient();
 
   const uploadMutation = useMutation({
@@ -52,7 +59,16 @@ export function ProfileAvatar({
       const formData = new FormData();
       formData.append('profileImage', file);
       
-      const response = await apiRequest('POST', '/api/user/profile-image', formData);
+      const response = await fetch('/api/user/profile-image', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+      
       return response.json();
     },
     onSuccess: () => {
@@ -66,12 +82,31 @@ export function ProfileAvatar({
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('DELETE', '/api/user/profile-image');
+      const response = await fetch('/api/user/profile-image', {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Delete failed: ${response.statusText}`);
+      }
+      
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       setShowUploadOptions(false);
+    }
+  });
+
+  const updateColorMutation = useMutation({
+    mutationFn: async (color: string) => {
+      const response = await apiRequest('PATCH', '/api/user', { profileColor: color });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      setShowColorPicker(false);
     }
   });
 
@@ -97,7 +132,16 @@ export function ProfileAvatar({
     deleteMutation.mutate();
   };
 
+  const handleColorChange = (color: string) => {
+    updateColorMutation.mutate(color);
+  };
+
   const initials = getProfileInitials(user.firstName, user.lastName, user.email);
+  
+  // Use user's profileColor if available, otherwise fallback to gradientType
+  const colorKey = (user.profileColor && gradientClasses[user.profileColor as keyof typeof gradientClasses]) 
+    ? user.profileColor as keyof typeof gradientClasses
+    : gradientType;
 
   return (
     <div className="relative inline-block">
@@ -109,7 +153,7 @@ export function ProfileAvatar({
             className="object-cover"
           />
         ) : (
-          <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[gradientType]} text-white font-bold border-0`}>
+          <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[colorKey]} text-white font-bold border-0`}>
             {initials}
           </AvatarFallback>
         )}
@@ -160,6 +204,45 @@ export function ProfileAvatar({
                     Remove Photo
                   </Button>
                 )}
+                
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setShowUploadOptions(false);
+                    setShowColorPicker(true);
+                  }}
+                >
+                  <Palette className="w-4 h-4 mr-2" />
+                  Change Color
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {showColorPicker && (
+            <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-50 min-w-64">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                    Avatar Color
+                  </h4>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowColorPicker(false)}
+                    className="h-6 w-6 p-0"
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+                
+                <ProfileColorPicker
+                  selectedColor={user.profileColor || 'blue'}
+                  onColorChange={handleColorChange}
+                  size="md"
+                />
               </div>
             </div>
           )}
