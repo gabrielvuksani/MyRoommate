@@ -39,35 +39,26 @@ export function SignupAvatarSelector({
   compact = false
 }: SignupAvatarSelectorProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [localImageUrl, setLocalImageUrl] = useState<string | null>(null);
-  const [imageRemoved, setImageRemoved] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
   
-  // Manage local preview URL with proper cleanup
-  React.useEffect(() => {
-    if (profileImage && !imageRemoved) {
-      const url = URL.createObjectURL(profileImage);
-      setLocalImageUrl(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setLocalImageUrl(null);
-    }
-  }, [profileImage, imageRemoved]);
-
+  // Create image URL directly from profileImage - simple and immediate
+  const imageUrl = profileImage ? URL.createObjectURL(profileImage) : null;
+  
   // Show remove button if there's a file
   const hasImage = !!profileImage;
 
   console.log('SIGNUP AVATAR DEBUG:', {
     profileImage: !!profileImage,
-    localImageUrl: !!localImageUrl,
+    imageUrl: !!imageUrl,
     hasImage,
-    imageRemoved,
     initials,
     firstName,
     lastName,
-    profileColor
+    profileColor,
+    forceUpdate
   });
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,9 +77,9 @@ export function SignupAvatarSelector({
         return;
       }
       
-      // Clear removed flag and set the file
-      setImageRemoved(false);
+      // Set the file and force update
       onImageChange(file);
+      setForceUpdate(prev => prev + 1);
     }
     
     // Reset the input value to allow selecting the same file again
@@ -97,8 +88,8 @@ export function SignupAvatarSelector({
 
   const handleRemoveImage = () => {
     console.log('REMOVING IMAGE - before state changes');
-    setImageRemoved(true);
     onImageChange(null);
+    setForceUpdate(prev => prev + 1);
     console.log('REMOVING IMAGE - after state changes');
     
     // Reset the file input to allow re-selection
@@ -114,16 +105,16 @@ export function SignupAvatarSelector({
         {/* Avatar Preview */}
         <div className="flex justify-center">
           <div className="relative">
-            <Avatar className="w-16 h-16">
-              {localImageUrl && !imageRemoved ? (
+            <Avatar className="w-16 h-16" key={`avatar-${forceUpdate}-${!!profileImage}`}>
+              {profileImage && imageUrl ? (
                 <AvatarImage 
-                  src={localImageUrl} 
+                  src={imageUrl} 
                   alt="Profile preview"
                   className="object-cover"
                   onError={() => {
                     console.log('Image failed to load, clearing...');
-                    setImageRemoved(true);
                     onImageChange(null);
+                    setForceUpdate(prev => prev + 1);
                   }}
                 />
               ) : (
@@ -240,16 +231,16 @@ export function SignupAvatarSelector({
           {/* Avatar Preview */}
           <div className="flex justify-center">
             <div className="relative">
-              <Avatar className="w-20 h-20">
-                {localImageUrl && !imageRemoved ? (
+              <Avatar className="w-20 h-20" key={`avatar-${forceUpdate}-${!!profileImage}`}>
+                {profileImage && imageUrl ? (
                   <AvatarImage 
-                    src={localImageUrl} 
+                    src={imageUrl} 
                     alt="Profile preview"
                     className="object-cover"
                     onError={() => {
                       console.log('Image failed to load, clearing...');
-                      setImageRemoved(true);
                       onImageChange(null);
+                      setForceUpdate(prev => prev + 1);
                     }}
                   />
                 ) : (
