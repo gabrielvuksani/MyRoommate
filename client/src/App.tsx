@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/ThemeProvider";
-import { AuthProvider, useAuth } from "@/hooks/use-supabase-auth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import Landing from "@/pages/landing";
 import { useQuery } from "@tanstack/react-query";
 import { getUserFlags } from "@/lib/userUtils";
@@ -62,17 +62,7 @@ function Router() {
   }
 
   // Get comprehensive user flags using centralized logic
-  // For Supabase, we need to adapt the user object structure
-  const adaptedUser = user ? {
-    id: user.id,
-    firstName: user.user_metadata?.firstName || '',
-    lastName: user.user_metadata?.lastName || '',
-    email: user.email || '',
-    profileColor: user.user_metadata?.profileColor || 'blue',
-    profileImageUrl: user.user_metadata?.profileImageUrl || null
-  } : null;
-  
-  const userFlags = getUserFlags(adaptedUser, household, !!user, location);
+  const userFlags = getUserFlags(user, household, !!user, location);
   const { needsOnboarding, hasHousehold } = userFlags;
   
   // Check if we should skip landing page for PWA/native apps
