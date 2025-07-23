@@ -3,15 +3,14 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-import { useAuth } from "@/hooks/use-supabase-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle } from "lucide-react";
-import { SimpleAvatarSelector } from "@/components/SimpleAvatarSelector";
+import { SignupAvatarSelector } from "@/components/SignupAvatarSelector";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
-  const { user, loginMutation, registerMutation, forgotPasswordMutation } = useAuth();
+  const { user, loginMutation, registerMutation } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -25,7 +24,6 @@ export default function AuthPage() {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [authError, setAuthError] = useState("");
-  const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
 
   // Scroll to top on page load
   useEffect(() => {
@@ -49,15 +47,13 @@ export default function AuthPage() {
       newErrors.email = "Please enter a valid email address";
     }
 
-    if (!showForgotPassword) {
-      if (!formData.password) {
-        newErrors.password = "Password is required";
-      } else if (formData.password.length < 8) {
-        newErrors.password = "Password must be at least 8 characters";
-      }
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
 
-    if (!isLogin && !showForgotPassword) {
+    if (!isLogin) {
       if (!formData.firstName) {
         newErrors.firstName = "First name is required";
       }
@@ -78,26 +74,10 @@ export default function AuthPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
-    setAuthError("");
-
-    if (showForgotPassword) {
-      // Handle forgot password
-      if (!formData.email) {
-        setErrors({ email: "Email is required" });
-        return;
-      }
-      
-      try {
-        await forgotPasswordMutation.mutateAsync({ email: formData.email });
-        setForgotPasswordSent(true);
-      } catch (error: any) {
-        setAuthError(error.message || "Failed to send reset email");
-      }
-      return;
-    }
-
     if (!validateForm()) return;
+
+    // Clear any previous auth errors
+    setAuthError("");
 
     try {
       if (isLogin) {
@@ -105,19 +85,56 @@ export default function AuthPage() {
           email: formData.email,
           password: formData.password,
         });
+        // Login successful - onSuccess will handle navigation
       } else {
-        await registerMutation.mutateAsync({
+        // First register the user
+        const registerData = {
           email: formData.email,
           password: formData.password,
+          confirmPassword: formData.confirmPassword,
           firstName: formData.firstName,
           lastName: formData.lastName,
-          profileColor: formData.profileColor,
-          profileImage,
-        });
+        };
+        
+        await registerMutation.mutateAsync(registerData);
+        
+        // After successful registration, upload profile image and update color if needed
+        if (profileImage || formData.profileColor !== 'blue') {
+          try {
+            // Upload profile image if provided
+            if (profileImage) {
+              const imageFormData = new FormData();
+              imageFormData.append('profileImage', profileImage);
+              
+              await fetch('/api/user/profile-image', {
+                method: 'POST',
+                body: imageFormData,
+                credentials: 'include'
+              });
+            }
+            
+            // Update profile color if not default
+            if (formData.profileColor !== 'blue') {
+              await fetch('/api/user', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ profileColor: formData.profileColor }),
+                credentials: 'include'
+              });
+            }
+          } catch (profileError) {
+            // Don't fail registration if profile updates fail
+            console.log('Profile update after registration failed:', profileError);
+          }
+        }
+        
+        // Registration successful - onSuccess will handle navigation
       }
     } catch (error: any) {
-      console.error('Auth error:', error);
-      const cleanErrorMessage = formatErrorMessage(error.message || "Authentication failed. Please try again.");
+      console.error("Auth error:", error);
+      // Extract and format error message
+      const rawErrorMessage = error.message || "Authentication failed. Please try again.";
+      const cleanErrorMessage = formatErrorMessage(rawErrorMessage);
       setAuthError(cleanErrorMessage);
     }
   };
@@ -212,12 +229,10 @@ export default function AuthPage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                      {showForgotPassword ? "Reset Password" : 
-                       isLogin ? "Sign In" : "Create Account"}
+                      {isLogin ? "Sign In" : "Create Account"}
                     </h2>
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      {showForgotPassword ? "Enter your email to receive reset instructions" :
-                       isLogin ? "Welcome back" : "There's always room for one more"}
+                      {isLogin ? "Welcome back" : "There's always room for one more"}
                     </p>
                   </div>
                 </div>
@@ -251,29 +266,31 @@ export default function AuthPage() {
                   {!isLogin && (
                     <div className="space-y-4">
                       {/* Unified Profile Section */}
-                      <div className="rounded-2xl p-6" style={{ 
+                      <div className="rounded-2xl p-4" style={{ 
                         background: 'var(--surface-secondary)',
                         border: '1px solid var(--border)'
                       }}>
-                        <div className="space-y-6">
-                          {/* Profile Picture Section */}
-                          <div className="w-full">
-                            <SimpleAvatarSelector
+                        <div className="w-full">
+                          {/* Profile Picture - Full Width */}
+                          <div className="w-full mb-4">
+                            <SignupAvatarSelector
                               firstName={formData.firstName}
                               lastName={formData.lastName}
                               email={formData.email}
                               profileColor={formData.profileColor}
                               profileImage={profileImage}
-                              onColorChange={(color: string) => updateFormData("profileColor", color)}
-                              onImageChange={(file: File | null) => {
+                              onColorChange={(color) => updateFormData("profileColor", color)}
+                              onImageChange={(file) => {
+                                console.log('AUTH PAGE - onImageChange called with:', file);
                                 setProfileImage(file);
+                                console.log('AUTH PAGE - setProfileImage called');
                               }}
-                              compact={false}
+                              compact={true}
                             />
                           </div>
                           
                           {/* Name Fields */}
-                          <div className="w-full space-y-4">
+                          <div className="w-full space-y-3">
                             <div>
                               <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                                 First Name *
@@ -283,12 +300,12 @@ export default function AuthPage() {
                                 placeholder="John"
                                 value={formData.firstName}
                                 onChange={(e) => updateFormData("firstName", e.target.value)}
-                                className={`input-modern h-12 ${errors.firstName ? 'border-red-500 focus:border-red-500' : ''}`}
+                                className={`input-modern h-10 ${errors.firstName ? 'border-red-500 focus:border-red-500' : ''}`}
                                 style={{
                                   background: 'var(--surface)',
                                   borderColor: errors.firstName ? '#ef4444' : 'var(--border)',
                                   borderRadius: 'var(--radius-md)',
-                                  padding: '16px 20px',
+                                  padding: '12px 16px',
                                   fontSize: '16px',
                                   color: 'var(--text-primary)',
                                   transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
@@ -305,12 +322,12 @@ export default function AuthPage() {
                                 placeholder="Doe"
                                 value={formData.lastName}
                                 onChange={(e) => updateFormData("lastName", e.target.value)}
-                                className={`input-modern h-12 ${errors.lastName ? 'border-red-500 focus:border-red-500' : ''}`}
+                                className={`input-modern h-10 ${errors.lastName ? 'border-red-500 focus:border-red-500' : ''}`}
                                 style={{
                                   background: 'var(--surface)',
                                   borderColor: errors.lastName ? '#ef4444' : 'var(--border)',
                                   borderRadius: 'var(--radius-md)',
-                                  padding: '16px 20px',
+                                  padding: '12px 16px',
                                   fontSize: '16px',
                                   color: 'var(--text-primary)',
                                   transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
@@ -324,47 +341,45 @@ export default function AuthPage() {
                     </div>
                   )}
 
-                  {/* Password - Hide for forgot password */}
-                  {!showForgotPassword && (
-                    <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                        Password *
-                      </label>
-                      <div className="relative">
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          value={formData.password}
-                          onChange={(e) => updateFormData("password", e.target.value)}
-                          className={`input-modern h-12 pr-12 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
-                          style={{
-                            background: 'var(--surface)',
-                            borderColor: errors.password ? '#ef4444' : 'var(--border)',
-                            borderRadius: 'var(--radius-md)',
-                            padding: '16px 48px 16px 20px',
-                            fontSize: '16px',
-                            color: 'var(--text-primary)',
-                            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:scale-105 transition-all duration-200 rounded-lg p-1"
-                          style={{ 
-                            color: 'var(--text-tertiary)',
-                            background: 'transparent'
-                          }}
-                        >
-                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
-                      </div>
-                      {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                  {/* Password */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                      Password *
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={formData.password}
+                        onChange={(e) => updateFormData("password", e.target.value)}
+                        className={`input-modern h-12 pr-12 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
+                        style={{
+                          background: 'var(--surface)',
+                          borderColor: errors.password ? '#ef4444' : 'var(--border)',
+                          borderRadius: 'var(--radius-md)',
+                          padding: '16px 48px 16px 20px',
+                          fontSize: '16px',
+                          color: 'var(--text-primary)',
+                          transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:scale-105 transition-all duration-200 rounded-lg p-1"
+                        style={{ 
+                          color: 'var(--text-tertiary)',
+                          background: 'transparent'
+                        }}
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
                     </div>
-                  )}
+                    {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                  </div>
 
-                  {/* Confirm Password (Register only, not forgot password) */}
-                  {!isLogin && !showForgotPassword && (
+                  {/* Confirm Password (Register only) */}
+                  {!isLogin && (
                     <div>
                       <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                         Confirm Password *
@@ -406,143 +421,68 @@ export default function AuthPage() {
                   <div className="pt-4">
                     <button
                       type="submit"
-                      disabled={loginMutation.isPending || registerMutation.isPending || forgotPasswordMutation.isPending}
+                      disabled={loginMutation.isPending || registerMutation.isPending}
                       className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-2xl font-semibold text-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
-                      {(loginMutation.isPending || registerMutation.isPending || forgotPasswordMutation.isPending) ? (
+                      {(loginMutation.isPending || registerMutation.isPending) ? (
                         <div className="flex items-center justify-center space-x-2">
                           <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                          <span>
-                            {showForgotPassword ? "Sending reset email..." : 
-                             isLogin ? "Signing in..." : "Creating account..."}
-                          </span>
+                          <span>Please wait...</span>
                         </div>
+                      ) : isLogin ? (
+                        "Sign In"
                       ) : (
-                        <span>
-                          {showForgotPassword ? "Send Reset Email" :
-                           isLogin ? "Sign In" : "Create Account"}
-                        </span>
+                        "Create Account"
                       )}
                     </button>
                   </div>
+                </form>
 
-                  {/* Forgot Password & Toggle */}
-                  {isLogin && !showForgotPassword && (
-                    <div className="pt-3 text-center">
-                      <button
-                        type="button"
-                        onClick={() => setShowForgotPassword(true)}
-                        className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"
-                        style={{ 
-                          color: 'var(--text-secondary)',
-                        }}
-                      >
-                        Forgot your password?{" "}
+                {/* Toggle Form */}
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={() => {
+                      setIsLogin(!isLogin);
+                      setErrors({});
+                      setFormData({
+                        email: "",
+                        password: "",
+                        confirmPassword: "",
+                        firstName: "",
+                        lastName: "",
+                        profileColor: "blue",
+                      });
+                      setProfileImage(null);
+                      setAuthError("");
+                    }}
+                    className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"
+                    style={{ 
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    {isLogin ? (
+                      <>
+                        Don't have an account?{" "}
                         <span 
                           className="font-semibold transition-colors duration-200"
                           style={{ color: 'var(--primary)' }}
                         >
-                          Reset it
+                          Sign up
                         </span>
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Back to Login from Forgot Password */}
-                  {showForgotPassword && !forgotPasswordSent && (
-                    <div className="pt-3 text-center">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowForgotPassword(false);
-                          setAuthError("");
-                          setErrors({});
-                        }}
-                        className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"
-                        style={{ 
-                          color: 'var(--text-secondary)',
-                        }}
-                      >
-                        Remember your password?{" "}
+                      </>
+                    ) : (
+                      <>
+                        Already have an account?{" "}
                         <span 
                           className="font-semibold transition-colors duration-200"
                           style={{ color: 'var(--primary)' }}
                         >
                           Sign in
                         </span>
-                      </button>
-                    </div>
-                  )}
-                </form>
-
-                {/* Forgot Password Success */}
-                {forgotPasswordSent && (
-                  <div className="mt-4">
-                    <Card className="glass-card border-green-200 dark:border-green-700">
-                      <CardContent className="p-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
-                            <CheckCircle size={16} className="text-white" />
-                          </div>
-                          <div>
-                            <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Reset Email Sent</h3>
-                            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                              Check your email for password reset instructions.
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                )}
-
-                {/* Toggle Form */}
-                {!showForgotPassword && (
-                  <div className="mt-8 text-center">
-                    <button
-                      onClick={() => {
-                        setIsLogin(!isLogin);
-                        setErrors({});
-                        setFormData({
-                          email: "",
-                          password: "",
-                          confirmPassword: "",
-                          firstName: "",
-                          lastName: "",
-                          profileColor: "blue",
-                        });
-                        setProfileImage(null);
-                        setAuthError("");
-                      }}
-                      className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"
-                      style={{ 
-                        color: 'var(--text-secondary)',
-                      }}
-                    >
-                      {isLogin ? (
-                        <>
-                          Don't have an account?{" "}
-                          <span 
-                            className="font-semibold transition-colors duration-200"
-                            style={{ color: 'var(--primary)' }}
-                          >
-                            Sign up
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          Already have an account?{" "}
-                          <span 
-                            className="font-semibold transition-colors duration-200"
-                            style={{ color: 'var(--primary)' }}
-                          >
-                            Sign in
-                          </span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                )}
+                      </>
+                    )}
+                  </button>
+                </div>
               </CardContent>
             </Card>
           </div>
