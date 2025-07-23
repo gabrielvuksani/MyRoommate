@@ -39,15 +39,41 @@ export function SignupAvatarSelector({
   compact = false
 }: SignupAvatarSelectorProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
   // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
   
+  // Manage preview URL properly with cleanup
+  React.useEffect(() => {
+    if (profileImage) {
+      // Clean up previous URL if it exists
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+      // Create new preview URL
+      const newPreviewUrl = URL.createObjectURL(profileImage);
+      setImagePreviewUrl(newPreviewUrl);
+    } else {
+      // Clean up and clear when no file
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+      setImagePreviewUrl(null);
+    }
+  }, [profileImage]);
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
+  
   // For signup form: direct check if there's a File object
   const hasImage = !!profileImage;
-  
-  // Create preview URL directly from profileImage when needed
-  const imagePreviewUrl = profileImage ? URL.createObjectURL(profileImage) : null;
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -65,7 +91,7 @@ export function SignupAvatarSelector({
         return;
       }
       
-      // Just set the file - preview URL is created on-demand
+      // Set the file - useEffect will handle preview URL creation
       onImageChange(file);
     }
     
@@ -74,7 +100,7 @@ export function SignupAvatarSelector({
   };
 
   const handleRemoveImage = () => {
-    // Clear the file - this will immediately make hasImage false
+    // Clear the file - useEffect will handle cleanup
     onImageChange(null);
     
     // Reset the file input to allow re-selection
