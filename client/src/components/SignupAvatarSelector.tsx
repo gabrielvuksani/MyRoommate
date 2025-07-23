@@ -39,27 +39,15 @@ export function SignupAvatarSelector({
   compact = false
 }: SignupAvatarSelectorProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
-  
-  // Effect to sync imagePreviewUrl with profileImage prop
-  React.useEffect(() => {
-    if (profileImage && !imagePreviewUrl) {
-      // Create preview URL from profileImage File if one doesn't exist
-      const previewUrl = URL.createObjectURL(profileImage);
-      setImagePreviewUrl(previewUrl);
-    } else if (!profileImage && imagePreviewUrl) {
-      // Clean up preview URL when profileImage is removed
-      URL.revokeObjectURL(imagePreviewUrl);
-      setImagePreviewUrl(null);
-    }
-  }, [profileImage]);
 
   // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
   
-  // For signup form: check if there's a File object, not preview URL
-  // This matches the remove button logic and handles the pre-upload state correctly
+  // For signup form: direct check if there's a File object
   const hasImage = !!profileImage;
+  
+  // Create preview URL directly from profileImage when needed
+  const imagePreviewUrl = profileImage ? URL.createObjectURL(profileImage) : null;
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -77,9 +65,7 @@ export function SignupAvatarSelector({
         return;
       }
       
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreviewUrl(previewUrl);
+      // Just set the file - preview URL is created on-demand
       onImageChange(file);
     }
     
@@ -88,14 +74,8 @@ export function SignupAvatarSelector({
   };
 
   const handleRemoveImage = () => {
-    // Clear the preview URL if it exists
-    if (imagePreviewUrl) {
-      URL.revokeObjectURL(imagePreviewUrl);
-    }
-    
-    // Clear parent state first, then local state
+    // Clear the file - this will immediately make hasImage false
     onImageChange(null);
-    setImagePreviewUrl(null);
     
     // Reset the file input to allow re-selection
     const fileInput = document.getElementById('signup-avatar-input') as HTMLInputElement;
@@ -111,14 +91,13 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {hasImage ? (
+              {hasImage && imagePreviewUrl ? (
                 <AvatarImage 
-                  src={imagePreviewUrl || ''} 
+                  src={imagePreviewUrl} 
                   alt="Profile preview"
                   className="object-cover"
                   onError={() => {
-                    // If image fails to load, clear preview and show fallback
-                    setImagePreviewUrl(null);
+                    // If image fails to load, clear file and show fallback
                     onImageChange(null);
                   }}
                 />
@@ -237,14 +216,13 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {hasImage ? (
+                {hasImage && imagePreviewUrl ? (
                   <AvatarImage 
-                    src={imagePreviewUrl || ''} 
+                    src={imagePreviewUrl} 
                     alt="Profile preview"
                     className="object-cover"
                     onError={() => {
-                      // If image fails to load, clear preview and show fallback
-                      setImagePreviewUrl(null);
+                      // If image fails to load, clear file and show fallback
                       onImageChange(null);
                     }}
                   />
