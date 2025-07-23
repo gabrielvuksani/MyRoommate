@@ -106,7 +106,7 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16" key={`avatar-${forceUpdate}-${!!profileImage}`}>
-              {profileImage && imageUrl ? (
+              {imageUrl ? (
                 <AvatarImage 
                   src={imageUrl} 
                   alt="Profile preview"
@@ -232,7 +232,7 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20" key={`avatar-${forceUpdate}-${!!profileImage}`}>
-                {profileImage && imageUrl ? (
+                {imageUrl ? (
                   <AvatarImage 
                     src={imageUrl} 
                     alt="Profile preview"
