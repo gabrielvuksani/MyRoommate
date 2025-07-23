@@ -258,8 +258,11 @@ export default function Profile() {
         }
       }
       
-      // Show test notification if permission is granted
+      // Set up push subscription after permission is granted
       if (status.permission === 'granted' || success) {
+        // Ensure push subscription is set up for background notifications
+        await notificationService.subscribeToPush();
+        
         await notificationService.showTestNotification();
         
         // Send additional demo notifications to showcase different types
@@ -757,8 +760,17 @@ export default function Profile() {
 
               <Button
                 onClick={async () => {
+                  // First ensure push subscription is set up
+                  console.log('Setting up push subscription for background test...');
+                  await notificationService.subscribeToPush();
+                  
+                  // Then test the push notification
                   const success = await notificationService.testPushNotification();
                   console.log('Push notification test result:', success);
+                  
+                  if (!success) {
+                    alert('Push notification test failed. Make sure you have granted notification permissions and are on a secure connection (HTTPS).');
+                  }
                 }}
                 className="w-full py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:from-emerald-600 hover:to-cyan-600"
               >

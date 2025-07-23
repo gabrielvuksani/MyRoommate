@@ -18,8 +18,8 @@ import { z } from "zod";
 // Configure web-push with VAPID keys
 webpush.setVapidDetails(
   'mailto:notifications@myroommate.app',
-  'BEl62iUYgUivxIkv69yViEuiBIa40HI80NM9w1NWfZT9SGdt6hF2nP7S6f6K6JKZfaYc7FvGhL1KRYu7eFHUfyk', // Public key
-  'dBnqwHzhgX6l0npjwsHYJq6B-Umt7g2ZnpmH-4i7Kqw' // Private key
+  'BNUBRCnltmYiEEVwd8KD4lVRp8EJgfuI19XNJD2lki87bZZ6IIrAxWo6u6WjXq3h8FIs6b1RYGX6i33DEZmKNZ0', // Public key
+  '8gDdfS0YP9m2JCg7RY9aDsTKCP6iLp0BNsRWch9BJAA' // Private key
 );
 
 // Store push subscriptions in memory (in production, use database)

@@ -80,7 +80,11 @@ self.addEventListener('push', (event) => {
     self.registration.showNotification(
       notificationData.title || 'myRoommate',
       options
-    )
+    ).then(() => {
+      console.log('Push notification displayed successfully');
+    }).catch((error) => {
+      console.error('Error displaying push notification:', error);
+    })
   );
 });
 

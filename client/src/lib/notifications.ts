@@ -83,7 +83,7 @@ export class NotificationService {
     }
   }
 
-  async subscribeToPush(): Promise<boolean> {
+  public async subscribeToPush(): Promise<boolean> {
     if (!this.serviceWorkerRegistration) {
       console.warn('Service Worker not available');
       return false;
@@ -101,7 +101,7 @@ export class NotificationService {
       this.pushSubscription = await this.serviceWorkerRegistration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: this.urlBase64ToUint8Array(
-          'BEl62iUYgUivxIkv69yViEuiBIa40HI80NM9w1NWfZT9SGdt6hF2nP7S6f6K6JKZfaYc7FvGhL1KRYu7eFHUfyk' // VAPID public key
+          'BNUBRCnltmYiEEVwd8KD4lVRp8EJgfuI19XNJD2lki87bZZ6IIrAxWo6u6WjXq3h8FIs6b1RYGX6i33DEZmKNZ0' // VAPID public key
         )
       });
 
@@ -119,6 +119,7 @@ export class NotificationService {
 
   private async sendSubscriptionToServer(subscription: PushSubscription): Promise<void> {
     try {
+      console.log('Sending push subscription to server:', subscription.toJSON());
       const response = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: {
@@ -129,12 +130,15 @@ export class NotificationService {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to send subscription: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`Failed to send subscription: ${response.status} - ${errorText}`);
       }
 
-      console.log('Push subscription sent to server successfully');
+      const result = await response.json();
+      console.log('Push subscription sent to server successfully:', result);
     } catch (error) {
       console.error('Error sending subscription to server:', error);
+      throw error;
     }
   }
 
