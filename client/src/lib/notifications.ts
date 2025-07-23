@@ -139,17 +139,18 @@ export class NotificationService {
     
     console.log('Notification check:', { type, isDocumentVisible, isInMessages, path: window.location.pathname });
     
-    // If user is actively in messages and document is visible, be more permissive
-    if (type === 'message' && isInMessages && isDocumentVisible) {
-      console.log('Allowing message notification - user is in active chat');
-      return true; // Let messages through when chat is active, as user requested
-    }
-    
-    // If document is visible and user is on the relevant page, reduce notifications
-    if (isDocumentVisible) {
-      if (type === 'chore' && window.location.pathname === '/chores') return false;
-      if (type === 'expense' && window.location.pathname === '/expenses') return false;
-      if (type === 'calendar' && window.location.pathname === '/calendar') return false;
+    // For message notifications, be more permissive
+    if (type === 'message') {
+      // Allow message notifications even when user is in messages (they might want to know about new messages)
+      console.log('Message notification - always allow for better reliability');
+      // Skip to timing checks only, don't block based on page visibility
+    } else {
+      // If document is visible and user is on the relevant page, reduce notifications for non-message types
+      if (isDocumentVisible) {
+        if (type === 'chore' && window.location.pathname === '/chores') return false;
+        if (type === 'expense' && window.location.pathname === '/expenses') return false;
+        if (type === 'calendar' && window.location.pathname === '/calendar') return false;
+      }
     }
     
     // Implement time-based throttling
@@ -157,9 +158,9 @@ export class NotificationService {
     const lastTime = this.lastNotificationTimes.get(throttleKey) || 0;
     const timeSince = now - lastTime;
     
-    // Different throttle times based on type
+    // Different throttle times based on type (reduced for messages)
     const throttleTimes = {
-      message: 2000,   // 2 seconds (unless chat is active)
+      message: 1000,   // 1 second for messages (more responsive)
       chore: 30000,    // 30 seconds
       expense: 15000,  // 15 seconds
       calendar: 60000, // 1 minute
