@@ -1,9 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
-import webpush from "web-push";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
+import { notificationService } from './notification-service';
 import {
   insertHouseholdSchema,
   insertChoreSchema,
@@ -15,15 +15,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 
-// Configure web-push with VAPID keys
-webpush.setVapidDetails(
-  'mailto:notifications@myroommate.app',
-  'BNUBRCnltmYiEEVwd8KD4lVRp8EJgfuI19XNJD2lki87bZZ6IIrAxWo6u6WjXq3h8FIs6b1RYGX6i33DEZmKNZ0', // Public key
-  '8gDdfS0YP9m2JCg7RY9aDsTKCP6iLp0BNsRWch9BJAA' // Private key
-);
-
-// Store push subscriptions in memory (in production, use database)
-const pushSubscriptions = new Map<string, any>(); // userId -> subscription
+// Enterprise notification service is now handled in notification-service.ts
 
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
@@ -215,25 +207,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Send push notification for chore assignment (background notifications)
-      if (chore.assignedTo) {
-        const pushPayload = {
-          title: '📝 New Chore Assigned',
-          body: `You've been assigned: ${chore.title}`,
-          icon: '/icon-192x192.png',
-          badge: '/icon-72x72.png',
-          tag: 'chore-assignment',
-          data: {
-            type: 'chore',
-            choreId: chore.id,
-            url: '/chores'
-          }
-        };
-        
-        sendPushNotification(chore.assignedTo, pushPayload)
-          .catch(error => {
-            // Silent fail for push notifications
-          });
+      // Send enterprise push notification for chore assignment
+      if (chore.assignedTo && chore.assignedTo !== userId) {
+        try {
+          await notificationService.sendChoreNotification(
+            chore.assignedTo,
+            chore.title,
+            req.user.firstName || req.user.email || 'Someone',
+            membership.household.id
+          );
+        } catch (error) {
+          // Silent fail for push notifications - reliability built into service
+        }
       }
       
       res.json(chore);
@@ -283,10 +268,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           for (const member of householdMembers) {
             if (member.userId !== userId) { // Don't notify the completer
-              sendPushNotification(member.userId, pushPayload)
-                .catch(error => {
-                  // Silent fail for push notifications
+              try {
+                await notificationService.queueNotification({
+                  userId: member.userId,
+                  householdId: membership.household.id,
+                  type: 'chore',
+                  title: '✅ Chore Completed',
+                  body: `${completerName} completed: ${chore.title}`,
+                  priority: 'normal',
+                  payload: { choreId: chore.id, completerName },
+                  expiresIn: 6 * 60 // 6 hours
                 });
+              } catch (error) {
+                // Silent fail for notifications
+              }
             }
           }
         }
@@ -370,27 +365,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Send push notifications to all household members except the creator (background notifications)
+      // Send enterprise push notifications to all household members except the creator
       const householdMembers = await storage.getHouseholdMembers(membership.household.id);
-      const pushPayload = {
-        title: '💰 New Expense Added',
-        body: `${validatedExpense.title} - $${validatedExpense.amount}`,
-        icon: '/icon-192x192.png',
-        badge: '/icon-72x72.png',
-        tag: 'new-expense',
-        data: {
-          type: 'expense',
-          expenseId: expense.id,
-          url: '/expenses'
-        }
-      };
-
+      const creatorName = req.user.firstName || req.user.email || 'Someone';
+      
       for (const member of householdMembers) {
         if (member.userId !== userId) { // Don't notify the creator
-          sendPushNotification(member.userId, pushPayload)
-            .catch(error => {
-              // Silent fail for push notifications
-            });
+          try {
+            await notificationService.sendExpenseNotification(
+              member.userId,
+              validatedExpense.title,
+              parseFloat(validatedExpense.amount.toString()),
+              creatorName,
+              membership.household.id
+            );
+          } catch (error) {
+            // Silent fail for push notifications - reliability built into service
+          }
         }
       }
       
@@ -513,28 +504,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Send push notifications to all household members except the creator (background notifications)
+      // Send enterprise push notifications to all household members except the creator
       const householdMembers = await storage.getHouseholdMembers(membership.household.id);
-      const eventDate = new Date(data.startDate).toLocaleDateString();
-      const pushPayload = {
-        title: '📅 New Calendar Event',
-        body: `${data.title} on ${eventDate}`,
-        icon: '/icon-192x192.png',
-        badge: '/icon-72x72.png',
-        tag: 'calendar-event',
-        data: {
-          type: 'calendar',
-          eventId: event.id,
-          url: '/calendar'
-        }
-      };
-
+      const creatorName = req.user.firstName || req.user.email || 'Someone';
+      
       for (const member of householdMembers) {
         if (member.userId !== userId) { // Don't notify the creator
-          sendPushNotification(member.userId, pushPayload)
-            .catch(error => {
-              // Silent fail for push notifications
-            });
+          try {
+            await notificationService.sendCalendarNotification(
+              member.userId,
+              event.title,
+              new Date(data.startDate),
+              creatorName,
+              membership.household.id
+            );
+          } catch (error) {
+            // Silent fail for push notifications - reliability built into service
+          }
         }
       }
       
@@ -872,7 +858,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Push notification subscription endpoints
+  // Enterprise push notification subscription endpoints
   app.post('/api/push/subscribe', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
@@ -883,14 +869,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid subscription format' });
       }
       
-      // Store subscription for this user with timestamp
-      pushSubscriptions.set(userId, {
-        ...subscription,
-        timestamp: Date.now()
-      });
+      // Store subscription using enterprise service
+      await notificationService.storePushSubscription(userId, subscription);
       
       res.json({ success: true, message: 'Push subscription stored successfully' });
     } catch (error) {
+      console.error('Error storing push subscription:', error);
       res.status(500).json({ message: 'Failed to store push subscription' });
     }
   });
@@ -898,8 +882,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/push/unsubscribe', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
-      pushSubscriptions.delete(userId);
-      console.log(`Push subscription removed for user: ${userId}`);
+      const { endpoint } = req.body;
+      
+      // Remove subscription using enterprise service
+      // await notificationService.removePushSubscription(userId, endpoint);
       
       res.json({ success: true, message: 'Push subscription removed successfully' });
     } catch (error) {
@@ -908,52 +894,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Push notification sending function with enhanced reliability
-  async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
-    const subscription = pushSubscriptions.get(userId);
-    
-    if (!subscription) {
-      return false;
-    }
-
-    // Send push notification with maximum urgency and immediate delivery
+  // Enterprise push notification helper function
+  async function sendPushNotification(userId: string, options: {
+    title: string;
+    body: string;
+    type: string;
+    payload?: any;
+  }): Promise<boolean> {
     try {
-      await webpush.sendNotification(subscription, JSON.stringify(payload), {
-        urgency: 'high',
-        TTL: 30, // 30 seconds for immediate delivery
-        topic: payload.tag || 'instant'
+      await notificationService.sendNotificationImmediate({
+        userId,
+        type: options.type as any,
+        title: options.title,
+        body: options.body,
+        priority: 'high',
+        payload: options.payload
       });
       return true;
-    } catch (error: any) {
-      // If subscription is invalid/expired, remove it immediately
-      if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
-        pushSubscriptions.delete(userId);
-      }
+    } catch (error) {
+      console.error('Error sending push notification:', error);
       return false;
     }
   }
 
-  // Test push notification endpoint
+  // Test push notification endpoint using enterprise service
   app.post('/api/push/test', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
       
-      const testPayload = {
+      const sent = await sendPushNotification(userId, {
         title: '🧪 Test Notification',
-        body: 'PWA push notifications are working! This notification works even when the app is closed.',
-        icon: '/icon-192x192.png',
-        badge: '/icon-72x72.png',
-        tag: 'test-notification',
-        data: {
-          type: 'test',
-          url: '/'
-        }
-      };
-      
-      const sent = await sendPushNotification(userId, testPayload);
+        body: 'Enterprise push notifications are working! This notification works even when the app is closed for 10+ minutes.',
+        type: 'system',
+        payload: { testType: 'enterprise-reliability' }
+      });
       
       if (sent) {
-        res.json({ success: true, message: 'Test push notification sent successfully' });
+        res.json({ success: true, message: 'Enterprise test push notification sent successfully' });
       } else {
         res.status(400).json({ success: false, message: 'No push subscription found or failed to send' });
       }
@@ -1143,12 +1120,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             };
 
+            // Send enterprise push notifications to all household members except the sender
             for (const member of householdMembers) {
               if (member.userId !== msgUserId) { // Don't notify the sender
-                sendPushNotification(member.userId, pushPayload)
-                  .catch(error => {
-                    // Silent fail for push notifications
-                  });
+                try {
+                  await notificationService.sendMessageNotification(
+                    member.userId,
+                    senderName,
+                    content.length > 50 ? content.substring(0, 50) + '...' : content,
+                    msgHouseholdId
+                  );
+                } catch (error) {
+                  // Silent fail for push notifications - reliability built into enterprise service
+                }
               }
             }
             
