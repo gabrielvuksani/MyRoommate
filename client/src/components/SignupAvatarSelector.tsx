@@ -40,6 +40,14 @@ export function SignupAvatarSelector({
 }: SignupAvatarSelectorProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  
+  // Effect to sync imagePreviewUrl with profileImage prop
+  React.useEffect(() => {
+    if (!profileImage && imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+      setImagePreviewUrl(null);
+    }
+  }, [profileImage, imagePreviewUrl]);
 
   // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
@@ -315,7 +323,7 @@ export function SignupAvatarSelector({
 
           {/* Color picker */}
           {showColorPicker && (
-            <div className="pt-2">
+            <div className="pt-2 w-full">
               <ProfileColorPicker
                 selectedColor={profileColor}
                 onColorChange={onColorChange}

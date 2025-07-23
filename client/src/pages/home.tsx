@@ -52,19 +52,20 @@ export default function Home() {
 
   // Fetch featured roommate listings for all users
   const { data: featuredListings = [] } = useQuery({
-    queryKey: ['/api/roommate-listings', { featured: true }],
-    queryFn: () => fetch('/api/roommate-listings?featured=true').then(res => res.json()),
+    queryKey: ["/api/roommate-listings", { featured: true }],
+    queryFn: () =>
+      fetch("/api/roommate-listings?featured=true").then((res) => res.json()),
   });
 
   const { data: myListings = [] } = useQuery({
-    queryKey: ['/api/roommate-listings/my'],
+    queryKey: ["/api/roommate-listings/my"],
     enabled: !!user, // Fetch when user is logged in
   });
 
   useEffect(() => {
     // Scroll to top when page loads with timeout for initial load
     window.scrollTo(0, 0);
-    
+
     // Additional timeout to ensure proper scrolling after onboarding
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -79,10 +80,14 @@ export default function Home() {
   }, []);
 
   // Consolidated variables for both household and non-household users
-  const activeChores = (chores as any[])?.filter((chore: any) => chore.status !== "done") || [];
-  const recentMessages = (messages as any[])?.slice().reverse().slice(0, 3) || [];
-  const netBalance = ((balance as any)?.totalOwed || 0) - ((balance as any)?.totalOwing || 0);
-  const firstName = (user as any)?.firstName || (user as any)?.email?.split("@")[0] || "there";
+  const activeChores =
+    (chores as any[])?.filter((chore: any) => chore.status !== "done") || [];
+  const recentMessages =
+    (messages as any[])?.slice().reverse().slice(0, 3) || [];
+  const netBalance =
+    ((balance as any)?.totalOwed || 0) - ((balance as any)?.totalOwing || 0);
+  const firstName =
+    (user as any)?.firstName || (user as any)?.email?.split("@")[0] || "there";
 
   const currentHour = new Date().getHours();
   const greeting =
@@ -99,11 +104,12 @@ export default function Home() {
     return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   })[0];
 
-  const todayEvents = (calendarEvents as any[])?.filter((event: any) => {
-    const eventDate = new Date(event.startDate).toDateString();
-    const today = new Date().toDateString();
-    return eventDate === today;
-  }) || [];
+  const todayEvents =
+    (calendarEvents as any[])?.filter((event: any) => {
+      const eventDate = new Date(event.startDate).toDateString();
+      const today = new Date().toDateString();
+      return eventDate === today;
+    }) || [];
 
   if (!household) {
     return (
@@ -116,15 +122,17 @@ export default function Home() {
                 <h1 className="page-title">
                   Welcome back, <span className="truncate">{firstName}</span>
                 </h1>
-                <p className="page-subtitle truncate">Find your perfect living situation</p>
+                <p className="page-subtitle truncate">
+                  Find your perfect living situation
+                </p>
               </div>
               <button
                 onClick={() => setLocation("/profile")}
                 className="flex-shrink-0 shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
               >
-                <QuickAvatar 
-                  user={user as any} 
-                  size="lg" 
+                <QuickAvatar
+                  user={user as any}
+                  size="lg"
                   gradientType="emerald"
                   className="rounded-2xl"
                 />
@@ -138,23 +146,40 @@ export default function Home() {
           {(myListings as any[])?.length > 0 && (
             <Card className="glass-card">
               <CardContent className="p-6">
-                <h4 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                <h4
+                  className="font-semibold mb-4"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   Your Activity
                 </h4>
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
-                    <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                    <p
+                      className="text-2xl font-bold"
+                      style={{ color: "var(--text-primary)" }}
+                    >
                       {Array.isArray(myListings) ? myListings.length : 0}
                     </p>
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    <p
+                      className="text-sm"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
                       Active Listings
                     </p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                      {Array.isArray(featuredListings) ? featuredListings.length : 0}
+                    <p
+                      className="text-2xl font-bold"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {Array.isArray(featuredListings)
+                        ? featuredListings.length
+                        : 0}
                     </p>
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    <p
+                      className="text-sm"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
                       Available Matches
                     </p>
                   </div>
@@ -166,22 +191,25 @@ export default function Home() {
           {(myListings as any[])?.length > 0 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   Your Listings
                 </h3>
                 <button
                   onClick={() => setLocation("/roommates")}
                   className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
-                  style={{ 
-                    background: 'var(--surface-secondary)',
-                    color: 'var(--text-secondary)'
+                  style={{
+                    background: "var(--surface-secondary)",
+                    color: "var(--text-secondary)",
                   }}
                 >
                   <span className="text-sm font-medium">View All</span>
                   <ArrowRight size={14} />
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 {(myListings as any[]).slice(0, 2).map((listing: any) => (
                   <RoommateListingCard
@@ -197,52 +225,70 @@ export default function Home() {
 
           {/* Featured Listings Section */}
           {(myListings as any[])?.length === 0 && (
-          <div className="space-y-4 pb-6 border-b" style={{ borderColor: 'var(--border-color)' }}>
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Featured Listings
-              </h3>
-              <button
-                onClick={() => setLocation("/roommates")}
-                className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
-                style={{ 
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                <span className="text-sm font-medium">View All</span>
-                <ArrowRight size={14} />
-              </button>
-            </div>
-
-            {featuredListings && featuredListings.length > 0 ? (
-              <div className="space-y-4">
-                {featuredListings.slice(0, 3).map((listing: any) => (
-                  <RoommateListingCard
-                    key={listing.id}
-                    listing={listing}
-                    compact={true}
-                    onContact={() => setLocation("/roommates")}
-                  />
-                ))}
+            <div
+              className="space-y-4 pb-6 border-b"
+              style={{ borderColor: "var(--border-color)" }}
+            >
+              <div className="flex items-center justify-between">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  Featured Listings
+                </h3>
+                <button
+                  onClick={() => setLocation("/roommates")}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
+                  style={{
+                    background: "var(--surface-secondary)",
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  <span className="text-sm font-medium">View All</span>
+                  <ArrowRight size={14} />
+                </button>
               </div>
-            ) : (
-              <Card className="glass-card">
-                <CardContent className="p-8 text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                    <Search size={24} style={{ color: 'var(--text-secondary)' }} />
-                  </div>
-                  <h4 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                    No listings yet
-                  </h4>
-                  <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                    Be the first to post a listing in your area
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        )}
+
+              {featuredListings && featuredListings.length > 0 ? (
+                <div className="space-y-4">
+                  {featuredListings.slice(0, 3).map((listing: any) => (
+                    <RoommateListingCard
+                      key={listing.id}
+                      listing={listing}
+                      compact={true}
+                      onContact={() => setLocation("/roommates")}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card className="glass-card">
+                  <CardContent className="p-8 text-center">
+                    <div
+                      className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                      style={{ backgroundColor: "var(--surface-secondary)" }}
+                    >
+                      <Search
+                        size={24}
+                        style={{ color: "var(--text-secondary)" }}
+                      />
+                    </div>
+                    <h4
+                      className="font-medium mb-2"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      No listings yet
+                    </h4>
+                    <p
+                      className="text-sm mb-4"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      Be the first to post a listing in your area
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -255,16 +301,24 @@ export default function Home() {
                   <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <HomeIcon className="text-white" size={20} />
                   </div>
-                  <p className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  <p
+                    className="text-lg font-semibold mb-2"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     Create or Join Household
                   </p>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Start managing shared living</p>
+                  <p
+                    className="text-sm"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    Start managing shared living
+                  </p>
                 </button>
               </CardContent>
             </Card>
 
             <Card className="glass-card">
-              <CardContent 
+              <CardContent
                 className="p-6 text-center animate-fade-in"
                 style={{ animationDelay: "100ms" }}
               >
@@ -275,10 +329,18 @@ export default function Home() {
                   <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Plus className="text-white" size={20} />
                   </div>
-                  <p className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  <p
+                    className="text-lg font-semibold mb-2"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     Post Your Listing
                   </p>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Find roommates nearby</p>
+                  <p
+                    className="text-sm"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    Find roommates nearby
+                  </p>
                 </button>
               </CardContent>
             </Card>
@@ -298,12 +360,17 @@ export default function Home() {
               <h1 className="page-title">
                 {greeting}, <span className="truncate">{firstName}</span>
               </h1>
-              <p className="page-subtitle truncate">{(household as any)?.name}</p>
+              <p className="page-subtitle truncate">
+                {(household as any)?.name}
+              </p>
             </div>
-            <button onClick={() => setLocation("/profile")} className="flex-shrink-0">
-              <QuickAvatar 
-                user={user as any} 
-                size="lg" 
+            <button
+              onClick={() => setLocation("/profile")}
+              className="flex-shrink-0"
+            >
+              <QuickAvatar
+                user={user as any}
+                size="lg"
                 gradientType="emerald"
                 className="shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in rounded-2xl"
               />
@@ -311,9 +378,9 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="pt-44 px-6 space-y-6">
+      <div className="pt-48 px-6 space-y-6">
         {/* Hero Stats */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="pt-6 grid grid-cols-2 gap-4">
           <Card className="glass-card">
             <CardContent className="p-6 text-center animate-fade-in">
               <button
@@ -323,10 +390,18 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <CheckSquare className="text-white" size={20} />
                 </div>
-                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                <p
+                  className="text-2xl font-bold"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   {activeChores.length}
                 </p>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Active chores</p>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Active chores
+                </p>
               </button>
             </CardContent>
           </Card>
@@ -343,10 +418,16 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <DollarSign className="text-white" size={20} />
                 </div>
-                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                <p
+                  className="text-2xl font-bold"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   ${Math.abs(netBalance).toFixed(2)}
                 </p>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--text-secondary)" }}
+                >
                   {netBalance > 0
                     ? "Owed to you"
                     : netBalance < 0
@@ -370,10 +451,18 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Calendar className="text-white" size={20} />
                 </div>
-                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                <p
+                  className="text-2xl font-bold"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   {todayEvents.length}
                 </p>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Today's events</p>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Today's events
+                </p>
               </button>
             </CardContent>
           </Card>
@@ -390,10 +479,18 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <MessageCircle className="text-white" size={20} />
                 </div>
-                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                <p
+                  className="text-2xl font-bold"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   {recentMessages.length}
                 </p>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>New messages</p>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  New messages
+                </p>
               </button>
             </CardContent>
           </Card>
@@ -403,23 +500,40 @@ export default function Home() {
         {(myListings as any[])?.length > 0 && (
           <Card className="glass-card">
             <CardContent className="p-6">
-              <h4 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+              <h4
+                className="font-semibold mb-4"
+                style={{ color: "var(--text-primary)" }}
+              >
                 Your Activity
               </h4>
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                  <p
+                    className="text-2xl font-bold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     {Array.isArray(myListings) ? myListings.length : 0}
                   </p>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <p
+                    className="text-sm"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     Active Listings
                   </p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                    {Array.isArray(featuredListings) ? featuredListings.length : 0}
+                  <p
+                    className="text-2xl font-bold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {Array.isArray(featuredListings)
+                      ? featuredListings.length
+                      : 0}
                   </p>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <p
+                    className="text-sm"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     Available Matches
                   </p>
                 </div>
@@ -430,7 +544,10 @@ export default function Home() {
 
         {/* AI-Powered Today's Priority */}
         <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
+          <h2
+            className="text-xl font-bold mb-4 flex items-center"
+            style={{ color: "var(--text-primary)" }}
+          >
             <Target className="w-5 h-5 mr-2 text-primary" />
             Today's Priority
             <span className="ml-2 px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full">
@@ -441,32 +558,42 @@ export default function Home() {
             <CardContent className="p-4">
               <div className="space-y-4">
                 {/* AI Analysis */}
-                <div className="rounded-xl p-4" style={{ background: 'var(--surface-overlay)' }}>
-                  <h3 className="font-semibold mb-2 flex items-center" style={{ color: 'var(--text-primary)' }}>
+                <div
+                  className="rounded-xl p-4"
+                  style={{ background: "var(--surface-overlay)" }}
+                >
+                  <h3
+                    className="font-semibold mb-2 flex items-center"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     <Brain className="w-4 h-4 mr-2 text-purple-600" />
                     Smart Recommendations
                   </h3>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <p
+                    className="text-sm"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     {(() => {
                       const today = new Date();
-                      const todayEvents = (calendarEvents as any[])?.filter(
-                        (event: any) => {
+                      const todayEvents =
+                        (calendarEvents as any[])?.filter((event: any) => {
                           const eventDate = new Date(event.startDate);
                           return (
                             eventDate.toDateString() === today.toDateString()
                           );
+                        }) || [];
+                      const urgentChores = (chores as any[])?.filter(
+                        (chore: any) => {
+                          if (chore.status === "done" || !chore.dueDate)
+                            return false;
+                          const dueDate = new Date(chore.dueDate);
+                          const diffTime = dueDate.getTime() - today.getTime();
+                          const diffDays = Math.ceil(
+                            diffTime / (1000 * 60 * 60 * 24),
+                          );
+                          return diffDays <= 1;
                         },
-                      ) || [];
-                      const urgentChores = (chores as any[])?.filter((chore: any) => {
-                        if (chore.status === "done" || !chore.dueDate)
-                          return false;
-                        const dueDate = new Date(chore.dueDate);
-                        const diffTime = dueDate.getTime() - today.getTime();
-                        const diffDays = Math.ceil(
-                          diffTime / (1000 * 60 * 60 * 24),
-                        );
-                        return diffDays <= 1;
-                      });
+                      );
 
                       if (todayEvents.length > 0 && urgentChores.length > 0) {
                         return `You have ${todayEvents.length} event${todayEvents.length > 1 ? "s" : ""} and ${urgentChores.length} urgent chore${urgentChores.length > 1 ? "s" : ""} today. Consider completing chores before your events.`;
@@ -489,12 +616,15 @@ export default function Home() {
                   <button
                     onClick={() => setLocation("/calendar")}
                     className="rounded-xl p-4 w-full text-left transition-colors btn-animated"
-                    style={{ 
-                      background: 'var(--surface-secondary)',
-                      borderColor: 'var(--border)'
+                    style={{
+                      background: "var(--surface-secondary)",
+                      borderColor: "var(--border)",
                     }}
                   >
-                    <h4 className="font-semibold mb-3 flex items-center" style={{ color: 'var(--text-primary)' }}>
+                    <h4
+                      className="font-semibold mb-3 flex items-center"
+                      style={{ color: "var(--text-primary)" }}
+                    >
                       <Calendar className="w-4 h-4 mr-2 text-blue-600" />
                       Today's Events
                     </h4>
@@ -523,10 +653,16 @@ export default function Home() {
                                 }}
                               ></div>
                               <div className="flex-1">
-                                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                                <p
+                                  className="text-sm font-medium"
+                                  style={{ color: "var(--text-primary)" }}
+                                >
                                   {event.title}
                                 </p>
-                                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                <p
+                                  className="text-xs"
+                                  style={{ color: "var(--text-secondary)" }}
+                                >
                                   {new Date(event.startDate).toLocaleTimeString(
                                     [],
                                     { hour: "2-digit", minute: "2-digit" },
@@ -536,7 +672,10 @@ export default function Home() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
                             No events scheduled
                           </p>
                         );
@@ -548,12 +687,15 @@ export default function Home() {
                   <button
                     onClick={() => setLocation("/chores")}
                     className="rounded-xl p-4 w-full text-left transition-colors btn-animated"
-                    style={{ 
-                      background: 'var(--surface-secondary)',
-                      borderColor: 'var(--border)'
+                    style={{
+                      background: "var(--surface-secondary)",
+                      borderColor: "var(--border)",
                     }}
                   >
-                    <h4 className="font-semibold mb-3 flex items-center" style={{ color: 'var(--text-primary)' }}>
+                    <h4
+                      className="font-semibold mb-3 flex items-center"
+                      style={{ color: "var(--text-primary)" }}
+                    >
                       <CheckSquare className="w-4 h-4 mr-2 text-emerald-600" />
                       Priority Chores
                     </h4>
@@ -581,10 +723,16 @@ export default function Home() {
                             >
                               <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
                               <div className="flex-1">
-                                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                                <p
+                                  className="text-sm font-medium"
+                                  style={{ color: "var(--text-primary)" }}
+                                >
                                   {chore.title}
                                 </p>
-                                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                <p
+                                  className="text-xs"
+                                  style={{ color: "var(--text-secondary)" }}
+                                >
                                   {chore.dueDate
                                     ? `Due ${new Date(chore.dueDate).toLocaleDateString()}`
                                     : "No due date"}
@@ -593,7 +741,10 @@ export default function Home() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
                             No pending chores
                           </p>
                         );
@@ -609,34 +760,47 @@ export default function Home() {
         {/* Performance Insights */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
+            <h2
+              className="text-xl font-bold flex items-center"
+              style={{ color: "var(--text-primary)" }}
+            >
               <BarChart3 className="w-5 h-5 mr-2 text-primary" />
               Household Performance
             </h2>
             <button
               onClick={() => setLocation("/dashboard")}
               className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
-              style={{ 
-                background: 'var(--surface-secondary)',
-                color: 'var(--text-secondary)'
+              style={{
+                background: "var(--surface-secondary)",
+                color: "var(--text-secondary)",
               }}
             >
               <span className="text-sm font-medium">View All</span>
               <ArrowRight size={14} />
             </button>
           </div>
-          {((chores as any[])?.length === 0 && (!balance || ((balance as any).totalOwed === 0 && (balance as any).totalOwing === 0))) ? (
+          {(chores as any[])?.length === 0 &&
+          (!balance ||
+            ((balance as any).totalOwed === 0 &&
+              (balance as any).totalOwing === 0)) ? (
             <Card className="glass-card">
               <CardContent className="p-6">
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
                     <BarChart3 size={24} className="text-white" />
                   </div>
-                  <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  <h3
+                    className="text-lg font-bold mb-2"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     No activity yet
                   </h3>
-                  <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
-                    Start tracking chores and expenses to see your household performance!
+                  <p
+                    className="mb-6"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    Start tracking chores and expenses to see your household
+                    performance!
                   </p>
                   <div className="flex justify-center space-x-4">
                     <button
@@ -656,80 +820,106 @@ export default function Home() {
               </CardContent>
             </Card>
           ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {(() => {
-              const completedChores = (chores as any[])?.filter(
-                (c: any) => c.status === "done",
-              ) || [];
-              const totalChores = (chores as any[])?.length || 0;
-              const completionRate =
-                totalChores > 0
-                  ? (completedChores.length / totalChores) * 100
-                  : 0;
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {(() => {
+                const completedChores =
+                  (chores as any[])?.filter((c: any) => c.status === "done") ||
+                  [];
+                const totalChores = (chores as any[])?.length || 0;
+                const completionRate =
+                  totalChores > 0
+                    ? (completedChores.length / totalChores) * 100
+                    : 0;
 
-              const memberPerformance =
-                (household as any)?.members?.map((member: any) => {
-                  const memberChores = (chores as any[])?.filter(
-                    (c: any) => c.assignedTo === member.userId,
-                  ) || [];
-                  const completedMemberChores = memberChores.filter(
-                    (c: any) => c.status === "done",
-                  );
-                  return {
-                    ...member,
-                    completionRate:
-                      memberChores.length > 0
-                        ? (completedMemberChores.length / memberChores.length) *
-                          100
-                        : 0,
-                  };
-                }) || [];
+                const memberPerformance =
+                  (household as any)?.members?.map((member: any) => {
+                    const memberChores =
+                      (chores as any[])?.filter(
+                        (c: any) => c.assignedTo === member.userId,
+                      ) || [];
+                    const completedMemberChores = memberChores.filter(
+                      (c: any) => c.status === "done",
+                    );
+                    return {
+                      ...member,
+                      completionRate:
+                        memberChores.length > 0
+                          ? (completedMemberChores.length /
+                              memberChores.length) *
+                            100
+                          : 0,
+                    };
+                  }) || [];
 
-              const topPerformer = memberPerformance.sort(
-                (a: any, b: any) => b.completionRate - a.completionRate,
-              )[0];
+                const topPerformer = memberPerformance.sort(
+                  (a: any, b: any) => b.completionRate - a.completionRate,
+                )[0];
 
-              return (
-                <>
-                  <Card className="glass-card">
-                    <CardContent className="p-6 text-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <TrendingUp className="w-6 h-6 text-white" />
-                      </div>
-                      <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                        {completionRate.toFixed(0)}%
-                      </p>
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Completion Rate</p>
-                    </CardContent>
-                  </Card>
+                return (
+                  <>
+                    <Card className="glass-card">
+                      <CardContent className="p-6 text-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                          <TrendingUp className="w-6 h-6 text-white" />
+                        </div>
+                        <p
+                          className="text-2xl font-bold"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          {completionRate.toFixed(0)}%
+                        </p>
+                        <p
+                          className="text-sm"
+                          style={{ color: "var(--text-secondary)" }}
+                        >
+                          Completion Rate
+                        </p>
+                      </CardContent>
+                    </Card>
 
-                  <Card className="glass-card">
-                    <CardContent className="p-6 text-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <Award className="w-6 h-6 text-white" />
-                      </div>
-                      <p className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
-                        {topPerformer?.user?.firstName || "Team"}
-                      </p>
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Top Performer</p>
-                    </CardContent>
-                  </Card>
+                    <Card className="glass-card">
+                      <CardContent className="p-6 text-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                          <Award className="w-6 h-6 text-white" />
+                        </div>
+                        <p
+                          className="text-lg font-bold"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          {topPerformer?.user?.firstName || "Team"}
+                        </p>
+                        <p
+                          className="text-sm"
+                          style={{ color: "var(--text-secondary)" }}
+                        >
+                          Top Performer
+                        </p>
+                      </CardContent>
+                    </Card>
 
-                  <Card className="glass-card">
-                    <CardContent className="p-6 text-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <CheckSquare className="w-6 h-6 text-white" />
-                      </div>
-                      <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                        {activeChores.length}
-                      </p>
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Active Tasks</p>
-                    </CardContent>
-                  </Card>
-                </>
-              );
-            })()}
-          </div>
+                    <Card className="glass-card">
+                      <CardContent className="p-6 text-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                          <CheckSquare className="w-6 h-6 text-white" />
+                        </div>
+                        <p
+                          className="text-2xl font-bold"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          {activeChores.length}
+                        </p>
+                        <p
+                          className="text-sm"
+                          style={{ color: "var(--text-secondary)" }}
+                        >
+                          Active Tasks
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </>
+                );
+              })()}
+            </div>
           )}
         </div>
 
@@ -737,16 +927,19 @@ export default function Home() {
           {/* Right Column - Recent Activity */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
+              <h2
+                className="text-xl font-bold flex items-center"
+                style={{ color: "var(--text-primary)" }}
+              >
                 <MessageCircle className="w-5 h-5 mr-2 text-primary" />
                 Recent Activity
               </h2>
               <button
                 onClick={() => setLocation("/messages")}
                 className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
-                style={{ 
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-secondary)'
+                style={{
+                  background: "var(--surface-secondary)",
+                  color: "var(--text-secondary)",
                 }}
               >
                 <span className="text-sm font-medium">View All</span>
@@ -763,26 +956,35 @@ export default function Home() {
                         key={message.id}
                         className="flex items-start space-x-3"
                       >
-                        <QuickAvatar 
-                          user={message.user} 
-                          size="md" 
+                        <QuickAvatar
+                          user={message.user}
+                          size="md"
                           gradientType="blue"
                           className="rounded-2xl flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2 mb-1">
-                            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                            <p
+                              className="text-sm font-medium"
+                              style={{ color: "var(--text-primary)" }}
+                            >
                               {message.user.firstName ||
                                 message.user.email?.split("@")[0]}
                             </p>
-                            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                            <span
+                              className="text-xs"
+                              style={{ color: "var(--text-secondary)" }}
+                            >
                               {new Date(message.createdAt).toLocaleTimeString(
                                 [],
                                 { hour: "2-digit", minute: "2-digit" },
                               )}
                             </span>
                           </div>
-                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
                             {message.content}
                           </p>
                         </div>
@@ -801,10 +1003,16 @@ export default function Home() {
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
                       <MessageCircle size={24} className="text-white" />
                     </div>
-                    <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+                    <h3
+                      className="text-lg font-bold mb-2"
+                      style={{ color: "var(--text-primary)" }}
+                    >
                       Start the conversation
                     </h3>
-                    <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+                    <p
+                      className="mb-6"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
                       No messages yet. Say hello to your roommates!
                     </p>
                     <div className="flex items-center justify-center space-x-2 text-primary font-medium">
@@ -819,23 +1027,36 @@ export default function Home() {
         </div>
 
         {/* Roommate Marketplace Section */}
-        <div className="mt-12 border-t pt-8" style={{ borderColor: 'var(--border-color)' }}>
+        <div
+          className="mt-12 border-t pt-8"
+          style={{ borderColor: "var(--border-color)" }}
+        >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                 <Users className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="font-semibold text-[22px]" style={{ color: 'var(--text-primary)' }}>Find Roommates</h2>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Discover your roommate match</p>
+                <h2
+                  className="font-semibold text-[22px]"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  Find Roommates
+                </h2>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Discover your roommate match
+                </p>
               </div>
             </div>
             <button
               onClick={() => setLocation("/roommates")}
               className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
-              style={{ 
-                background: 'var(--surface-secondary)',
-                color: 'var(--text-secondary)'
+              style={{
+                background: "var(--surface-secondary)",
+                color: "var(--text-secondary)",
               }}
             >
               <span className="text-sm font-medium">View All</span>
@@ -852,7 +1073,7 @@ export default function Home() {
                   compact={true}
                   onContact={(listing) => {
                     if (listing.contactInfo) {
-                      window.open(`mailto:${listing.contactInfo}`, '_blank');
+                      window.open(`mailto:${listing.contactInfo}`, "_blank");
                     }
                   }}
                 />
@@ -864,8 +1085,15 @@ export default function Home() {
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>No listings yet</h3>
-                <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Be the first to post a roommate listing in your area</p>
+                <h3
+                  className="text-lg font-semibold mb-2"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  No listings yet
+                </h3>
+                <p className="mb-4" style={{ color: "var(--text-secondary)" }}>
+                  Be the first to post a roommate listing in your area
+                </p>
                 <button
                   onClick={() => setLocation("/roommates")}
                   className="px-6 py-3 bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-2xl font-semibold transition-all hover:scale-[1.02] btn-animated"
@@ -882,9 +1110,9 @@ export default function Home() {
               <button
                 onClick={() => setLocation("/roommates")}
                 className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
-                style={{ 
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-secondary)'
+                style={{
+                  background: "var(--surface-secondary)",
+                  color: "var(--text-secondary)",
                 }}
               >
                 <span className="text-sm font-medium">View All</span>

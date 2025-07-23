@@ -74,11 +74,27 @@ export function ProfileAvatar({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       setShowUploadOptions(false);
+      setUploading(false);
     },
     onError: (error) => {
       console.error('Profile image upload failed:', error);
+      setUploading(false);
+    },
+    onSettled: () => {
+      setUploading(false);
     }
   });
+
+  // Reset success states after a delay
+  React.useEffect(() => {
+    if (uploadMutation.isSuccess || deleteMutation.isSuccess) {
+      const timer = setTimeout(() => {
+        uploadMutation.reset();
+        deleteMutation.reset();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [uploadMutation.isSuccess, deleteMutation.isSuccess, uploadMutation.reset, deleteMutation.reset]);
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
@@ -96,6 +112,9 @@ export function ProfileAvatar({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       setShowUploadOptions(false);
+    },
+    onError: (error) => {
+      console.error('Profile image removal failed:', error);
     }
   });
 
@@ -180,9 +199,9 @@ export function ProfileAvatar({
           >
             {uploading || uploadMutation.isPending || deleteMutation.isPending || updateColorMutation.isPending ? (
               <div className="w-3 h-3 border border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-            ) : updateColorMutation.isSuccess ? (
+            ) : uploadMutation.isSuccess || deleteMutation.isSuccess || updateColorMutation.isSuccess ? (
               <Check className="w-3 h-3 text-green-500" />
-            ) : updateColorMutation.isError ? (
+            ) : uploadMutation.isError || deleteMutation.isError || updateColorMutation.isError ? (
               <AlertCircle className="w-3 h-3 text-red-500" />
             ) : (
               <Camera className="w-3 h-3" />
