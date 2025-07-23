@@ -69,7 +69,7 @@ function Router() {
   const skipLanding = shouldSkipLanding();
 
   return (
-    <div className="max-w-md mx-auto min-h-screen relative" style={{ background: 'var(--background)' }}>
+    <div className="w-full min-h-screen relative" style={{ background: 'var(--background)' }}>
       <Switch>
         {!user ? (
           <>
