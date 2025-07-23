@@ -300,13 +300,13 @@ export default function Home() {
               </h1>
               <p className="page-subtitle truncate">{(household as any)?.name}</p>
             </div>
-            <button
-              onClick={() => setLocation("/profile")}
-              className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
-            >
-              <span className="text-white font-bold text-lg">
-                {getProfileInitials((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email)}
-              </span>
+            <button onClick={() => setLocation("/profile")} className="flex-shrink-0">
+              <QuickAvatar 
+                user={user as any} 
+                size="lg" 
+                gradientType="emerald"
+                className="shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in rounded-2xl"
+              />
             </button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Camera, X, Upload, Palette } from 'lucide-react';
+import { Camera, X, Upload, Palette, Check, AlertCircle } from 'lucide-react';
 import { getProfileInitials } from '@/lib/nameUtils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -101,12 +101,19 @@ export function ProfileAvatar({
 
   const updateColorMutation = useMutation({
     mutationFn: async (color: string) => {
-      const response = await apiRequest('PATCH', '/api/user', { profileColor: color });
-      return response.json();
+      return apiRequest('PATCH', '/api/user', { profileColor: color });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/households/current'] });
       setShowColorPicker(false);
+      // Reset success state after 2 seconds
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      }, 2000);
+    },
+    onError: (error) => {
+      console.error('Profile color update failed:', error);
     }
   });
 
@@ -168,15 +175,28 @@ export function ProfileAvatar({
             onClick={() => setShowUploadOptions(!showUploadOptions)}
             disabled={uploading || uploadMutation.isPending || deleteMutation.isPending}
           >
-            {uploading || uploadMutation.isPending || deleteMutation.isPending ? (
+            {uploading || uploadMutation.isPending || deleteMutation.isPending || updateColorMutation.isPending ? (
               <div className="w-3 h-3 border border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+            ) : updateColorMutation.isSuccess ? (
+              <Check className="w-3 h-3 text-green-500" />
+            ) : updateColorMutation.isError ? (
+              <AlertCircle className="w-3 h-3 text-red-500" />
             ) : (
               <Camera className="w-3 h-3" />
             )}
           </Button>
 
           {showUploadOptions && (
-            <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2 z-50 min-w-40">
+            <div 
+              className="absolute top-full left-0 mt-2 rounded-2xl shadow-lg border p-3 z-50 min-w-48"
+              style={{
+                background: 'var(--surface)',
+                borderColor: 'var(--border)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                backgroundColor: 'rgba(var(--surface-rgb), 0.9)'
+              }}
+            >
               <div className="space-y-2">
                 <label className="block">
                   <input
@@ -185,57 +205,77 @@ export function ProfileAvatar({
                     onChange={handleFileSelect}
                     className="hidden"
                   />
-                  <Button variant="ghost" size="sm" className="w-full justify-start text-left" asChild>
-                    <span className="cursor-pointer">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Photo
-                    </span>
-                  </Button>
+                  <button className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] cursor-pointer"
+                    style={{
+                      background: 'var(--surface-secondary)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--border)'
+                    }}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Photo
+                  </button>
                 </label>
                 
                 {user.profileImageUrl && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  <button 
+                    className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] text-red-500 hover:text-red-600"
                     onClick={handleRemoveImage}
+                    style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border)'
+                    }}
                   >
                     <X className="w-4 h-4 mr-2" />
                     Remove Photo
-                  </Button>
+                  </button>
                 )}
                 
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full justify-start"
+                <button 
+                  className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.02]"
                   onClick={() => {
                     setShowUploadOptions(false);
                     setShowColorPicker(true);
                   }}
+                  style={{
+                    background: 'var(--surface-secondary)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border)'
+                  }}
                 >
                   <Palette className="w-4 h-4 mr-2" />
                   Change Color
-                </Button>
+                </button>
               </div>
             </div>
           )}
 
           {showColorPicker && (
-            <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-50 min-w-64">
+            <div 
+              className="absolute top-full left-0 mt-2 rounded-2xl shadow-lg border p-4 z-50 min-w-64"
+              style={{
+                background: 'var(--surface)',
+                borderColor: 'var(--border)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                backgroundColor: 'rgba(var(--surface-rgb), 0.9)'
+              }}
+            >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>
                     Avatar Color
                   </h4>
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <button
                     onClick={() => setShowColorPicker(false)}
-                    className="h-6 w-6 p-0"
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+                    style={{
+                      background: 'var(--surface-secondary)',
+                      color: 'var(--text-secondary)'
+                    }}
                   >
                     <X className="w-3 h-3" />
-                  </Button>
+                  </button>
                 </div>
                 
                 <ProfileColorPicker
