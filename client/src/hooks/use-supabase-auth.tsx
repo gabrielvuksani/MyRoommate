@@ -23,6 +23,8 @@ export interface AuthContextType {
   forgotPasswordMutation: UseMutationResult<void, Error, { email: string }>;
   resetPasswordMutation: UseMutationResult<void, Error, { password: string }>;
   updateProfileMutation: UseMutationResult<Profile, Error, Partial<Profile>>;
+  signInWithProvider: (provider: 'google' | 'github' | 'apple') => Promise<void>;
+  resendConfirmation: (email: string) => Promise<void>;
 }
 
 export interface LoginData {
@@ -66,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   // Create legacy user object for compatibility
-  const user = createLegacyUser(supabaseUser, profile);
+  const user = profile ? createLegacyUser(supabaseUser, profile) : null;
 
   // Initialize auth state
   useEffect(() => {
@@ -182,16 +184,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const forgotPasswordMutation = useMutation({
     mutationFn: async ({ email }: { email: string }) => {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${window.location.origin}/auth?reset=true`,
       });
       if (error) throw error;
     },
+    onError: (error: Error) => {
+      console.error("Reset password failed:", error.message);
+    },
   });
+
+  const signInWithProvider = async (provider: 'google' | 'github' | 'apple') => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+    if (error) throw error;
+  };
+
+  const resendConfirmation = async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+    });
+    if (error) throw error;
+  };
+
+
 
   const resetPasswordMutation = useMutation({
     mutationFn: async ({ password }: { password: string }) => {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
+    },
+    onError: (error: Error) => {
+      console.error("Password reset failed:", error.message);
     },
   });
 
@@ -228,6 +260,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         forgotPasswordMutation,
         resetPasswordMutation,
         updateProfileMutation,
+        signInWithProvider,
+        resendConfirmation,
       }}
     >
       {children}

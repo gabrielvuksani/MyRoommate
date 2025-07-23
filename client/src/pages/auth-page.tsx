@@ -5,12 +5,14 @@ import { Input } from "@/components/ui/input";
 
 import { useAuth } from "@/hooks/use-supabase-auth";
 import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle } from "lucide-react";
+import { FaGoogle, FaGithub, FaApple } from "react-icons/fa";
 import { SimpleAvatarSelector } from "@/components/SimpleAvatarSelector";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
-  const { user, loginMutation, registerMutation } = useAuth();
+  const { user, loginMutation, registerMutation, forgotPasswordMutation, signInWithProvider } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,6 +26,7 @@ export default function AuthPage() {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [authError, setAuthError] = useState("");
+  const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
 
   // Scroll to top on page load
   useEffect(() => {
@@ -74,10 +77,26 @@ export default function AuthPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
-
-    // Clear any previous auth errors
+    setErrors({});
     setAuthError("");
+
+    if (showForgotPassword) {
+      // Handle forgot password
+      if (!formData.email) {
+        setErrors({ email: "Email is required" });
+        return;
+      }
+      
+      try {
+        await forgotPasswordMutation.mutateAsync({ email: formData.email });
+        setForgotPasswordSent(true);
+      } catch (error: any) {
+        setAuthError(error.message || "Failed to send reset email");
+      }
+      return;
+    }
+
+    if (!validateForm()) return;
 
     try {
       if (isLogin) {
@@ -85,56 +104,19 @@ export default function AuthPage() {
           email: formData.email,
           password: formData.password,
         });
-        // Login successful - onSuccess will handle navigation
       } else {
-        // First register the user
-        const registerData = {
+        await registerMutation.mutateAsync({
           email: formData.email,
           password: formData.password,
-          confirmPassword: formData.confirmPassword,
           firstName: formData.firstName,
           lastName: formData.lastName,
-        };
-        
-        await registerMutation.mutateAsync(registerData);
-        
-        // After successful registration, upload profile image and update color if needed
-        if (profileImage || formData.profileColor !== 'blue') {
-          try {
-            // Upload profile image if provided
-            if (profileImage) {
-              const imageFormData = new FormData();
-              imageFormData.append('profileImage', profileImage);
-              
-              await fetch('/api/user/profile-image', {
-                method: 'POST',
-                body: imageFormData,
-                credentials: 'include'
-              });
-            }
-            
-            // Update profile color if not default
-            if (formData.profileColor !== 'blue') {
-              await fetch('/api/user', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ profileColor: formData.profileColor }),
-                credentials: 'include'
-              });
-            }
-          } catch (profileError) {
-            // Don't fail registration if profile updates fail
-            console.log('Profile update after registration failed:', profileError);
-          }
-        }
-        
-        // Registration successful - onSuccess will handle navigation
+          profileColor: formData.profileColor,
+          profileImage,
+        });
       }
     } catch (error: any) {
-      console.error("Auth error:", error);
-      // Extract and format error message
-      const rawErrorMessage = error.message || "Authentication failed. Please try again.";
-      const cleanErrorMessage = formatErrorMessage(rawErrorMessage);
+      console.error('Auth error:', error);
+      const cleanErrorMessage = formatErrorMessage(error.message || "Authentication failed. Please try again.");
       setAuthError(cleanErrorMessage);
     }
   };
@@ -197,6 +179,9 @@ export default function AuthPage() {
               <h1 className="text-3xl font-bold text-[#1a1a1a] dark:text-white mb-3">
                 myRoommate
               </h1>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                Powered by Supabase for secure authentication
+              </p>
             </div>
 
             {/* Error Message */}
@@ -229,10 +214,12 @@ export default function AuthPage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                      {isLogin ? "Sign In" : "Create Account"}
+                      {showForgotPassword ? "Reset Password" : 
+                       isLogin ? "Sign In" : "Create Account"}
                     </h2>
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      {isLogin ? "Welcome back" : "There's always room for one more"}
+                      {showForgotPassword ? "Enter your email to receive reset instructions" :
+                       isLogin ? "Welcome back" : "There's always room for one more"}
                     </p>
                   </div>
                 </div>
@@ -421,68 +408,206 @@ export default function AuthPage() {
                   <div className="pt-4">
                     <button
                       type="submit"
-                      disabled={loginMutation.isPending || registerMutation.isPending}
+                      disabled={loginMutation.isPending || registerMutation.isPending || forgotPasswordMutation.isPending}
                       className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-2xl font-semibold text-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
-                      {(loginMutation.isPending || registerMutation.isPending) ? (
+                      {(loginMutation.isPending || registerMutation.isPending || forgotPasswordMutation.isPending) ? (
                         <div className="flex items-center justify-center space-x-2">
                           <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                          <span>Please wait...</span>
+                          <span>
+                            {showForgotPassword ? "Sending reset email..." : 
+                             isLogin ? "Signing in..." : "Creating account..."}
+                          </span>
                         </div>
-                      ) : isLogin ? (
-                        "Sign In"
                       ) : (
-                        "Create Account"
+                        <span>
+                          {showForgotPassword ? "Send Reset Email" :
+                           isLogin ? "Sign In" : "Create Account"}
+                        </span>
                       )}
                     </button>
                   </div>
-                </form>
 
-                {/* Toggle Form */}
-                <div className="mt-8 text-center">
-                  <button
-                    onClick={() => {
-                      setIsLogin(!isLogin);
-                      setErrors({});
-                      setFormData({
-                        email: "",
-                        password: "",
-                        confirmPassword: "",
-                        firstName: "",
-                        lastName: "",
-                        profileColor: "blue",
-                      });
-                      setProfileImage(null);
-                      setAuthError("");
-                    }}
-                    className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"
-                    style={{ 
-                      color: 'var(--text-secondary)',
-                    }}
-                  >
-                    {isLogin ? (
-                      <>
-                        Don't have an account?{" "}
+                  {/* Forgot Password & Toggle */}
+                  {isLogin && !showForgotPassword && (
+                    <div className="pt-3 text-center">
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"
+                        style={{ 
+                          color: 'var(--text-secondary)',
+                        }}
+                      >
+                        Forgot your password?{" "}
                         <span 
                           className="font-semibold transition-colors duration-200"
                           style={{ color: 'var(--primary)' }}
                         >
-                          Sign up
+                          Reset it
                         </span>
-                      </>
-                    ) : (
-                      <>
-                        Already have an account?{" "}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Back to Login from Forgot Password */}
+                  {showForgotPassword && !forgotPasswordSent && (
+                    <div className="pt-3 text-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowForgotPassword(false);
+                          setAuthError("");
+                          setErrors({});
+                        }}
+                        className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"
+                        style={{ 
+                          color: 'var(--text-secondary)',
+                        }}
+                      >
+                        Remember your password?{" "}
                         <span 
                           className="font-semibold transition-colors duration-200"
                           style={{ color: 'var(--primary)' }}
                         >
                           Sign in
                         </span>
-                      </>
-                    )}
-                  </button>
-                </div>
+                      </button>
+                    </div>
+                  )}
+                </form>
+
+                {/* Social Sign In - Only show for login and not forgot password */}
+                {!showForgotPassword && (
+                  <>
+                    <div className="relative my-6">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t" style={{ borderColor: 'var(--border)' }}></div>
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-4 text-sm" style={{ 
+                          background: 'var(--background)',
+                          color: 'var(--text-secondary)'
+                        }}>
+                          Or continue with
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3">
+                      {/* Google */}
+                      <button
+                        type="button"
+                        onClick={() => signInWithProvider('google')}
+                        className="flex items-center justify-center py-3 px-4 rounded-xl border transition-all duration-200 hover:scale-105 hover:shadow-md"
+                        style={{
+                          background: 'var(--surface)',
+                          borderColor: 'var(--border)',
+                          color: 'var(--text-primary)'
+                        }}
+                      >
+                        <FaGoogle className="w-5 h-5 text-red-500" />
+                      </button>
+
+                      {/* GitHub */}
+                      <button
+                        type="button"
+                        onClick={() => signInWithProvider('github')}
+                        className="flex items-center justify-center py-3 px-4 rounded-xl border transition-all duration-200 hover:scale-105 hover:shadow-md"
+                        style={{
+                          background: 'var(--surface)',
+                          borderColor: 'var(--border)',
+                          color: 'var(--text-primary)'
+                        }}
+                      >
+                        <FaGithub className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+                      </button>
+
+                      {/* Apple */}
+                      <button
+                        type="button"
+                        onClick={() => signInWithProvider('apple')}
+                        className="flex items-center justify-center py-3 px-4 rounded-xl border transition-all duration-200 hover:scale-105 hover:shadow-md"
+                        style={{
+                          background: 'var(--surface)',
+                          borderColor: 'var(--border)',
+                          color: 'var(--text-primary)'
+                        }}
+                      >
+                        <FaApple className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* Forgot Password Success */}
+                {forgotPasswordSent && (
+                  <div className="mt-4">
+                    <Card className="glass-card border-green-200 dark:border-green-700">
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                            <CheckCircle size={16} className="text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Reset Email Sent</h3>
+                            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                              Check your email for password reset instructions.
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                {/* Toggle Form */}
+                {!showForgotPassword && (
+                  <div className="mt-8 text-center">
+                    <button
+                      onClick={() => {
+                        setIsLogin(!isLogin);
+                        setErrors({});
+                        setFormData({
+                          email: "",
+                          password: "",
+                          confirmPassword: "",
+                          firstName: "",
+                          lastName: "",
+                          profileColor: "blue",
+                        });
+                        setProfileImage(null);
+                        setAuthError("");
+                      }}
+                      className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"
+                      style={{ 
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      {isLogin ? (
+                        <>
+                          Don't have an account?{" "}
+                          <span 
+                            className="font-semibold transition-colors duration-200"
+                            style={{ color: 'var(--primary)' }}
+                          >
+                            Sign up
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          Already have an account?{" "}
+                          <span 
+                            className="font-semibold transition-colors duration-200"
+                            style={{ color: 'var(--primary)' }}
+                          >
+                            Sign in
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -498,7 +623,7 @@ export default function AuthPage() {
               Your roommate journey starts here
             </h2>
             <p className="text-xl mb-8 text-gray-600 dark:text-gray-300 leading-relaxed">
-              Manage chores, split expenses, coordinate schedules, and find the perfect roommate match.
+              Secure authentication, real-time sync, and powerful features powered by Supabase.
             </p>
             <div className="space-y-4 text-left">
               <div className="flex items-center space-x-3">
