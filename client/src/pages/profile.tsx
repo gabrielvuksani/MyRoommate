@@ -747,12 +747,23 @@ export default function Profile() {
                     : notificationStatus?.blockReason
                     ? "Notifications Unavailable"
                     : notificationStatus?.permission === 'granted'
-                    ? "Test Notifications"
+                    ? "Test Live Notifications"
                     : notificationStatus?.canRequest
                     ? "Enable Notifications"
                     : "Notifications Blocked"
                   }
                 </span>
+              </Button>
+
+              <Button
+                onClick={async () => {
+                  const success = await notificationService.testPushNotification();
+                  console.log('Push notification test result:', success);
+                }}
+                className="w-full py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:from-emerald-600 hover:to-cyan-600"
+              >
+                <Bell size={20} />
+                <span>Test Background Push</span>
               </Button>
               {(household as any) && (
                 <Button

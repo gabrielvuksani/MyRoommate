@@ -32,6 +32,10 @@ interface WebSocketMessage {
   content?: string;
   householdId?: string;
   error?: string;
+  chore?: any;
+  expense?: any;
+  event?: any;
+  timestamp?: number;
 }
 
 export default function Messages() {

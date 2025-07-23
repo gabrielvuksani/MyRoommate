@@ -23,6 +23,7 @@ export class NotificationService {
   private serviceWorkerRegistration: ServiceWorkerRegistration | null = null;
   private lastNotificationTimes = new Map<string, number>();
   private recentNotifications = new Map<string, number>();
+  private pushSubscription: PushSubscription | null = null;
 
   private constructor() {
     this.checkPermission();
@@ -46,11 +47,110 @@ export class NotificationService {
     if ('serviceWorker' in navigator) {
       try {
         this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js');
-        console.log('Service Worker registered for notifications');
+        console.log('Service Worker registered for push notifications');
+        
+        // Wait for service worker to be ready
+        await navigator.serviceWorker.ready;
+        
+        // Set up push subscription
+        await this.setupPushSubscription();
       } catch (error) {
         console.error('Service Worker registration failed:', error);
       }
     }
+  }
+
+  private async setupPushSubscription(): Promise<void> {
+    if (!this.serviceWorkerRegistration) {
+      console.warn('Service Worker not available for push subscription');
+      return;
+    }
+
+    try {
+      // Check if already subscribed
+      this.pushSubscription = await this.serviceWorkerRegistration.pushManager.getSubscription();
+      
+      if (this.pushSubscription) {
+        console.log('Existing push subscription found');
+        await this.sendSubscriptionToServer(this.pushSubscription);
+        return;
+      }
+
+      // Create new subscription
+      await this.subscribeToPush();
+    } catch (error) {
+      console.error('Error setting up push subscription:', error);
+    }
+  }
+
+  async subscribeToPush(): Promise<boolean> {
+    if (!this.serviceWorkerRegistration) {
+      console.warn('Service Worker not available');
+      return false;
+    }
+
+    try {
+      // Request notification permission first
+      const permissionGranted = await this.requestPermission();
+      if (!permissionGranted) {
+        console.warn('Notification permission denied');
+        return false;
+      }
+
+      // Create push subscription
+      this.pushSubscription = await this.serviceWorkerRegistration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: this.urlBase64ToUint8Array(
+          'BEl62iUYgUivxIkv69yViEuiBIa40HI80NM9w1NWfZT9SGdt6hF2nP7S6f6K6JKZfaYc7FvGhL1KRYu7eFHUfyk' // VAPID public key
+        )
+      });
+
+      console.log('Push subscription created:', this.pushSubscription);
+      
+      // Send subscription to server
+      await this.sendSubscriptionToServer(this.pushSubscription);
+      
+      return true;
+    } catch (error) {
+      console.error('Error subscribing to push notifications:', error);
+      return false;
+    }
+  }
+
+  private async sendSubscriptionToServer(subscription: PushSubscription): Promise<void> {
+    try {
+      const response = await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(subscription.toJSON())
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to send subscription: ${response.status}`);
+      }
+
+      console.log('Push subscription sent to server successfully');
+    } catch (error) {
+      console.error('Error sending subscription to server:', error);
+    }
+  }
+
+  private urlBase64ToUint8Array(base64String: string): Uint8Array {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
   }
 
   async requestPermission(): Promise<boolean> {
@@ -317,6 +417,34 @@ export class NotificationService {
       tag: 'household-notification',
       requireInteraction: true
     }, 'household');
+  }
+
+  // Test push notification to verify PWA background notifications work
+  async testPushNotification(): Promise<boolean> {
+    if (!this.pushSubscription) {
+      console.warn('No push subscription available for test');
+      return false;
+    }
+
+    try {
+      const response = await fetch('/api/push/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Test push failed: ${response.status}`);
+      }
+
+      console.log('Test push notification sent');
+      return true;
+    } catch (error) {
+      console.error('Error sending test push notification:', error);
+      return false;
+    }
   }
 
   // Test notification for debugging
