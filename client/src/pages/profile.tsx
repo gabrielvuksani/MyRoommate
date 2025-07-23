@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
-import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell, CheckCircle, Info } from "lucide-react";
+import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell, Trash2 } from "lucide-react";
 import { getProfileInitials } from "@/lib/nameUtils";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useTheme } from "@/lib/ThemeProvider";
@@ -36,6 +36,9 @@ export default function Profile() {
 
 
   const [isCopied, setIsCopied] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+  const [notificationStatus, setNotificationStatus] = useState<any>(null);
+  const [isTestingNotification, setIsTestingNotification] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -51,7 +54,9 @@ export default function Profile() {
 
     window.addEventListener("scroll", handleScroll);
     
-
+    // Check notification permission and detailed status
+    setNotificationPermission(notificationService.getPermissionStatus());
+    setNotificationStatus(notificationService.getDetailedStatus());
     
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -195,9 +200,96 @@ export default function Profile() {
     }
   };
 
+  const handleDeleteAllData = async () => {
+    // Show confirmation dialog
+    if (!window.confirm('Are you sure you want to delete all household data? This action cannot be undone and will remove all chores, expenses, messages, calendar events, and household members. Your roommate listings will be preserved.')) {
+      return;
+    }
 
+    try {
+      // Show loading state
+      PersistentLoading.show("Deleting all data...");
+      
+      await deleteAllDataMutation.mutateAsync();
+      
+      // Navigate to home after successful deletion
+      setTimeout(() => {
+        PersistentLoading.hide();
+        window.location.replace('/');
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Delete all data error:', error);
+      // Hide loading on error
+      PersistentLoading.hide();
+      alert('Failed to delete all data. Please try again.');
+    }
+  };
 
-
+  const handleTestNotification = async () => {
+    const status = notificationService.getDetailedStatus();
+    
+    // Handle different scenarios intelligently
+    if (!status.supported) {
+      alert('Your browser does not support notifications.');
+      return;
+    }
+    
+    if (!status.secure) {
+      alert('Notifications require a secure connection (HTTPS). They may not work on this connection.');
+      return;
+    }
+    
+    if (status.permission === 'denied') {
+      alert('Notifications are blocked. To enable them:\n\n1. Click the lock icon in your address bar\n2. Select "Allow" for notifications\n3. Refresh the page and try again');
+      return;
+    }
+    
+    setIsTestingNotification(true);
+    try {
+      let success = false;
+      
+      // Request permission if needed
+      if (status.canRequest) {
+        success = await notificationService.requestPermission();
+        if (!success) {
+          alert('Notification permission was denied. Please enable notifications in your browser settings.');
+          return;
+        }
+      }
+      
+      // Set up push subscription after permission is granted
+      if (status.permission === 'granted' || success) {
+        // Ensure push subscription is set up for background notifications
+        await notificationService.subscribeToPush();
+        
+        await notificationService.showTestNotification();
+        
+        // Send additional demo notifications to showcase different types
+        setTimeout(() => {
+          notificationService.showMessageNotification("Alex", "Hey! Are you free this weekend?");
+        }, 2000);
+        
+        setTimeout(() => {
+          notificationService.showChoreNotification("Take out trash", "Sam");
+        }, 4000);
+        
+        setTimeout(() => {
+          notificationService.showExpenseNotification("Groceries", 45.67, "Jordan");
+        }, 6000);
+      }
+      
+      // Update status after permission change
+      setNotificationPermission(notificationService.getPermissionStatus());
+      setNotificationStatus(notificationService.getDetailedStatus());
+      
+    } catch (error) {
+      console.error('Test notification failed:', error);
+      alert('Failed to send test notification. Please check your browser settings.');
+    } finally {
+      setIsTestingNotification(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -596,56 +688,21 @@ export default function Profile() {
                   </div>
                 ))}
               </div>
-
+              <Button
+                onClick={handleDeleteAllData}
+                disabled={deleteAllDataMutation.isPending}
+                className="mt-4 w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
+              >
+                <Trash2 size={20} />
+                <span>
+                  {deleteAllDataMutation.isPending
+                    ? "Deleting All Household Data..."
+                    : "Delete All Household Data"}
+                </span>
+              </Button>
             </CardContent>
           </Card>
         )}
-
-        {/* Background Notifications Section */}
-        <Card className="glass-card p-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-                  <Bell className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-primary">Background Notifications</h3>
-                  <p className="text-sm text-secondary">Real-time alerts when app is closed</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-3 bg-surface-secondary/30 backdrop-blur-sm rounded-xl p-4">
-              <div className="flex items-center space-x-2 text-sm text-secondary">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>New messages from roommates</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-secondary">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Chore assignments and completions</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-secondary">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>New shared expenses</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-secondary">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Calendar events and reminders</span>
-              </div>
-            </div>
-
-            <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl p-4">
-              <div className="flex items-start space-x-3">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <div className="text-sm">
-                  <p className="text-green-800 dark:text-green-200 font-medium mb-1">Background notifications active</p>
-                  <p className="text-green-600 dark:text-green-300">You'll receive real-time notifications even when the app is closed. This keeps you connected with your household activities.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
 
         {/* Developer Tools */}
         <Card className="glass-card" style={{
@@ -656,13 +713,55 @@ export default function Profile() {
             <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
               Developer Tools
             </h3>
-            <Button
-              onClick={handleRefresh}
-              className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-blue-700"
-            >
-              <RefreshCw size={20} />
-              <span>Refresh App & Data</span>
-            </Button>
+            <div className="space-y-3">
+              <Button
+                onClick={handleRefresh}
+                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-blue-700"
+              >
+                <RefreshCw size={20} />
+                <span>Refresh App & Data</span>
+              </Button>
+              <Button
+                onClick={handleTestNotification}
+                disabled={isTestingNotification || (notificationStatus && !notificationStatus.supported)}
+                className={`w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center space-x-2 disabled:opacity-50 ${
+                  notificationStatus?.blockReason
+                    ? 'bg-gray-600 hover:bg-gray-700'
+                    : notificationStatus?.permission === 'granted'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-purple-600 hover:bg-purple-700'
+                }`}
+              >
+                <Bell size={20} className={isTestingNotification ? "animate-pulse" : ""} />
+                <span>
+                  {isTestingNotification
+                    ? "Sending test notification..."
+                    : notificationStatus?.blockReason
+                    ? "Notifications Unavailable"
+                    : notificationStatus?.permission === 'granted'
+                    ? "Test Live Notifications"
+                    : notificationStatus?.canRequest
+                    ? "Enable Notifications"
+                    : "Notifications Blocked"
+                  }
+                </span>
+              </Button>
+
+              <div className="text-sm text-gray-600 dark:text-gray-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-xl border border-green-200 dark:border-green-800">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Bell size={16} className="text-green-600 dark:text-green-400" />
+                  <span className="font-medium text-green-800 dark:text-green-300">Background Notifications Active</span>
+                </div>
+                <p className="text-xs text-green-700 dark:text-green-400">
+                  Real push notifications now work automatically for:
+                </p>
+                <ul className="text-xs text-green-700 dark:text-green-400 mt-1 ml-4 space-y-1">
+                  <li>• New messages when app is closed</li>
+                  <li>• Chore assignments and completions</li>
+                  <li>• New expenses and calendar events</li>
+                </ul>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
