@@ -62,7 +62,17 @@ function Router() {
   }
 
   // Get comprehensive user flags using centralized logic
-  const userFlags = getUserFlags(user, household, !!user, location);
+  // For Supabase, we need to adapt the user object structure
+  const adaptedUser = user ? {
+    id: user.id,
+    firstName: user.user_metadata?.firstName || '',
+    lastName: user.user_metadata?.lastName || '',
+    email: user.email || '',
+    profileColor: user.user_metadata?.profileColor || 'blue',
+    profileImageUrl: user.user_metadata?.profileImageUrl || null
+  } : null;
+  
+  const userFlags = getUserFlags(adaptedUser, household, !!user, location);
   const { needsOnboarding, hasHousehold } = userFlags;
   
   // Check if we should skip landing page for PWA/native apps
