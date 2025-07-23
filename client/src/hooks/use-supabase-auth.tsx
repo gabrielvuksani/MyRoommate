@@ -36,6 +36,7 @@ export interface RegisterData {
   firstName: string;
   lastName: string;
   profileColor?: string;
+  profileImage?: File | null;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);

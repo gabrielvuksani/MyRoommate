@@ -62,7 +62,12 @@ export function SimpleAvatarSelector({
         <div className="relative">
           <Avatar className="w-16 h-16">
             {imageUrl ? (
-              <AvatarImage src={imageUrl} alt="Profile preview" className="object-cover" />
+              <AvatarImage 
+                src={imageUrl} 
+                alt="Profile preview" 
+                className="object-cover"
+                onError={() => onImageChange(null)}
+              />
             ) : (
               <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-lg border-0`}>
                 {initials}
@@ -110,7 +115,12 @@ export function SimpleAvatarSelector({
         <div className="relative">
           <Avatar className="w-20 h-20">
             {imageUrl ? (
-              <AvatarImage src={imageUrl} alt="Profile preview" className="object-cover" />
+              <AvatarImage 
+                src={imageUrl} 
+                alt="Profile preview" 
+                className="object-cover"
+                onError={() => onImageChange(null)}
+              />
             ) : (
               <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-xl border-0`}>
                 {initials}

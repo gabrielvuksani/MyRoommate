@@ -251,13 +251,13 @@ export default function AuthPage() {
                   {!isLogin && (
                     <div className="space-y-4">
                       {/* Unified Profile Section */}
-                      <div className="rounded-2xl p-4" style={{ 
+                      <div className="rounded-2xl p-6" style={{ 
                         background: 'var(--surface-secondary)',
                         border: '1px solid var(--border)'
                       }}>
-                        <div className="w-full">
-                          {/* Profile Picture - Full Width */}
-                          <div className="w-full mb-4">
+                        <div className="space-y-6">
+                          {/* Profile Picture Section */}
+                          <div className="w-full">
                             <SimpleAvatarSelector
                               firstName={formData.firstName}
                               lastName={formData.lastName}
@@ -266,16 +266,14 @@ export default function AuthPage() {
                               profileImage={profileImage}
                               onColorChange={(color: string) => updateFormData("profileColor", color)}
                               onImageChange={(file: File | null) => {
-                                console.log('AUTH PAGE - onImageChange called with:', file);
                                 setProfileImage(file);
-                                console.log('AUTH PAGE - setProfileImage called');
                               }}
-                              compact={true}
+                              compact={false}
                             />
                           </div>
                           
                           {/* Name Fields */}
-                          <div className="w-full space-y-3">
+                          <div className="w-full space-y-4">
                             <div>
                               <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                                 First Name *
@@ -285,12 +283,12 @@ export default function AuthPage() {
                                 placeholder="John"
                                 value={formData.firstName}
                                 onChange={(e) => updateFormData("firstName", e.target.value)}
-                                className={`input-modern h-10 ${errors.firstName ? 'border-red-500 focus:border-red-500' : ''}`}
+                                className={`input-modern h-12 ${errors.firstName ? 'border-red-500 focus:border-red-500' : ''}`}
                                 style={{
                                   background: 'var(--surface)',
                                   borderColor: errors.firstName ? '#ef4444' : 'var(--border)',
                                   borderRadius: 'var(--radius-md)',
-                                  padding: '12px 16px',
+                                  padding: '16px 20px',
                                   fontSize: '16px',
                                   color: 'var(--text-primary)',
                                   transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
@@ -307,12 +305,12 @@ export default function AuthPage() {
                                 placeholder="Doe"
                                 value={formData.lastName}
                                 onChange={(e) => updateFormData("lastName", e.target.value)}
-                                className={`input-modern h-10 ${errors.lastName ? 'border-red-500 focus:border-red-500' : ''}`}
+                                className={`input-modern h-12 ${errors.lastName ? 'border-red-500 focus:border-red-500' : ''}`}
                                 style={{
                                   background: 'var(--surface)',
                                   borderColor: errors.lastName ? '#ef4444' : 'var(--border)',
                                   borderRadius: 'var(--radius-md)',
-                                  padding: '12px 16px',
+                                  padding: '16px 20px',
                                   fontSize: '16px',
                                   color: 'var(--text-primary)',
                                   transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'

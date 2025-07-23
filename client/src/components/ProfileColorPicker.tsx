@@ -9,12 +9,10 @@ interface ProfileColorPickerProps {
 }
 
 const colorOptions = [
-  { name: 'blue', class: 'from-blue-400 to-blue-600', bg: 'bg-gradient-to-br from-blue-400 to-blue-600' },
-  { name: 'emerald', class: 'from-emerald-400 to-cyan-400', bg: 'bg-gradient-to-br from-emerald-400 to-cyan-400' },
+  { name: 'blue', class: 'from-blue-400 to-indigo-600', bg: 'bg-gradient-to-br from-blue-400 to-indigo-600' },
   { name: 'purple', class: 'from-purple-400 to-pink-600', bg: 'bg-gradient-to-br from-purple-400 to-pink-600' },
-  { name: 'orange', class: 'from-orange-400 to-red-500', bg: 'bg-gradient-to-br from-orange-400 to-red-500' },
-  { name: 'indigo', class: 'from-indigo-400 to-purple-600', bg: 'bg-gradient-to-br from-indigo-400 to-purple-600' },
   { name: 'green', class: 'from-green-400 to-emerald-600', bg: 'bg-gradient-to-br from-green-400 to-emerald-600' },
+  { name: 'orange', class: 'from-orange-400 to-red-600', bg: 'bg-gradient-to-br from-orange-400 to-red-600' },
   { name: 'pink', class: 'from-pink-400 to-rose-600', bg: 'bg-gradient-to-br from-pink-400 to-rose-600' },
   { name: 'teal', class: 'from-teal-400 to-cyan-600', bg: 'bg-gradient-to-br from-teal-400 to-cyan-600' }
 ];
@@ -37,7 +35,7 @@ export function ProfileColorPicker({
         Avatar Color
       </p>
       <div className="w-full flex justify-center">
-        <div className={`grid gap-4 ${fullWidth ? 'grid-cols-8 w-full' : 'grid-cols-4 w-auto'}`}>
+        <div className={`grid gap-3 ${fullWidth ? 'grid-cols-6 w-full' : 'grid-cols-3 w-auto'}`}>
           {colorOptions.map((color) => (
             <button
               key={color.name}
