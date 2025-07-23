@@ -184,6 +184,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         householdId: membership.household.id,
       });
       
+      // Real-time broadcast for chore assignment
+      const householdClientSet = householdClients.get(membership.household.id);
+      if (householdClientSet) {
+        const broadcastData = JSON.stringify({
+          type: 'new_chore',
+          chore: chore,
+          timestamp: Date.now()
+        });
+        
+        householdClientSet.forEach((client: any) => {
+          try {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(broadcastData);
+            }
+          } catch (error) {
+            console.error('Chore broadcast error:', error);
+          }
+        });
+      }
+      
       res.json(chore);
     } catch (error) {
       console.error("Error creating chore:", error);
@@ -263,6 +283,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         splits
       );
+      
+      // Real-time broadcast for new expense
+      const householdClientSet = householdClients.get(membership.household.id);
+      if (householdClientSet) {
+        const broadcastData = JSON.stringify({
+          type: 'new_expense',
+          expense: expense,
+          timestamp: Date.now()
+        });
+        
+        householdClientSet.forEach((client: any) => {
+          try {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(broadcastData);
+            }
+          } catch (error) {
+            console.error('Expense broadcast error:', error);
+          }
+        });
+      }
       
       res.json(expense);
     } catch (error) {
@@ -362,6 +402,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         householdId: membership.household.id,
         createdBy: userId,
       });
+      
+      // Real-time broadcast for new calendar event
+      const householdClientSet = householdClients.get(membership.household.id);
+      if (householdClientSet) {
+        const broadcastData = JSON.stringify({
+          type: 'new_calendar_event',
+          event: event,
+          timestamp: Date.now()
+        });
+        
+        householdClientSet.forEach((client: any) => {
+          try {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(broadcastData);
+            }
+          } catch (error) {
+            console.error('Calendar event broadcast error:', error);
+          }
+        });
+      }
       
       res.json(event);
     } catch (error) {

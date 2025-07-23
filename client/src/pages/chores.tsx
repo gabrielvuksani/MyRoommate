@@ -66,16 +66,6 @@ export default function Chores() {
     onSuccess: (_, choreData) => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
       
-      // Send notification for new chore assignment
-      if (choreData.assignedTo && choreData.title && Array.isArray(householdMembers)) {
-        const assignedUser = householdMembers.find((m: any) => m.userId === choreData.assignedTo);
-        const assignedName = assignedUser ? `${assignedUser.user.firstName || assignedUser.user.email?.split('@')[0]}` : 'someone';
-        console.log('Attempting to show chore notification:', { title: choreData.title, assignedName });
-        notificationService.showChoreNotification(choreData.title, assignedName)
-          .then(success => console.log('Chore notification result:', success))
-          .catch(error => console.error('Chore notification error:', error));
-      }
-      
       setIsCreateOpen(false);
       setNewChore({
         title: '',

@@ -107,17 +107,6 @@ export default function AddExpense() {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
       queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
       
-      // Send notification for new expense
-      if (expenseData && expenseData.title) {
-        const paidByUser = (household as any)?.members?.find((m: any) => m.userId === expenseData.paidBy);
-        const paidByName = paidByUser ? `${paidByUser.user.firstName || paidByUser.user.email?.split('@')[0]}` : 'someone';
-        const amount = parseFloat(expenseData.amount);
-        console.log('Attempting to show expense notification:', { title: expenseData.title, amount, paidByName });
-        notificationService.showExpenseNotification(expenseData.title, amount, paidByName)
-          .then(success => console.log('Expense notification result:', success))
-          .catch(error => console.error('Expense notification error:', error));
-      }
-      
       setLocation("/expenses");
     },
     onError: (error) => {

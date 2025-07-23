@@ -161,6 +161,44 @@ export default function Messages() {
         });
       } else if (data.type === "pong") {
         console.log('WebSocket pong received - connection healthy');
+      } else if (data.type === "new_chore" && data.chore) {
+        console.log('Real-time chore received:', data.chore.id || 'unknown');
+        
+        queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
+        
+        // Show notification for chore assignments to current user
+        if (data.chore.assignedTo === user?.id && data.chore.title) {
+          console.log('Attempting real-time chore notification:', data.chore.title);
+          notificationService.showChoreNotification(data.chore.title, 'you')
+            .then(success => console.log('Real-time chore notification result:', success))
+            .catch(error => console.error('Real-time chore notification error:', error));
+        }
+      } else if (data.type === "new_expense" && data.expense) {
+        console.log('Real-time expense received:', data.expense.id || 'unknown');
+        
+        queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
+        
+        // Show notification for new expenses (if not the one who created it)
+        if (data.expense.paidBy !== user?.id && data.expense.title) {
+          const amount = parseFloat(data.expense.amount || '0');
+          console.log('Attempting real-time expense notification:', data.expense.title);
+          notificationService.showExpenseNotification(data.expense.title, amount, 'a roommate')
+            .then(success => console.log('Real-time expense notification result:', success))
+            .catch(error => console.error('Real-time expense notification error:', error));
+        }
+      } else if (data.type === "new_calendar_event" && data.event) {
+        console.log('Real-time calendar event received:', data.event.id || 'unknown');
+        
+        queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
+        
+        // Show notification for new calendar events (if not the one who created it)
+        if (data.event.createdBy !== user?.id && data.event.title && data.event.startDate) {
+          console.log('Attempting real-time calendar notification:', data.event.title);
+          notificationService.showCalendarNotification(data.event.title, data.event.startDate)
+            .then(success => console.log('Real-time calendar notification result:', success))
+            .catch(error => console.error('Real-time calendar notification error:', error));
+        }
       } else if (data.type === "user_typing") {
         if (data.userId !== user?.id && data.userName) {
           setTypingUsers(prev => {

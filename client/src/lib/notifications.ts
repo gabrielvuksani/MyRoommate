@@ -158,13 +158,13 @@ export class NotificationService {
     const lastTime = this.lastNotificationTimes.get(throttleKey) || 0;
     const timeSince = now - lastTime;
     
-    // Different throttle times based on type (reduced for messages)
+    // Reduced throttle times for real-time experience
     const throttleTimes = {
-      message: 1000,   // 1 second for messages (more responsive)
-      chore: 30000,    // 30 seconds
-      expense: 15000,  // 15 seconds
-      calendar: 60000, // 1 minute
-      household: 120000 // 2 minutes
+      message: 500,    // 0.5 seconds for messages (real-time)
+      chore: 1000,     // 1 second for chores (real-time)
+      expense: 1000,   // 1 second for expenses (real-time)
+      calendar: 1000,  // 1 second for calendar (real-time)
+      household: 5000  // 5 seconds for household events
     };
     
     const throttleTime = throttleTimes[type] || 10000;
