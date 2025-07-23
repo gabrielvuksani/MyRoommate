@@ -137,8 +137,11 @@ export class NotificationService {
     const isDocumentVisible = !document.hidden;
     const isInMessages = window.location.pathname === '/messages';
     
+    console.log('Notification check:', { type, isDocumentVisible, isInMessages, path: window.location.pathname });
+    
     // If user is actively in messages and document is visible, be more permissive
     if (type === 'message' && isInMessages && isDocumentVisible) {
+      console.log('Allowing message notification - user is in active chat');
       return true; // Let messages through when chat is active, as user requested
     }
     
@@ -170,6 +173,8 @@ export class NotificationService {
       return false;
     }
     
+    console.log(`Notification timing check passed for ${type}: ${timeSince}ms >= ${throttleTime}ms`);
+    
     // Check for notification spam (more than 3 notifications per minute)
     const recentCount = this.recentNotifications.get(type) || 0;
     if (recentCount >= 3) {
@@ -198,6 +203,8 @@ export class NotificationService {
   }
 
   async showNotification(options: NotificationOptions, type: NotificationType = 'message'): Promise<boolean> {
+    console.log('showNotification called:', { type, title: options.title, permission: this.permission });
+    
     // Check if notifications are supported
     if (!('Notification' in window)) {
       console.warn('Notifications not supported');
@@ -206,13 +213,16 @@ export class NotificationService {
     
     // Apply spam prevention
     if (!this.shouldShowNotification(type, options.tag)) {
+      console.log('Notification blocked by spam prevention');
       return false;
     }
 
     // Check permission
     if (this.permission !== 'granted') {
+      console.log('Permission not granted, requesting...', this.permission);
       const granted = await this.requestPermission();
       if (!granted) {
+        console.log('Permission denied');
         return false;
       }
     }
@@ -266,6 +276,7 @@ export class NotificationService {
 
   // Predefined notification types for common app events
   async showMessageNotification(senderName: string, messageContent: string, householdName?: string): Promise<boolean> {
+    console.log('showMessageNotification called:', { senderName, messageContent, householdName });
     return this.showNotification({
       title: `New message from ${senderName}`,
       body: householdName ? `${householdName}: ${messageContent}` : messageContent,
