@@ -270,9 +270,9 @@ export default function AuthPage() {
                         background: 'var(--surface-secondary)',
                         border: '1px solid var(--border)'
                       }}>
-                        <div className="flex items-start space-x-4">
-                          {/* Profile Picture */}
-                          <div className="flex-shrink-0">
+                        <div className="w-full">
+                          {/* Profile Picture - Full Width */}
+                          <div className="w-full mb-4">
                             <SignupAvatarSelector
                               firstName={formData.firstName}
                               lastName={formData.lastName}
@@ -286,7 +286,7 @@ export default function AuthPage() {
                           </div>
                           
                           {/* Name Fields */}
-                          <div className="flex-1 space-y-3">
+                          <div className="w-full space-y-3">
                             <div>
                               <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                                 First Name *

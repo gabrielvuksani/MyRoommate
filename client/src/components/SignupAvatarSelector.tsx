@@ -201,11 +201,12 @@ export function SignupAvatarSelector({
 
         {/* Color picker */}
         {showColorPicker && (
-          <div className="pt-2">
+          <div className="pt-2 w-full -mx-4 px-4">
             <ProfileColorPicker
               selectedColor={profileColor}
               onColorChange={onColorChange}
               size="sm"
+              fullWidth={true}
             />
           </div>
         )}
@@ -214,34 +215,21 @@ export function SignupAvatarSelector({
   }
 
   return (
-    <Card className="glass-card">
-      <CardContent className="p-6">
-        <div className="text-center space-y-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center">
-              <User className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
-              Profile Picture
-            </h3>
-          </div>
-          
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Add a photo or choose a color for your avatar (optional)
-          </p>
-
+    <Card className="glass-card p-0 w-full">
+      <CardContent className="p-4 w-full">
+        <div className="space-y-4 w-full">
           {/* Avatar Preview */}
           <div className="flex justify-center">
             <div className="relative">
-              <Avatar className="w-24 h-24">
-                {imagePreviewUrl ? (
+              <Avatar className="w-20 h-20">
+                {imagePreviewUrl || profileImage ? (
                   <AvatarImage 
-                    src={imagePreviewUrl} 
+                    src={imagePreviewUrl || (profileImage ? URL.createObjectURL(profileImage) : '')} 
                     alt="Profile preview"
                     className="object-cover"
                   />
                 ) : (
-                  <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-2xl border-0`}>
+                  <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-xl border-0`}>
                     {initials}
                   </AvatarFallback>
                 )}
@@ -274,7 +262,7 @@ export function SignupAvatarSelector({
 
           {/* Action buttons */}
           <div className="space-y-3">
-            {imagePreviewUrl ? (
+            {imagePreviewUrl || profileImage ? (
               <Button 
                 type="button"
                 variant="outline" 
@@ -323,11 +311,12 @@ export function SignupAvatarSelector({
 
           {/* Color picker */}
           {showColorPicker && (
-            <div className="pt-2 w-full">
+            <div className="pt-2 w-full -mx-4 px-4">
               <ProfileColorPicker
                 selectedColor={profileColor}
                 onColorChange={onColorChange}
                 size="md"
+                fullWidth={true}
               />
             </div>
           )}

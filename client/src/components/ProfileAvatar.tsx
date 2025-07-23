@@ -52,7 +52,33 @@ export function ProfileAvatar({
   const [uploading, setUploading] = useState(false);
   const [showUploadOptions, setShowUploadOptions] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [localImageUrl, setLocalImageUrl] = useState<string | null>(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
   const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/user/profile-image', {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Delete failed: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      setShowUploadOptions(false);
+      setImageRemoved(false); // Reset after successful deletion
+    },
+    onError: (error) => {
+      console.error('Profile image removal failed:', error);
+      setImageRemoved(false); // Reset on error
+    }
+  });
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -75,10 +101,13 @@ export function ProfileAvatar({
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       setShowUploadOptions(false);
       setUploading(false);
+      setLocalImageUrl(null); // Clear local preview after successful upload
+      setImageRemoved(false);
     },
     onError: (error) => {
       console.error('Profile image upload failed:', error);
       setUploading(false);
+      setLocalImageUrl(null); // Clear local preview on error
     },
     onSettled: () => {
       setUploading(false);
@@ -95,28 +124,6 @@ export function ProfileAvatar({
       return () => clearTimeout(timer);
     }
   }, [uploadMutation.isSuccess, deleteMutation.isSuccess, uploadMutation.reset, deleteMutation.reset]);
-
-  const deleteMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch('/api/user/profile-image', {
-        method: 'DELETE',
-        credentials: 'include'
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Delete failed: ${response.statusText}`);
-      }
-      
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-      setShowUploadOptions(false);
-    },
-    onError: (error) => {
-      console.error('Profile image removal failed:', error);
-    }
-  });
 
   const updateColorMutation = useMutation({
     mutationFn: async (color: string) => {
@@ -151,6 +158,10 @@ export function ProfileAvatar({
       }
       
       setUploading(true);
+      // Create local preview for immediate feedback
+      const previewUrl = URL.createObjectURL(file);
+      setLocalImageUrl(previewUrl);
+      setImageRemoved(false);
       uploadMutation.mutate(file);
     }
     // Reset the input value to allow selecting the same file again
@@ -158,6 +169,9 @@ export function ProfileAvatar({
   };
 
   const handleRemoveImage = () => {
+    // Immediately show fallback for real-time feedback
+    setImageRemoved(true);
+    setLocalImageUrl(null);
     deleteMutation.mutate();
   };
 
@@ -172,12 +186,15 @@ export function ProfileAvatar({
     ? user.profileColor as keyof typeof gradientClasses
     : gradientType;
 
+  // Determine what image to show based on local state and user data
+  const displayImageUrl = localImageUrl || (!imageRemoved ? user.profileImageUrl : null);
+
   return (
     <div className="relative inline-block">
       <Avatar className={`${sizeClasses[size]} ${className}`}>
-        {user.profileImageUrl ? (
+        {displayImageUrl ? (
           <AvatarImage 
-            src={user.profileImageUrl} 
+            src={displayImageUrl} 
             alt={`${user.firstName || user.email}'s profile`}
             className="object-cover"
           />

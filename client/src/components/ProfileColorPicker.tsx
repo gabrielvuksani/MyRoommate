@@ -5,6 +5,7 @@ interface ProfileColorPickerProps {
   selectedColor: string;
   onColorChange: (color: string) => void;
   size?: 'sm' | 'md' | 'lg';
+  fullWidth?: boolean;
 }
 
 const colorOptions = [
@@ -24,14 +25,19 @@ const sizeClasses = {
   lg: 'w-12 h-12'
 };
 
-export function ProfileColorPicker({ selectedColor, onColorChange, size = 'md' }: ProfileColorPickerProps) {
+export function ProfileColorPicker({ 
+  selectedColor, 
+  onColorChange, 
+  size = 'md',
+  fullWidth = false
+}: ProfileColorPickerProps) {
   return (
     <div className="space-y-3">
       <p className="text-sm font-medium text-center" style={{ color: 'var(--text-primary)' }}>
         Avatar Color
       </p>
       <div className="w-full">
-        <div className="grid grid-cols-4 gap-4 w-full">
+        <div className={`grid gap-4 w-full ${fullWidth ? 'grid-cols-8' : 'grid-cols-4'}`}>
           {colorOptions.map((color) => (
             <button
               key={color.name}
