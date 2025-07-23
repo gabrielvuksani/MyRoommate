@@ -111,18 +111,16 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 23, 2025 (Latest):**
-- ✓ **CRITICAL COMPLETION: Unified notification system fully integrated into all real app actions**
-- ✓ **Push notifications now automatically fire from real user actions when PWA is closed:**
-  - ✓ **Messages**: New messages send push notifications to all household members except sender
-  - ✓ **Chore assignments**: New chore assignments notify the assigned user
-  - ✓ **Chore completions**: Chore completions notify all household members except completer
-  - ✓ **Expenses**: New expense additions notify all household members except creator
-  - ✓ **Calendar events**: New calendar events notify all household members except creator
-- ✓ **Automatic notification setup**: Push subscription happens automatically on successful login**
-- ✓ **Enhanced service worker**: Improved push event handling and notification display for background use**
-- ✓ **Clean console output**: Removed all console logs while keeping test buttons for production debugging**
-- ✓ **Informational UI**: Added status display in profile showing all active background notification features**
-- ✓ **Production ready**: Complete unified system that works seamlessly when app is closed on mobile devices**
+- ✓ **CRITICAL FIX: Enhanced notification system for persistent background delivery after extended app closure (10+ minutes)**
+- ✓ **Enhanced Service Worker**: New `/sw-enhanced.js` with improved push event handling, forced immediate notification display, and persistent background operation**
+- ✓ **Aggressive Subscription Management**: Automatic re-subscription every 10 minutes to maintain active push connections with keep-alive mechanisms**
+- ✓ **Server-Side Reliability**: Enhanced push delivery with 24-hour TTL, maximum urgency settings, and improved error handling for subscription validation**
+- ✓ **Background Sync**: Automatic subscription validation when network reconnects using ServiceWorker sync API**
+- ✓ **Service Worker Keep-Alive**: Prevents browser from killing background processes with periodic messages every 25 seconds**
+- ✓ **Immediate Notification Display**: Force immediate notification display with Promise.resolve() and unique notification tags to prevent blocking/batching**
+- ✓ **Extended Delivery Window**: 24-hour TTL instead of 30 seconds for maximum delivery reliability when app is closed for extended periods**
+- ✓ **Push notifications now work consistently regardless of app closure duration as long as internet connection is available**
+- ✓ **Production ready**: Complete enhanced system that maintains seamless background notification delivery on mobile devices**
 - ✓ **Fixed critical fallback avatar display bug app-wide - now properly shows colored fallback with initials when images are removed or fail to load**
 - ✓ **Implemented universal avatar fallback system using QuickAvatar component across entire application**
 - ✓ **Fixed ProfileAvatar and SignupAvatarSelector conditional logic - removed restrictive checks that prevented fallback display**

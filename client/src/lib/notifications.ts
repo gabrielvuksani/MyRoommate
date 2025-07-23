@@ -46,26 +46,37 @@ export class NotificationService {
   private async registerServiceWorker(): Promise<void> {
     if ('serviceWorker' in navigator) {
       try {
-        // Force service worker update on every load for reliability
-        this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js', {
-          updateViaCache: 'none'
+        // Register enhanced service worker with force update
+        this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw-enhanced.js', {
+          updateViaCache: 'none',
+          scope: '/'
         });
+        
+        // Force update check for latest version
+        await this.serviceWorkerRegistration.update();
         
         // Wait for service worker to be ready and active
         await navigator.serviceWorker.ready;
         
-        // Ensure service worker is controlling the page
-        if (!navigator.serviceWorker.controller) {
-          // Reload to ensure service worker controls the page
-          window.location.reload();
-          return;
+        // Set up background sync for subscription reliability
+        if ('sync' in window.ServiceWorkerRegistration.prototype) {
+          await this.serviceWorkerRegistration.sync.register('push-subscription-sync');
         }
         
-        // Set up push subscription with retry mechanism
+        // Set up push subscription with enhanced reliability
         await this.setupPushSubscriptionWithRetry();
+        
+        // Schedule periodic subscription refresh
+        this.schedulePeriodicRefresh();
       } catch (error) {
-        // Silent fail but retry after delay
-        setTimeout(() => this.registerServiceWorker(), 2000);
+        // Fallback to basic service worker
+        try {
+          this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js');
+          await this.setupPushSubscriptionWithRetry();
+        } catch (fallbackError) {
+          // Silent fail but retry after delay
+          setTimeout(() => this.registerServiceWorker(), 3000);
+        }
       }
     }
   }
@@ -514,6 +525,20 @@ export class NotificationService {
       notifications.forEach(notification => notification.close());
     }
   }
+
+  private schedulePeriodicRefresh(): void {
+    // Aggressive subscription refresh for maximum reliability
+    setInterval(async () => {
+      try {
+        if (this.permission === 'granted' && this.serviceWorkerRegistration) {
+          // Re-subscribe to ensure push notifications keep working
+          await this.subscribeToPush();
+        }
+      } catch (error) {
+        // Silent fail for periodic refresh
+      }
+    }, 10 * 60 * 1000); // Every 10 minutes
+  }
 }
 
 // Export singleton instance
@@ -521,14 +546,10 @@ export const notificationService = NotificationService.getInstance();
 
 // Initialize periodic subscription refresh for reliability
 if (typeof window !== 'undefined') {
-  // Refresh subscription every 15 minutes to ensure real-time reliability
-  setInterval(async () => {
-    try {
-      if (notificationService.getPermissionStatus() === 'granted') {
-        await notificationService.subscribeToPush();
-      }
-    } catch (error) {
-      // Silent fail for periodic refresh
+  // Keep service worker active with periodic messages
+  setInterval(() => {
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'KEEP_ALIVE' });
     }
-  }, 15 * 60 * 1000); // 15 minutes
+  }, 25000); // Every 25 seconds
 }

@@ -36,8 +36,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.id;
       const { firstName, lastName } = req.body;
       
-      const updatedUser = await storage.upsertUser({
-        id: userId,
+      const updatedUser = await storage.updateUser(userId, {
         firstName,
         lastName,
       });
@@ -861,7 +860,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: true,
         featured: true,
         verified: true,
-        createdBy: req.user?.id || '44253576'
+        userId: req.user?.id || '44253576'
       };
 
       const listing = await storage.createRoommateListing(demoListing);
@@ -916,13 +915,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return false;
     }
 
-    // Send push notification with maximum urgency and immediate delivery
+    // Send push notification with enhanced delivery settings
     try {
       await webpush.sendNotification(subscription, JSON.stringify(payload), {
         urgency: 'high',
-        TTL: 30, // 30 seconds for immediate delivery
-        topic: payload.tag || 'instant'
+        TTL: 86400, // 24 hours for maximum delivery window
+        topic: undefined, // Allow all notifications through
+        headers: {
+          'Urgency': 'high',
+          'Topic': payload.tag || 'instant'
+        }
       });
+      
+      // Update subscription timestamp on successful send
+      subscription.timestamp = Date.now();
+      pushSubscriptions.set(userId, subscription);
+      
       return true;
     } catch (error: any) {
       // If subscription is invalid/expired, remove it immediately
@@ -932,6 +940,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return false;
     }
   }
+
+  // Periodic subscription cleanup to remove stale subscriptions
+  setInterval(() => {
+    const now = Date.now();
+    const TWO_HOURS = 2 * 60 * 60 * 1000;
+    
+    for (const [userId, subscription] of pushSubscriptions.entries()) {
+      // Remove subscriptions older than 2 hours without activity
+      if (subscription.timestamp && (now - subscription.timestamp) > TWO_HOURS) {
+        pushSubscriptions.delete(userId);
+      }
+    }
+  }, 60 * 60 * 1000); // Run every hour
 
   // Test push notification endpoint
   app.post('/api/push/test', isAuthenticated, async (req: any, res) => {
