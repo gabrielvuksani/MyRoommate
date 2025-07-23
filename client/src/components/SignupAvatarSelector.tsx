@@ -93,9 +93,9 @@ export function SignupAvatarSelector({
       URL.revokeObjectURL(imagePreviewUrl);
     }
     
-    // Clear both local state and parent state immediately
-    setImagePreviewUrl(null);
+    // Clear parent state first, then local state
     onImageChange(null);
+    setImagePreviewUrl(null);
     
     // Reset the file input to allow re-selection
     const fileInput = document.getElementById('signup-avatar-input') as HTMLInputElement;
@@ -111,9 +111,9 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {hasImage && imagePreviewUrl ? (
+              {hasImage ? (
                 <AvatarImage 
-                  src={imagePreviewUrl} 
+                  src={imagePreviewUrl || ''} 
                   alt="Profile preview"
                   className="object-cover"
                   onError={() => {
@@ -237,9 +237,9 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {hasImage && imagePreviewUrl ? (
+                {hasImage ? (
                   <AvatarImage 
-                    src={imagePreviewUrl} 
+                    src={imagePreviewUrl || ''} 
                     alt="Profile preview"
                     className="object-cover"
                     onError={() => {
