@@ -5,12 +5,11 @@ import { Input } from "@/components/ui/input";
 
 import { useAuth } from "@/hooks/use-supabase-auth";
 import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle } from "lucide-react";
-import { FaGoogle, FaGithub, FaApple } from "react-icons/fa";
 import { SimpleAvatarSelector } from "@/components/SimpleAvatarSelector";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
-  const { user, loginMutation, registerMutation, forgotPasswordMutation, signInWithProvider } = useAuth();
+  const { user, loginMutation, registerMutation, forgotPasswordMutation } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -180,7 +179,7 @@ export default function AuthPage() {
                 myRoommate
               </h1>
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                Powered by Supabase for secure authentication
+                Secure email authentication
               </p>
             </div>
 
@@ -477,69 +476,6 @@ export default function AuthPage() {
                   )}
                 </form>
 
-                {/* Social Sign In - Only show for login and not forgot password */}
-                {!showForgotPassword && (
-                  <>
-                    <div className="relative my-6">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t" style={{ borderColor: 'var(--border)' }}></div>
-                      </div>
-                      <div className="relative flex justify-center text-sm">
-                        <span className="px-4 text-sm" style={{ 
-                          background: 'var(--background)',
-                          color: 'var(--text-secondary)'
-                        }}>
-                          Or continue with
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      {/* Google */}
-                      <button
-                        type="button"
-                        onClick={() => signInWithProvider('google')}
-                        className="flex items-center justify-center py-3 px-4 rounded-xl border transition-all duration-200 hover:scale-105 hover:shadow-md"
-                        style={{
-                          background: 'var(--surface)',
-                          borderColor: 'var(--border)',
-                          color: 'var(--text-primary)'
-                        }}
-                      >
-                        <FaGoogle className="w-5 h-5 text-red-500" />
-                      </button>
-
-                      {/* GitHub */}
-                      <button
-                        type="button"
-                        onClick={() => signInWithProvider('github')}
-                        className="flex items-center justify-center py-3 px-4 rounded-xl border transition-all duration-200 hover:scale-105 hover:shadow-md"
-                        style={{
-                          background: 'var(--surface)',
-                          borderColor: 'var(--border)',
-                          color: 'var(--text-primary)'
-                        }}
-                      >
-                        <FaGithub className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
-                      </button>
-
-                      {/* Apple */}
-                      <button
-                        type="button"
-                        onClick={() => signInWithProvider('apple')}
-                        className="flex items-center justify-center py-3 px-4 rounded-xl border transition-all duration-200 hover:scale-105 hover:shadow-md"
-                        style={{
-                          background: 'var(--surface)',
-                          borderColor: 'var(--border)',
-                          color: 'var(--text-primary)'
-                        }}
-                      >
-                        <FaApple className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
-                      </button>
-                    </div>
-                  </>
-                )}
-
                 {/* Forgot Password Success */}
                 {forgotPasswordSent && (
                   <div className="mt-4">
@@ -623,7 +559,7 @@ export default function AuthPage() {
               Your roommate journey starts here
             </h2>
             <p className="text-xl mb-8 text-gray-600 dark:text-gray-300 leading-relaxed">
-              Secure authentication, real-time sync, and powerful features powered by Supabase.
+              Manage chores, split expenses, coordinate schedules, and find the perfect roommate match.
             </p>
             <div className="space-y-4 text-left">
               <div className="flex items-center space-x-3">

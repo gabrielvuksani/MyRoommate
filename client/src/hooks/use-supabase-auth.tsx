@@ -23,8 +23,6 @@ export interface AuthContextType {
   forgotPasswordMutation: UseMutationResult<void, Error, { email: string }>;
   resetPasswordMutation: UseMutationResult<void, Error, { password: string }>;
   updateProfileMutation: UseMutationResult<Profile, Error, Partial<Profile>>;
-  signInWithProvider: (provider: 'google' | 'github' | 'apple') => Promise<void>;
-  resendConfirmation: (email: string) => Promise<void>;
 }
 
 export interface LoginData {
@@ -193,27 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const signInWithProvider = async (provider: 'google' | 'github' | 'apple') => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: window.location.origin,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      },
-    });
-    if (error) throw error;
-  };
 
-  const resendConfirmation = async (email: string) => {
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email,
-    });
-    if (error) throw error;
-  };
 
 
 
@@ -260,8 +238,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         forgotPasswordMutation,
         resetPasswordMutation,
         updateProfileMutation,
-        signInWithProvider,
-        resendConfirmation,
       }}
     >
       {children}
