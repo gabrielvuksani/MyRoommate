@@ -57,8 +57,9 @@ export function SignupAvatarSelector({
   // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
   
-  // Much simpler logic: show image only if we have a preview URL, otherwise show fallback
-  const hasImage = !!imagePreviewUrl;
+  // For signup form: check if there's a File object, not preview URL
+  // This matches the remove button logic and handles the pre-upload state correctly
+  const hasImage = !!profileImage;
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -110,9 +111,9 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {hasImage ? (
+              {hasImage && imagePreviewUrl ? (
                 <AvatarImage 
-                  src={imagePreviewUrl!} 
+                  src={imagePreviewUrl} 
                   alt="Profile preview"
                   className="object-cover"
                   onError={() => {
@@ -236,9 +237,9 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {hasImage ? (
+                {hasImage && imagePreviewUrl ? (
                   <AvatarImage 
-                    src={imagePreviewUrl!} 
+                    src={imagePreviewUrl} 
                     alt="Profile preview"
                     className="object-cover"
                     onError={() => {
