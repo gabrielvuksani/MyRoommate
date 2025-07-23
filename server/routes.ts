@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { verifyToken, optionalAuth, AuthenticatedRequest } from "./supabaseAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import {
   insertHouseholdSchema,
   insertChoreSchema,
@@ -15,76 +15,23 @@ import {
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Supabase Auth endpoints
-  
-  // Get user by Supabase ID
-  app.get('/api/user/:id', verifyToken, async (req: AuthenticatedRequest, res) => {
-    try {
-      const userId = req.params.id;
-      
-      // Verify user can only access their own profile
-      if (req.user?.id !== userId) {
-        return res.status(403).json({ message: 'Forbidden' });
-      }
-      
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      
-      // Remove password from response
-      const { password, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  await setupAuth(app);
 
-  // Create user profile (called during registration)
-  app.post('/api/user/profile', verifyToken, async (req: AuthenticatedRequest, res) => {
-    try {
-      const userData = req.body;
-      
-      // Verify user can only create their own profile
-      if (req.user?.id !== userData.id) {
-        return res.status(403).json({ message: 'Forbidden' });
-      }
+  // Auth routes are now handled in setupAuth function
 
-      const user = await storage.createUser({
-        ...userData,
-        password: '', // Not needed for Supabase auth
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-      
-      // Remove password from response
-      const { password, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
-    } catch (error) {
-      console.error("Error creating user profile:", error);
-      res.status(500).json({ message: "Failed to create user profile" });
-    }
-  });
-
-  // Update user profile
-  app.patch('/api/auth/user', verifyToken, async (req: AuthenticatedRequest, res) => {
+  // User profile routes
+  app.patch('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const { firstName, lastName } = req.body;
       
-      const updatedUser = await storage.updateUser(userId, {
+      const updatedUser = await storage.upsertUser({
+        id: userId,
         firstName,
         lastName,
       });
       
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      
-      // Remove password from response
-      const { password, ...userWithoutPassword } = updatedUser;
-      res.json(userWithoutPassword);
+      res.json(updatedUser);
     } catch (error) {
       console.error("Error updating user:", error);
       res.status(500).json({ message: "Failed to update user" });
@@ -92,9 +39,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Household routes
-  app.post('/api/households', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/households', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const data = insertHouseholdSchema.parse(req.body);
       
       // Generate invite code
@@ -116,9 +63,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/households/join', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/households/join', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const { inviteCode } = req.body;
       
       console.log("Join household attempt:", { userId, inviteCode, codeLength: inviteCode?.length });
@@ -153,9 +100,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/households/leave', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/households/leave', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       await storage.leaveHousehold(userId);
       res.json({ message: "Successfully left household" });
     } catch (error) {
@@ -164,9 +111,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/households/current', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.patch('/api/households/current', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const { name } = req.body;
       
       if (!name || !name.trim()) {
@@ -186,9 +133,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/households/current', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/households/current', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -203,9 +150,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chore routes
-  app.get('/api/chores', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/chores', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -219,9 +166,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chores', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/chores', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -244,7 +191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/chores/:id', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.patch('/api/chores/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       const updates = req.body;
@@ -266,7 +213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/chores/:id', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.delete('/api/chores/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteChore(id);
@@ -278,9 +225,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Expense routes
-  app.get('/api/expenses', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/expenses', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -294,9 +241,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/expenses', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/expenses', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -324,9 +271,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/expenses/:id', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.delete('/api/expenses/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const { id } = req.params;
       
       // Verify user has access to delete this expense
@@ -343,9 +290,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/expense-splits/:id', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.patch('/api/expense-splits/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const splitId = req.params.id;
       const { settled } = req.body;
       
@@ -363,9 +310,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/balance', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/balance', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -380,9 +327,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Calendar routes
-  app.get('/api/calendar', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/calendar', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -396,9 +343,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/calendar', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/calendar', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -423,9 +370,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/calendar-events/:id', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.delete('/api/calendar-events/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const { id } = req.params;
       
       // Verify user has access to delete this calendar event
@@ -443,9 +390,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Message routes - Optimized for real-time performance
-  app.get('/api/messages', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/messages', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -467,9 +414,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/messages', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/messages', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const { content, householdId } = req.body;
       
       if (!content || !content.trim()) {
@@ -498,9 +445,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Shopping routes
-  app.get('/api/shopping', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/shopping', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -514,9 +461,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/shopping', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/shopping', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const membership = await storage.getUserHousehold(userId);
       if (!membership) {
         return res.status(404).json({ message: "No household found" });
@@ -536,7 +483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/shopping/:id', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.patch('/api/shopping/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       const updates = req.body;
@@ -550,7 +497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Roommate listing routes
-  app.get('/api/roommate-listings', async (req: AuthenticatedRequest, res) => {
+  app.get('/api/roommate-listings', async (req: any, res) => {
     try {
       const { city, featured } = req.query;
       const listings = await storage.getRoommateListings(
@@ -565,7 +512,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create demo listing (no auth required for demo)
-  app.post('/api/roommate-listings/demo', async (req: AuthenticatedRequest, res) => {
+  app.post('/api/roommate-listings/demo', async (req: any, res) => {
     try {
       // Check if demo listing already exists
       const existingListings = await storage.getRoommateListings();
@@ -642,9 +589,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/roommate-listings', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/roommate-listings', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const data = insertRoommateListingSchema.parse(req.body);
       
       // First, unfeature all existing listings
@@ -664,9 +611,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/roommate-listings/my', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/roommate-listings/my', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const listings = await storage.getUserRoommateListings(userId);
       res.json(listings);
     } catch (error) {
@@ -675,7 +622,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/roommate-listings/:id', async (req: AuthenticatedRequest, res) => {
+  app.get('/api/roommate-listings/:id', async (req: any, res) => {
     try {
       const { id } = req.params;
       const listing = await storage.getRoommateListing(id);
@@ -689,7 +636,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/roommate-listings/:id', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.patch('/api/roommate-listings/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       const updates = req.body;
@@ -702,7 +649,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/roommate-listings/:id', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.delete('/api/roommate-listings/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteRoommateListing(id);
@@ -714,7 +661,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Demo listing endpoint for university marketplace testing
-  app.post('/api/roommate-listings/demo', async (req: AuthenticatedRequest, res) => {
+  app.post('/api/roommate-listings/demo', async (req: any, res) => {
     try {
       const demoListing = {
         title: "Cozy Room Near UC Berkeley Campus",
@@ -751,9 +698,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Developer Tools API - Delete All Data
-  app.delete('/api/dev/delete-all-data', verifyToken, async (req: AuthenticatedRequest, res) => {
+  app.delete('/api/dev/delete-all-data', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       
       // For security, only allow the current user's household data to be deleted
       const membership = await storage.getUserHousehold(userId);

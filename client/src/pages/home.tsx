@@ -94,7 +94,7 @@ export default function Home() {
     currentHour < 12
       ? "Good morning"
       : currentHour < 17
-        ? "Afternoon"
+        ? "Good afternoon"
         : "Good evening";
 
   const nextChore = activeChores.sort((a: any, b: any) => {
@@ -378,9 +378,9 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="pt-44 px-6 space-y-6">
+      <div className="pt-48 px-6 space-y-6">
         {/* Hero Stats */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="pt-6 grid grid-cols-2 gap-4">
           <Card className="glass-card">
             <CardContent className="p-6 text-center animate-fade-in">
               <button
