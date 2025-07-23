@@ -46,16 +46,41 @@ export class NotificationService {
   private async registerServiceWorker(): Promise<void> {
     if ('serviceWorker' in navigator) {
       try {
-        this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js');
-        console.log('Service Worker registered for push notifications');
+        // Force service worker update on every load for reliability
+        this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js', {
+          updateViaCache: 'none'
+        });
         
-        // Wait for service worker to be ready
+        // Wait for service worker to be ready and active
         await navigator.serviceWorker.ready;
         
-        // Set up push subscription
-        await this.setupPushSubscription();
+        // Ensure service worker is controlling the page
+        if (!navigator.serviceWorker.controller) {
+          // Reload to ensure service worker controls the page
+          window.location.reload();
+          return;
+        }
+        
+        // Set up push subscription with retry mechanism
+        await this.setupPushSubscriptionWithRetry();
       } catch (error) {
-        console.error('Service Worker registration failed:', error);
+        // Silent fail but retry after delay
+        setTimeout(() => this.registerServiceWorker(), 2000);
+      }
+    }
+  }
+
+  private async setupPushSubscriptionWithRetry(): Promise<void> {
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        await this.setupPushSubscription();
+        return;
+      } catch (error) {
+        retries--;
+        if (retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
     }
   }
@@ -70,6 +95,7 @@ export class NotificationService {
       this.pushSubscription = await this.serviceWorkerRegistration.pushManager.getSubscription();
       
       if (this.pushSubscription) {
+        // Verify subscription is still valid by sending to server
         await this.sendSubscriptionToServer(this.pushSubscription);
         return;
       }
@@ -77,7 +103,7 @@ export class NotificationService {
       // Create new subscription
       await this.subscribeToPush();
     } catch (error) {
-      // Silent fail for push subscription setup
+      throw error;
     }
   }
 
@@ -93,7 +119,13 @@ export class NotificationService {
         return false;
       }
 
-      // Create push subscription
+      // Unsubscribe from any existing subscription first
+      const existingSubscription = await this.serviceWorkerRegistration.pushManager.getSubscription();
+      if (existingSubscription) {
+        await existingSubscription.unsubscribe();
+      }
+
+      // Create fresh push subscription
       this.pushSubscription = await this.serviceWorkerRegistration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: this.urlBase64ToUint8Array(
@@ -101,7 +133,7 @@ export class NotificationService {
         )
       });
 
-      // Send subscription to server
+      // Send subscription to server with validation
       await this.sendSubscriptionToServer(this.pushSubscription);
       
       return true;
@@ -486,3 +518,17 @@ export class NotificationService {
 
 // Export singleton instance
 export const notificationService = NotificationService.getInstance();
+
+// Initialize periodic subscription refresh for reliability
+if (typeof window !== 'undefined') {
+  // Refresh subscription every 15 minutes to ensure real-time reliability
+  setInterval(async () => {
+    try {
+      if (notificationService.getPermissionStatus() === 'granted') {
+        await notificationService.subscribeToPush();
+      }
+    } catch (error) {
+      // Silent fail for periodic refresh
+    }
+  }, 15 * 60 * 1000); // 15 minutes
+}

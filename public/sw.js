@@ -10,7 +10,6 @@ const STATIC_CACHE_URLS = [
 
 // Install event - cache static resources
 self.addEventListener('install', (event) => {
-  console.log('Service Worker installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(STATIC_CACHE_URLS))
@@ -20,13 +19,11 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('Service Worker activating...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -37,17 +34,13 @@ self.addEventListener('activate', (event) => {
 
 // Push event - handle background push notifications
 self.addEventListener('push', (event) => {
-  console.log('Push notification received:', event);
-  
   let notificationData = {};
   
   try {
     if (event.data) {
       notificationData = event.data.json();
-      console.log('Push notification data:', notificationData);
     }
   } catch (error) {
-    console.error('Error parsing push data:', error);
     notificationData = {
       title: 'myRoommate',
       body: 'You have a new notification',
@@ -59,32 +52,31 @@ self.addEventListener('push', (event) => {
     body: notificationData.body || 'You have a new notification',
     icon: notificationData.icon || '/icon-192x192.png',
     badge: '/icon-72x72.png',
-    tag: notificationData.tag || 'general',
+    tag: notificationData.tag || Date.now().toString(), // Unique tag for each notification
     data: notificationData.data || {},
-    requireInteraction: notificationData.requireInteraction !== false,
-    vibrate: notificationData.vibrate || [200, 100, 200],
-    actions: notificationData.actions || [
+    requireInteraction: true,
+    vibrate: [300, 100, 300, 100, 300],
+    silent: false,
+    renotify: true,
+    timestamp: Date.now(),
+    dir: 'ltr',
+    lang: 'en',
+    actions: [
       {
         action: 'open',
-        title: 'Open App',
-        icon: '/icon-72x72.png'
-      },
-      {
-        action: 'dismiss',
-        title: 'Dismiss'
+        title: 'Open App'
       }
     ]
   };
 
+  // Always show notification immediately
   event.waitUntil(
-    self.registration.showNotification(
-      notificationData.title || 'myRoommate',
-      options
-    ).then(() => {
-      console.log('Push notification displayed successfully');
-    }).catch((error) => {
-      console.error('Error displaying push notification:', error);
-    })
+    Promise.resolve(
+      self.registration.showNotification(
+        notificationData.title || 'myRoommate',
+        options
+      )
+    )
   );
 });
 

@@ -878,13 +878,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.id;
       const subscription = req.body;
       
-      // Store subscription for this user
-      pushSubscriptions.set(userId, subscription);
-      console.log(`Push subscription stored for user: ${userId}`);
+      // Validate subscription format
+      if (!subscription || !subscription.endpoint || !subscription.keys) {
+        return res.status(400).json({ message: 'Invalid subscription format' });
+      }
+      
+      // Store subscription for this user with timestamp
+      pushSubscriptions.set(userId, {
+        ...subscription,
+        timestamp: Date.now()
+      });
       
       res.json({ success: true, message: 'Push subscription stored successfully' });
     } catch (error) {
-      console.error('Error storing push subscription:', error);
       res.status(500).json({ message: 'Failed to store push subscription' });
     }
   });
@@ -902,22 +908,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Push notification sending function
-  async function sendPushNotification(userId: string, payload: any) {
+  // Push notification sending function with enhanced reliability
+  async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
     const subscription = pushSubscriptions.get(userId);
+    
     if (!subscription) {
-      console.log(`No push subscription found for user: ${userId}`);
       return false;
     }
 
+    // Send push notification with maximum urgency and immediate delivery
     try {
-      await webpush.sendNotification(subscription, JSON.stringify(payload));
-      console.log(`Push notification sent to user: ${userId}`);
+      await webpush.sendNotification(subscription, JSON.stringify(payload), {
+        urgency: 'high',
+        TTL: 30, // 30 seconds for immediate delivery
+        topic: payload.tag || 'instant'
+      });
       return true;
-    } catch (error) {
-      console.error(`Error sending push notification to user ${userId}:`, error);
-      // Remove invalid subscription
-      pushSubscriptions.delete(userId);
+    } catch (error: any) {
+      // If subscription is invalid/expired, remove it immediately
+      if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
+        pushSubscriptions.delete(userId);
+      }
       return false;
     }
   }
