@@ -195,20 +195,20 @@ export function ProfileAvatar({
               style={{
                 background: 'var(--surface)',
                 borderColor: 'var(--border)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                backgroundColor: 'rgba(var(--surface-rgb), 0.9)'
+                backdropFilter: 'blur(30px)',
+                WebkitBackdropFilter: 'blur(30px)',
+                backgroundColor: 'rgba(var(--surface-rgb), 0.85)'
               }}
             >
               <div className="space-y-2">
-                <label className="block">
+                <label className="block cursor-pointer">
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileSelect}
                     className="hidden"
                   />
-                  <button className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] cursor-pointer"
+                  <div className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] cursor-pointer"
                     style={{
                       background: 'var(--surface-secondary)',
                       color: 'var(--text-primary)',
@@ -217,7 +217,7 @@ export function ProfileAvatar({
                   >
                     <Upload className="w-4 h-4 mr-2" />
                     Upload Photo
-                  </button>
+                  </div>
                 </label>
                 
                 {user.profileImageUrl && (

@@ -240,10 +240,15 @@ export function SignupAvatarSelector({
               </Avatar>
               
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full p-0 bg-white dark:bg-gray-800 border-2 border-white dark:border-gray-800 shadow-lg hover:scale-110 transition-transform"
-                onClick={() => document.getElementById('signup-avatar-input')?.click()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  document.getElementById('signup-avatar-input')?.click();
+                }}
               >
                 <Camera className="w-3 h-3" />
               </Button>
@@ -263,9 +268,14 @@ export function SignupAvatarSelector({
           <div className="space-y-3">
             {imagePreviewUrl ? (
               <Button 
+                type="button"
                 variant="outline" 
                 size="sm" 
-                onClick={handleRemoveImage}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRemoveImage();
+                }}
                 className="w-full"
               >
                 <X className="w-4 h-4 mr-2" />
@@ -273,9 +283,14 @@ export function SignupAvatarSelector({
               </Button>
             ) : (
               <Button 
+                type="button"
                 variant="outline" 
                 size="sm" 
-                onClick={() => document.getElementById('signup-avatar-input')?.click()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  document.getElementById('signup-avatar-input')?.click();
+                }}
                 className="w-full"
               >
                 <Upload className="w-4 h-4 mr-2" />
@@ -284,9 +299,14 @@ export function SignupAvatarSelector({
             )}
             
             <Button 
+              type="button"
               variant="ghost" 
               size="sm" 
-              onClick={() => setShowColorPicker(!showColorPicker)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowColorPicker(!showColorPicker);
+              }}
               className="w-full"
             >
               {showColorPicker ? 'Hide Colors' : 'Choose Avatar Color'}

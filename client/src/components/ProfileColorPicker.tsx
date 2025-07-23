@@ -31,7 +31,7 @@ export function ProfileColorPicker({ selectedColor, onColorChange, size = 'md' }
         Avatar Color
       </p>
       <div className="w-full">
-        <div className="grid grid-cols-4 gap-3 w-full">
+        <div className="grid grid-cols-4 gap-4 w-full">
           {colorOptions.map((color) => (
             <button
               key={color.name}
