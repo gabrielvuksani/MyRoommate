@@ -43,12 +43,16 @@ export function SignupAvatarSelector({
   
   // Effect to sync imagePreviewUrl with profileImage prop
   React.useEffect(() => {
+    console.log('SignupAvatarSelector useEffect triggered - profileImage:', profileImage, 'imagePreviewUrl:', imagePreviewUrl);
+    
     if (profileImage && !imagePreviewUrl) {
       // Create preview URL from profileImage File if one doesn't exist
+      console.log('Creating preview URL from profileImage');
       const previewUrl = URL.createObjectURL(profileImage);
       setImagePreviewUrl(previewUrl);
     } else if (!profileImage && imagePreviewUrl) {
       // Clean up preview URL when profileImage is removed
+      console.log('Cleaning up preview URL because profileImage was removed');
       URL.revokeObjectURL(imagePreviewUrl);
       setImagePreviewUrl(null);
     }
@@ -56,6 +60,8 @@ export function SignupAvatarSelector({
 
   // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
+  
+  console.log('SignupAvatarSelector render - imagePreviewUrl:', imagePreviewUrl, 'profileImage exists:', !!profileImage, 'initials:', initials, 'profileColor:', profileColor);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -84,6 +90,9 @@ export function SignupAvatarSelector({
   };
 
   const handleRemoveImage = () => {
+    console.log('SignupAvatarSelector: handleRemoveImage called');
+    console.log('Before removal - imagePreviewUrl:', imagePreviewUrl, 'profileImage:', profileImage);
+    
     // Clear the preview URL if it exists
     if (imagePreviewUrl) {
       URL.revokeObjectURL(imagePreviewUrl);
@@ -99,6 +108,8 @@ export function SignupAvatarSelector({
     if (fileInput) {
       fileInput.value = '';
     }
+    
+    console.log('After removal - preview cleared, should show fallback now');
   };
 
   if (compact) {
@@ -114,6 +125,7 @@ export function SignupAvatarSelector({
                   alt="Profile preview"
                   className="object-cover"
                   onError={() => {
+                    console.log('SignupAvatarSelector: Image error occurred, clearing preview');
                     // If image fails to load, clear preview and show fallback
                     setImagePreviewUrl(null);
                     onImageChange(null);
