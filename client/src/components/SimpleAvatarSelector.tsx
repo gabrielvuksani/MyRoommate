@@ -82,7 +82,7 @@ export function SimpleAvatarSelector({
             type="button"
             onClick={() => document.getElementById('avatar-upload')?.click()}
             size="sm"
-            className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full p-1.5"
+            className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full p-1.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <Camera size={12} />
           </Button>
@@ -130,7 +130,7 @@ export function SimpleAvatarSelector({
             type="button"
             onClick={() => document.getElementById('avatar-upload-full')?.click()}
             size="sm"
-            className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full p-2"
+            className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full p-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <Camera size={14} />
           </Button>
