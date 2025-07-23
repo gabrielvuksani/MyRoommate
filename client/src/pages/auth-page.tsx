@@ -280,7 +280,11 @@ export default function AuthPage() {
                               profileColor={formData.profileColor}
                               profileImage={profileImage}
                               onColorChange={(color) => updateFormData("profileColor", color)}
-                              onImageChange={setProfileImage}
+                              onImageChange={(file) => {
+                                console.log('AUTH PAGE - onImageChange called with:', file);
+                                setProfileImage(file);
+                                console.log('AUTH PAGE - setProfileImage called');
+                              }}
                               compact={true}
                             />
                           </div>

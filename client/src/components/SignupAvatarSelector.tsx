@@ -39,20 +39,31 @@ export function SignupAvatarSelector({
   compact = false
 }: SignupAvatarSelectorProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [localImageUrl, setLocalImageUrl] = useState<string | null>(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
 
   // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
   
-  // Simple: if there's a profileImage File, create URL on demand
-  const imagePreviewUrl = profileImage ? URL.createObjectURL(profileImage) : null;
-  
-  // Simple: show remove button if there's a file
+  // Manage local preview URL with proper cleanup
+  React.useEffect(() => {
+    if (profileImage && !imageRemoved) {
+      const url = URL.createObjectURL(profileImage);
+      setLocalImageUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setLocalImageUrl(null);
+    }
+  }, [profileImage, imageRemoved]);
+
+  // Show remove button if there's a file
   const hasImage = !!profileImage;
 
   console.log('SIGNUP AVATAR DEBUG:', {
     profileImage: !!profileImage,
-    imagePreviewUrl: !!imagePreviewUrl,
+    localImageUrl: !!localImageUrl,
     hasImage,
+    imageRemoved,
     initials,
     firstName,
     lastName,
@@ -75,7 +86,8 @@ export function SignupAvatarSelector({
         return;
       }
       
-      // Set the file - useEffect will handle preview URL creation
+      // Clear removed flag and set the file
+      setImageRemoved(false);
       onImageChange(file);
     }
     
@@ -84,9 +96,10 @@ export function SignupAvatarSelector({
   };
 
   const handleRemoveImage = () => {
-    console.log('REMOVING IMAGE - before onImageChange(null)');
+    console.log('REMOVING IMAGE - before state changes');
+    setImageRemoved(true);
     onImageChange(null);
-    console.log('REMOVING IMAGE - after onImageChange(null)');
+    console.log('REMOVING IMAGE - after state changes');
     
     // Reset the file input to allow re-selection
     const fileInput = document.getElementById('signup-avatar-input') as HTMLInputElement;
@@ -102,13 +115,14 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {imagePreviewUrl ? (
+              {localImageUrl && !imageRemoved ? (
                 <AvatarImage 
-                  src={imagePreviewUrl} 
+                  src={localImageUrl} 
                   alt="Profile preview"
                   className="object-cover"
                   onError={() => {
                     console.log('Image failed to load, clearing...');
+                    setImageRemoved(true);
                     onImageChange(null);
                   }}
                 />
@@ -227,13 +241,14 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {imagePreviewUrl ? (
+                {localImageUrl && !imageRemoved ? (
                   <AvatarImage 
-                    src={imagePreviewUrl} 
+                    src={localImageUrl} 
                     alt="Profile preview"
                     className="object-cover"
                     onError={() => {
                       console.log('Image failed to load, clearing...');
+                      setImageRemoved(true);
                       onImageChange(null);
                     }}
                   />
