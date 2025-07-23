@@ -120,14 +120,13 @@ export function ProfileAvatar({
     }
   });
 
-  // Reset success states after a delay and hide upload options
+  // Reset success states after a delay
   React.useEffect(() => {
     if (uploadMutation.isSuccess || deleteMutation.isSuccess) {
       const timer = setTimeout(() => {
         uploadMutation.reset();
         deleteMutation.reset();
-        setShowUploadOptions(false); // Auto-hide after success
-      }, 1500); // Reduced delay for snappier feedback
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [uploadMutation.isSuccess, deleteMutation.isSuccess, uploadMutation.reset, deleteMutation.reset]);
@@ -227,7 +226,7 @@ export function ProfileAvatar({
           <Button
             variant="outline"
             size="sm"
-            className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full p-0 bg-white dark:bg-gray-800 border-2 border-white dark:border-gray-800 shadow-lg hover:scale-110 transition-all duration-200"
+            className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full p-0 bg-white dark:bg-gray-800 border-2 border-white dark:border-gray-800 shadow-lg hover:scale-110 transition-transform"
             onClick={() => setShowUploadOptions(!showUploadOptions)}
             disabled={uploading || uploadMutation.isPending || deleteMutation.isPending}
           >
@@ -244,7 +243,7 @@ export function ProfileAvatar({
 
           {showUploadOptions && (
             <div 
-              className="absolute top-full left-0 mt-2 rounded-2xl shadow-lg border p-3 z-50 min-w-48 animate-in fade-in-0 zoom-in-95 duration-200"
+              className="absolute top-full left-0 mt-2 rounded-2xl shadow-lg border p-3 z-50 min-w-48"
               style={{
                 background: 'var(--surface)',
                 borderColor: 'var(--border)',
@@ -261,7 +260,7 @@ export function ProfileAvatar({
                     onChange={handleFileSelect}
                     className="hidden"
                   />
-                  <div className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-[1.02] hover:shadow-md cursor-pointer"
+                  <div className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] cursor-pointer"
                     style={{
                       background: 'var(--surface-secondary)',
                       color: 'var(--text-primary)',
@@ -275,7 +274,7 @@ export function ProfileAvatar({
                 
                 {user.profileImageUrl && (
                   <button 
-                    className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-[1.02] hover:shadow-md text-red-500 hover:text-red-600"
+                    className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] text-red-500 hover:text-red-600"
                     onClick={handleRemoveImage}
                     style={{
                       background: 'var(--surface-secondary)',
@@ -288,7 +287,7 @@ export function ProfileAvatar({
                 )}
                 
                 <button 
-                  className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
+                  className="w-full flex items-center justify-start px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.02]"
                   onClick={() => {
                     setShowUploadOptions(false);
                     setShowColorPicker(true);

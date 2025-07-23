@@ -525,23 +525,16 @@ export default function Messages() {
                       <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Start the conversation</h3>
                       <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Be the first to send a message to your household</p>
                     </div>
-                    <div className="grid grid-cols-1 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       {conversationStarters.map((starter, index) => (
                         <Button
                           key={index}
                           variant="outline"
-                          className="h-auto p-4 text-left justify-start glass-card hover:scale-[1.02] transition-all duration-200"
-                          style={{
-                            background: 'var(--surface-secondary)',
-                            border: '1px solid var(--border)',
-                            minHeight: '56px'
-                          }}
+                          className="h-auto p-3 text-left justify-start glass-card hover:bg-white/50 transition-all duration-200"
                           onClick={() => handleStarterClick(starter.text)}
                         >
-                          <starter.icon className={`w-5 h-5 mr-3 ${starter.color} flex-shrink-0`} />
-                          <span className="text-base font-medium flex-1" style={{ color: 'var(--text-primary)' }}>
-                            {starter.text}
-                          </span>
+                          <starter.icon className={`w-4 h-4 mr-2 ${starter.color}`} />
+                          <span className="text-sm">{starter.text}</span>
                         </Button>
                       ))}
                     </div>

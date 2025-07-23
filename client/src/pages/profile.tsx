@@ -202,13 +202,13 @@ export default function Profile() {
 
   const handleDeleteAllData = async () => {
     // Show confirmation dialog
-    if (!window.confirm('Are you sure you want to clear all app data? This will remove all chores, expenses, messages, calendar events, and household members from your current household. Your roommate listings will be preserved. This action cannot be undone.')) {
+    if (!window.confirm('Are you sure you want to delete all household data? This action cannot be undone and will remove all chores, expenses, messages, calendar events, and household members. Your roommate listings will be preserved.')) {
       return;
     }
 
     try {
       // Show loading state
-      PersistentLoading.show("Clearing app data...");
+      PersistentLoading.show("Deleting all data...");
       
       await deleteAllDataMutation.mutateAsync();
       
@@ -222,7 +222,7 @@ export default function Profile() {
       console.error('Delete all data error:', error);
       // Hide loading on error
       PersistentLoading.hide();
-      alert('Failed to clear app data. Please try again.');
+      alert('Failed to delete all data. Please try again.');
     }
   };
 
@@ -709,13 +709,13 @@ export default function Profile() {
               <Button
                 onClick={handleDeleteAllData}
                 disabled={deleteAllDataMutation.isPending}
-                className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50 transition-all duration-200"
+                className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
               >
-                <Trash2 size={20} className={deleteAllDataMutation.isPending ? "animate-pulse" : ""} />
+                <Trash2 size={20} />
                 <span>
                   {deleteAllDataMutation.isPending
-                    ? "Clearing App Data..."
-                    : "Clear App Data"}
+                    ? "Deleting All Data..."
+                    : "Delete All Data"}
                 </span>
               </Button>
             </div>
