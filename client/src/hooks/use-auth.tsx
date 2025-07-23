@@ -1,96 +1,186 @@
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import {
   useQuery,
   useMutation,
   UseMutationResult,
 } from "@tanstack/react-query";
 import { User, LoginData, RegisterData } from "@shared/schema";
-import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
+import { queryClient } from "../lib/queryClient";
 import { AuthTransition } from "../lib/authTransition";
 import { PersistentLoading } from "../lib/persistentLoading";
+import { supabase } from "../lib/supabase";
+import { nanoid } from "nanoid";
 
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   error: Error | null;
-  loginMutation: UseMutationResult<User, Error, LoginData>;
+  loginMutation: UseMutationResult<any, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
-  registerMutation: UseMutationResult<User, Error, RegisterData>;
+  registerMutation: UseMutationResult<any, Error, RegisterData>;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const {
-    data: user,
-    error,
-    isLoading,
-  } = useQuery<User | undefined, Error>({
-    queryKey: ["/api/user"],
-    queryFn: getQueryFn({ on401: "returnNull" }),
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Initialize auth state and listen for changes
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        await fetchUserProfile(session.user.id);
+      } else {
+        setUser(null);
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      setIsLoading(true);
+      // Fetch user profile from our database using the Supabase user ID
+      const response = await fetch(`/api/user/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        }
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+      setError(err as Error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest("POST", "/api/login", credentials);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Login failed");
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password,
+      });
+      
+      if (error) {
+        throw new Error(error.message || "Login failed");
       }
-      return await res.json();
+      
+      if (!data.user) {
+        throw new Error("Login failed");
+      }
+      
+      return data.user;
     },
-    onSuccess: (user: User) => {
+    onSuccess: async () => {
       // Show persistent loading overlay
       PersistentLoading.show("Setting up your account...");
       // Mark authentication transition in progress
       AuthTransition.setInProgress();
-      // Set user data immediately for instant UI update
-      queryClient.setQueryData(["/api/user"], user);
+      // User data will be automatically updated via auth state listener
       // Redirect using window.location (consistent with logout, works for PWA and browser)
       window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
+      setError(error);
     },
   });
 
   const registerMutation = useMutation({
     mutationFn: async (credentials: RegisterData) => {
-      const res = await apiRequest("POST", "/api/register", credentials);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Registration failed");
+      // First, create the auth user in Supabase
+      const { data, error } = await supabase.auth.signUp({
+        email: credentials.email,
+        password: credentials.password,
+        options: {
+          emailRedirectTo: undefined // Disable email confirmation for now
+        }
+      });
+      
+      if (error) {
+        throw new Error(error.message || "Registration failed");
       }
-      return await res.json();
+      
+      if (!data.user) {
+        throw new Error("Registration failed");
+      }
+
+      // Create user profile in our database
+      const session = await supabase.auth.getSession();
+      const response = await fetch('/api/user/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.data.session?.access_token}`
+        },
+        body: JSON.stringify({
+          id: data.user.id,
+          email: credentials.email,
+          firstName: credentials.firstName,
+          lastName: credentials.lastName,
+          phoneNumber: credentials.phoneNumber || null,
+          dateOfBirth: credentials.dateOfBirth || null,
+          profileColor: 'blue',
+          verified: true // Auto-verify for now
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create user profile");
+      }
+
+      return await response.json();
     },
-    onSuccess: (user: User) => {
+    onSuccess: () => {
       // Show persistent loading overlay
-      PersistentLoading.show("Setting up your account...");
+      PersistentLoading.show("Creating your account...");
       // Mark authentication transition in progress
       AuthTransition.setInProgress();
-      // Set flag for new user signup
+      // Set new signup flag for onboarding
       sessionStorage.setItem('is_new_signup', 'true');
-      // Set user data immediately for instant UI update
-      queryClient.setQueryData(["/api/user"], user);
+      // User data will be automatically updated via auth state listener
       // Redirect using window.location (consistent with logout, works for PWA and browser)
       window.location.href = "/";
     },
     onError: (error: Error) => {
       console.error("Registration failed:", error.message);
+      setError(error);
     },
   });
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/logout");
-      if (!res.ok) {
-        throw new Error("Logout failed");
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw new Error(error.message || "Logout failed");
       }
     },
     onSuccess: () => {
       // Show persistent loading overlay
       PersistentLoading.show("Signing out...");
-      queryClient.setQueryData(["/api/user"], null);
+      setUser(null);
       // Clear all cached data on logout
       queryClient.clear();
       // Redirect to landing page after logout
@@ -98,6 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onError: (error: Error) => {
       console.error("Logout failed:", error.message);
+      setError(error);
     },
   });
 
