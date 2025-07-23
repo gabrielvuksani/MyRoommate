@@ -111,6 +111,11 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 23, 2025 (Latest):**
+- ✓ **Fixed critical blank page issue**: Removed overly restrictive landscape mode CSS that was completely hiding the app
+- ✓ **Replaced destructive portrait mode enforcement**: Now shows helpful notification instead of hiding entire application  
+- ✓ **Improved cross-device compatibility**: App now works on all orientations and screen sizes while still encouraging portrait mode for mobile
+
+**July 23, 2025 (Earlier):**
 - ✓ **Fixed critical fallback avatar display bug app-wide - now properly shows colored fallback with initials when images are removed or fail to load**
 - ✓ **Implemented universal avatar fallback system using QuickAvatar component across entire application**
 - ✓ **Fixed ProfileAvatar and SignupAvatarSelector conditional logic - removed restrictive checks that prevented fallback display**
