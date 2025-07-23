@@ -47,10 +47,15 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
-      refetchInterval: false,
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes instead of Infinity
-      retry: false,
+      refetchInterval: false, // No polling - WebSocket handles real-time updates
+      refetchOnWindowFocus: false, // WebSocket handles focus/visibility changes
+      refetchOnReconnect: true, // Still refetch when coming back online
+      staleTime: 30 * 60 * 1000, // 30 minutes - WebSocket invalidates when needed
+      gcTime: 60 * 60 * 1000, // 1 hour - keep data cached longer
+      retry: (failureCount, error: any) => {
+        if (error?.status === 401) return false;
+        return failureCount < 3;
+      },
     },
     mutations: {
       retry: false,
