@@ -117,22 +117,16 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {hasImage ? (
-                imagePreviewUrl ? (
-                  <AvatarImage 
-                    src={imagePreviewUrl} 
-                    alt="Profile preview"
-                    className="object-cover"
-                    onError={() => {
-                      // If image fails to load, clear file and show fallback
-                      onImageChange(null);
-                    }}
-                  />
-                ) : (
-                  <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-lg border-0`}>
-                    {initials}
-                  </AvatarFallback>
-                )
+              {profileImage && imagePreviewUrl ? (
+                <AvatarImage 
+                  src={imagePreviewUrl} 
+                  alt="Profile preview"
+                  className="object-cover"
+                  onError={() => {
+                    // If image fails to load, clear file and show fallback
+                    onImageChange(null);
+                  }}
+                />
               ) : (
                 <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-lg border-0`}>
                   {initials}
@@ -248,22 +242,16 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {hasImage ? (
-                  imagePreviewUrl ? (
-                    <AvatarImage 
-                      src={imagePreviewUrl} 
-                      alt="Profile preview"
-                      className="object-cover"
-                      onError={() => {
-                        // If image fails to load, clear file and show fallback
-                        onImageChange(null);
-                      }}
-                    />
-                  ) : (
-                    <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-xl border-0`}>
-                      {initials}
-                    </AvatarFallback>
-                  )
+                {profileImage && imagePreviewUrl ? (
+                  <AvatarImage 
+                    src={imagePreviewUrl} 
+                    alt="Profile preview"
+                    className="object-cover"
+                    onError={() => {
+                      // If image fails to load, clear file and show fallback
+                      onImageChange(null);
+                    }}
+                  />
                 ) : (
                   <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-xl border-0`}>
                     {initials}
