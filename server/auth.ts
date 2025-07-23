@@ -145,6 +145,8 @@ export function setupAuth(app: Express) {
         verified: true, // Auto-verify for now
         idVerified: false,
         profileImageUrl: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
 
       // Auto login after registration
