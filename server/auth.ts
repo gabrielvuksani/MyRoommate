@@ -139,8 +139,8 @@ export function setupAuth(app: Express) {
         password: hashedPassword,
         firstName: validatedData.firstName,
         lastName: validatedData.lastName,
-        phoneNumber: validatedData.phoneNumber,
-        dateOfBirth: validatedData.dateOfBirth ? new Date(validatedData.dateOfBirth) : null,
+        phoneNumber: validatedData.phoneNumber || null,
+        dateOfBirth: validatedData.dateOfBirth || null,
         verificationToken,
         verified: true, // Auto-verify for now
         idVerified: false,
@@ -148,7 +148,7 @@ export function setupAuth(app: Express) {
       });
 
       // Auto login after registration
-      req.login(user, (err) => {
+      req.login(user, (err: any) => {
         if (err) return next(err);
         
         // Return JSON for API calls, redirect for browser requests
@@ -188,7 +188,7 @@ export function setupAuth(app: Express) {
           return res.status(401).json({ message: info?.message || "Invalid credentials" });
         }
         
-        req.login(user, (err) => {
+        req.login(user, (err: any) => {
           if (err) return next(err);
           
           // Return JSON for API calls, redirect for browser requests
