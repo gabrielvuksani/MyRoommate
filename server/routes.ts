@@ -36,7 +36,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.id;
       const { firstName, lastName } = req.body;
       
-      const updatedUser = await storage.updateUser(userId, {
+      const updatedUser = await storage.upsertUser({
+        id: userId,
         firstName,
         lastName,
       });
@@ -860,7 +861,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: true,
         featured: true,
         verified: true,
-        userId: req.user?.id || '44253576'
+        createdBy: req.user?.id || '44253576'
       };
 
       const listing = await storage.createRoommateListing(demoListing);
@@ -915,22 +916,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return false;
     }
 
-    // Send push notification with enhanced delivery settings
+    // Send push notification with maximum urgency and immediate delivery
     try {
       await webpush.sendNotification(subscription, JSON.stringify(payload), {
         urgency: 'high',
-        TTL: 86400, // 24 hours for maximum delivery window
-        topic: undefined, // Allow all notifications through
-        headers: {
-          'Urgency': 'high',
-          'Topic': payload.tag || 'instant'
-        }
+        TTL: 30, // 30 seconds for immediate delivery
+        topic: payload.tag || 'instant'
       });
-      
-      // Update subscription timestamp on successful send
-      subscription.timestamp = Date.now();
-      pushSubscriptions.set(userId, subscription);
-      
       return true;
     } catch (error: any) {
       // If subscription is invalid/expired, remove it immediately
@@ -940,19 +932,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return false;
     }
   }
-
-  // Periodic subscription cleanup to remove stale subscriptions
-  setInterval(() => {
-    const now = Date.now();
-    const TWO_HOURS = 2 * 60 * 60 * 1000;
-    
-    for (const [userId, subscription] of pushSubscriptions.entries()) {
-      // Remove subscriptions older than 2 hours without activity
-      if (subscription.timestamp && (now - subscription.timestamp) > TWO_HOURS) {
-        pushSubscriptions.delete(userId);
-      }
-    }
-  }, 60 * 60 * 1000); // Run every hour
 
   // Test push notification endpoint
   app.post('/api/push/test', isAuthenticated, async (req: any, res) => {
@@ -1012,9 +991,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // High-performance WebSocket setup with user caching
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
-  
-  // Separate WebSocket server for notifications (scalable approach)
-  const notificationWss = new WebSocketServer({ server: httpServer, path: '/ws-notifications' });
   
   // Performance optimization caches
   const userCache = new Map<string, any>();
@@ -1280,106 +1256,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
   });
-
-  // Notification WebSocket server for real-time push notifications
-  const notificationClients = new Map<string, Set<any>>(); // householdId -> Set<WebSocket>
-  
-  notificationWss.on('connection', (ws: any) => {
-    let userId: string | null = null;
-    let householdId: string | null = null;
-    
-    ws.on('message', (data: any) => {
-      try {
-        const message = JSON.parse(data.toString());
-        
-        if (message.type === 'authenticate' && message.userId && message.householdId) {
-          userId = message.userId;
-          householdId = message.householdId;
-          
-          // Add to notification clients for this household
-          if (!notificationClients.has(householdId)) {
-            notificationClients.set(householdId, new Set());
-          }
-          
-          const householdClients = notificationClients.get(householdId);
-          if (householdClients) {
-            householdClients.add(ws);
-          }
-          
-          // Store metadata on WebSocket
-          (ws as any)._userId = userId;
-          (ws as any)._householdId = householdId;
-          
-          console.log(`Notification client authenticated: User ${userId} in household ${householdId}`);
-          
-          // Send confirmation
-          ws.send(JSON.stringify({
-            type: 'authenticated',
-            userId,
-            householdId
-          }));
-        }
-      } catch (error) {
-        console.error('Error processing notification WebSocket message:', error);
-      }
-    });
-    
-    ws.on('close', () => {
-      // Clean up client from household sets
-      if (householdId && notificationClients.has(householdId)) {
-        const householdClients = notificationClients.get(householdId);
-        if (householdClients) {
-          householdClients.delete(ws);
-          
-          // Remove empty household sets
-          if (householdClients.size === 0) {
-            notificationClients.delete(householdId);
-          }
-        }
-      }
-      
-      console.log(`Notification client disconnected: User ${userId}`);
-    });
-    
-    ws.on('error', (error: any) => {
-      console.error('Notification WebSocket error:', error);
-    });
-  });
-  
-  // Helper function to broadcast notifications to household members
-  function broadcastNotificationToHousehold(householdId: string, notification: any, excludeUserId?: string) {
-    const clients = notificationClients.get(householdId);
-    if (!clients) return;
-    
-    const message = JSON.stringify(notification);
-    let sentCount = 0;
-    
-    clients.forEach((client) => {
-      // Skip sending to the user who triggered the action
-      if (excludeUserId && (client as any)._userId === excludeUserId) {
-        return;
-      }
-      
-      if (client.readyState === 1) { // WebSocket.OPEN
-        try {
-          client.send(message);
-          sentCount++;
-        } catch (error) {
-          console.error('Error sending notification to client:', error);
-          // Remove invalid clients
-          clients.delete(client);
-        }
-      } else {
-        // Remove disconnected clients
-        clients.delete(client);
-      }
-    });
-    
-    console.log(`Broadcast notification to ${sentCount} clients in household ${householdId}`);
-  }
-  
-  // Store the broadcast function for use in other routes
-  (app as any).broadcastNotification = broadcastNotificationToHousehold;
 
   return httpServer;
 }

@@ -9,7 +9,6 @@ import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { QuickAvatar } from "@/components/ProfileAvatar";
 import { notificationService } from "@/lib/notifications";
-import { useUnifiedNotifications } from "@/hooks/use-unified-notifications";
 import { MessageCircle, Coffee, Home, ShoppingCart, Calendar } from "lucide-react";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
@@ -55,9 +54,6 @@ export default function Messages() {
   const { user } = useAuth() as { user: any };
   const queryClient = useQueryClient();
   const { keyboardHeight, isKeyboardVisible } = useKeyboardHeight();
-  
-  // Unified notification system - handles ALL notifications when app is closed
-  const { isReady } = useUnifiedNotifications();
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -68,19 +64,42 @@ export default function Messages() {
   const { data: serverMessages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household && !!user,
-    refetchInterval: false,
-    refetchIntervalInBackground: false,
-    refetchOnWindowFocus: false,
-    staleTime: Infinity,
-    gcTime: 30 * 60 * 1000,
-    retry: false,
+    refetchInterval: connectionStatus === 'connected' ? 5000 : 2000, // Slower polling when connected via WebSocket
+    refetchIntervalInBackground: true,
+    staleTime: connectionStatus === 'connected' ? 30000 : 1000, // Longer stale time when WebSocket is active
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Use server messages directly for reliable message display
   const messages = useMemo(() => {
     const sortedMessages = Array.isArray(serverMessages) ? serverMessages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) : [];
     
-    // No polling-based notifications - all handled by WebSocket real-time events
+    // Check for new messages and trigger notifications (backup for when WebSocket is not connected)
+    if (sortedMessages.length > 0 && user && household) {
+      const currentMessageIds = new Set(sortedMessages.map(msg => msg.id));
+      const previousIds = previousMessageIds.current;
+      
+      // Find new messages that weren't in the previous set
+      const newMessages = sortedMessages.filter(msg => 
+        !previousIds.has(msg.id) && msg.userId !== user.id
+      );
+      
+      // Trigger notifications for new messages from other users
+      newMessages.forEach(msg => {
+        if (msg.user && msg.content) {
+          const userName = formatDisplayName(msg.user.firstName || null, msg.user.lastName || null);
+          const householdName = household.name;
+          console.log('Polling detected new message, attempting notification from:', userName);
+          notificationService.showMessageNotification(userName, msg.content, householdName)
+            .then(success => console.log('Polling notification result:', success))
+            .catch(error => console.error('Polling notification error:', error));
+        }
+      });
+      
+      // Update the previous message IDs
+      previousMessageIds.current = currentMessageIds;
+    }
     
     return sortedMessages;
   }, [serverMessages, user, household]);
@@ -89,7 +108,6 @@ export default function Messages() {
     onConnect: () => {
       console.log('WebSocket connected successfully');
       setConnectionStatus('connected');
-      // Only load initial messages on connect, no ongoing polling
       queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
     },
     onDisconnect: () => {
@@ -125,9 +143,20 @@ export default function Messages() {
           return updatedMessages;
         });
         
-        // Unified notification system handles all notifications via WebSocket
+        // Send notification for new messages (only if not from current user)
+        if (data.message && data.message.userId !== user?.id) {
+          const userName = formatDisplayName(data.message.user?.firstName || null, data.message.user?.lastName || null);
+          const householdName = household?.name;
+          console.log('Attempting to show notification for message from:', userName);
+          notificationService.showMessageNotification(userName, data.message.content || '', householdName)
+            .then(success => console.log('Message notification result:', success))
+            .catch(error => console.error('Message notification error:', error));
+        }
         
-        // No need to invalidate - cache updated directly via WebSocket
+        queryClient.invalidateQueries({ 
+          queryKey: ["/api/messages"], 
+          refetchType: 'active' 
+        });
         
         requestAnimationFrame(() => {
           setTimeout(() => {
