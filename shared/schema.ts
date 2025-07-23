@@ -28,7 +28,22 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table for Custom Auth
+// Profiles table for Supabase Auth (matches auth.users)
+export const profiles = pgTable("profiles", {
+  id: uuid("id").primaryKey().notNull(), // matches auth.users.id
+  email: varchar("email").unique().notNull(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  profileColor: varchar("profile_color").default('blue'),
+  phoneNumber: varchar("phone_number"),
+  dateOfBirth: date("date_of_birth"),
+  idVerified: boolean("id_verified").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Keep the old users table for backward compatibility during migration
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
   email: varchar("email").unique().notNull(),
@@ -51,7 +66,7 @@ export const households = pgTable("households", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
   inviteCode: varchar("invite_code", { length: 8 }).unique().notNull(),
-  createdBy: varchar("created_by").references(() => users.id).notNull(),
+  createdBy: uuid("created_by").references(() => profiles.id).notNull(),
   rentAmount: decimal("rent_amount", { precision: 10, scale: 2 }),
   rentDueDay: integer("rent_due_day"),
   currency: varchar("currency", { length: 3 }).default("USD"),
@@ -63,7 +78,7 @@ export const households = pgTable("households", {
 export const householdMembers = pgTable("household_members", {
   id: uuid("id").primaryKey().defaultRandom(),
   householdId: uuid("household_id").references(() => households.id),
-  userId: varchar("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => profiles.id),
   role: varchar("role").default("member"), // admin, member
   joinedAt: timestamp("joined_at").defaultNow(),
 });
@@ -75,7 +90,7 @@ export const chores = pgTable("chores", {
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   status: varchar("status").default("todo"), // todo, doing, done
-  assignedTo: varchar("assigned_to").references(() => users.id),
+  assignedTo: uuid("assigned_to").references(() => profiles.id),
   dueDate: timestamp("due_date"),
   recurrence: varchar("recurrence"), // daily, weekly, monthly, custom
   recurrenceInterval: integer("recurrence_interval").default(1),
@@ -91,7 +106,7 @@ export const expenses = pgTable("expenses", {
   householdId: uuid("household_id").references(() => households.id),
   title: varchar("title", { length: 255 }).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  paidBy: varchar("paid_by").references(() => users.id),
+  paidBy: uuid("paid_by").references(() => profiles.id),
   category: varchar("category"),
   splitType: varchar("split_type").default("equal"), // equal, custom, percentage
   receiptUrl: varchar("receipt_url"),
@@ -103,7 +118,7 @@ export const expenses = pgTable("expenses", {
 export const expenseSplits = pgTable("expense_splits", {
   id: uuid("id").primaryKey().defaultRandom(),
   expenseId: uuid("expense_id").references(() => expenses.id),
-  userId: varchar("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => profiles.id),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   settled: boolean("settled").default(false),
   settledAt: timestamp("settled_at"),
@@ -119,7 +134,7 @@ export const calendarEvents = pgTable("calendar_events", {
   endDate: timestamp("end_date"),
   color: varchar("color").default("#007AFF"),
   type: varchar("type"), // rent, utility, social, chore, bill
-  createdBy: varchar("created_by").references(() => users.id),
+  createdBy: uuid("created_by").references(() => profiles.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -127,7 +142,7 @@ export const calendarEvents = pgTable("calendar_events", {
 export const messages = pgTable("messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   householdId: uuid("household_id").references(() => households.id),
-  userId: varchar("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => profiles.id),
   content: text("content").notNull(),
   type: varchar("type").default("text"), // text, system, attachment
   linkedTo: varchar("linked_to"), // bill_id, chore_id, event_id, grocery_id
@@ -142,9 +157,9 @@ export const shoppingItems = pgTable("shopping_items", {
   name: varchar("name", { length: 255 }).notNull(),
   quantity: integer("quantity").default(1),
   completed: boolean("completed").default(false),
-  completedBy: varchar("completed_by").references(() => users.id),
+  completedBy: uuid("completed_by").references(() => profiles.id),
   completedAt: timestamp("completed_at"),
-  createdBy: varchar("created_by").references(() => users.id),
+  createdBy: uuid("created_by").references(() => profiles.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -175,7 +190,7 @@ export const roommateListings = pgTable("roommate_listings", {
   verified: boolean("verified").default(false).notNull(), // Student verification status
   isActive: boolean("is_active").default(true).notNull(),
   featured: boolean("featured").default(false).notNull(),
-  createdBy: text("created_by").references(() => users.id),
+  createdBy: text("created_by").references(() => profiles.id),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
@@ -369,10 +384,19 @@ export const registerSchema = z.object({
   path: ["confirmPassword"],
 });
 
+// Profile schemas for Supabase
+export const insertProfileSchema = createInsertSchema(profiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Profile = typeof profiles.$inferSelect;
+export type InsertProfile = z.infer<typeof insertProfileSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type RegisterData = z.infer<typeof registerSchema>;
 export type Household = typeof households.$inferSelect;
