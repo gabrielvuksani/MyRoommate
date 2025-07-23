@@ -1013,6 +1013,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // High-performance WebSocket setup with user caching
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
   
+  // Separate WebSocket server for notifications (scalable approach)
+  const notificationWss = new WebSocketServer({ server: httpServer, path: '/ws-notifications' });
+  
   // Performance optimization caches
   const userCache = new Map<string, any>();
   const clientsById = new Map<string, WebSocket>();
@@ -1277,6 +1280,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
   });
+
+  // Notification WebSocket server for real-time push notifications
+  const notificationClients = new Map<string, Set<any>>(); // householdId -> Set<WebSocket>
+  
+  notificationWss.on('connection', (ws: any) => {
+    let userId: string | null = null;
+    let householdId: string | null = null;
+    
+    ws.on('message', (data: any) => {
+      try {
+        const message = JSON.parse(data.toString());
+        
+        if (message.type === 'authenticate' && message.userId && message.householdId) {
+          userId = message.userId;
+          householdId = message.householdId;
+          
+          // Add to notification clients for this household
+          if (!notificationClients.has(householdId)) {
+            notificationClients.set(householdId, new Set());
+          }
+          
+          const householdClients = notificationClients.get(householdId);
+          if (householdClients) {
+            householdClients.add(ws);
+          }
+          
+          // Store metadata on WebSocket
+          (ws as any)._userId = userId;
+          (ws as any)._householdId = householdId;
+          
+          console.log(`Notification client authenticated: User ${userId} in household ${householdId}`);
+          
+          // Send confirmation
+          ws.send(JSON.stringify({
+            type: 'authenticated',
+            userId,
+            householdId
+          }));
+        }
+      } catch (error) {
+        console.error('Error processing notification WebSocket message:', error);
+      }
+    });
+    
+    ws.on('close', () => {
+      // Clean up client from household sets
+      if (householdId && notificationClients.has(householdId)) {
+        const householdClients = notificationClients.get(householdId);
+        if (householdClients) {
+          householdClients.delete(ws);
+          
+          // Remove empty household sets
+          if (householdClients.size === 0) {
+            notificationClients.delete(householdId);
+          }
+        }
+      }
+      
+      console.log(`Notification client disconnected: User ${userId}`);
+    });
+    
+    ws.on('error', (error: any) => {
+      console.error('Notification WebSocket error:', error);
+    });
+  });
+  
+  // Helper function to broadcast notifications to household members
+  function broadcastNotificationToHousehold(householdId: string, notification: any, excludeUserId?: string) {
+    const clients = notificationClients.get(householdId);
+    if (!clients) return;
+    
+    const message = JSON.stringify(notification);
+    let sentCount = 0;
+    
+    clients.forEach((client) => {
+      // Skip sending to the user who triggered the action
+      if (excludeUserId && (client as any)._userId === excludeUserId) {
+        return;
+      }
+      
+      if (client.readyState === 1) { // WebSocket.OPEN
+        try {
+          client.send(message);
+          sentCount++;
+        } catch (error) {
+          console.error('Error sending notification to client:', error);
+          // Remove invalid clients
+          clients.delete(client);
+        }
+      } else {
+        // Remove disconnected clients
+        clients.delete(client);
+      }
+    });
+    
+    console.log(`Broadcast notification to ${sentCount} clients in household ${householdId}`);
+  }
+  
+  // Store the broadcast function for use in other routes
+  (app as any).broadcastNotification = broadcastNotificationToHousehold;
 
   return httpServer;
 }
