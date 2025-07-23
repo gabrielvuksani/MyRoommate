@@ -43,16 +43,12 @@ export function SignupAvatarSelector({
   
   // Effect to sync imagePreviewUrl with profileImage prop
   React.useEffect(() => {
-    console.log('SignupAvatarSelector useEffect triggered - profileImage:', profileImage, 'imagePreviewUrl:', imagePreviewUrl);
-    
     if (profileImage && !imagePreviewUrl) {
       // Create preview URL from profileImage File if one doesn't exist
-      console.log('Creating preview URL from profileImage');
       const previewUrl = URL.createObjectURL(profileImage);
       setImagePreviewUrl(previewUrl);
     } else if (!profileImage && imagePreviewUrl) {
       // Clean up preview URL when profileImage is removed
-      console.log('Cleaning up preview URL because profileImage was removed');
       URL.revokeObjectURL(imagePreviewUrl);
       setImagePreviewUrl(null);
     }
@@ -61,7 +57,9 @@ export function SignupAvatarSelector({
   // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
   
-  console.log('SignupAvatarSelector render - imagePreviewUrl:', imagePreviewUrl, 'profileImage exists:', !!profileImage, 'initials:', initials, 'profileColor:', profileColor);
+  // Key insight: Determine what should be displayed - prioritize showing fallback when no image
+  const shouldShowImage = imagePreviewUrl && profileImage;
+  const shouldShowFallback = !shouldShowImage;
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -90,17 +88,13 @@ export function SignupAvatarSelector({
   };
 
   const handleRemoveImage = () => {
-    console.log('SignupAvatarSelector: handleRemoveImage called');
-    console.log('Before removal - imagePreviewUrl:', imagePreviewUrl, 'profileImage:', profileImage);
-    
     // Clear the preview URL if it exists
     if (imagePreviewUrl) {
       URL.revokeObjectURL(imagePreviewUrl);
     }
-    // Immediately clear preview to show fallback
-    setImagePreviewUrl(null);
     
-    // Clear the profile image from parent component
+    // Clear both local state and parent state immediately
+    setImagePreviewUrl(null);
     onImageChange(null);
     
     // Reset the file input to allow re-selection
@@ -108,8 +102,6 @@ export function SignupAvatarSelector({
     if (fileInput) {
       fileInput.value = '';
     }
-    
-    console.log('After removal - preview cleared, should show fallback now');
   };
 
   if (compact) {
@@ -119,13 +111,12 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {imagePreviewUrl ? (
+              {shouldShowImage ? (
                 <AvatarImage 
-                  src={imagePreviewUrl} 
+                  src={imagePreviewUrl!} 
                   alt="Profile preview"
                   className="object-cover"
                   onError={() => {
-                    console.log('SignupAvatarSelector: Image error occurred, clearing preview');
                     // If image fails to load, clear preview and show fallback
                     setImagePreviewUrl(null);
                     onImageChange(null);
@@ -168,7 +159,7 @@ export function SignupAvatarSelector({
 
         {/* Compact action buttons */}
         <div className="space-y-2">
-          {imagePreviewUrl ? (
+          {shouldShowImage ? (
             <button 
               type="button"
               onClick={(e) => {
@@ -246,9 +237,9 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {imagePreviewUrl ? (
+                {shouldShowImage ? (
                   <AvatarImage 
-                    src={imagePreviewUrl} 
+                    src={imagePreviewUrl!} 
                     alt="Profile preview"
                     className="object-cover"
                     onError={() => {
@@ -291,7 +282,7 @@ export function SignupAvatarSelector({
 
           {/* Action buttons */}
           <div className="space-y-3">
-            {imagePreviewUrl || profileImage ? (
+            {shouldShowImage ? (
               <Button 
                 type="button"
                 variant="outline" 
