@@ -52,14 +52,13 @@ export function SignupAvatarSelector({
       URL.revokeObjectURL(imagePreviewUrl);
       setImagePreviewUrl(null);
     }
-  }, [profileImage, imagePreviewUrl]);
+  }, [profileImage]);
 
   // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
   
-  // Key insight: Determine what should be displayed - prioritize showing fallback when no image
-  const shouldShowImage = imagePreviewUrl && profileImage;
-  const shouldShowFallback = !shouldShowImage;
+  // Much simpler logic: show image only if we have a preview URL, otherwise show fallback
+  const hasImage = !!imagePreviewUrl;
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -111,7 +110,7 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {shouldShowImage ? (
+              {hasImage ? (
                 <AvatarImage 
                   src={imagePreviewUrl!} 
                   alt="Profile preview"
@@ -159,7 +158,7 @@ export function SignupAvatarSelector({
 
         {/* Compact action buttons */}
         <div className="space-y-2">
-          {shouldShowImage ? (
+          {hasImage ? (
             <button 
               type="button"
               onClick={(e) => {
@@ -237,7 +236,7 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {shouldShowImage ? (
+                {hasImage ? (
                   <AvatarImage 
                     src={imagePreviewUrl!} 
                     alt="Profile preview"
@@ -282,7 +281,7 @@ export function SignupAvatarSelector({
 
           {/* Action buttons */}
           <div className="space-y-3">
-            {shouldShowImage ? (
+            {hasImage ? (
               <Button 
                 type="button"
                 variant="outline" 
