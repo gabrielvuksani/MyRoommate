@@ -3,14 +3,16 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-supabase-auth";
 import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle } from "lucide-react";
 import { SignupAvatarSelector } from "@/components/SignupAvatarSelector";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
-  const { user, loginMutation, registerMutation } = useAuth();
+  const { user, signIn, signUp, resetPassword, uploadProfileImage, updateProfile } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,6 +26,7 @@ export default function AuthPage() {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [authError, setAuthError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Scroll to top on page load
   useEffect(() => {
@@ -32,11 +35,11 @@ export default function AuthPage() {
 
   // Redirect if user was already logged in when they accessed this page
   React.useEffect(() => {
-    if (user && !loginMutation.isPending && !registerMutation.isPending && !loginMutation.isSuccess && !registerMutation.isSuccess) {
+    if (user && !isSubmitting) {
       // User was already logged in when they accessed this page
       window.location.href = "/";
     }
-  }, [user, loginMutation.isPending, registerMutation.isPending, loginMutation.isSuccess, registerMutation.isSuccess]);
+  }, [user, isSubmitting]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -76,100 +79,101 @@ export default function AuthPage() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    // Clear any previous auth errors
+    // Clear any previous messages
     setAuthError("");
+    setSuccessMessage("");
+    setIsSubmitting(true);
 
     try {
       if (isLogin) {
-        await loginMutation.mutateAsync({
-          email: formData.email,
-          password: formData.password,
-        });
-        // Login successful - onSuccess will handle navigation
-      } else {
-        // First register the user
-        const registerData = {
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-        };
+        const { user: authUser, error } = await signIn(formData.email, formData.password);
         
-        await registerMutation.mutateAsync(registerData);
-        
-        // After successful registration, upload profile image and update color if needed
-        if (profileImage || formData.profileColor !== 'blue') {
-          try {
-            // Upload profile image if provided
-            if (profileImage) {
-              const imageFormData = new FormData();
-              imageFormData.append('profileImage', profileImage);
-              
-              await fetch('/api/user/profile-image', {
-                method: 'POST',
-                body: imageFormData,
-                credentials: 'include'
-              });
-            }
-            
-            // Update profile color if not default
-            if (formData.profileColor !== 'blue') {
-              await fetch('/api/user', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ profileColor: formData.profileColor }),
-                credentials: 'include'
-              });
-            }
-          } catch (profileError) {
-            // Don't fail registration if profile updates fail
-            console.log('Profile update after registration failed:', profileError);
-          }
+        if (error) {
+          throw error;
         }
         
-        // Registration successful - onSuccess will handle navigation
+        if (authUser) {
+          // Login successful - useEffect will handle navigation
+          setSuccessMessage("Login successful!");
+        }
+      } else {
+        // Register the user
+        const { user: authUser, error } = await signUp(formData.email, formData.password, {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        });
+        
+        if (error) {
+          throw error;
+        }
+        
+        if (authUser) {
+          // Upload profile image if provided
+          if (profileImage) {
+            try {
+              await uploadProfileImage(profileImage);
+            } catch (profileError) {
+              console.warn('Profile image upload failed:', profileError);
+            }
+          }
+          
+          // Update profile color if not default
+          if (formData.profileColor !== 'blue') {
+            try {
+              await updateProfile({ profileColor: formData.profileColor });
+            } catch (profileError) {
+              console.warn('Profile color update failed:', profileError);
+            }
+          }
+          
+          setSuccessMessage("Registration successful! Please check your email to verify your account.");
+        }
       }
     } catch (error: any) {
-      console.error("Auth error:", error);
-      // Extract and format error message
-      const rawErrorMessage = error.message || "Authentication failed. Please try again.";
-      const cleanErrorMessage = formatErrorMessage(rawErrorMessage);
-      setAuthError(cleanErrorMessage);
+      // Convert error to user-friendly message
+      const errorMessage = error?.message || "An error occurred";
+      if (errorMessage.includes("Invalid login credentials") || errorMessage.includes("Invalid email or password")) {
+        setAuthError("Invalid email or password, please try again");
+      } else if (errorMessage.includes("User already registered") || errorMessage.includes("already been registered")) {
+        setAuthError("An account with this email already exists");
+      } else if (errorMessage.includes("Password")) {
+        setAuthError("Password must be at least 8 characters");
+      } else {
+        setAuthError(errorMessage);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const formatErrorMessage = (errorMessage: string) => {
-    // Clean up common error patterns
-    let cleanMessage = errorMessage
-      .replace(/^\d+:\s*/, '') // Remove error codes like "401: "
-      .replace(/[{}]/g, '') // Remove curly braces
-      .replace(/^"message":"/, '') // Remove JSON structure
-      .replace(/^"/, '').replace(/"$/, '') // Remove quotes
-      .replace(/message":"/, '') // Remove remaining message structure
-      .trim();
-
-    // Add more user-friendly messaging
-    if (cleanMessage.toLowerCase().includes('invalid email or password')) {
-      return 'Invalid email or password, please try again.';
-    }
-    // Remove email verification message since it's disabled
-    // if (cleanMessage.toLowerCase().includes('please verify your email')) {
-    //   return 'Please check your email and verify your account before signing in.';
-    // }
-    if (cleanMessage.toLowerCase().includes('user already exists') || cleanMessage.toLowerCase().includes('username already exists')) {
-      return 'An account with this email already exists. Please try signing in instead.';
-    }
-    if (cleanMessage.toLowerCase().includes('authentication failed')) {
-      return 'Authentication failed. Please check your credentials and try again.';
-    }
-    if (cleanMessage.toLowerCase().includes('registration failed')) {
-      return 'Registration failed. Please check your information and try again.';
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email) {
+      setAuthError("Please enter your email address");
+      return;
     }
 
-    // Return cleaned message with fallback
-    return cleanMessage || 'Something went wrong. Please try again.';
+    setIsSubmitting(true);
+    setAuthError("");
+    setSuccessMessage("");
+
+    try {
+      const { error } = await resetPassword(formData.email);
+      
+      if (error) {
+        throw error;
+      }
+      
+      setSuccessMessage("Password reset email sent! Check your inbox.");
+      setShowForgotPassword(false);
+    } catch (error: any) {
+      setAuthError(error?.message || "Failed to send reset email");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+
 
   const updateFormData = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -421,10 +425,10 @@ export default function AuthPage() {
                   <div className="pt-4">
                     <button
                       type="submit"
-                      disabled={loginMutation.isPending || registerMutation.isPending}
+                      disabled={isSubmitting}
                       className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-2xl font-semibold text-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
-                      {(loginMutation.isPending || registerMutation.isPending) ? (
+                      {isSubmitting ? (
                         <div className="flex items-center justify-center space-x-2">
                           <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                           <span>Please wait...</span>
@@ -436,6 +440,33 @@ export default function AuthPage() {
                       )}
                     </button>
                   </div>
+
+                  {/* Forgot Password Link - Login only */}
+                  {isLogin && (
+                    <div className="text-center mt-4">
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                      >
+                        Forgot your password?
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Success Message */}
+                  {successMessage && (
+                    <div className="mt-4 p-3 rounded-lg bg-green-50 border border-green-200 text-green-800 text-sm">
+                      {successMessage}
+                    </div>
+                  )}
+
+                  {/* Error Message */}
+                  {authError && (
+                    <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">
+                      {authError}
+                    </div>
+                  )}
                 </form>
 
                 {/* Toggle Form */}
@@ -454,6 +485,7 @@ export default function AuthPage() {
                       });
                       setProfileImage(null);
                       setAuthError("");
+                      setSuccessMessage("");
                     }}
                     className="text-sm transition-all duration-200 hover:scale-105 rounded-lg px-3 py-2"
                     style={{ 
@@ -529,6 +561,69 @@ export default function AuthPage() {
           </div>
         </div>
 
+        {/* Forgot Password Modal */}
+        {showForgotPassword && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <Card className="w-full max-w-md glass-card">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-400 rounded-xl flex items-center justify-center">
+                    <Lock className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      Reset Password
+                    </h2>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      Enter your email to reset your password
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                      Email Address
+                    </label>
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={formData.email}
+                      onChange={(e) => updateFormData("email", e.target.value)}
+                      className="input-modern h-12"
+                      style={{
+                        background: 'var(--surface)',
+                        borderColor: 'var(--border)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '16px 20px',
+                        fontSize: '16px',
+                        color: 'var(--text-primary)',
+                        transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(false)}
+                      className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50"
+                    >
+                      {isSubmitting ? "Sending..." : "Send Reset Email"}
+                    </button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );
