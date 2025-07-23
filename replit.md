@@ -114,6 +114,8 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ **Fixed critical fallback avatar display bug app-wide - now properly shows colored fallback with initials when images are removed or fail to load**
 - ✓ **Implemented universal avatar fallback system using QuickAvatar component across entire application**
 - ✓ **Fixed ProfileAvatar and SignupAvatarSelector conditional logic - removed restrictive checks that prevented fallback display**
+- ✓ **Corrected signup form avatar display logic to match remove button conditions (imagePreviewUrl || profileImage)**
+- ✓ **Added onError handlers to all avatar images for graceful fallback when images fail to load**
 - ✓ **Updated all avatar usage points: message bubbles, roommate listing cards, listing detail pages, home page, dashboard**
 - ✓ **Enhanced immediate state clearing when removing images to ensure instant fallback display without blank spaces**
 - ✓ **Fixed avatar color picker form submission bug - now prevents unwanted form validation**

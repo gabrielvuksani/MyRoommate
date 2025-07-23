@@ -107,11 +107,16 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {imagePreviewUrl ? (
+              {imagePreviewUrl || profileImage ? (
                 <AvatarImage 
-                  src={imagePreviewUrl} 
+                  src={imagePreviewUrl || (profileImage ? URL.createObjectURL(profileImage) : '')} 
                   alt="Profile preview"
                   className="object-cover"
+                  onError={() => {
+                    // If image fails to load, clear preview and show fallback
+                    setImagePreviewUrl(null);
+                    onImageChange(null);
+                  }}
                 />
               ) : (
                 <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-lg border-0`}>
@@ -228,11 +233,16 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {imagePreviewUrl ? (
+                {imagePreviewUrl || profileImage ? (
                   <AvatarImage 
-                    src={imagePreviewUrl} 
+                    src={imagePreviewUrl || (profileImage ? URL.createObjectURL(profileImage) : '')} 
                     alt="Profile preview"
                     className="object-cover"
+                    onError={() => {
+                      // If image fails to load, clear preview and show fallback
+                      setImagePreviewUrl(null);
+                      onImageChange(null);
+                    }}
                   />
                 ) : (
                   <AvatarFallback className={`bg-gradient-to-br ${gradientClasses[profileColor as keyof typeof gradientClasses] || gradientClasses.blue} text-white font-bold text-xl border-0`}>
