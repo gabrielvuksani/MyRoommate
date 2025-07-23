@@ -355,15 +355,15 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-export const registerSchema = insertUserSchema.extend({
+export const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string(),
+  confirmPassword: z.string().optional(),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  phoneNumber: z.string().optional(),
-  dateOfBirth: z.string().optional(),
-}).refine((data) => data.password === data.confirmPassword, {
+  phoneNumber: z.string().optional().nullable(),
+  dateOfBirth: z.string().optional().nullable(),
+}).refine((data) => !data.confirmPassword || data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
