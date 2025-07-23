@@ -13,6 +13,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell, Trash2 } from "lucide-react";
 import { getProfileInitials } from "@/lib/nameUtils";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useTheme } from "@/lib/ThemeProvider";
 import BackButton from "../components/back-button";
 import { PersistentLoading } from "@/lib/persistentLoading";
@@ -330,11 +331,13 @@ export default function Profile() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4 flex-1 min-w-0">
-                <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center">
-                  <span className="text-2xl font-bold text-white">
-                    {getProfileInitials((user as any).firstName, (user as any).lastName, (user as any).email)}
-                  </span>
-                </div>
+                <ProfileAvatar 
+                  user={user as any} 
+                  size="xl" 
+                  editable={true} 
+                  gradientType="emerald"
+                  className="rounded-3xl"
+                />
                 <div className="flex-1 min-w-0">
                   <h2 className="text-2xl font-bold truncate" style={{ color: 'var(--text-primary)' }}>
                     {(user as any).firstName && (user as any).lastName
@@ -653,13 +656,11 @@ export default function Profile() {
                     style={{ borderBottom: '1px solid var(--border)' }}
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                        <span className="text-white font-semibold text-sm">
-                          {member.user.firstName?.[0] ||
-                            member.user.email?.[0] ||
-                            "?"}
-                        </span>
-                      </div>
+                      <ProfileAvatar 
+                        user={member.user} 
+                        size="md" 
+                        gradientType="blue"
+                      />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>
                           {member.user.firstName && member.user.lastName

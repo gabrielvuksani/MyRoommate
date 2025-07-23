@@ -23,6 +23,7 @@ import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { getProfileInitials } from "@/lib/nameUtils";
 import RoommateListingCard from "@/components/roommate-listing-card";
+import { QuickAvatar } from "@/components/ProfileAvatar";
 
 export default function Home() {
   const { user } = useAuth();
@@ -119,11 +120,14 @@ export default function Home() {
               </div>
               <button
                 onClick={() => setLocation("/profile")}
-                className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
+                className="flex-shrink-0 shadow-lg btn-animated transition-all hover:scale-[1.05] animate-fade-in"
               >
-                <span className="text-white font-bold text-lg">
-                  {getProfileInitials((user as any)?.firstName, (user as any)?.lastName, (user as any)?.email)}
-                </span>
+                <QuickAvatar 
+                  user={user as any} 
+                  size="lg" 
+                  gradientType="emerald"
+                  className="rounded-2xl"
+                />
               </button>
             </div>
           </div>
@@ -621,7 +625,7 @@ export default function Home() {
               <ArrowRight size={14} />
             </button>
           </div>
-          {((chores as any[])?.length === 0 && (!balance || (balance.totalOwed === 0 && balance.totalOwing === 0))) ? (
+          {((chores as any[])?.length === 0 && (!balance || ((balance as any).totalOwed === 0 && (balance as any).totalOwing === 0))) ? (
             <Card className="glass-card">
               <CardContent className="p-6">
                 <div className="text-center py-8">
@@ -759,11 +763,12 @@ export default function Home() {
                         key={message.id}
                         className="flex items-start space-x-3"
                       >
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-                          <span className="text-white text-sm font-bold">
-                            {getProfileInitials(message.user.firstName, message.user.lastName, message.user.email)}
-                          </span>
-                        </div>
+                        <QuickAvatar 
+                          user={message.user} 
+                          size="md" 
+                          gradientType="blue"
+                          className="rounded-2xl flex-shrink-0"
+                        />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2 mb-1">
                             <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { getProfileInitials } from "@/lib/nameUtils";
+import { QuickAvatar } from "@/components/ProfileAvatar";
 import BackButton from "../components/back-button";
 
 export default function Dashboard() {
@@ -356,15 +357,11 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center space-x-4">
                     <div className="relative">
-                      <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-bold">
-                          {getProfileInitials(
-                            member.user.firstName,
-                            member.user.lastName,
-                            member.user.email,
-                          )}
-                        </span>
-                      </div>
+                      <QuickAvatar 
+                        user={member.user} 
+                        size="lg" 
+                        gradientType="blue"
+                      />
                       {index === 0 && (
                         <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
                           <Award className="w-3 h-3 text-yellow-800" />

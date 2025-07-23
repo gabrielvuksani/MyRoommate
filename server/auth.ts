@@ -8,6 +8,9 @@ import { storage } from "./storage";
 import { User, loginSchema, registerSchema } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 import { nanoid } from "nanoid";
+import multer from "multer";
+import path from "path";
+import { promises as fs } from "fs";
 
 declare global {
   namespace Express {
@@ -41,6 +44,39 @@ async function comparePasswords(supplied: string, stored: string) {
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
+
+// Configure multer for profile image uploads
+const storage_multer = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'profiles');
+    try {
+      await fs.mkdir(uploadDir, { recursive: true });
+      cb(null, uploadDir);
+    } catch (error) {
+      cb(error as Error, uploadDir);
+    }
+  },
+  filename: (req, file, cb) => {
+    const user = req.user as Express.User;
+    const ext = path.extname(file.originalname);
+    const filename = `${user.id}-${Date.now()}${ext}`;
+    cb(null, filename);
+  }
+});
+
+const upload = multer({
+  storage: storage_multer,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  }
+});
 
 export function setupAuth(app: Express) {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
@@ -236,6 +272,78 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     res.json(req.user);
+  });
+
+  // Profile image upload endpoint
+  app.post("/api/user/profile-image", upload.single('profileImage'), async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+
+      const user = req.user as Express.User;
+      const imageUrl = `/uploads/profiles/${req.file.filename}`;
+      
+      // Update user profile image in database
+      const updatedUser = await storage.updateUserProfileImage(user.id, imageUrl);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Remove old profile image file if it exists
+      if (user.profileImageUrl) {
+        try {
+          const oldImagePath = path.join(process.cwd(), 'public', user.profileImageUrl);
+          await fs.unlink(oldImagePath);
+        } catch (error) {
+          // Ignore errors when removing old file
+          console.log('Could not remove old profile image:', error);
+        }
+      }
+
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Profile image upload error:", error);
+      res.status(500).json({ message: "Failed to upload profile image" });
+    }
+  });
+
+  // Remove profile image endpoint
+  app.delete("/api/user/profile-image", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const user = req.user as Express.User;
+      
+      if (!user.profileImageUrl) {
+        return res.status(400).json({ message: "No profile image to remove" });
+      }
+
+      // Remove file from disk
+      try {
+        const imagePath = path.join(process.cwd(), 'public', user.profileImageUrl);
+        await fs.unlink(imagePath);
+      } catch (error) {
+        console.log('Could not remove profile image file:', error);
+      }
+
+      // Update user in database
+      const updatedUser = await storage.updateUserProfileImage(user.id, null);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Profile image removal error:", error);
+      res.status(500).json({ message: "Failed to remove profile image" });
+    }
   });
 }
 

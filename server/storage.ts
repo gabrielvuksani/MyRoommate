@@ -38,6 +38,8 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: User): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
+  updateUserProfileImage(id: string, profileImageUrl: string | null): Promise<User | undefined>;
   
   // Household operations
   createHousehold(household: InsertHousehold & { inviteCode: string }): Promise<Household>;
@@ -119,6 +121,30 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async updateUserProfileImage(id: string, profileImageUrl: string | null): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({
+        profileImageUrl,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
   }
 
   async createHousehold(household: InsertHousehold & { inviteCode: string, createdBy: string }): Promise<Household> {

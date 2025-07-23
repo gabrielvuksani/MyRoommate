@@ -1,4 +1,5 @@
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
+import { QuickAvatar } from "./ProfileAvatar";
 
 interface MessageBubbleProps {
   message: any;
@@ -37,11 +38,12 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
             <span className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
               {userName}
             </span>
-            <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
-              <span className="text-white text-xs font-bold">
-                {getProfileInitials(message.user?.firstName, message.user?.lastName, message.user?.email)}
-              </span>
-            </div>
+            <QuickAvatar 
+              user={message.user} 
+              size="sm" 
+              gradientType="emerald"
+              className="shadow-lg ring-2 ring-white/20"
+            />
           </div>
           <div 
             className={`relative group ${isPending ? 'opacity-70' : ''}`}
@@ -75,9 +77,12 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
     <div className="flex justify-start mb-4 animate-fade-in">
       <div className="flex flex-col items-start max-w-xs">
         <div className="flex items-center space-x-3 mb-2">
-          <div className="w-7 h-7 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
-            <span className="text-white text-xs font-bold">{userInitials}</span>
-          </div>
+          <QuickAvatar 
+            user={message.user} 
+            size="sm" 
+            gradientType="blue"
+            className="shadow-lg ring-2 ring-white/20"
+          />
           <span className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
             {userName}
           </span>
