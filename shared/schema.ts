@@ -75,7 +75,6 @@ export const chores = pgTable("chores", {
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   status: varchar("status").default("todo"), // todo, doing, done
-  priority: varchar("priority").default("medium"), // low, medium, high, urgent
   assignedTo: varchar("assigned_to").references(() => users.id),
   dueDate: timestamp("due_date"),
   recurrence: varchar("recurrence"), // daily, weekly, monthly, custom

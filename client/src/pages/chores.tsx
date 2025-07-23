@@ -5,51 +5,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { notificationService } from "@/lib/notifications";
-import { 
-  Plus, 
-  CheckCircle2, 
-  Circle, 
-  Clock, 
-  AlertTriangle, 
-  Zap, 
-  Calendar,
-  Filter,
-  Search,
-  MoreVertical,
-  CheckSquare,
-  Square,
-  Flame,
-  Trophy,
-  Target,
-  TrendingUp,
-  Users,
-  ChevronDown,
-  X
-} from "lucide-react";
 
-type ViewMode = 'overview' | 'my-tasks' | 'all-tasks' | 'completed';
-type FilterType = 'all' | 'urgent' | 'today' | 'overdue' | 'assigned-to-me';
-type SortType = 'priority' | 'due-date' | 'created' | 'alphabetical';
+import ChoreBoard from "@/components/chore-board";
+import { Plus } from "lucide-react";
 
 export default function Chores() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [headerScrolled, setHeaderScrolled] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('overview');
-  const [filter, setFilter] = useState<FilterType>('all');
-  const [sort, setSortType] = useState<SortType>('priority');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
 
   const [newChore, setNewChore] = useState({
     title: '',
     description: '',
     assignedTo: '',
-    dueDate: new Date().toISOString().split('T')[0],
+    dueDate: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
     recurrence: '',
     priority: 'medium',
   });
@@ -76,127 +47,13 @@ export default function Chores() {
     enabled: !!household,
   });
 
-  const { data: user } = useQuery({
-    queryKey: ["/api/user"],
-  });
-
   const { data: members = [] } = useQuery({
     queryKey: ["/api/households/current/members"],
     enabled: !!household,
   }) as { data: any[] };
 
+  // Use household members if available, otherwise fall back to separate members query
   const householdMembers = (household as any)?.members || members;
-
-  // Enhanced chore processing with smart categorization
-  const processedChores = useMemo(() => {
-    if (!chores || !user) return { all: [], urgent: [], today: [], overdue: [], myTasks: [], completed: [] };
-
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-
-    const categorized = {
-      all: (chores as any[]).filter((chore: any) => chore.status !== 'done'),
-      urgent: [] as any[],
-      today: [] as any[],
-      overdue: [] as any[],
-      myTasks: (chores as any[]).filter((chore: any) => chore.assignedTo === user.id && chore.status !== 'done'),
-      completed: (chores as any[]).filter((chore: any) => chore.status === 'done'),
-    };
-
-    categorized.all.forEach((chore: any) => {
-      const dueDate = chore.dueDate ? new Date(chore.dueDate) : null;
-      
-      // Priority-based urgent classification
-      if (chore.priority === 'urgent') {
-        categorized.urgent.push(chore);
-      }
-      
-      // Due today
-      if (dueDate && dueDate >= today && dueDate < tomorrow) {
-        categorized.today.push(chore);
-      }
-      
-      // Overdue
-      if (dueDate && dueDate < today) {
-        categorized.overdue.push(chore);
-        if (!categorized.urgent.includes(chore)) {
-          categorized.urgent.push(chore);
-        }
-      }
-    });
-
-    return categorized;
-  }, [chores, user]);
-
-  // Smart filtering and sorting
-  const filteredAndSortedChores = useMemo(() => {
-    let filtered = [...processedChores.all];
-
-    // Apply filters
-    switch (filter) {
-      case 'urgent':
-        filtered = processedChores.urgent;
-        break;
-      case 'today':
-        filtered = processedChores.today;
-        break;
-      case 'overdue':
-        filtered = processedChores.overdue;
-        break;
-      case 'assigned-to-me':
-        filtered = processedChores.myTasks;
-        break;
-    }
-
-    // Apply search
-    if (searchQuery.trim()) {
-      filtered = filtered.filter((chore: any) =>
-        chore.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        chore.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Apply sorting
-    filtered.sort((a: any, b: any) => {
-      switch (sort) {
-        case 'priority':
-          const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
-          const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] || 1;
-          const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] || 1;
-          if (aPriority !== bPriority) return bPriority - aPriority;
-          // Secondary sort by due date
-          const aDue = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
-          const bDue = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
-          return aDue - bDue;
-        case 'due-date':
-          const aDate = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
-          const bDate = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
-          return aDate - bDate;
-        case 'created':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case 'alphabetical':
-          return a.title.localeCompare(b.title);
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [processedChores, filter, searchQuery, sort]);
-
-  // Statistics for overview
-  const stats = useMemo(() => {
-    const total = processedChores.all.length;
-    const completed = processedChores.completed.length;
-    const myTasks = processedChores.myTasks.length;
-    const urgent = processedChores.urgent.length;
-    const overdue = processedChores.overdue.length;
-    const today = processedChores.today.length;
-    const completionRate = total > 0 ? Math.round((completed / (total + completed)) * 100) : 0;
-
-    return { total, completed, myTasks, urgent, overdue, today, completionRate };
-  }, [processedChores]);
 
   const createChoreMutation = useMutation({
     mutationFn: async (choreData: any) => {
@@ -214,7 +71,7 @@ export default function Chores() {
         title: '',
         description: '',
         assignedTo: '',
-        dueDate: new Date().toISOString().split('T')[0],
+        dueDate: new Date().toISOString().split('T')[0], // Reset to today's date
         recurrence: '',
         priority: 'medium',
       });
@@ -342,24 +199,6 @@ export default function Chores() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Select value={newChore.priority} onValueChange={(value) => setNewChore({ ...newChore, priority: value })}>
-                    <SelectTrigger className="input-modern" style={{
-                      background: 'var(--surface-secondary)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-primary)'
-                    }}>
-                      <SelectValue placeholder="Priority" />
-                    </SelectTrigger>
-                    <SelectContent style={{
-                      background: 'var(--surface)',
-                      border: '1px solid var(--border-color)'
-                    }}>
-                      <SelectItem value="low" style={{ color: 'var(--text-primary)' }}>🟢 Low</SelectItem>
-                      <SelectItem value="medium" style={{ color: 'var(--text-primary)' }}>🟡 Medium</SelectItem>
-                      <SelectItem value="high" style={{ color: 'var(--text-primary)' }}>🟠 High</SelectItem>
-                      <SelectItem value="urgent" style={{ color: 'var(--text-primary)' }}>🔴 Urgent</SelectItem>
-                    </SelectContent>
-                  </Select>
                   <input 
                     type="date"
                     value={newChore.dueDate}
@@ -382,6 +221,25 @@ export default function Chores() {
                       <SelectItem value="daily" style={{ color: 'var(--text-primary)' }}>Daily</SelectItem>
                       <SelectItem value="weekly" style={{ color: 'var(--text-primary)' }}>Weekly</SelectItem>
                       <SelectItem value="monthly" style={{ color: 'var(--text-primary)' }}>Monthly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={newChore.priority} onValueChange={(value) => setNewChore({ ...newChore, priority: value })}>
+                    <SelectTrigger className="input-modern" style={{
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)'
+                    }}>
+                      <SelectValue placeholder="Priority..." />
+                    </SelectTrigger>
+                    <SelectContent style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border-color)'
+                    }}>
+                      <SelectItem value="low" style={{ color: 'var(--text-primary)' }}>Low Priority</SelectItem>
+                      <SelectItem value="medium" style={{ color: 'var(--text-primary)' }}>Medium Priority</SelectItem>
+                      <SelectItem value="high" style={{ color: 'var(--text-primary)' }}>High Priority</SelectItem>
+                      <SelectItem value="urgent" style={{ color: 'var(--text-primary)' }}>Urgent</SelectItem>
                     </SelectContent>
                   </Select>
                   <button
@@ -415,16 +273,16 @@ export default function Chores() {
               </div>
               
               {(() => {
-                const urgentChores = (chores as any[]).filter((c: any) => 
+                const urgentChores = chores.filter((c: any) => 
                   (c.status === 'todo' || !c.status) && 
                   c.priority === 'urgent'
                 );
-                const overdueChores = (chores as any[]).filter((c: any) => 
+                const overdueChores = chores.filter((c: any) => 
                   (c.status === 'todo' || !c.status) && 
                   c.dueDate && new Date(c.dueDate) < new Date()
                 );
                 const priorityChore = urgentChores[0] || overdueChores[0] || 
-                  (chores as any[]).find((c: any) => c.status === 'todo' || !c.status);
+                  chores.find((c: any) => c.status === 'todo' || !c.status);
                 
                 if (!priorityChore) {
                   return (
@@ -445,7 +303,7 @@ export default function Chores() {
                           <p className="text-footnote mb-2" style={{ color: 'var(--text-secondary)' }}>{priorityChore.description}</p>
                         )}
                         <div className="flex items-center gap-2 text-footnote" style={{ color: 'var(--text-secondary)' }}>
-                          <span>{householdMembers.find((m: any) => m.userId === priorityChore.assignedTo)?.user?.firstName || 'Unassigned'}</span>
+                          <span>{priorityChore.assignedUser?.firstName || priorityChore.assignedUser?.email?.split('@')[0] || 'Unassigned'}</span>
                           {priorityChore.dueDate && (
                             <>
                               <span>•</span>
@@ -555,226 +413,8 @@ export default function Chores() {
           border: '1px solid var(--border-color)'
         }}>
           <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-headline font-semibold" style={{ color: 'var(--text-primary)' }}>All Tasks</h2>
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
-                    <input
-                      type="text"
-                      placeholder="Search tasks..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 pr-4 py-2 rounded-lg text-sm"
-                      style={{
-                        background: 'var(--surface-secondary)',
-                        border: '1px solid var(--border-color)',
-                        color: 'var(--text-primary)'
-                      }}
-                    />
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowFilters(!showFilters)}
-                    className="flex items-center space-x-1"
-                  >
-                    <Filter size={16} />
-                    <span>Filter</span>
-                  </Button>
-                </div>
-              </div>
-
-              {showFilters && (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-                  <Button
-                    variant={filter === 'all' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setFilter('all')}
-                    className="justify-start"
-                  >
-                    All ({processedChores.all.length})
-                  </Button>
-                  <Button
-                    variant={filter === 'urgent' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setFilter('urgent')}
-                    className="justify-start"
-                  >
-                    🔥 Urgent ({processedChores.urgent.length})
-                  </Button>
-                  <Button
-                    variant={filter === 'today' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setFilter('today')}
-                    className="justify-start"
-                  >
-                    📅 Today ({processedChores.today.length})
-                  </Button>
-                  <Button
-                    variant={filter === 'assigned-to-me' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setFilter('assigned-to-me')}
-                    className="justify-start"
-                  >
-                    👤 My Tasks ({processedChores.myTasks.length})
-                  </Button>
-                </div>
-              )}
-
-              <div className="space-y-3">
-                {filteredAndSortedChores.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="text-4xl mb-2">✅</div>
-                    <p className="text-lg font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
-                      All caught up!
-                    </p>
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      {searchQuery ? 'No tasks match your search.' : 'No tasks in this category.'}
-                    </p>
-                  </div>
-                ) : (
-                  filteredAndSortedChores.map((chore: any) => (
-                    <div
-                      key={chore.id}
-                      className="rounded-xl p-4 transition-all duration-200 hover:shadow-md"
-                      style={{
-                        border: '1px solid var(--border-color)',
-                        background: 'var(--surface-secondary)'
-                      }}
-                    >
-                      <div className="flex items-start space-x-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleUpdateChore(chore.id, { 
-                            status: chore.status === 'done' ? 'todo' : 'done' 
-                          })}
-                          className="mt-1 p-0 w-6 h-6 rounded-full"
-                        >
-                          {chore.status === 'done' ? (
-                            <CheckCircle2 size={20} className="text-green-500" />
-                          ) : (
-                            <Circle size={20} style={{ color: 'var(--text-secondary)' }} />
-                          )}
-                        </Button>
-
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 min-w-0">
-                              <h3 
-                                className={`font-medium mb-1 ${chore.status === 'done' ? 'line-through opacity-60' : ''}`}
-                                style={{ color: 'var(--text-primary)' }}
-                              >
-                                {chore.title}
-                              </h3>
-                              {chore.description && (
-                                <p 
-                                  className={`text-sm mb-2 ${chore.status === 'done' ? 'line-through opacity-60' : ''}`}
-                                  style={{ color: 'var(--text-secondary)' }}
-                                >
-                                  {chore.description}
-                                </p>
-                              )}
-                              <div className="flex items-center space-x-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                <span>
-                                  {householdMembers.find((m: any) => m.userId === chore.assignedTo)?.user?.firstName || 'Unassigned'}
-                                </span>
-                                {chore.dueDate && (
-                                  <>
-                                    <span>•</span>
-                                    <span className={new Date(chore.dueDate) < new Date() ? 'text-red-500 font-medium' : ''}>
-                                      Due {new Date(chore.dueDate).toLocaleDateString()}
-                                    </span>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="flex items-center space-x-2 ml-4">
-                              {chore.priority && (
-                                <Badge
-                                  variant="secondary"
-                                  className="text-xs"
-                                  style={{
-                                    background: chore.priority === 'urgent' ? 'rgba(255, 69, 58, 0.1)' :
-                                               chore.priority === 'high' ? 'rgba(255, 159, 10, 0.1)' :
-                                               chore.priority === 'medium' ? 'rgba(0, 122, 255, 0.1)' :
-                                               'var(--surface-secondary)',
-                                    color: chore.priority === 'urgent' ? '#FF453A' :
-                                          chore.priority === 'high' ? '#FF9F0A' :
-                                          chore.priority === 'medium' ? 'var(--primary)' :
-                                          'var(--text-secondary)'
-                                  }}
-                                >
-                                  {chore.priority === 'urgent' ? '🔥' :
-                                   chore.priority === 'high' ? '⚡' :
-                                   chore.priority === 'medium' ? '📌' : '📝'} {chore.priority}
-                                </Badge>
-                              )}
-
-                              <Badge
-                                variant="outline"
-                                className="text-xs"
-                                style={{
-                                  background: chore.status === 'done' ? 'rgba(48, 209, 88, 0.1)' :
-                                             chore.status === 'doing' ? 'rgba(255, 159, 10, 0.1)' :
-                                             'rgba(0, 122, 255, 0.1)',
-                                  color: chore.status === 'done' ? '#30D158' :
-                                        chore.status === 'doing' ? '#FF9F0A' :
-                                        'var(--primary)'
-                                }}
-                              >
-                                {chore.status === 'done' ? '✅ Done' :
-                                 chore.status === 'doing' ? '🚀 In Progress' :
-                                 '📋 To Do'}
-                              </Badge>
-
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDeleteChore(chore.id)}
-                                className="p-1 w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                <X size={16} className="text-red-500" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          {chore.status !== 'done' && (
-                            <div className="flex items-center space-x-2 mt-3">
-                              {chore.status === 'todo' && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleUpdateChore(chore.id, { status: 'doing' })}
-                                  className="text-xs"
-                                >
-                                  <Clock size={14} className="mr-1" />
-                                  Start
-                                </Button>
-                              )}
-                              {chore.status === 'doing' && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleUpdateChore(chore.id, { status: 'done' })}
-                                  className="text-xs"
-                                >
-                                  <CheckCircle2 size={14} className="mr-1" />
-                                  Complete
-                                </Button>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+            <h2 className="text-headline font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>All Chores</h2>
+            <ChoreBoard chores={Array.isArray(chores) ? chores : []} onUpdateChore={handleUpdateChore} onDeleteChore={handleDeleteChore} />
           </CardContent>
         </Card>
       </div>
