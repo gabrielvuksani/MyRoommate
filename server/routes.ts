@@ -231,12 +231,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         
         sendPushNotification(chore.assignedTo, pushPayload)
-          .then(sent => {
-            if (sent) {
-              console.log(`Chore push notification sent to user: ${chore.assignedTo}`);
-            }
-          })
-          .catch(error => console.error('Error sending chore push notification:', error));
+          .catch(error => {
+            // Silent fail for push notifications
+          });
       }
       
       res.json(chore);
@@ -287,12 +284,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           for (const member of householdMembers) {
             if (member.userId !== userId) { // Don't notify the completer
               sendPushNotification(member.userId, pushPayload)
-                .then(sent => {
-                  if (sent) {
-                    console.log(`Chore completion push notification sent to user: ${member.userId}`);
-                  }
-                })
-                .catch(error => console.error('Error sending chore completion push notification:', error));
+                .catch(error => {
+                  // Silent fail for push notifications
+                });
             }
           }
         }
@@ -394,12 +388,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const member of householdMembers) {
         if (member.userId !== userId) { // Don't notify the creator
           sendPushNotification(member.userId, pushPayload)
-            .then(sent => {
-              if (sent) {
-                console.log(`Expense push notification sent to user: ${member.userId}`);
-              }
-            })
-            .catch(error => console.error('Error sending expense push notification:', error));
+            .catch(error => {
+              // Silent fail for push notifications
+            });
         }
       }
       
@@ -541,12 +532,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const member of householdMembers) {
         if (member.userId !== userId) { // Don't notify the creator
           sendPushNotification(member.userId, pushPayload)
-            .then(sent => {
-              if (sent) {
-                console.log(`Calendar push notification sent to user: ${member.userId}`);
-              }
-            })
-            .catch(error => console.error('Error sending calendar push notification:', error));
+            .catch(error => {
+              // Silent fail for push notifications
+            });
         }
       }
       
@@ -1002,10 +990,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   let messageCount = 0;
   let totalProcessingTime = 0;
   
-  console.log('WebSocket server initialized on path /ws');
+  // WebSocket server initialized
   
   wss.on('connection', (ws: any) => {
-    console.log('New WebSocket connection established');
     let userId: string | null = null;
     let householdId: string | null = null;
     
@@ -1015,7 +1002,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Cache user info on first connection
         if (message.type === 'connect' && message.userId && message.householdId) {
-          console.log(`WebSocket connect: userId=${message.userId}, householdId=${message.householdId}`);
           userId = message.userId;
           householdId = message.householdId;
           if (userId && householdId) {
@@ -1040,10 +1026,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 const user = await storage.getUser(userId);
                 if (user) {
                   userCache.set(userId, user);
-                  console.log(`User cached: ${userId}`);
                 }
               } catch (error) {
-                console.error(`Error caching user ${userId}:`, error);
+                // Silent fail for user caching
               }
             }
           }
@@ -1063,7 +1048,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ws.send(JSON.stringify({ type: 'pong' }));
             }
           } catch (error) {
-            console.error('Error sending pong:', error);
+            // Silent fail for ping/pong
           }
           return;
         }
@@ -1085,7 +1070,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               linkedType,
             }, cachedUser);
             
-            console.log(`Message created in ${Date.now() - startTime}ms:`, newMessage.id);
+            // Message created successfully
             
             // Immediate broadcast to all household clients for real-time sync
             const householdClientSet = householdClients.get(msgHouseholdId);
@@ -1127,7 +1112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               });
               
-              console.log(`Broadcasted to ${successfulBroadcasts} clients, cleaned ${deadConnections.size} dead connections`);
+              // Broadcast completed
             }
 
             // Send push notifications to all household members except the sender (background notifications)
@@ -1150,12 +1135,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             for (const member of householdMembers) {
               if (member.userId !== msgUserId) { // Don't notify the sender
                 sendPushNotification(member.userId, pushPayload)
-                  .then(sent => {
-                    if (sent) {
-                      console.log(`Message push notification sent to user: ${member.userId}`);
-                    }
-                  })
-                  .catch(error => console.error('Error sending message push notification:', error));
+                  .catch(error => {
+                    // Silent fail for push notifications
+                  });
               }
             }
             
@@ -1164,13 +1146,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const processingTime = Date.now() - startTime;
             totalProcessingTime += processingTime;
             
-            // Log performance every 5 messages for real-time monitoring
-            if (messageCount % 5 === 0) {
-              console.log(`Real-time Performance: ${messageCount} messages, avg ${(totalProcessingTime/messageCount).toFixed(1)}ms, last: ${processingTime}ms`);
-            }
+            // Performance tracking complete
             
           } catch (error) {
-            console.error('Message processing error:', error);
             // Send error back to sender with temp ID for cleanup
             if (ws.readyState === WebSocket.OPEN) {
               ws.send(JSON.stringify({
@@ -1245,13 +1223,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         
       } catch (error) {
-        console.error('WebSocket message error:', error);
+        // Silent fail for WebSocket message errors
       }
     });
     
     ws.on('close', () => {
-      console.log('WebSocket client disconnected', { userId, householdId });
-      
       // Comprehensive cleanup for production stability
       if (userId) {
         clientsById.delete(userId);

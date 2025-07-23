@@ -39,13 +39,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return await res.json();
     },
-    onSuccess: (user: User) => {
+    onSuccess: async (user: User) => {
       // Show persistent loading overlay
       PersistentLoading.show("Setting up your account...");
       // Mark authentication transition in progress
       AuthTransition.setInProgress();
       // Set user data immediately for instant UI update
       queryClient.setQueryData(["/api/user"], user);
+      
+      // Automatically set up push notifications after successful login
+      try {
+        const { notificationService } = await import('@/lib/notifications');
+        await notificationService.init();
+        if (notificationService.getPermissionStatus() === 'granted') {
+          await notificationService.subscribeToPush();
+        }
+      } catch (error) {
+        // Silent fail for notification setup
+      }
+      
       // Redirect using window.location (consistent with logout, works for PWA and browser)
       window.location.href = "/";
     },

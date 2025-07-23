@@ -62,7 +62,6 @@ export class NotificationService {
 
   private async setupPushSubscription(): Promise<void> {
     if (!this.serviceWorkerRegistration) {
-      console.warn('Service Worker not available for push subscription');
       return;
     }
 
@@ -71,7 +70,6 @@ export class NotificationService {
       this.pushSubscription = await this.serviceWorkerRegistration.pushManager.getSubscription();
       
       if (this.pushSubscription) {
-        console.log('Existing push subscription found');
         await this.sendSubscriptionToServer(this.pushSubscription);
         return;
       }
@@ -79,13 +77,12 @@ export class NotificationService {
       // Create new subscription
       await this.subscribeToPush();
     } catch (error) {
-      console.error('Error setting up push subscription:', error);
+      // Silent fail for push subscription setup
     }
   }
 
   public async subscribeToPush(): Promise<boolean> {
     if (!this.serviceWorkerRegistration) {
-      console.warn('Service Worker not available');
       return false;
     }
 
@@ -93,7 +90,6 @@ export class NotificationService {
       // Request notification permission first
       const permissionGranted = await this.requestPermission();
       if (!permissionGranted) {
-        console.warn('Notification permission denied');
         return false;
       }
 
@@ -105,21 +101,17 @@ export class NotificationService {
         )
       });
 
-      console.log('Push subscription created:', this.pushSubscription);
-      
       // Send subscription to server
       await this.sendSubscriptionToServer(this.pushSubscription);
       
       return true;
     } catch (error) {
-      console.error('Error subscribing to push notifications:', error);
       return false;
     }
   }
 
   private async sendSubscriptionToServer(subscription: PushSubscription): Promise<void> {
     try {
-      console.log('Sending push subscription to server:', subscription.toJSON());
       const response = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: {
@@ -130,14 +122,9 @@ export class NotificationService {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to send subscription: ${response.status} - ${errorText}`);
+        throw new Error(`Failed to send subscription: ${response.status}`);
       }
-
-      const result = await response.json();
-      console.log('Push subscription sent to server successfully:', result);
     } catch (error) {
-      console.error('Error sending subscription to server:', error);
       throw error;
     }
   }
@@ -159,7 +146,6 @@ export class NotificationService {
 
   async requestPermission(): Promise<boolean> {
     if (!('Notification' in window)) {
-      console.warn('This browser does not support notifications');
       return false;
     }
 
@@ -176,7 +162,6 @@ export class NotificationService {
       this.permission = result;
       return result === 'granted';
     } catch (error) {
-      console.error('Error requesting notification permission:', error);
       return false;
     }
   }
