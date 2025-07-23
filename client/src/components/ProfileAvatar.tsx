@@ -181,10 +181,8 @@ export function ProfileAvatar({
     // Immediately show fallback for real-time feedback
     setImageRemoved(true);
     setLocalImageUrl(null);
-    // Force React to re-render with fallback immediately
-    setTimeout(() => {
-      deleteMutation.mutate();
-    }, 0);
+    // Call the delete mutation to update the server
+    deleteMutation.mutate();
   };
 
   const handleColorChange = (color: string) => {
@@ -200,11 +198,12 @@ export function ProfileAvatar({
 
   // Determine what image to show based on local state and user data
   const displayImageUrl = localImageUrl || (!imageRemoved ? user.profileImageUrl : null);
+  const shouldShowImage = displayImageUrl && !imageRemoved;
 
   return (
     <div className="relative inline-block">
       <Avatar className={`${sizeClasses[size]} ${className}`}>
-        {displayImageUrl && !imageRemoved ? (
+        {shouldShowImage ? (
           <AvatarImage 
             src={displayImageUrl} 
             alt={`${user.firstName || user.email}'s profile`}

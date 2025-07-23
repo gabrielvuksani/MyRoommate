@@ -86,8 +86,10 @@ export function SignupAvatarSelector({
     // Clear the preview URL if it exists
     if (imagePreviewUrl) {
       URL.revokeObjectURL(imagePreviewUrl);
-      setImagePreviewUrl(null);
     }
+    // Immediately clear preview to show fallback
+    setImagePreviewUrl(null);
+    
     // Clear the profile image from parent component
     onImageChange(null);
     
@@ -96,11 +98,6 @@ export function SignupAvatarSelector({
     if (fileInput) {
       fileInput.value = '';
     }
-    
-    // Force immediate fallback display
-    setTimeout(() => {
-      setImagePreviewUrl(null);
-    }, 0);
   };
 
   if (compact) {
@@ -110,7 +107,7 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {imagePreviewUrl && profileImage ? (
+              {imagePreviewUrl ? (
                 <AvatarImage 
                   src={imagePreviewUrl} 
                   alt="Profile preview"
@@ -210,7 +207,7 @@ export function SignupAvatarSelector({
 
         {/* Color picker */}
         {showColorPicker && (
-          <div className="pt-2 w-full -mx-4 px-4">
+          <div className="pt-2 w-full items-center pr-2">
             <ProfileColorPicker
               selectedColor={profileColor}
               onColorChange={onColorChange}
@@ -231,9 +228,9 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {imagePreviewUrl || profileImage ? (
+                {imagePreviewUrl ? (
                   <AvatarImage 
-                    src={imagePreviewUrl || (profileImage ? URL.createObjectURL(profileImage) : '')} 
+                    src={imagePreviewUrl} 
                     alt="Profile preview"
                     className="object-cover"
                   />
