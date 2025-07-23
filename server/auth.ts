@@ -11,7 +11,19 @@ import { nanoid } from "nanoid";
 
 declare global {
   namespace Express {
-    interface User extends User {}
+    interface User {
+      id: string;
+      email: string;
+      firstName?: string;
+      lastName?: string;
+      profileImageUrl?: string;
+      verified?: boolean;
+      phoneNumber?: string;
+      dateOfBirth?: Date;
+      idVerified?: boolean;
+      createdAt?: Date;
+      updatedAt?: Date;
+    }
   }
 }
 
