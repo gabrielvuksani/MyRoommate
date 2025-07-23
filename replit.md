@@ -111,6 +111,14 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 23, 2025 (Latest):**
+- ✓ **Implemented comprehensive app-wide notification system with smart spam prevention**
+- ✓ **Enhanced notification service with document focus detection, current page detection, and time-based throttling**
+- ✓ **Added special handling for messages when chat is active - allows more notifications when user is in messages page**
+- ✓ **Notifications now work across all major app areas: messages, chore assignments/completions, expense additions, calendar events**
+- ✓ **Applied different throttle times based on notification type (messages: 2s, chores: 30s, expenses: 15s, calendar: 60s)**
+- ✓ **Implemented intelligent spam prevention with max 3 notifications per minute per type and smart page-based filtering**
+- ✓ **Fixed TypeScript errors in chores completion notifications**
+- ✓ **Removed duplicate notification service files for cleaner codebase**
 - ✓ **Fixed critical fallback avatar display bug app-wide - now properly shows colored fallback with initials when images are removed or fail to load**
 - ✓ **Implemented universal avatar fallback system using QuickAvatar component across entire application**
 - ✓ **Fixed ProfileAvatar and SignupAvatarSelector conditional logic - removed restrictive checks that prevented fallback display**

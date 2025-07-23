@@ -21,6 +21,8 @@ export class NotificationService {
   private static instance: NotificationService;
   private permission: NotificationPermission = 'default';
   private serviceWorkerRegistration: ServiceWorkerRegistration | null = null;
+  private lastNotificationTimes = new Map<string, number>();
+  private recentNotifications = new Map<string, number>();
 
   private constructor() {
     this.checkPermission();
@@ -129,29 +131,100 @@ export class NotificationService {
     };
   }
 
+  // Smart spam prevention logic
+  private shouldShowNotification(type: NotificationType, tag?: string): boolean {
+    const now = Date.now();
+    const isDocumentVisible = !document.hidden;
+    const isInMessages = window.location.pathname === '/messages';
+    
+    // If user is actively in messages and document is visible, be more permissive
+    if (type === 'message' && isInMessages && isDocumentVisible) {
+      return true; // Let messages through when chat is active, as user requested
+    }
+    
+    // If document is visible and user is on the relevant page, reduce notifications
+    if (isDocumentVisible) {
+      if (type === 'chore' && window.location.pathname === '/chores') return false;
+      if (type === 'expense' && window.location.pathname === '/expenses') return false;
+      if (type === 'calendar' && window.location.pathname === '/calendar') return false;
+    }
+    
+    // Implement time-based throttling
+    const throttleKey = tag || type;
+    const lastTime = this.lastNotificationTimes.get(throttleKey) || 0;
+    const timeSince = now - lastTime;
+    
+    // Different throttle times based on type
+    const throttleTimes = {
+      message: 2000,   // 2 seconds (unless chat is active)
+      chore: 30000,    // 30 seconds
+      expense: 15000,  // 15 seconds
+      calendar: 60000, // 1 minute
+      household: 120000 // 2 minutes
+    };
+    
+    const throttleTime = throttleTimes[type] || 10000;
+    
+    if (timeSince < throttleTime) {
+      console.log(`Notification throttled for ${type}: ${timeSince}ms < ${throttleTime}ms`);
+      return false;
+    }
+    
+    // Check for notification spam (more than 3 notifications per minute)
+    const recentCount = this.recentNotifications.get(type) || 0;
+    if (recentCount >= 3) {
+      console.log(`Notification spam prevention for ${type}: ${recentCount} recent notifications`);
+      return false;
+    }
+    
+    return true;
+  }
+  
+  private trackNotification(type: NotificationType, tag?: string): void {
+    const now = Date.now();
+    const throttleKey = tag || type;
+    
+    this.lastNotificationTimes.set(throttleKey, now);
+    
+    // Track recent notifications for spam prevention
+    const currentCount = this.recentNotifications.get(type) || 0;
+    this.recentNotifications.set(type, currentCount + 1);
+    
+    // Reset count after 1 minute
+    setTimeout(() => {
+      const count = this.recentNotifications.get(type) || 0;
+      this.recentNotifications.set(type, Math.max(0, count - 1));
+    }, 60000);
+  }
+
   async showNotification(options: NotificationOptions, type: NotificationType = 'message'): Promise<boolean> {
     // Check if notifications are supported
     if (!('Notification' in window)) {
       console.warn('Notifications not supported');
       return false;
     }
+    
+    // Apply spam prevention
+    if (!this.shouldShowNotification(type, options.tag)) {
+      return false;
+    }
 
     // Check permission
     if (this.permission !== 'granted') {
-      console.warn('Notification permission not granted');
-      return false;
+      const granted = await this.requestPermission();
+      if (!granted) {
+        return false;
+      }
     }
 
-    // Don't show notifications if document is focused (user is actively using the app)
-    if (document.hasFocus()) {
-      console.log('Document has focus, skipping notification');
-      return false;
-    }
+    // Track this notification for spam prevention
+    this.trackNotification(type, options.tag);
 
+    // Show notification with proper options
     const notificationOptions: NotificationOptions = {
       icon: '/favicon.ico',
-      badge: '/favicon.ico',
-      tag: `myroommate-${type}`,
+      badge: '/favicon.ico', 
+      tag: options.tag || `myroommate-${type}`,
       requireInteraction: false,
       vibrate: [200, 100, 200],
       ...options,

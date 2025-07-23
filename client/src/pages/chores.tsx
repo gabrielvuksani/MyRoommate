@@ -93,8 +93,16 @@ export default function Chores() {
       const response = await apiRequest("PATCH", `/api/chores/${id}`, updates);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (_, { id, updates }) => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
+      
+      // Send notification for chore completion
+      if (updates.status === 'done') {
+        const chore = (chores as any[]).find((c: any) => c.id === id);
+        if (chore && chore.title) {
+          notificationService.showChoreNotification(`✅ ${chore.title} completed!`);
+        }
+      }
     },
     onError: (error) => {
       console.error('Error updating chore:', error);
