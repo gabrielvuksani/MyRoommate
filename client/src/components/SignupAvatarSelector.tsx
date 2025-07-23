@@ -41,14 +41,15 @@ export function SignupAvatarSelector({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   
-  // Effect to sync imagePreviewUrl with profileImage prop and ensure fallback display
+  // Effect to sync imagePreviewUrl with profileImage prop
   React.useEffect(() => {
-    if (!profileImage && imagePreviewUrl) {
+    if (profileImage && !imagePreviewUrl) {
+      // Create preview URL from profileImage File if one doesn't exist
+      const previewUrl = URL.createObjectURL(profileImage);
+      setImagePreviewUrl(previewUrl);
+    } else if (!profileImage && imagePreviewUrl) {
+      // Clean up preview URL when profileImage is removed
       URL.revokeObjectURL(imagePreviewUrl);
-      setImagePreviewUrl(null);
-    }
-    // Force re-render when profileImage is removed to show fallback immediately
-    if (!profileImage) {
       setImagePreviewUrl(null);
     }
   }, [profileImage, imagePreviewUrl]);
@@ -107,9 +108,9 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {imagePreviewUrl || profileImage ? (
+              {imagePreviewUrl ? (
                 <AvatarImage 
-                  src={imagePreviewUrl || (profileImage ? URL.createObjectURL(profileImage) : '')} 
+                  src={imagePreviewUrl} 
                   alt="Profile preview"
                   className="object-cover"
                   onError={() => {
@@ -233,9 +234,9 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {imagePreviewUrl || profileImage ? (
+                {imagePreviewUrl ? (
                   <AvatarImage 
-                    src={imagePreviewUrl || (profileImage ? URL.createObjectURL(profileImage) : '')} 
+                    src={imagePreviewUrl} 
                     alt="Profile preview"
                     className="object-cover"
                     onError={() => {
