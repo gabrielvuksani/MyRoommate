@@ -49,13 +49,15 @@ export default function AuthPage() {
       newErrors.email = "Please enter a valid email address";
     }
 
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+    if (!showForgotPassword) {
+      if (!formData.password) {
+        newErrors.password = "Password is required";
+      } else if (formData.password.length < 8) {
+        newErrors.password = "Password must be at least 8 characters";
+      }
     }
 
-    if (!isLogin) {
+    if (!isLogin && !showForgotPassword) {
       if (!formData.firstName) {
         newErrors.firstName = "First name is required";
       }
@@ -178,9 +180,6 @@ export default function AuthPage() {
               <h1 className="text-3xl font-bold text-[#1a1a1a] dark:text-white mb-3">
                 myRoommate
               </h1>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                Secure email authentication
-              </p>
             </div>
 
             {/* Error Message */}
@@ -327,45 +326,47 @@ export default function AuthPage() {
                     </div>
                   )}
 
-                  {/* Password */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                      Password *
-                    </label>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={formData.password}
-                        onChange={(e) => updateFormData("password", e.target.value)}
-                        className={`input-modern h-12 pr-12 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
-                        style={{
-                          background: 'var(--surface)',
-                          borderColor: errors.password ? '#ef4444' : 'var(--border)',
-                          borderRadius: 'var(--radius-md)',
-                          padding: '16px 48px 16px 20px',
-                          fontSize: '16px',
-                          color: 'var(--text-primary)',
-                          transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:scale-105 transition-all duration-200 rounded-lg p-1"
-                        style={{ 
-                          color: 'var(--text-tertiary)',
-                          background: 'transparent'
-                        }}
-                      >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
+                  {/* Password - Hide for forgot password */}
+                  {!showForgotPassword && (
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                        Password *
+                      </label>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={formData.password}
+                          onChange={(e) => updateFormData("password", e.target.value)}
+                          className={`input-modern h-12 pr-12 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
+                          style={{
+                            background: 'var(--surface)',
+                            borderColor: errors.password ? '#ef4444' : 'var(--border)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: '16px 48px 16px 20px',
+                            fontSize: '16px',
+                            color: 'var(--text-primary)',
+                            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:scale-105 transition-all duration-200 rounded-lg p-1"
+                          style={{ 
+                            color: 'var(--text-tertiary)',
+                            background: 'transparent'
+                          }}
+                        >
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
+                      {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
                     </div>
-                    {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-                  </div>
+                  )}
 
-                  {/* Confirm Password (Register only) */}
-                  {!isLogin && (
+                  {/* Confirm Password (Register only, not forgot password) */}
+                  {!isLogin && !showForgotPassword && (
                     <div>
                       <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                         Confirm Password *
