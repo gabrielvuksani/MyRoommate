@@ -217,9 +217,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Send push notification for chore assignment (background notifications)
       if (chore.assignedTo) {
+        const creator = await storage.getUser(userId);
+        const creatorName = creator ? `${creator.firstName || 'Someone'}` : 'Someone';
         const pushPayload = {
           title: '📝 New Chore Assigned',
-          body: `You've been assigned: ${chore.title}`,
+          body: `${creatorName} assigned you: ${chore.title}`,
           icon: '/icon-192x192.png',
           badge: '/icon-72x72.png',
           tag: 'chore-assignment',
@@ -231,11 +233,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         
         sendPushNotification(chore.assignedTo, pushPayload)
-          .then(sent => {
-            if (sent) {
-              console.log(`Chore push notification sent to user: ${chore.assignedTo}`);
-            }
-          })
           .catch(error => console.error('Error sending chore push notification:', error));
       }
       
@@ -287,11 +284,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           for (const member of householdMembers) {
             if (member.userId !== userId) { // Don't notify the completer
               sendPushNotification(member.userId, pushPayload)
-                .then(sent => {
-                  if (sent) {
-                    console.log(`Chore completion push notification sent to user: ${member.userId}`);
-                  }
-                })
                 .catch(error => console.error('Error sending chore completion push notification:', error));
             }
           }
@@ -394,11 +386,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const member of householdMembers) {
         if (member.userId !== userId) { // Don't notify the creator
           sendPushNotification(member.userId, pushPayload)
-            .then(sent => {
-              if (sent) {
-                console.log(`Expense push notification sent to user: ${member.userId}`);
-              }
-            })
             .catch(error => console.error('Error sending expense push notification:', error));
         }
       }
@@ -541,11 +528,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const member of householdMembers) {
         if (member.userId !== userId) { // Don't notify the creator
           sendPushNotification(member.userId, pushPayload)
-            .then(sent => {
-              if (sent) {
-                console.log(`Calendar push notification sent to user: ${member.userId}`);
-              }
-            })
             .catch(error => console.error('Error sending calendar push notification:', error));
         }
       }
@@ -847,42 +829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Demo listing endpoint for university marketplace testing
-  app.post('/api/roommate-listings/demo', async (req: any, res) => {
-    try {
-      const demoListing = {
-        title: "Cozy Room Near UC Berkeley Campus",
-        description: "Looking for a clean, responsible roommate to share a beautiful 2-bedroom apartment just 5 minutes walk from UC Berkeley campus. Perfect for students! The room is fully furnished with a comfortable bed, desk, and closet. Shared living room, kitchen, and bathroom are spacious and well-maintained.",
-        rent: 950,
-        utilities: 75,
-        location: "2647 Telegraph Avenue",
-        city: "Berkeley",
-        university: "UC Berkeley",
-        availableFrom: new Date('2025-08-01'),
-        availableTo: new Date('2026-05-31'),
-        roomType: "private" as const,
-        housingType: "apartment" as const,
-        genderPreference: "any" as const,
-        studentYear: "any" as const,
-        studyHabits: "quiet" as const,
-        socialPreferences: "balanced" as const,
-        lifestylePreferences: ["no_smoking", "pet_friendly", "clean"],
-        amenities: ["WiFi", "Laundry", "Kitchen", "Near Campus", "Quiet", "Furnished"],
-        contactInfo: "student.housing@berkeley.edu",
-        images: [],
-        isActive: true,
-        featured: true,
-        verified: true,
-        createdBy: req.user?.id || '44253576'
-      };
 
-      const listing = await storage.createRoommateListing(demoListing);
-      res.json(listing);
-    } catch (error) {
-      console.error("Error creating demo listing:", error);
-      res.status(500).json({ message: "Failed to create demo listing" });
-    }
-  });
 
   // Push notification subscription endpoints
   app.post('/api/push/subscribe', isAuthenticated, async (req: any, res) => {
@@ -892,7 +839,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Store subscription for this user
       pushSubscriptions.set(userId, subscription);
-      console.log(`Push subscription stored for user: ${userId}`);
       
       res.json({ success: true, message: 'Push subscription stored successfully' });
     } catch (error) {
@@ -905,7 +851,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.id;
       pushSubscriptions.delete(userId);
-      console.log(`Push subscription removed for user: ${userId}`);
       
       res.json({ success: true, message: 'Push subscription removed successfully' });
     } catch (error) {
@@ -918,75 +863,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async function sendPushNotification(userId: string, payload: any) {
     const subscription = pushSubscriptions.get(userId);
     if (!subscription) {
-      console.log(`No push subscription found for user: ${userId}`);
       return false;
     }
 
     try {
       await webpush.sendNotification(subscription, JSON.stringify(payload));
-      console.log(`Push notification sent to user: ${userId}`);
       return true;
     } catch (error) {
-      console.error(`Error sending push notification to user ${userId}:`, error);
+      console.error('Push notification error:', error);
       // Remove invalid subscription
       pushSubscriptions.delete(userId);
       return false;
     }
   }
 
-  // Test push notification endpoint
-  app.post('/api/push/test', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.id;
-      
-      const testPayload = {
-        title: '🧪 Test Notification',
-        body: 'PWA push notifications are working! This notification works even when the app is closed.',
-        icon: '/icon-192x192.png',
-        badge: '/icon-72x72.png',
-        tag: 'test-notification',
-        data: {
-          type: 'test',
-          url: '/'
-        }
-      };
-      
-      const sent = await sendPushNotification(userId, testPayload);
-      
-      if (sent) {
-        res.json({ success: true, message: 'Test push notification sent successfully' });
-      } else {
-        res.status(400).json({ success: false, message: 'No push subscription found or failed to send' });
-      }
-    } catch (error) {
-      console.error('Error sending test push notification:', error);
-      res.status(500).json({ message: 'Failed to send test push notification' });
-    }
-  });
 
-  // Developer Tools API - Delete All Data
-  app.delete('/api/dev/delete-all-data', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.id;
-      
-      // For security, only allow the current user's household data to be deleted
-      const membership = await storage.getUserHousehold(userId);
-      if (!membership) {
-        return res.status(404).json({ message: "No household found" });
-      }
-      
-      const householdId = membership.household.id;
-      
-      // Delete all data for the household using storage method
-      await storage.deleteAllHouseholdData(householdId);
-      
-      console.log(`Deleted all data for household: ${householdId}`);
-      res.json({ success: true, message: "All household data deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting all data:", error);
-      res.status(500).json({ message: "Failed to delete all data" });
-    }
-  });
+
+
 
   const httpServer = createServer(app);
 
@@ -1002,10 +895,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   let messageCount = 0;
   let totalProcessingTime = 0;
   
-  console.log('WebSocket server initialized on path /ws');
+
   
   wss.on('connection', (ws: any) => {
-    console.log('New WebSocket connection established');
+
     let userId: string | null = null;
     let householdId: string | null = null;
     
@@ -1015,7 +908,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Cache user info on first connection
         if (message.type === 'connect' && message.userId && message.householdId) {
-          console.log(`WebSocket connect: userId=${message.userId}, householdId=${message.householdId}`);
+  
           userId = message.userId;
           householdId = message.householdId;
           if (userId && householdId) {
@@ -1040,7 +933,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 const user = await storage.getUser(userId);
                 if (user) {
                   userCache.set(userId, user);
-                  console.log(`User cached: ${userId}`);
                 }
               } catch (error) {
                 console.error(`Error caching user ${userId}:`, error);
@@ -1085,7 +977,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               linkedType,
             }, cachedUser);
             
-            console.log(`Message created in ${Date.now() - startTime}ms:`, newMessage.id);
+
             
             // Immediate broadcast to all household clients for real-time sync
             const householdClientSet = householdClients.get(msgHouseholdId);
@@ -1127,7 +1019,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               });
               
-              console.log(`Broadcasted to ${successfulBroadcasts} clients, cleaned ${deadConnections.size} dead connections`);
+  
             }
 
             // Send push notifications to all household members except the sender (background notifications)
@@ -1150,24 +1042,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             for (const member of householdMembers) {
               if (member.userId !== msgUserId) { // Don't notify the sender
                 sendPushNotification(member.userId, pushPayload)
-                  .then(sent => {
-                    if (sent) {
-                      console.log(`Message push notification sent to user: ${member.userId}`);
-                    }
-                  })
                   .catch(error => console.error('Error sending message push notification:', error));
               }
             }
             
-            // Performance tracking
-            messageCount++;
-            const processingTime = Date.now() - startTime;
-            totalProcessingTime += processingTime;
-            
-            // Log performance every 5 messages for real-time monitoring
-            if (messageCount % 5 === 0) {
-              console.log(`Real-time Performance: ${messageCount} messages, avg ${(totalProcessingTime/messageCount).toFixed(1)}ms, last: ${processingTime}ms`);
-            }
+
             
           } catch (error) {
             console.error('Message processing error:', error);
