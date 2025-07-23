@@ -41,6 +41,7 @@ export function SignupAvatarSelector({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
+  // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,11 +71,19 @@ export function SignupAvatarSelector({
   };
 
   const handleRemoveImage = () => {
+    // Clear the preview URL if it exists
     if (imagePreviewUrl) {
       URL.revokeObjectURL(imagePreviewUrl);
       setImagePreviewUrl(null);
     }
+    // Clear the profile image from parent component
     onImageChange(null);
+    
+    // Reset the file input to allow re-selection
+    const fileInput = document.getElementById('signup-avatar-input') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   };
 
   if (compact) {

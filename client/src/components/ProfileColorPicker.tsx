@@ -30,12 +30,17 @@ export function ProfileColorPicker({ selectedColor, onColorChange, size = 'md' }
       <p className="text-sm font-medium text-center" style={{ color: 'var(--text-primary)' }}>
         Avatar Color
       </p>
-      <div className="flex justify-center">
-        <div className="grid grid-cols-4 gap-3 max-w-fit">
+      <div className="w-full">
+        <div className="grid grid-cols-4 gap-3 w-full">
           {colorOptions.map((color) => (
             <button
               key={color.name}
-              onClick={() => onColorChange(color.name)}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onColorChange(color.name);
+              }}
               className={`${sizeClasses[size]} ${color.bg} rounded-full relative transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
               title={color.name}
             >
