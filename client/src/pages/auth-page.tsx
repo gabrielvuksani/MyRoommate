@@ -3,9 +3,9 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-supabase-auth";
 import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle } from "lucide-react";
-import { SignupAvatarSelector } from "@/components/SignupAvatarSelector";
+import { SimpleAvatarSelector } from "@/components/SimpleAvatarSelector";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
@@ -273,14 +273,14 @@ export default function AuthPage() {
                         <div className="w-full">
                           {/* Profile Picture - Full Width */}
                           <div className="w-full mb-4">
-                            <SignupAvatarSelector
+                            <SimpleAvatarSelector
                               firstName={formData.firstName}
                               lastName={formData.lastName}
                               email={formData.email}
                               profileColor={formData.profileColor}
                               profileImage={profileImage}
-                              onColorChange={(color) => updateFormData("profileColor", color)}
-                              onImageChange={(file) => {
+                              onColorChange={(color: string) => updateFormData("profileColor", color)}
+                              onImageChange={(file: File | null) => {
                                 console.log('AUTH PAGE - onImageChange called with:', file);
                                 setProfileImage(file);
                                 console.log('AUTH PAGE - setProfileImage called');

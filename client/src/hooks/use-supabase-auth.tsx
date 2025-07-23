@@ -10,9 +10,10 @@ import { AuthTransition } from "../lib/authTransition";
 import { PersistentLoading } from "../lib/persistentLoading";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@shared/schema";
+import { createLegacyUser } from "../lib/supabase-auth-adapter";
 
 export interface AuthContextType {
-  user: User | null;
+  user: any | null; // Legacy user format for compatibility
   profile: Profile | null;
   isLoading: boolean;
   error: Error | null;
@@ -39,19 +40,19 @@ export interface RegisterData {
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Profile query - only fetch if user exists
   const { data: profile } = useQuery<Profile | null>({
-    queryKey: ["profile", user?.id],
+    queryKey: ["profile", supabaseUser?.id],
     queryFn: async () => {
-      if (!user?.id) return null;
+      if (!supabaseUser?.id) return null;
       
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', supabaseUser.id)
         .single();
       
       if (error) {
@@ -61,21 +62,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       return data;
     },
-    enabled: !!user?.id,
+    enabled: !!supabaseUser?.id,
   });
+
+  // Create legacy user object for compatibility
+  const user = createLegacyUser(supabaseUser, profile);
 
   // Initialize auth state
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      setSupabaseUser(session?.user ?? null);
       setIsLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setUser(session?.user ?? null);
+        setSupabaseUser(session?.user ?? null);
         setIsLoading(false);
         
         // Clear all queries when user logs out
@@ -193,12 +197,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: Partial<Profile>) => {
-      if (!user?.id) throw new Error('Not authenticated');
+      if (!supabaseUser?.id) throw new Error('Not authenticated');
       
       const { data, error } = await supabase
         .from('profiles')
         .update(updates)
-        .eq('id', user.id)
+        .eq('id', supabaseUser.id)
         .select()
         .single();
       
@@ -207,7 +211,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (data) => {
       // Update the profile cache
-      queryClient.setQueryData(["profile", user?.id], data);
+      queryClient.setQueryData(["profile", supabaseUser?.id], data);
     },
   });
 
