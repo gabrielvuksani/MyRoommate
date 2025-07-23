@@ -432,128 +432,60 @@ export default function Calendar() {
                 {getDayEvents(selectedDate.getDate()).map((event: any, index: number) => (
                   <div 
                     key={event.id} 
-                    className="glass-card p-6 animate-fade-in hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl"
+                    className="rounded-2xl p-5 animate-fade-in"
                     style={{ 
-                      animationDelay: `${index * 100}ms`,
-                      background: 'var(--surface)',
-                      border: '1px solid var(--border)',
-                      backdropFilter: 'blur(20px) saturate(1.8)',
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      backgroundColor: 'var(--bg-secondary)',
+                      borderColor: 'var(--border-color)',
+                      border: '1px solid',
+                      animationDelay: `${index * 100}ms` 
                     }}
                   >
                     <div className="flex items-start space-x-4">
-                      {/* Enhanced Color Indicator */}
-                      <div className="flex flex-col items-center space-y-2">
-                        <div 
-                          className="w-4 h-4 rounded-full shadow-lg"
-                          style={{ 
-                            backgroundColor: event.color || '#007AFF',
-                            boxShadow: `0 0 20px ${event.color || '#007AFF'}40`
-                          }}
-                        ></div>
-                        <div 
-                          className="w-1 h-12 rounded-full opacity-30"
-                          style={{ backgroundColor: event.color || '#007AFF' }}
-                        ></div>
-                      </div>
-                      
+                      <div 
+                        className="w-4 h-16 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: event.color || '#007AFF' }}
+                      ></div>
                       <div className="flex-1">
-                        <div className="flex items-start justify-between mb-3">
-                          <h4 className="font-bold text-xl" style={{ color: 'var(--text-primary)' }}>
-                            {event.title}
-                          </h4>
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>{event.title}</h4>
                           <button
                             onClick={() => handleDeleteEvent(event.id)}
-                            className="group relative px-3 py-2 rounded-xl transition-all duration-200 hover:scale-105"
-                            style={{ 
-                              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%)',
-                              border: '1px solid rgba(239, 68, 68, 0.2)',
-                              color: '#ef4444'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%)';
-                              e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%)';
-                              e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)';
-                            }}
+                            className="px-2 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors"
                           >
-                            <span className="text-xs font-semibold">Delete</span>
+                            Delete
                           </button>
                         </div>
-                        
                         {event.description && (
-                          <p className="mb-4 text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                            {event.description}
-                          </p>
+                          <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>{event.description}</p>
                         )}
-                        
-                        {/* Enhanced Badge Section */}
-                        <div className="flex items-start flex-wrap gap-3">
-                          {/* Time Badge */}
-                          <div className="group relative">
-                            <div 
-                              className="px-4 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm"
-                              style={{ 
-                                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%)',
-                                border: '1px solid rgba(59, 130, 246, 0.2)',
-                                boxShadow: '0 2px 8px rgba(59, 130, 246, 0.1)'
-                              }}
-                            >
-                              <span className="font-semibold text-sm" style={{ color: '#3b82f6' }}>
-                                {new Date(event.startDate).toLocaleTimeString('en-US', {
-                                  hour: 'numeric',
-                                  minute: '2-digit'
-                                })}
-                                {event.endDate && (
-                                  <span style={{ color: 'var(--text-secondary)' }}>
-                                    {' - '}
-                                    {new Date(event.endDate).toLocaleTimeString('en-US', {
-                                      hour: 'numeric',
-                                      minute: '2-digit'
-                                    })}
-                                  </span>
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          {/* Creator Badge */}
-                          <div className="group relative">
-                            <div 
-                              className="px-4 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm"
-                              style={{ 
-                                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%)',
-                                border: '1px solid rgba(16, 185, 129, 0.2)',
-                                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.1)'
-                              }}
-                            >
-                              <span className="font-semibold text-sm" style={{ color: '#10b981' }}>
-                                {event.creator?.firstName || 'Unknown'}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          {/* Type Badge */}
-                          {event.type && (
-                            <div className="group relative">
-                              <div 
-                                className="px-4 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm"
-                                style={{ 
-                                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%)',
-                                  border: '1px solid rgba(139, 92, 246, 0.2)',
-                                  boxShadow: '0 2px 8px rgba(139, 92, 246, 0.1)'
-                                }}
-                              >
-                                <span className="capitalize font-semibold text-sm" style={{ color: '#8b5cf6' }}>
-                                  {event.type === 'social' && '🎉 '}
-                                  {event.type === 'work' && '💼 '}
-                                  {event.type === 'personal' && '👤 '}
-                                  {event.type === 'household' && '🏠 '}
-                                  {event.type}
+                        <div className="flex items-start flex-wrap gap-2">
+                          <div className="px-3 py-2 rounded-xl shadow-sm" style={{ backgroundColor: 'var(--bg-primary)' }}>
+                            <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+                              {new Date(event.startDate).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit'
+                              })}
+                              {event.endDate && (
+                                <span style={{ color: 'var(--text-secondary)' }}>
+                                  {' - '}
+                                  {new Date(event.endDate).toLocaleTimeString('en-US', {
+                                    hour: 'numeric',
+                                    minute: '2-digit'
+                                  })}
                                 </span>
-                              </div>
+                              )}
+                            </span>
+                          </div>
+                          <div className="px-3 py-2 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                            <span className="font-semibold text-sm" style={{ color: 'var(--text-secondary)' }}>
+                              {event.creator?.firstName || 'Unknown'}
+                            </span>
+                          </div>
+                          {event.type && (
+                            <div className="px-3 py-2 rounded-xl" style={{ backgroundColor: 'var(--blue-light)' }}>
+                              <span className="capitalize font-semibold text-sm" style={{ color: 'var(--accent-blue)' }}>
+                                {event.type}
+                              </span>
                             </div>
                           )}
                         </div>
