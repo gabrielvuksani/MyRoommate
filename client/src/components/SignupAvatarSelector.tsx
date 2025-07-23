@@ -39,41 +39,25 @@ export function SignupAvatarSelector({
   compact = false
 }: SignupAvatarSelectorProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
   // Recalculate initials whenever firstName, lastName, or email changes
   const initials = getProfileInitials(firstName, lastName, email);
   
-  // Manage preview URL properly with cleanup
-  React.useEffect(() => {
-    if (profileImage) {
-      // Clean up previous URL if it exists
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
-      // Create new preview URL
-      const newPreviewUrl = URL.createObjectURL(profileImage);
-      setImagePreviewUrl(newPreviewUrl);
-    } else {
-      // Clean up and clear when no file
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
-      setImagePreviewUrl(null);
-    }
-  }, [profileImage]);
-
-  // Cleanup on unmount
-  React.useEffect(() => {
-    return () => {
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
-    };
-  }, [imagePreviewUrl]);
+  // Simple: if there's a profileImage File, create URL on demand
+  const imagePreviewUrl = profileImage ? URL.createObjectURL(profileImage) : null;
   
-  // For signup form: direct check if there's a File object
+  // Simple: show remove button if there's a file
   const hasImage = !!profileImage;
+
+  console.log('SIGNUP AVATAR DEBUG:', {
+    profileImage: !!profileImage,
+    imagePreviewUrl: !!imagePreviewUrl,
+    hasImage,
+    initials,
+    firstName,
+    lastName,
+    profileColor
+  });
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -100,8 +84,9 @@ export function SignupAvatarSelector({
   };
 
   const handleRemoveImage = () => {
-    // Clear the file - useEffect will handle cleanup
+    console.log('REMOVING IMAGE - before onImageChange(null)');
     onImageChange(null);
+    console.log('REMOVING IMAGE - after onImageChange(null)');
     
     // Reset the file input to allow re-selection
     const fileInput = document.getElementById('signup-avatar-input') as HTMLInputElement;
@@ -117,13 +102,13 @@ export function SignupAvatarSelector({
         <div className="flex justify-center">
           <div className="relative">
             <Avatar className="w-16 h-16">
-              {profileImage && imagePreviewUrl ? (
+              {imagePreviewUrl ? (
                 <AvatarImage 
                   src={imagePreviewUrl} 
                   alt="Profile preview"
                   className="object-cover"
                   onError={() => {
-                    // If image fails to load, clear file and show fallback
+                    console.log('Image failed to load, clearing...');
                     onImageChange(null);
                   }}
                 />
@@ -242,13 +227,13 @@ export function SignupAvatarSelector({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                {profileImage && imagePreviewUrl ? (
+                {imagePreviewUrl ? (
                   <AvatarImage 
                     src={imagePreviewUrl} 
                     alt="Profile preview"
                     className="object-cover"
                     onError={() => {
-                      // If image fails to load, clear file and show fallback
+                      console.log('Image failed to load, clearing...');
                       onImageChange(null);
                     }}
                   />
