@@ -158,7 +158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Add creator as admin
-      await storage.joinHousehold(household.id, userId);
+      await storage.joinHousehold(household.id, userId, 'admin');
       
       res.json(household);
     } catch (error) {

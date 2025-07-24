@@ -50,7 +50,7 @@ export interface IStorage {
   getHousehold(id: string): Promise<Household | undefined>;
   getHouseholdByInviteCode(code: string): Promise<Household | undefined>;
   updateHousehold(id: string, updates: Partial<InsertHousehold>): Promise<Household>;
-  joinHousehold(householdId: string, userId: string): Promise<HouseholdMember>;
+  joinHousehold(householdId: string, userId: string, role?: string): Promise<HouseholdMember>;
   leaveHousehold(userId: string): Promise<void>;
   getHouseholdMembers(householdId: string): Promise<(HouseholdMember & { user: User })[]>;
   getUserHousehold(userId: string): Promise<(HouseholdMember & { household: Household }) | undefined>;
@@ -184,16 +184,16 @@ export class DatabaseStorage implements IStorage {
     return household;
   }
 
-  async joinHousehold(householdId: string, userId: string): Promise<HouseholdMember> {
+  async joinHousehold(householdId: string, userId: string, role: string = 'member'): Promise<HouseholdMember> {
     try {
-      console.log("Attempting to join household:", { householdId, userId });
+      console.log("Attempting to join household:", { householdId, userId, role });
       
       const [member] = await db
         .insert(householdMembers)
         .values({ 
           householdId, 
           userId,
-          role: 'member',
+          role,
           joinedAt: new Date()
         })
         .returning();
