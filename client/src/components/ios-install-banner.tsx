@@ -11,6 +11,8 @@ import { pwaDetection } from '@/lib/pwa-detection';
 export function IOSInstallBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
+  const [showReminder, setShowReminder] = useState(false);
+  const [animateSteps, setAnimateSteps] = useState(false);
 
   useEffect(() => {
     const environment = pwaDetection.getEnvironment();
@@ -46,7 +48,19 @@ export function IOSInstallBanner() {
 
   const handleInstall = () => {
     // On iOS, we can't programmatically install, so we show instructions
-    // The banner will stay visible to guide the user through the process
+    // Show reminder and animate the steps
+    setShowReminder(true);
+    setAnimateSteps(true);
+    
+    // Hide reminder after 3 seconds
+    setTimeout(() => {
+      setShowReminder(false);
+    }, 3000);
+    
+    // Stop animation after 4 seconds
+    setTimeout(() => {
+      setAnimateSteps(false);
+    }, 4000);
   };
 
   if (!isVisible || isDismissed) {
@@ -91,9 +105,20 @@ export function IOSInstallBanner() {
           Add to your home screen for the best experience with push notifications and offline access.
         </p>
 
+        {/* Reminder Alert */}
+        {showReminder && (
+          <div className="mb-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 animate-fade-in">
+            <p className="text-xs text-blue-700 dark:text-blue-300 flex items-center gap-1">
+              <span>👇 Please tap the</span>
+              <Share className="w-3 h-3" />
+              <span>Share button at the bottom of Safari</span>
+            </p>
+          </div>
+        )}
+
         {/* Installation Steps */}
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center gap-2 text-xs">
+        <div className={`space-y-2 mb-4 ${animateSteps ? 'animate-pulse-glow' : ''}`}>
+          <div className={`flex items-center gap-2 text-xs transition-all duration-500 ${animateSteps ? 'scale-105' : ''}`}>
             <div className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0">
               <span className="text-[10px] font-bold">1</span>
             </div>
@@ -104,7 +129,7 @@ export function IOSInstallBanner() {
             </div>
           </div>
           
-          <div className="flex items-center gap-2 text-xs">
+          <div className={`flex items-center gap-2 text-xs transition-all duration-500 ${animateSteps ? 'scale-105 delay-150' : ''}`}>
             <div className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0">
               <span className="text-[10px] font-bold">2</span>
             </div>
