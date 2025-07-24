@@ -55,9 +55,9 @@ export function IOSInstallBanner() {
   }
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 z-50 max-w-md mx-auto">
+    <div className="fixed bottom-20 left-6 right-6 z-50 max-w-md mx-auto">
       <div 
-        className="glass-card rounded-2xl p-4 animate-slide-up backdrop-blur-xl border shadow-lg"
+        className="glass-card rounded-2xl p-6 animate-slide-up backdrop-blur-xl border shadow-lg"
         style={{
           background: 'var(--surface)',
           borderColor: 'var(--border)',
