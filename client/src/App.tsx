@@ -28,6 +28,7 @@ import ListingDetail from "@/pages/listing-detail";
 import AddListing from "@/pages/add-listing";
 import AddExpense from "@/pages/add-expense";
 import BottomNavigation from "@/components/bottom-navigation";
+import { IOSInstallBanner } from "@/components/ios-install-banner";
 import { PWAEnvironmentIndicator } from "@/components/pwa-environment-indicator";
 
 function Router() {
@@ -111,6 +112,9 @@ function Router() {
       {user && hasHousehold && !needsOnboarding && !isKeyboardVisible && (
         <BottomNavigation />
       )}
+      
+      {/* iOS Install Banner */}
+      <IOSInstallBanner />
     </div>
   );
 }
