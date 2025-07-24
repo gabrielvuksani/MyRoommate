@@ -12,6 +12,7 @@ import {
   pushSubscriptions,
   type User,
   type UpsertUser,
+  type InsertUser,
   type Household,
   type InsertHousehold,
   type HouseholdMember,

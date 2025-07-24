@@ -121,6 +121,9 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ **Zero-latency notifications**: Notifications arrive instantly when PWA is closed, no delays or missed messages
 - ✓ **Production-ready scalability**: Database queries optimized with proper indexes for millions of concurrent users
 - ✓ **Complete database cleanup**: Wiped all user data, sessions, messages, chores, expenses, and households while preserving 6 demo users and 6 demo roommate listings for showcase purposes
+- ✓ **Fixed responsive header spacing**: iPhone 16 mobile optimization with pt-56 (224px) on mobile, pt-52 (208px) on small screens, pt-44+ (176px+) on larger screens
+- ✓ **Featured listing auto-assignment**: Latest roommate listing automatically receives featured status, unfeaturing all previous listings
+- ✓ **Fixed TypeScript errors**: Added missing InsertUser type import to server storage interface
 
 **July 23, 2025 (Earlier):**
 - ✓ **CRITICAL COMPLETION: Unified notification system fully integrated into all real app actions**
