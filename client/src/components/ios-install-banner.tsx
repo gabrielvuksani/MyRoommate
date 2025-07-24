@@ -21,7 +21,7 @@ export function IOSInstallBanner() {
     // 3. Not previously dismissed (check localStorage)
     // 4. Using Safari (where installation is possible)
     const shouldShow = 
-      environment.platform === 'ios' && 
+      environment.platform === 'iOS' && 
       !environment.isInstalled && 
       !localStorage.getItem('ios-install-banner-dismissed') &&
       environment.canInstall;
