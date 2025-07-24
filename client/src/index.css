@@ -305,11 +305,15 @@
 
 /* Content spacing that accounts for floating headers and safe areas */
 .content-with-header {
-  padding-top: calc(176px + env(safe-area-inset-top, 0px)); /* 11rem = 176px */
+  padding-top: calc(176px + env(safe-area-inset-top, 0px)); /* 11rem = 176px - home page */
+}
+
+.content-with-header-roommates {
+  padding-top: calc(184px + env(safe-area-inset-top, 0px)); /* 11.5rem = 184px - roommates page */
 }
 
 .content-with-header-compact {
-  padding-top: calc(144px + env(safe-area-inset-top, 0px)); /* 9rem = 144px */
+  padding-top: calc(144px + env(safe-area-inset-top, 0px)); /* 9rem = 144px - other pages */
 }
 
 .messages-content {

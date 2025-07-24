@@ -255,7 +255,7 @@ export default function Chores() {
           </div>
         </div>
       </div>
-      <div className="content-with-header px-6 space-y-6">
+      <div className="content-with-header-compact px-6 space-y-6">
         {/* Today's Focus */}
         {Array.isArray(chores) && chores.length > 0 && (
           <Card className="glass-card" style={{ 

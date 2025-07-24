@@ -111,6 +111,10 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 24, 2025 (Latest):**
+- ✓ **COMPLETED: Enhanced notification UX with intelligent toggle visibility**: Individual notification type toggles now only show when notifications are enabled AND permission is granted
+- ✓ **Reorganized profile page sections for better information hierarchy**: Account details and household information now appear before notifications section
+- ✓ **Unified notification testing functionality**: Removed duplicate test button from notification section, enhanced existing button in developer tools with smart state handling
+- ✓ **Adjusted safe area spacing for different page types**: Home page unchanged (176px), roommates page increased (184px), other pages decreased (144px)
 - ✓ **COMPLETED: Smart notification system with intelligent capability detection and conditional rendering**
 - ✓ **Fixed switch/slider visibility issues in dark mode app-wide**: Added proper CSS variables --switch-bg-unchecked (#E2E8F0) and dark mode variant (rgba(148, 163, 184, 0.3))
 - ✓ **Enhanced notification section to only show when notifications can be served**: Conditional rendering based on canShowNotifications flag that checks browser support and permissions

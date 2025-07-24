@@ -379,7 +379,7 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="content-with-header px-6 space-y-6">
+      <div className="content-with-header-compact px-6 space-y-6">
         {/* Profile Header */}
         <Card className="glass-card" style={{
           background: 'var(--surface)',
@@ -541,208 +541,6 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Notification Settings - Only show if notifications can be served */}
-        {canShowNotifications && (
-          <Card className="glass-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)'
-          }}>
-            <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Notifications
-              </h3>
-              <Bell className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
-            </div>
-
-            {/* Environment Info */}
-            {notificationInfo && (
-              <div className="mb-6 p-4 rounded-xl" style={{ 
-                background: 'var(--surface-secondary)',
-                border: '1px solid var(--border)'
-              }}>
-                <div className="flex items-center gap-2 mb-2">
-                  {notificationInfo.supportLevel === 'full' && <Smartphone className="w-4 h-4 text-green-600" />}
-                  {notificationInfo.supportLevel === 'partial' && <Monitor className="w-4 h-4 text-blue-600" />}
-                  {notificationInfo.supportLevel === 'none' && <AlertTriangle className="w-4 h-4 text-orange-600" />}
-                  
-                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                    {notificationInfo.supportLevel === 'full' && 'Full Support - Push Notifications'}
-                    {notificationInfo.supportLevel === 'partial' && 'Partial Support - Browser Notifications'}
-                    {notificationInfo.supportLevel === 'none' && (
-                      notificationInfo.requiresInstall ? 'Installation Required' : 'Limited Support'
-                    )}
-                  </span>
-                </div>
-                
-                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  {notificationInfo.supportLevel === 'full' && 'You can receive notifications even when the app is closed.'}
-                  {notificationInfo.supportLevel === 'partial' && 'You can receive notifications while using the browser.'}
-                  {notificationInfo.supportLevel === 'none' && (
-                    notificationInfo.requiresInstall 
-                      ? 'Install the app to your home screen to enable push notifications.'
-                      : notificationInfo.permission === 'denied' 
-                        ? 'Notifications are blocked in your browser settings.'
-                        : 'Click "Enable Notifications" below to get started.'
-                  )}
-                </p>
-                
-                {/* Install prompt for mobile users */}
-                {notificationInfo.requiresInstall && (
-                  <button 
-                    className="mt-3 text-xs text-blue-600 underline hover:text-blue-700"
-                    onClick={() => {
-                      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-                      if (isIOS) {
-                        alert('To install on iOS:\n\n1. Tap the Share button (box with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
-                      } else {
-                        alert('To install on Android:\n\n1. Tap the menu button (three dots)\n2. Tap "Add to Home screen"\n3. Follow the prompts');
-                      }
-                    }}
-                  >
-                    How to install the app
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Master Toggle */}
-            {notificationSettings && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
-                        Enable Notifications
-                      </span>
-                      {notificationInfo.permission === 'granted' && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                          Allowed
-                        </span>
-                      )}
-                      {notificationInfo.permission === 'denied' && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                          Blocked
-                        </span>
-                      )}
-                      {notificationInfo.permission === 'default' && notificationSettings.enabled && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
-                          Permission needed
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-                      {notificationInfo.permission === 'denied' 
-                        ? 'Enable in browser settings to continue'
-                        : 'Master control for all notification types'}
-                    </p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.enabled}
-                    onCheckedChange={(checked) => handleNotificationToggle('enabled', checked)}
-                    disabled={notificationInfo?.permission === 'denied' || notificationInfo?.requiresInstall}
-                  />
-                </div>
-
-                {/* Individual Type Controls */}
-                {notificationSettings.enabled && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between py-2">
-                      <div>
-                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                          Messages
-                        </span>
-                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          New messages from roommates
-                        </p>
-                      </div>
-                      <Switch
-                        checked={notificationSettings.types.message}
-                        onCheckedChange={(checked) => handleNotificationToggle('message', checked)}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between py-2">
-                      <div>
-                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                          Chores
-                        </span>
-                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          Chore assignments and completions
-                        </p>
-                      </div>
-                      <Switch
-                        checked={notificationSettings.types.chore}
-                        onCheckedChange={(checked) => handleNotificationToggle('chore', checked)}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between py-2">
-                      <div>
-                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                          Expenses
-                        </span>
-                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          New expenses and bill splits
-                        </p>
-                      </div>
-                      <Switch
-                        checked={notificationSettings.types.expense}
-                        onCheckedChange={(checked) => handleNotificationToggle('expense', checked)}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between py-2">
-                      <div>
-                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                          Calendar
-                        </span>
-                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          New events and reminders
-                        </p>
-                      </div>
-                      <Switch
-                        checked={notificationSettings.types.calendar}
-                        onCheckedChange={(checked) => handleNotificationToggle('calendar', checked)}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between py-2">
-                      <div>
-                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                          Household
-                        </span>
-                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          Important household updates
-                        </p>
-                      </div>
-                      <Switch
-                        checked={notificationSettings.types.household}
-                        onCheckedChange={(checked) => handleNotificationToggle('household', checked)}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Test Button */}
-                <div className="pt-4 mt-4" style={{ borderTop: '1px solid var(--border)' }}>
-                  <Button
-                    onClick={handleTestNotification}
-                    disabled={isTestingNotification || (!notificationSettings.enabled && !notificationInfo?.requiresInstall)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isTestingNotification ? "Sending..." : 
-                     notificationInfo?.requiresInstall ? "Install App for Notifications" :
-                     notificationInfo?.permission === 'denied' ? "Enable in Browser Settings" :
-                     "Test Notifications"}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        )}
-
         {/* Account Details */}
         <Card className="glass-card" style={{
           background: 'var(--surface)',
@@ -828,12 +626,17 @@ export default function Profile() {
                             }}
                           />
                           <Button
-                            onClick={handleUpdateHouseholdName}
-                            disabled={
-                              !editHouseholdName.trim() ||
-                              updateHouseholdNameMutation.isPending
-                            }
-                            className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
+                            onClick={() => handleUpdateHouseholdName()}
+                            disabled={updateHouseholdNameMutation.isPending}
+                            className="w-full py-3 rounded-xl font-semibold transition-all disabled:opacity-50"
+                            style={{
+                              background: updateHouseholdNameMutation.isPending
+                                ? 'var(--surface-secondary)'
+                                : 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+                              color: updateHouseholdNameMutation.isPending
+                                ? 'var(--text-secondary)'
+                                : '#ffffff'
+                            }}
                           >
                             {updateHouseholdNameMutation.isPending
                               ? "Saving..."
@@ -960,6 +763,257 @@ export default function Profile() {
           </Card>
         )}
 
+        {/* Notification Settings - Only show if notifications can be served */}
+        {canShowNotifications && (
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)'
+          }}>
+            <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                Notifications
+              </h3>
+              <Bell className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
+            </div>
+
+            {/* Environment Info */}
+            {notificationInfo && (
+              <div className="mb-6 p-4 rounded-xl" style={{ 
+                background: 'var(--surface-secondary)',
+                border: '1px solid var(--border)'
+              }}>
+                <div className="flex items-center gap-2 mb-2">
+                  {notificationInfo.supportLevel === 'full' && <Smartphone className="w-4 h-4 text-green-600" />}
+                  {notificationInfo.supportLevel === 'partial' && <Monitor className="w-4 h-4 text-blue-600" />}
+                  {notificationInfo.supportLevel === 'none' && <AlertTriangle className="w-4 h-4 text-orange-600" />}
+                  
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    {notificationInfo.supportLevel === 'full' && 'Full Support - Push Notifications'}
+                    {notificationInfo.supportLevel === 'partial' && 'Partial Support - Browser Notifications'}
+                    {notificationInfo.supportLevel === 'none' && (
+                      notificationInfo.requiresInstall ? 'Installation Required' : 'Limited Support'
+                    )}
+                  </span>
+                </div>
+                
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  {notificationInfo.supportLevel === 'full' && 'You can receive notifications even when the app is closed.'}
+                  {notificationInfo.supportLevel === 'partial' && 'You can receive notifications while using the browser.'}
+                  {notificationInfo.supportLevel === 'none' && (
+                    notificationInfo.requiresInstall 
+                      ? 'Install the app to your home screen to enable push notifications.'
+                      : notificationInfo.permission === 'denied' 
+                        ? 'Notifications are blocked in your browser settings.'
+                        : 'Click "Enable Notifications" below to get started.'
+                  )}
+                </p>
+                
+                {/* Install prompt for mobile users */}
+                {notificationInfo.requiresInstall && (
+                  <button 
+                    className="mt-3 text-xs text-blue-600 underline hover:text-blue-700"
+                    onClick={() => {
+                      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                      if (isIOS) {
+                        alert('To install on iOS:\n\n1. Tap the Share button (box with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
+                      } else {
+                        alert('To install on Android:\n\n1. Tap the menu button (three dots)\n2. Tap "Add to Home screen"\n3. Follow the prompts');
+                      }
+                    }}
+                  >
+                    How to install the app
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Master Toggle */}
+            {notificationSettings && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                        Enable Notifications
+                      </span>
+                      {notificationInfo.permission === 'granted' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                          Allowed
+                        </span>
+                      )}
+                      {notificationInfo.permission === 'denied' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                          Blocked
+                        </span>
+                      )}
+                      {notificationInfo.permission === 'default' && notificationSettings.enabled && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                          Permission needed
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                      {notificationInfo.permission === 'denied' 
+                        ? 'Enable in browser settings to continue'
+                        : 'Master control for all notification types'}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notificationSettings.enabled}
+                    onCheckedChange={(checked) => handleNotificationToggle('enabled', checked)}
+                    disabled={notificationInfo?.permission === 'denied' || notificationInfo?.requiresInstall}
+                  />
+                </div>
+
+                {/* Individual Type Controls - Only show when notifications are enabled and allowed */}
+                {notificationSettings.enabled && notificationInfo?.permission === 'granted' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Messages
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          New messages from roommates
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.message}
+                        onCheckedChange={(checked) => handleNotificationToggle('message', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Chores
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          Chore assignments and completions
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.chore}
+                        onCheckedChange={(checked) => handleNotificationToggle('chore', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Expenses
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          New expenses and bill splits
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.expense}
+                        onCheckedChange={(checked) => handleNotificationToggle('expense', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Calendar
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          New events and reminders
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.calendar}
+                        onCheckedChange={(checked) => handleNotificationToggle('calendar', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Household
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          Important household updates
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.household}
+                        onCheckedChange={(checked) => handleNotificationToggle('household', checked)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        )}
+
+        {/* Household Members */}
+        {(household as any)?.members && (
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)'
+          }}>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Household Members
+              </h3>
+              <div className="space-y-3">
+                {(household as any).members.map((member: any) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between py-3 last:border-b-0"
+                    style={{ borderBottom: '1px solid var(--border)' }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <ProfileAvatar 
+                        user={member.user} 
+                        size="md" 
+                        gradientType="blue"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                          {member.user.firstName && member.user.lastName
+                            ? `${member.user.firstName} ${member.user.lastName}`
+                            : member.user.firstName ||
+                              member.user.email?.split("@")[0] ||
+                              "Unknown"}
+                        </p>
+                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {member.role === "admin" ? "Administrator" : "Member"}
+                        </p>
+                      </div>
+                    </div>
+                    {member.role && (
+                      <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{
+                        color: 'var(--text-secondary)',
+                        background: 'var(--surface-secondary)'
+                      }}>
+                        {member.role}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <Button
+                onClick={handleDeleteAllData}
+                disabled={deleteAllDataMutation.isPending}
+                className="mt-4 w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
+              >
+                <Trash2 size={20} />
+                <span>
+                  {deleteAllDataMutation.isPending
+                    ? "Deleting All Household Data..."
+                    : "Delete All Household Data"}
+                </span>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Developer Tools */}
         <Card className="glass-card" style={{
           background: 'var(--surface)',
@@ -979,14 +1033,15 @@ export default function Profile() {
               </Button>
               <Button
                 onClick={handleTestNotification}
-                disabled={isTestingNotification || notificationInfo?.strategy === 'none'}
-                className="w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center space-x-2 disabled:opacity-50 bg-purple-600 hover:bg-purple-700"
+                disabled={isTestingNotification || (!notificationSettings?.enabled && !notificationInfo?.requiresInstall)}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Bell size={20} className={isTestingNotification ? "animate-pulse" : ""} />
                 <span>
-                  {isTestingNotification
-                    ? "Sending test notification..."
-                    : "Test Notifications"}
+                  {isTestingNotification ? "Sending test notification..." : 
+                   notificationInfo?.requiresInstall ? "Install App for Notifications" :
+                   notificationInfo?.permission === 'denied' ? "Enable in Browser Settings" :
+                   "Test Notifications"}
                 </span>
               </Button>
               
