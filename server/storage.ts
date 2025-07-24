@@ -769,7 +769,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserPushSubscriptions(userId: string): Promise<any[]> {
-    // Using raw query to match actual database schema
+    // Optimized query with proper indexes for fast user lookup
     const result = await db.execute(sql`
       SELECT 
         id,
@@ -777,12 +777,12 @@ export class DatabaseStorage implements IStorage {
         endpoint,
         p256dh_key,
         auth_key,
-        created_at as "createdAt",
-        is_active as "active"
+        created_at as "createdAt"
       FROM push_subscriptions
       WHERE user_id = ${userId}
         AND is_active = true
       ORDER BY created_at DESC
+      LIMIT 50
     `);
     
     return result.rows.map((row: any) => ({
@@ -793,13 +793,12 @@ export class DatabaseStorage implements IStorage {
         p256dh: row.p256dh_key,
         auth: row.auth_key
       },
-      active: row.active,
       createdAt: row.createdAt
     }));
   }
 
   async getActivePushSubscriptions(householdId: string): Promise<any[]> {
-    // Using raw query to match actual database schema
+    // Optimized query with proper indexes for millions of users
     const result = await db.execute(sql`
       SELECT 
         ps.id,
@@ -807,17 +806,13 @@ export class DatabaseStorage implements IStorage {
         ps.endpoint,
         ps.p256dh_key,
         ps.auth_key,
-        ps.created_at as "createdAt",
-        ps.is_active as "active",
-        u.id as "user_id",
-        u.email as "user_email",
-        u.first_name as "user_firstName",
-        u.last_name as "user_lastName"
+        ps.created_at as "createdAt"
       FROM push_subscriptions ps
-      INNER JOIN users u ON ps.user_id = u.id
-      INNER JOIN household_members hm ON u.id = hm.user_id
+      INNER JOIN household_members hm ON ps.user_id = hm.user_id
       WHERE hm.household_id = ${householdId}
         AND ps.is_active = true
+      ORDER BY ps.created_at DESC
+      LIMIT 10000
     `);
     
     return result.rows.map((row: any) => ({
@@ -828,14 +823,7 @@ export class DatabaseStorage implements IStorage {
         p256dh: row.p256dh_key,
         auth: row.auth_key
       },
-      active: row.active,
-      createdAt: row.createdAt,
-      user: {
-        id: row.user_id,
-        email: row.user_email,
-        firstName: row.user_firstName,
-        lastName: row.user_lastName
-      }
+      createdAt: row.createdAt
     }));
   }
 

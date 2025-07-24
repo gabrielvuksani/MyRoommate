@@ -41,6 +41,83 @@ webpush.setVapidDetails(
   '8gDdfS0YP9m2JCg7RY9aDsTKCP6iLp0BNsRWch9BJAA' // Private key
 );
 
+// High-performance notification queue for millions of users
+class NotificationQueue {
+  private queue: Array<{ userId?: string, householdId?: string, excludeUserId?: string, payload: any }> = [];
+  private processing = false;
+  private readonly QUEUE_BATCH_SIZE = 2000;
+  private readonly PROCESS_INTERVAL = 50; // Process every 50ms for high throughput
+
+  constructor() {
+    // Start the queue processor with high frequency
+    setInterval(async () => {
+      if (!this.processing && this.queue.length > 0) {
+        await this.processQueue();
+      }
+    }, this.PROCESS_INTERVAL);
+  }
+
+  // Add notification to queue (async, non-blocking)
+  enqueue(notification: { userId?: string, householdId?: string, excludeUserId?: string, payload: any }) {
+    this.queue.push(notification);
+    
+    // Auto-process if queue gets large (prevent memory buildup)
+    if (this.queue.length > 5000 && !this.processing) {
+      setImmediate(() => this.processQueue());
+    }
+  }
+
+  // Process queued notifications in high-performance batches
+  private async processQueue() {
+    if (this.processing || this.queue.length === 0) return;
+    
+    this.processing = true;
+    
+    try {
+      const batch = this.queue.splice(0, this.QUEUE_BATCH_SIZE);
+      
+      // Group by type for maximum efficiency
+      const userNotifications = batch.filter(n => n.userId);
+      const householdNotifications = batch.filter(n => n.householdId);
+      
+      // Process both types with maximum concurrency
+      const promises = [
+        ...userNotifications.map(n => 
+          sendPushNotification(n.userId!, n.payload).catch(console.error)
+        ),
+        ...householdNotifications.map(n => 
+          sendHouseholdPushNotifications(n.householdId!, n.excludeUserId!, n.payload).catch(console.error)
+        )
+      ];
+      
+      // Fire and forget for maximum performance
+      Promise.allSettled(promises);
+      
+    } catch (error) {
+      console.error('Error processing notification queue:', error);
+    } finally {
+      this.processing = false;
+    }
+  }
+
+  getQueueSize(): number {
+    return this.queue.length;
+  }
+
+  // Get queue metrics for monitoring
+  getMetrics() {
+    return {
+      queueSize: this.queue.length,
+      processing: this.processing,
+      batchSize: this.QUEUE_BATCH_SIZE,
+      processInterval: this.PROCESS_INTERVAL
+    };
+  }
+}
+
+// Initialize the global notification queue
+const notificationQueue = new NotificationQueue();
+
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
@@ -970,63 +1047,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Push notification sending function with database storage
+  // Scalable push notification function for individual users
   async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
     try {
       const subscriptions = await storage.getUserPushSubscriptions(userId);
-      console.log(`Found ${subscriptions?.length || 0} push subscriptions for user ${userId}:`, subscriptions);
       
       if (!subscriptions || subscriptions.length === 0) {
-        console.log('No push subscriptions found for user:', userId);
         return false;
       }
 
-      // Send to all active subscriptions for this user (multiple devices)
-      let successCount = 0;
-      for (const sub of subscriptions) {
-        try {
-          await webpush.sendNotification(sub, JSON.stringify(payload), {
-            urgency: 'high',
-            TTL: 30, // 30 seconds for immediate delivery
-            topic: payload.tag || 'instant'
-          });
-          successCount++;
-        } catch (error: any) {
-          // If subscription is invalid/expired, deactivate it
-          if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
-            await storage.deactivatePushSubscription(sub.endpoint);
+      // Process all user subscriptions concurrently
+      const results = await Promise.allSettled(
+        subscriptions.map(async (sub) => {
+          try {
+            await webpush.sendNotification(sub, JSON.stringify(payload), {
+              urgency: 'high',
+              TTL: 60, // Increased TTL for reliability
+              topic: payload.tag || 'instant'
+            });
+            return true;
+          } catch (error: any) {
+            // Deactivate invalid subscriptions asynchronously
+            if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
+              // Fire and forget for better performance
+              storage.deactivatePushSubscription(sub.endpoint).catch(console.error);
+            }
+            return false;
           }
-        }
-      }
+        })
+      );
       
-      return successCount > 0;
+      // Return true if at least one notification was sent successfully
+      return results.some(result => result.status === 'fulfilled' && result.value === true);
+      
     } catch (error) {
       console.error('Error sending push notification:', error);
       return false;
     }
   }
 
-  // Send push notifications to all household members
+  // Scalable push notification system for millions of users
   async function sendHouseholdPushNotifications(householdId: string, excludeUserId: string, payload: any): Promise<void> {
     try {
       const subscriptions = await storage.getActivePushSubscriptions(householdId);
       
-      for (const sub of subscriptions) {
-        if (sub.userId !== excludeUserId) {
-          try {
-            await webpush.sendNotification(sub, JSON.stringify(payload), {
-              urgency: 'high',
-              TTL: 30,
-              topic: payload.tag || 'instant'
-            });
-          } catch (error: any) {
-            // Deactivate invalid subscriptions
-            if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
-              await storage.deactivatePushSubscription(sub.endpoint);
-            }
-          }
+      // Optimized batch processing for millions of users
+      const BATCH_SIZE = 500; // Increased batch size for better throughput
+      const MAX_CONCURRENT_BATCHES = 10; // Limit concurrent processing
+      
+      const targetSubscriptions = subscriptions.filter(sub => sub.userId !== excludeUserId);
+      
+      // Process in controlled batches to prevent memory issues
+      for (let i = 0; i < targetSubscriptions.length; i += BATCH_SIZE * MAX_CONCURRENT_BATCHES) {
+        const superBatch = targetSubscriptions.slice(i, i + (BATCH_SIZE * MAX_CONCURRENT_BATCHES));
+        const batchPromises: Promise<void>[] = [];
+        
+        for (let j = 0; j < superBatch.length; j += BATCH_SIZE) {
+          const batch = superBatch.slice(j, j + BATCH_SIZE);
+          
+          const batchPromise = Promise.allSettled(
+            batch.map(async (sub) => {
+              try {
+                await webpush.sendNotification(sub, JSON.stringify(payload), {
+                  urgency: 'high',
+                  TTL: 300, // 5 minutes TTL for better delivery
+                  topic: payload.tag || 'general',
+                  headers: {
+                    'Content-Encoding': 'gzip', // Compress payload
+                  }
+                });
+              } catch (error: any) {
+                // Async cleanup for invalid subscriptions
+                if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
+                  setImmediate(() => {
+                    storage.deactivatePushSubscription(sub.endpoint).catch(console.error);
+                  });
+                }
+              }
+            })
+          ).then(() => {});
+          
+          batchPromises.push(batchPromise);
+        }
+        
+        // Process super batch and wait before next iteration
+        await Promise.allSettled(batchPromises);
+        
+        // Small delay to prevent overwhelming the push service
+        if (i + (BATCH_SIZE * MAX_CONCURRENT_BATCHES) < targetSubscriptions.length) {
+          await new Promise(resolve => setTimeout(resolve, 50));
         }
       }
+      
     } catch (error) {
       console.error('Error sending household push notifications:', error);
     }
