@@ -64,45 +64,20 @@ export default function Messages() {
   const { data: serverMessages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household && !!user,
-    refetchInterval: connectionStatus === 'connected' ? 5000 : 2000, // Slower polling when connected via WebSocket
-    refetchIntervalInBackground: true,
-    staleTime: connectionStatus === 'connected' ? 30000 : 1000, // Longer stale time when WebSocket is active
+    // NO POLLING - Messages come via push notifications and WebSocket only
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
+    staleTime: Infinity, // Messages are real-time, no staleness
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  // Use server messages directly for reliable message display
+  // Use server messages directly - NO CLIENT-SIDE NOTIFICATIONS
   const messages = useMemo(() => {
     const sortedMessages = Array.isArray(serverMessages) ? serverMessages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) : [];
-    
-    // Check for new messages and trigger notifications (backup for when WebSocket is not connected)
-    if (sortedMessages.length > 0 && user && household) {
-      const currentMessageIds = new Set(sortedMessages.map(msg => msg.id));
-      const previousIds = previousMessageIds.current;
-      
-      // Find new messages that weren't in the previous set
-      const newMessages = sortedMessages.filter(msg => 
-        !previousIds.has(msg.id) && msg.userId !== user.id
-      );
-      
-      // Trigger notifications for new messages from other users
-      newMessages.forEach(msg => {
-        if (msg.user && msg.content) {
-          const userName = formatDisplayName(msg.user.firstName || null, msg.user.lastName || null);
-          const householdName = household.name;
-          console.log('Polling detected new message, attempting notification from:', userName);
-          notificationService.showMessageNotification(userName, msg.content, householdName)
-            .then(success => console.log('Polling notification result:', success))
-            .catch(error => console.error('Polling notification error:', error));
-        }
-      });
-      
-      // Update the previous message IDs
-      previousMessageIds.current = currentMessageIds;
-    }
-    
+    // All notifications are handled server-side via push notifications
     return sortedMessages;
-  }, [serverMessages, user, household]);
+  }, [serverMessages]);
 
   const { sendMessage } = useWebSocket({
     onConnect: () => {
