@@ -17,7 +17,7 @@ import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useTheme } from "@/lib/ThemeProvider";
 import BackButton from "../components/back-button";
 import { PersistentLoading } from "@/lib/persistentLoading";
-import { useNotifications } from "@/components/unified-notification-provider";
+import { notificationService } from "@/lib/notifications";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -36,8 +36,9 @@ export default function Profile() {
 
 
   const [isCopied, setIsCopied] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+  const [notificationStatus, setNotificationStatus] = useState<any>(null);
   const [isTestingNotification, setIsTestingNotification] = useState(false);
-  const { permissionStatus, isSubscribed, requestPermission, getStatus, sendTestNotification } = useNotifications();
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -53,7 +54,9 @@ export default function Profile() {
 
     window.addEventListener("scroll", handleScroll);
     
-
+    // Check notification permission and detailed status
+    setNotificationPermission(notificationService.getPermissionStatus());
+    setNotificationStatus(notificationService.getDetailedStatus());
     
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -224,11 +227,16 @@ export default function Profile() {
   };
 
   const handleTestNotification = async () => {
-    const status = getStatus();
+    const status = notificationService.getDetailedStatus();
     
     // Handle different scenarios intelligently
     if (!status.supported) {
       alert('Your browser does not support notifications.');
+      return;
+    }
+    
+    if (!status.secure) {
+      alert('Notifications require a secure connection (HTTPS). They may not work on this connection.');
       return;
     }
     
@@ -239,28 +247,45 @@ export default function Profile() {
     
     setIsTestingNotification(true);
     try {
-      let success = isSubscribed;
+      let success = false;
       
       // Request permission if needed
-      if (status.permission !== 'granted') {
-        success = await requestPermission();
+      if (status.canRequest) {
+        success = await notificationService.requestPermission();
         if (!success) {
           alert('Notification permission was denied. Please enable notifications in your browser settings.');
-          setIsTestingNotification(false);
           return;
         }
       }
       
-      // Send test notification
-      if (success) {
-        const testSuccess = await sendTestNotification();
-        if (!testSuccess) {
-          alert('Notification test failed. This may be expected until VAPID keys are properly configured.');
-        }
+      // Set up push subscription after permission is granted
+      if (status.permission === 'granted' || success) {
+        // Ensure push subscription is set up for background notifications
+        await notificationService.subscribeToPush();
+        
+        await notificationService.showTestNotification();
+        
+        // Send additional demo notifications to showcase different types
+        setTimeout(() => {
+          notificationService.showMessageNotification("Alex", "Hey! Are you free this weekend?");
+        }, 2000);
+        
+        setTimeout(() => {
+          notificationService.showChoreNotification("Take out trash", "Sam");
+        }, 4000);
+        
+        setTimeout(() => {
+          notificationService.showExpenseNotification("Groceries", 45.67, "Jordan");
+        }, 6000);
       }
+      
+      // Update status after permission change
+      setNotificationPermission(notificationService.getPermissionStatus());
+      setNotificationStatus(notificationService.getDetailedStatus());
+      
     } catch (error) {
-      console.error('Error testing notification:', error);
-      alert('Error testing notification: ' + error.message);
+      console.error('Test notification failed:', error);
+      alert('Failed to send test notification. Please check your browser settings.');
     } finally {
       setIsTestingNotification(false);
     }
@@ -698,11 +723,11 @@ export default function Profile() {
               </Button>
               <Button
                 onClick={handleTestNotification}
-                disabled={isTestingNotification || permissionStatus === 'unsupported'}
+                disabled={isTestingNotification || (notificationStatus && !notificationStatus.supported)}
                 className={`w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center space-x-2 disabled:opacity-50 ${
-                  permissionStatus === 'denied'
+                  notificationStatus?.blockReason
                     ? 'bg-gray-600 hover:bg-gray-700'
-                    : permissionStatus === 'granted' && isSubscribed
+                    : notificationStatus?.permission === 'granted'
                     ? 'bg-green-600 hover:bg-green-700'
                     : 'bg-purple-600 hover:bg-purple-700'
                 }`}
@@ -711,13 +736,13 @@ export default function Profile() {
                 <span>
                   {isTestingNotification
                     ? "Sending test notification..."
-                    : permissionStatus === 'unsupported'
+                    : notificationStatus?.blockReason
                     ? "Notifications Unavailable"
-                    : permissionStatus === 'denied'
-                    ? "Notifications Blocked"
-                    : permissionStatus === 'granted' && isSubscribed
+                    : notificationStatus?.permission === 'granted'
                     ? "Test Live Notifications"
-                    : "Enable Notifications"
+                    : notificationStatus?.canRequest
+                    ? "Enable Notifications"
+                    : "Notifications Blocked"
                   }
                 </span>
               </Button>

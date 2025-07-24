@@ -9,8 +9,6 @@ import {
   messages,
   shoppingItems,
   roommateListings,
-  pushSubscriptions,
-  notificationQueue,
   type User,
   type UpsertUser,
   type Household,
@@ -30,10 +28,6 @@ import {
   type InsertShoppingItem,
   type RoommateListing,
   type InsertRoommateListing,
-  type PushSubscription,
-  type InsertPushSubscription,
-  type NotificationQueue,
-  type InsertNotificationQueue,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, sql } from "drizzle-orm";

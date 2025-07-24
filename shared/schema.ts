@@ -388,61 +388,6 @@ export type CalendarEvent = typeof calendarEvents.$inferSelect;
 export type InsertCalendarEvent = z.infer<typeof insertCalendarEventSchema>;
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
-
-// Push notification subscriptions table for enterprise-grade reliability
-export const pushSubscriptions = pgTable("push_subscriptions", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
-  endpoint: varchar("endpoint", { length: 2048 }).notNull(),
-  p256dhKey: varchar("p256dh_key", { length: 512 }).notNull(),
-  authKey: varchar("auth_key", { length: 512 }).notNull(),
-  userAgent: varchar("user_agent", { length: 1024 }),
-  isActive: boolean("is_active").default(true),
-  lastUsed: timestamp("last_used").defaultNow(),
-  failureCount: integer("failure_count").default(0),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => [
-  index("idx_push_subscriptions_user_id").on(table.userId),
-  index("idx_push_subscriptions_active").on(table.isActive),
-  index("idx_push_subscriptions_endpoint").on(table.endpoint),
-]);
-
-// Notification queue for reliable delivery
-export const notificationQueue = pgTable("notification_queue", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
-  householdId: uuid("household_id").references(() => households.id, { onDelete: 'cascade' }),
-  type: varchar("type", { length: 50 }).notNull(), // message, chore, expense, calendar
-  title: varchar("title", { length: 255 }).notNull(),
-  body: varchar("body", { length: 1000 }).notNull(),
-  payload: jsonb("payload"),
-  priority: varchar("priority", { length: 20 }).default("normal"), // high, normal, low
-  status: varchar("status", { length: 20 }).default("pending"), // pending, sent, failed, expired
-  attempts: integer("attempts").default(0),
-  maxAttempts: integer("max_attempts").default(3),
-  scheduledFor: timestamp("scheduled_for").defaultNow(),
-  sentAt: timestamp("sent_at"),
-  failedAt: timestamp("failed_at"),
-  expiresAt: timestamp("expires_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => [
-  index("idx_notification_queue_user_id").on(table.userId),
-  index("idx_notification_queue_status").on(table.status),
-  index("idx_notification_queue_scheduled").on(table.scheduledFor),
-  index("idx_notification_queue_priority").on(table.priority),
-]);
-
-// Type definitions for push subscriptions
-export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions);
-export type PushSubscription = typeof pushSubscriptions.$inferSelect;
-export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema>;
-
-// Type definitions for notification queue
-export const insertNotificationQueueSchema = createInsertSchema(notificationQueue);
-export type NotificationQueue = typeof notificationQueue.$inferSelect;
-export type InsertNotificationQueue = z.infer<typeof insertNotificationQueueSchema>;
 export type ShoppingItem = typeof shoppingItems.$inferSelect;
 export type InsertShoppingItem = z.infer<typeof insertShoppingItemSchema>;
 export type RoommateListing = typeof roommateListings.$inferSelect;

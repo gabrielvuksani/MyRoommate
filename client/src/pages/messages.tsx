@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { useWebSocket } from "@/lib/websocket";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import MessageBubble from "@/components/message-bubble";
 import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
 import { QuickAvatar } from "@/components/ProfileAvatar";
@@ -43,8 +43,8 @@ export default function Messages() {
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  // Use WebSocket for real-time connection instead of polling
-  const { status: connectionStatus, sendMessage: wsSendMessage } = useWebSocket(household?.id);
+  // Connection status - starts optimistic when user and household are available
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -64,9 +64,11 @@ export default function Messages() {
   const { data: serverMessages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household && !!user,
-    // No polling - WebSocket handles real-time updates
-    retry: 2,
-    retryDelay: 1000,
+    refetchInterval: connectionStatus === 'connected' ? 5000 : 2000, // Slower polling when connected via WebSocket
+    refetchIntervalInBackground: true,
+    staleTime: connectionStatus === 'connected' ? 30000 : 1000, // Longer stale time when WebSocket is active
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Use server messages directly for reliable message display
