@@ -47,7 +47,7 @@ export default function Expenses() {
       queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
     },
     onError: (error) => {
-      console.error('Error deleting expense:', error);
+
     },
   });
 
@@ -60,7 +60,7 @@ export default function Expenses() {
       queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
     },
     onError: (error) => {
-      console.error('Error updating expense settlement:', error);
+
     },
   });
 

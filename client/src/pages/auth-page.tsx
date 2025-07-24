@@ -124,14 +124,14 @@ export default function AuthPage() {
             }
           } catch (profileError) {
             // Don't fail registration if profile updates fail
-            console.log('Profile update after registration failed:', profileError);
+
           }
         }
         
         // Registration successful - onSuccess will handle navigation
       }
     } catch (error: any) {
-      console.error("Auth error:", error);
+
       // Extract and format error message
       const rawErrorMessage = error.message || "Authentication failed. Please try again.";
       const cleanErrorMessage = formatErrorMessage(rawErrorMessage);
@@ -281,9 +281,9 @@ export default function AuthPage() {
                               profileImage={profileImage}
                               onColorChange={(color) => updateFormData("profileColor", color)}
                               onImageChange={(file) => {
-                                console.log('AUTH PAGE - onImageChange called with:', file);
+
                                 setProfileImage(file);
-                                console.log('AUTH PAGE - setProfileImage called');
+
                               }}
                               compact={true}
                             />

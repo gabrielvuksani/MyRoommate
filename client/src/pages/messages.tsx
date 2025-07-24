@@ -83,40 +83,40 @@ export default function Messages() {
 
   const { sendMessage } = useWebSocket({
     onConnect: () => {
-      console.log('WebSocket connected successfully');
+
       setConnectionStatus('connected');
       queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
     },
     onDisconnect: () => {
-      console.log('WebSocket disconnected');
+
       setConnectionStatus('disconnected');
     },
     onMessage: (data: WebSocketMessage) => {
       if (data.type === 'connection_confirmed') {
         setConnectionStatus('connected');
-        console.log('WebSocket connection confirmed:', data);
+
         queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
         return;
       }
       if (data.type === 'message_error') {
-        console.error('Message error:', data.error);
+
         queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
         return;
       }
       if (data.type === "new_message" && data.message) {
-        console.log('Real-time message received:', data.message.id || 'unknown');
+
         
         queryClient.setQueryData(["/api/messages"], (old: any) => {
           const currentMessages = old || [];
           
           const messageExists = data.message?.id ? currentMessages.some((msg: any) => msg.id === data.message!.id) : false;
           if (messageExists) {
-            console.log('Message already exists in cache, skipping duplicate');
+
             return currentMessages;
           }
           
           const updatedMessages = [...currentMessages, data.message];
-          console.log('Cache updated with new message:', updatedMessages.length, 'total messages');
+
           return updatedMessages;
         });
         
@@ -130,22 +130,22 @@ export default function Messages() {
         // Always scroll to latest message when new message arrives
         scrollToLatestMessage();
       } else if (data.type === "pong") {
-        console.log('WebSocket pong received - connection healthy');
+
       } else if (data.type === "new_chore" && data.chore) {
-        console.log('Real-time chore received:', data.chore.id || 'unknown');
+
         
         queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
         
         // Push notifications are handled server-side for chore assignments
       } else if (data.type === "new_expense" && data.expense) {
-        console.log('Real-time expense received:', data.expense.id || 'unknown');
+
         
         queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
         queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
         
         // Push notifications are handled server-side for expenses
       } else if (data.type === "new_calendar_event" && data.event) {
-        console.log('Real-time calendar event received:', data.event.id || 'unknown');
+
         
         queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
         
@@ -288,7 +288,7 @@ export default function Messages() {
       return response.json();
     },
     onSuccess: (newMessage: any) => {
-      console.log('Message sent via API fallback:', newMessage.id);
+
       
       // If WebSocket is not connected, update cache directly for immediate UI feedback
       if (connectionStatus !== 'connected') {
@@ -316,7 +316,7 @@ export default function Messages() {
       scrollToLatestMessage();
     },
     onError: (error) => {
-      console.error("Failed to send message:", error);
+
     },
   });
 
@@ -352,14 +352,14 @@ export default function Messages() {
           householdId: household.id,
           userId: user.id,
         });
-        console.log('Message sent via WebSocket');
+
       } catch (error) {
-        console.error('WebSocket send failed, falling back to API:', error);
+
         sendMessageMutation.mutate(messageContent);
       }
     } else {
       // Use API when WebSocket is not available
-      console.log('Using API fallback for message send');
+
       sendMessageMutation.mutate(messageContent);
     }
   };
@@ -424,11 +424,12 @@ export default function Messages() {
         className="flex-1 overflow-y-auto transition-all duration-500 ease-out page-content"
         style={{ 
           paddingBottom: isKeyboardVisible 
-            ? '160px'  // Extra space for short conversations when keyboard is visible
+            ? '100px'  // Extra space for short conversations when keyboard is visible
             : '200px', // Normal space above tab bar
           transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
           filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`,
-          minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto' // Ensure scrollable area for short conversations
+          minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto', // Ensure scrollable area for short conversations
+          paddingTop: '150px',
         }}
       >
         <div className="max-w-3xl mx-auto px-6">

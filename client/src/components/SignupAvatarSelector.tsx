@@ -50,17 +50,6 @@ export function SignupAvatarSelector({
   // Show remove button if there's a file
   const hasImage = !!profileImage;
 
-  console.log('SIGNUP AVATAR DEBUG:', {
-    profileImage: !!profileImage,
-    imageUrl: !!imageUrl,
-    hasImage,
-    initials,
-    firstName,
-    lastName,
-    profileColor,
-    forceUpdate
-  });
-
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -87,10 +76,8 @@ export function SignupAvatarSelector({
   };
 
   const handleRemoveImage = () => {
-    console.log('REMOVING IMAGE - before state changes');
     onImageChange(null);
     setForceUpdate(prev => prev + 1);
-    console.log('REMOVING IMAGE - after state changes');
     
     // Reset the file input to allow re-selection
     const fileInput = document.getElementById('signup-avatar-input') as HTMLInputElement;
@@ -112,7 +99,6 @@ export function SignupAvatarSelector({
                   alt="Profile preview"
                   className="object-cover"
                   onError={() => {
-                    console.log('Image failed to load, clearing...');
                     onImageChange(null);
                     setForceUpdate(prev => prev + 1);
                   }}
@@ -238,7 +224,7 @@ export function SignupAvatarSelector({
                     alt="Profile preview"
                     className="object-cover"
                     onError={() => {
-                      console.log('Image failed to load, clearing...');
+
                       onImageChange(null);
                       setForceUpdate(prev => prev + 1);
                     }}

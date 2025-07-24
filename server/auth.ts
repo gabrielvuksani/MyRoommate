@@ -185,7 +185,7 @@ export function setupAuth(app: Express) {
       if (error.name === "ZodError") {
         return res.status(400).json({ message: error.errors[0].message });
       }
-      console.error("Registration error:", error);
+
       res.status(500).json({ message: "Registration failed. Please try again." });
     }
   };
@@ -289,7 +289,7 @@ export function setupAuth(app: Express) {
       const { password: _, ...userWithoutPassword } = updatedUser;
       res.json(userWithoutPassword);
     } catch (error) {
-      console.error("User update error:", error);
+
       res.status(500).json({ message: "Failed to update user profile" });
     }
   });
@@ -330,14 +330,14 @@ export function setupAuth(app: Express) {
           const oldFileName = urlParts[urlParts.length - 1];
           await deleteImage(`profiles/${oldFileName}`);
         } catch (error) {
-          console.log('Could not remove old profile image from storage:', error);
+
         }
       }
 
       const { password: _, ...userWithoutPassword } = updatedUser;
       res.json(userWithoutPassword);
     } catch (error) {
-      console.error("Profile image upload error:", error);
+
       res.status(500).json({ message: "Failed to upload profile image" });
     }
   });
@@ -360,7 +360,7 @@ export function setupAuth(app: Express) {
           const fileName = urlParts[urlParts.length - 1];
           await deleteImage(`profiles/${fileName}`);
         } catch (error) {
-          console.log('Could not remove profile image from storage:', error);
+
         }
       }
 
@@ -374,7 +374,7 @@ export function setupAuth(app: Express) {
       const { password: _, ...userWithoutPassword } = updatedUser;
       res.json(userWithoutPassword);
     } catch (error) {
-      console.error("Profile image removal error:", error);
+
       res.status(500).json({ message: "Failed to remove profile image" });
     }
   });

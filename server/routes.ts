@@ -83,10 +83,10 @@ class NotificationQueue {
       // Process both types with maximum concurrency
       const promises = [
         ...userNotifications.map(n => 
-          sendPushNotification(n.userId!, n.payload).catch(console.error)
+          sendPushNotification(n.userId!, n.payload).catch(() => {})
         ),
         ...householdNotifications.map(n => 
-          sendHouseholdPushNotifications(n.householdId!, n.excludeUserId!, n.payload).catch(console.error)
+          sendHouseholdPushNotifications(n.householdId!, n.excludeUserId!, n.payload).catch(() => {})
         )
       ];
       
@@ -94,7 +94,7 @@ class NotificationQueue {
       Promise.allSettled(promises);
       
     } catch (error) {
-      console.error('Error processing notification queue:', error);
+      // Silent error handling for production
     } finally {
       this.processing = false;
     }
@@ -118,6 +118,102 @@ class NotificationQueue {
 // Initialize the global notification queue
 const notificationQueue = new NotificationQueue();
 
+// Scalable push notification function for individual users
+async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
+  try {
+    const subscriptions = await storage.getUserPushSubscriptions(userId);
+    
+    if (!subscriptions || subscriptions.length === 0) {
+      return false;
+    }
+
+    // Process all user subscriptions concurrently
+    const results = await Promise.allSettled(
+      subscriptions.map(async (sub) => {
+        try {
+          await webpush.sendNotification(sub, JSON.stringify(payload), {
+            urgency: 'high',
+            TTL: 60, // Increased TTL for reliability
+            topic: payload.tag || 'instant'
+          });
+          return true;
+        } catch (error: any) {
+          // Deactivate invalid subscriptions asynchronously
+          if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
+            // Fire and forget for better performance
+            storage.deactivatePushSubscription(sub.endpoint).catch(() => {});
+          }
+          return false;
+        }
+      })
+    );
+    
+    // Return true if at least one notification was sent successfully
+    return results.some(result => result.status === 'fulfilled' && result.value === true);
+    
+  } catch (error) {
+    return false;
+  }
+}
+
+// Scalable push notification system for millions of users
+async function sendHouseholdPushNotifications(householdId: string, excludeUserId: string, payload: any): Promise<void> {
+  try {
+    const subscriptions = await storage.getActivePushSubscriptions(householdId);
+    
+    // Optimized batch processing for millions of users
+    const BATCH_SIZE = 500; // Increased batch size for better throughput
+    const MAX_CONCURRENT_BATCHES = 10; // Limit concurrent processing
+    
+    const targetSubscriptions = subscriptions.filter(sub => sub.userId !== excludeUserId);
+    
+    // Process in controlled batches to prevent memory issues
+    for (let i = 0; i < targetSubscriptions.length; i += BATCH_SIZE * MAX_CONCURRENT_BATCHES) {
+      const superBatch = targetSubscriptions.slice(i, i + (BATCH_SIZE * MAX_CONCURRENT_BATCHES));
+      const batchPromises: Promise<void>[] = [];
+      
+      for (let j = 0; j < superBatch.length; j += BATCH_SIZE) {
+        const batch = superBatch.slice(j, j + BATCH_SIZE);
+        
+        const batchPromise = Promise.allSettled(
+          batch.map(async (sub) => {
+            try {
+              await webpush.sendNotification(sub, JSON.stringify(payload), {
+                urgency: 'high',
+                TTL: 300, // 5 minutes TTL for better delivery
+                topic: payload.tag || 'general',
+                headers: {
+                  'Content-Encoding': 'gzip', // Compress payload
+                }
+              });
+            } catch (error: any) {
+              // Async cleanup for invalid subscriptions
+              if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
+                setImmediate(() => {
+                  storage.deactivatePushSubscription(sub.endpoint).catch(() => {});
+                });
+              }
+            }
+          })
+        ).then(() => {});
+        
+        batchPromises.push(batchPromise);
+      }
+      
+      // Process super batch and wait before next iteration
+      await Promise.allSettled(batchPromises);
+      
+      // Small delay to prevent overwhelming the push service
+      if (i + (BATCH_SIZE * MAX_CONCURRENT_BATCHES) < targetSubscriptions.length) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+    }
+    
+  } catch (error) {
+    // Silent error handling for production
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
@@ -129,15 +225,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.id;
       const { firstName, lastName } = req.body;
       
-      const updatedUser = await storage.upsertUser({
-        id: userId,
+      const updatedUser = await storage.updateUser(userId, {
         firstName,
         lastName,
       });
       
       res.json(updatedUser);
     } catch (error) {
-      console.error("Error updating user:", error);
+
       res.status(500).json({ message: "Failed to update user" });
     }
   });
@@ -162,7 +257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(household);
     } catch (error) {
-      console.error("Error creating household:", error);
+
       res.status(500).json({ message: "Failed to create household" });
     }
   });
@@ -199,7 +294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const member = await storage.joinHousehold(household.id, userId);
       res.json({ household, member });
     } catch (error) {
-      console.error("Error joining household:", error);
+
       res.status(500).json({ message: "Failed to join household" });
     }
   });
@@ -210,7 +305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.leaveHousehold(userId);
       res.json({ message: "Successfully left household" });
     } catch (error) {
-      console.error("Error leaving household:", error);
+
       res.status(500).json({ message: "Failed to leave household" });
     }
   });
@@ -232,7 +327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedHousehold = await storage.updateHousehold(membership.household.id, { name: name.trim() });
       res.json(updatedHousehold);
     } catch (error) {
-      console.error("Error updating household:", error);
+
       res.status(500).json({ message: "Failed to update household" });
     }
   });
@@ -248,7 +343,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const members = await storage.getHouseholdMembers(membership.household.id);
       res.json({ ...membership.household, members });
     } catch (error) {
-      console.error("Error fetching household:", error);
+
       res.status(500).json({ message: "Failed to fetch household" });
     }
   });
@@ -265,7 +360,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const chores = await storage.getChores(membership.household.id);
       res.json(chores);
     } catch (error) {
-      console.error("Error fetching chores:", error);
+
       res.status(500).json({ message: "Failed to fetch chores" });
     }
   });
@@ -303,7 +398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               client.send(broadcastData);
             }
           } catch (error) {
-            console.error('Chore broadcast error:', error);
+
           }
         });
       }
@@ -328,7 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(chore);
     } catch (error) {
-      console.error("Error creating chore:", error);
+
       res.status(500).json({ message: "Failed to create chore" });
     }
   });
@@ -377,7 +472,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(chore);
     } catch (error) {
-      console.error("Error updating chore:", error);
+
       res.status(500).json({ message: "Failed to update chore" });
     }
   });
@@ -388,7 +483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.deleteChore(id);
       res.json({ success: true });
     } catch (error) {
-      console.error("Error deleting chore:", error);
+
       res.status(500).json({ message: "Failed to delete chore" });
     }
   });
@@ -405,7 +500,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const expenses = await storage.getExpenses(membership.household.id);
       res.json(expenses);
     } catch (error) {
-      console.error("Error fetching expenses:", error);
+
       res.status(500).json({ message: "Failed to fetch expenses" });
     }
   });
@@ -448,7 +543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               client.send(broadcastData);
             }
           } catch (error) {
-            console.error('Expense broadcast error:', error);
+
           }
         });
       }
@@ -472,7 +567,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(expense);
     } catch (error) {
-      console.error("Error creating expense:", error);
+
       res.status(500).json({ message: "Failed to create expense" });
     }
   });
@@ -491,7 +586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.deleteExpense(id);
       res.json({ success: true });
     } catch (error) {
-      console.error("Error deleting expense:", error);
+
       res.status(500).json({ message: "Failed to delete expense" });
     }
   });
@@ -511,7 +606,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedSplit = await storage.updateExpenseSplit(splitId, settled);
       res.json(updatedSplit);
     } catch (error) {
-      console.error("Error updating expense split:", error);
+
       res.status(500).json({ message: "Failed to update expense split" });
     }
   });
@@ -527,7 +622,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const balance = await storage.getUserBalance(membership.household.id, userId);
       res.json(balance);
     } catch (error) {
-      console.error("Error fetching balance:", error);
+
       res.status(500).json({ message: "Failed to fetch balance" });
     }
   });
@@ -544,7 +639,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const events = await storage.getCalendarEvents(membership.household.id);
       res.json(events);
     } catch (error) {
-      console.error("Error fetching calendar events:", error);
+
       res.status(500).json({ message: "Failed to fetch calendar events" });
     }
   });
@@ -584,7 +679,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               client.send(broadcastData);
             }
           } catch (error) {
-            console.error('Calendar event broadcast error:', error);
+
           }
         });
       }
@@ -609,7 +704,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(event);
     } catch (error) {
-      console.error("Error creating calendar event:", error);
+
       res.status(500).json({ message: "Failed to create calendar event" });
     }
   });
@@ -628,7 +723,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.deleteCalendarEvent(id);
       res.json({ success: true });
     } catch (error) {
-      console.error("Error deleting calendar event:", error);
+
       res.status(500).json({ message: "Failed to delete calendar event" });
     }
   });
@@ -653,7 +748,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const messages = await storage.getMessages(membership.household.id, limit);
       res.json(messages);
     } catch (error) {
-      console.error("Error fetching messages:", error);
+
       res.status(500).json({ message: "Failed to fetch messages" });
     }
   });
@@ -704,7 +799,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(message);
     } catch (error) {
-      console.error("Error creating message:", error);
+
       res.status(500).json({ message: "Failed to send message" });
     }
   });
@@ -721,7 +816,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const items = await storage.getShoppingItems(membership.household.id);
       res.json(items);
     } catch (error) {
-      console.error("Error fetching shopping items:", error);
+
       res.status(500).json({ message: "Failed to fetch shopping items" });
     }
   });
@@ -743,7 +838,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(item);
     } catch (error) {
-      console.error("Error creating shopping item:", error);
+
       res.status(500).json({ message: "Failed to create shopping item" });
     }
   });
@@ -756,7 +851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const item = await storage.updateShoppingItem(id, updates);
       res.json(item);
     } catch (error) {
-      console.error("Error updating shopping item:", error);
+
       res.status(500).json({ message: "Failed to update shopping item" });
     }
   });
@@ -771,7 +866,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       res.json(listings);
     } catch (error) {
-      console.error("Error fetching roommate listings:", error);
+
       res.status(500).json({ message: "Failed to fetch roommate listings" });
     }
   });
@@ -844,12 +939,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         images: [createSampleImage()],
         contactInfo: "sarah.berkeley.housing@gmail.com",
         featured: true,
-        createdBy: null,
+        createdBy: 'demo-user-1',
       });
       
       res.json(demoListing);
     } catch (error) {
-      console.error("Error creating demo listing:", error);
+
       res.status(500).json({ message: "Failed to create demo listing" });
     }
   });
@@ -871,7 +966,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(listing);
     } catch (error) {
-      console.error("Error creating roommate listing:", error);
+
       res.status(500).json({ message: "Failed to create roommate listing" });
     }
   });
@@ -882,7 +977,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const listings = await storage.getUserRoommateListings(userId);
       res.json(listings);
     } catch (error) {
-      console.error("Error fetching user's roommate listings:", error);
+
       res.status(500).json({ message: "Failed to fetch your roommate listings" });
     }
   });
@@ -896,7 +991,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(listing);
     } catch (error) {
-      console.error("Error fetching roommate listing:", error);
+
       res.status(500).json({ message: "Failed to fetch roommate listing" });
     }
   });
@@ -909,7 +1004,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const listing = await storage.updateRoommateListing(id, updates);
       res.json(listing);
     } catch (error) {
-      console.error("Error updating roommate listing:", error);
+
       res.status(500).json({ message: "Failed to update roommate listing" });
     }
   });
@@ -920,7 +1015,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.deleteRoommateListing(id);
       res.json({ success: true });
     } catch (error) {
-      console.error("Error deleting roommate listing:", error);
+
       res.status(500).json({ message: "Failed to delete roommate listing" });
     }
   });
@@ -949,7 +1044,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ imageUrls: uploadedUrls });
     } catch (error) {
-      console.error("Error uploading listing images:", error);
+
       res.status(500).json({ message: "Failed to upload images" });
     }
   });
@@ -986,7 +1081,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const listing = await storage.createRoommateListing(demoListing);
       res.json(listing);
     } catch (error) {
-      console.error("Error creating demo listing:", error);
+
       res.status(500).json({ message: "Failed to create demo listing" });
     }
   });
@@ -1020,7 +1115,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ success: true, message: 'Push subscription stored successfully' });
     } catch (error) {
-      console.error('Error storing push subscription:', error);
       res.status(500).json({ message: 'Failed to store push subscription' });
     }
   });
@@ -1042,107 +1136,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ success: true, message: 'Push subscription removed successfully' });
     } catch (error) {
-      console.error('Error removing push subscription:', error);
       res.status(500).json({ message: 'Failed to remove push subscription' });
     }
   });
 
-  // Scalable push notification function for individual users
-  async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
-    try {
-      const subscriptions = await storage.getUserPushSubscriptions(userId);
-      
-      if (!subscriptions || subscriptions.length === 0) {
-        return false;
-      }
 
-      // Process all user subscriptions concurrently
-      const results = await Promise.allSettled(
-        subscriptions.map(async (sub) => {
-          try {
-            await webpush.sendNotification(sub, JSON.stringify(payload), {
-              urgency: 'high',
-              TTL: 60, // Increased TTL for reliability
-              topic: payload.tag || 'instant'
-            });
-            return true;
-          } catch (error: any) {
-            // Deactivate invalid subscriptions asynchronously
-            if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
-              // Fire and forget for better performance
-              storage.deactivatePushSubscription(sub.endpoint).catch(console.error);
-            }
-            return false;
-          }
-        })
-      );
-      
-      // Return true if at least one notification was sent successfully
-      return results.some(result => result.status === 'fulfilled' && result.value === true);
-      
-    } catch (error) {
-      console.error('Error sending push notification:', error);
-      return false;
-    }
-  }
-
-  // Scalable push notification system for millions of users
-  async function sendHouseholdPushNotifications(householdId: string, excludeUserId: string, payload: any): Promise<void> {
-    try {
-      const subscriptions = await storage.getActivePushSubscriptions(householdId);
-      
-      // Optimized batch processing for millions of users
-      const BATCH_SIZE = 500; // Increased batch size for better throughput
-      const MAX_CONCURRENT_BATCHES = 10; // Limit concurrent processing
-      
-      const targetSubscriptions = subscriptions.filter(sub => sub.userId !== excludeUserId);
-      
-      // Process in controlled batches to prevent memory issues
-      for (let i = 0; i < targetSubscriptions.length; i += BATCH_SIZE * MAX_CONCURRENT_BATCHES) {
-        const superBatch = targetSubscriptions.slice(i, i + (BATCH_SIZE * MAX_CONCURRENT_BATCHES));
-        const batchPromises: Promise<void>[] = [];
-        
-        for (let j = 0; j < superBatch.length; j += BATCH_SIZE) {
-          const batch = superBatch.slice(j, j + BATCH_SIZE);
-          
-          const batchPromise = Promise.allSettled(
-            batch.map(async (sub) => {
-              try {
-                await webpush.sendNotification(sub, JSON.stringify(payload), {
-                  urgency: 'high',
-                  TTL: 300, // 5 minutes TTL for better delivery
-                  topic: payload.tag || 'general',
-                  headers: {
-                    'Content-Encoding': 'gzip', // Compress payload
-                  }
-                });
-              } catch (error: any) {
-                // Async cleanup for invalid subscriptions
-                if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
-                  setImmediate(() => {
-                    storage.deactivatePushSubscription(sub.endpoint).catch(console.error);
-                  });
-                }
-              }
-            })
-          ).then(() => {});
-          
-          batchPromises.push(batchPromise);
-        }
-        
-        // Process super batch and wait before next iteration
-        await Promise.allSettled(batchPromises);
-        
-        // Small delay to prevent overwhelming the push service
-        if (i + (BATCH_SIZE * MAX_CONCURRENT_BATCHES) < targetSubscriptions.length) {
-          await new Promise(resolve => setTimeout(resolve, 50));
-        }
-      }
-      
-    } catch (error) {
-      console.error('Error sending household push notifications:', error);
-    }
-  }
 
   // Test push notification endpoint
   app.post('/api/push/test', isAuthenticated, async (req: any, res) => {
@@ -1169,7 +1167,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(400).json({ success: false, message: 'No push subscription found or failed to send' });
       }
     } catch (error) {
-      console.error('Error sending test push notification:', error);
       res.status(500).json({ message: 'Failed to send test push notification' });
     }
   });
@@ -1193,7 +1190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ success: true, message: "All household data deleted successfully" });
     } catch (error) {
-      console.error("Error deleting all data:", error);
+
       res.status(500).json({ message: "Failed to delete all data" });
     }
   });
@@ -1317,7 +1314,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     deadConnections.add(client);
                   }
                 } catch (error) {
-                  console.error('Broadcast error:', error);
+
                   deadConnections.add(client);
                 }
               });
@@ -1356,7 +1353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
             for (const member of householdMembers) {
               if (member.userId !== msgUserId) { // Don't notify the sender
-                sendPushNotification(member.userId, pushPayload)
+                sendPushNotification(member.userId!, pushPayload)
                   .catch(error => {
                     // Silent fail for push notifications
                   });

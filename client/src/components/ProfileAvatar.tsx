@@ -78,7 +78,7 @@ export function ProfileAvatar({
       setImageRemoved(false); // Reset after successful deletion
     },
     onError: (error) => {
-      console.error('Profile image removal failed:', error);
+
       setImageRemoved(false); // Reset on error
     }
   });
@@ -111,7 +111,7 @@ export function ProfileAvatar({
       setImageRemoved(false);
     },
     onError: (error) => {
-      console.error('Profile image upload failed:', error);
+
       setUploading(false);
       setLocalImageUrl(null); // Clear local preview on error
     },
@@ -148,7 +148,7 @@ export function ProfileAvatar({
       }, 2000);
     },
     onError: (error) => {
-      console.error('Profile color update failed:', error);
+
     }
   });
 

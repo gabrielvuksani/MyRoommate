@@ -5,7 +5,6 @@ import { storage } from './storage';
 
 // Upload all demo images to Supabase and update database
 async function uploadDemoImages() {
-  console.log('Starting demo image upload to Supabase...');
 
   const imageMap = {
     'demo-listing-1': ['berkeley-house-1.svg', 'berkeley-house-2.svg'],
@@ -17,20 +16,16 @@ async function uploadDemoImages() {
   };
 
   for (const [listingId, imageFiles] of Object.entries(imageMap)) {
-    console.log(`\nProcessing listing: ${listingId}`);
     const uploadedUrls: string[] = [];
 
     for (const imageFile of imageFiles) {
       try {
         const imagePath = path.join(path.dirname(process.cwd()), 'public', 'images', imageFile);
-        console.log(`    Path: ${imagePath}`);
         
         // Check if file exists
         try {
           await fs.access(imagePath);
-          console.log(`    ✅ File exists: ${imageFile}`);
         } catch (error) {
-          console.log(`  ⚠️  Image file not found: ${imageFile} (Error: ${error})`);
           continue;
         }
 
@@ -43,12 +38,9 @@ async function uploadDemoImages() {
         
         if (publicUrl) {
           uploadedUrls.push(publicUrl);
-          console.log(`  ✅ Uploaded: ${imageFile} -> ${publicUrl}`);
         } else {
-          console.log(`  ❌ Failed to upload: ${imageFile}`);
         }
       } catch (error) {
-        console.error(`  ❌ Error uploading ${imageFile}:`, error);
       }
     }
 
@@ -56,15 +48,11 @@ async function uploadDemoImages() {
     if (uploadedUrls.length > 0) {
       try {
         await storage.updateRoommateListingImages(listingId, uploadedUrls);
-        console.log(`  📝 Updated database for ${listingId} with ${uploadedUrls.length} images`);
       } catch (error) {
-        console.error(`  ❌ Failed to update database for ${listingId}:`, error);
       }
     }
   }
 
-  console.log('\n✅ Demo image upload completed!');
 }
 
 // Run the upload script
-uploadDemoImages().catch(console.error);
