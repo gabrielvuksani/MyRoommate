@@ -271,7 +271,7 @@
   background: transparent;
   transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   border-bottom: 1px solid transparent;
-  padding-top: env(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 .floating-header.scrolled {
@@ -292,6 +292,20 @@
 /* Apple Typography */
 .page-header {
   padding: 48px 24px 24px 24px;
+  padding-top: calc(48px + env(safe-area-inset-top, 0px));
+}
+
+/* Content spacing that accounts for floating headers and safe areas */
+.content-with-header {
+  padding-top: calc(176px + env(safe-area-inset-top, 0px)); /* 11rem = 176px */
+}
+
+.content-with-header-compact {
+  padding-top: calc(144px + env(safe-area-inset-top, 0px)); /* 9rem = 144px */
+}
+
+.messages-content {
+  padding-top: calc(144px + env(safe-area-inset-top, 0px)); /* 9rem = 144px for messages */
 }
 
 .page-title {

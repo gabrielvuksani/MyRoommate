@@ -163,7 +163,7 @@ export default function AddListing() {
       </div>
 
       {/* Content */}
-      <div className="pt-32 px-6 space-y-6 pb-32">
+      <div className="content-with-header px-6 space-y-6 pb-32">
         
         {/* Basic Information */}
         <Card className="glass-card">

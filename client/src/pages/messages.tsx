@@ -487,13 +487,14 @@ export default function Messages() {
 
   return (
     <div className="h-screen flex flex-col page-transition">
-      {/* Fixed Header */}
+      {/* Fixed Header with safe area support */}
       <div 
         className="fixed top-0 left-0 right-0 z-50"
         style={{
           backgroundColor: 'var(--header-bg)',
           backdropFilter: 'blur(20px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
         }}
       >
         <div className="max-w-3xl mx-auto">
@@ -523,7 +524,7 @@ export default function Messages() {
       {/* Scrollable Messages Container - Premium spacing */}
       <div 
         ref={messagesContainerRef}
-        className={`flex-1 overflow-y-auto transition-all duration-500 ease-out pt-36 ${
+        className={`flex-1 overflow-y-auto transition-all duration-500 ease-out messages-content ${
           isKeyboardVisible 
             ? 'pb-40 min-h-[calc(100vh-6rem)]' // pb-40 = 160px, min-h for short conversations
             : 'pb-52' // pb-52 = 208px, normal space above tab bar

@@ -141,7 +141,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="pt-44 px-6 space-y-6">
+        <div className="content-with-header px-6 space-y-6">
           {/* Quick Stats */}
           {(myListings as any[])?.length > 0 && (
             <Card className="glass-card">
