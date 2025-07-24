@@ -1029,7 +1029,7 @@ export default function Home() {
         {/* Roommate Marketplace Section */}
         <div
           className="mt-12 border-t pt-8"
-          style={{ borderColor: "var(--border-color)" }}
+          style={{ borderBottom: '1px solid var(--border)' }}
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">

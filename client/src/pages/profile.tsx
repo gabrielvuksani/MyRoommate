@@ -372,7 +372,7 @@ export default function Profile() {
             <div>
               <h1 className="page-title">Settings</h1>
               <p className="page-subtitle">
-                Manage your account & app settings
+                Manage account & app settings
               </p>
             </div>
           </div>
@@ -571,198 +571,6 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Household Information */}
-        {household && (
-          <Card className="glass-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)'
-          }}>
-            <CardContent className="p-6">
-              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
-                Household Information
-              </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                  <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>Name</span>
-                  <div className="flex items-center space-x-2">
-                    <span
-                      className="font-semibold truncate"
-                      style={{ color: 'var(--text-primary)' }}
-                      title={(household as any).name}
-                    >
-                      {(household as any).name}
-                    </span>
-                    <Dialog open={isHouseholdEditOpen} onOpenChange={setIsHouseholdEditOpen}>
-                      <DialogTrigger asChild>
-                        <Button
-                          onClick={() => {
-                            setEditHouseholdName((household as any)?.name || "");
-                          }}
-                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
-                          style={{
-                            background: 'var(--surface-secondary)',
-                            color: 'var(--text-secondary)'
-                          }}
-                        >
-                          <Edit3 size={16} />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader className="px-6 pt-6 pb-6">
-                          <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                            Edit Household Name
-                          </DialogTitle>
-                        </DialogHeader>
-                        <div className="px-6 pb-6 space-y-4">
-                          <Input
-                            placeholder="Household name"
-                            value={editHouseholdName}
-                            onChange={(e) => setEditHouseholdName(e.target.value)}
-                            className="w-full p-4 rounded-xl"
-                            style={{
-                              background: 'var(--surface-secondary)',
-                              border: '1px solid var(--border)',
-                              color: 'var(--text-primary)'
-                            }}
-                          />
-                          <Button
-                            onClick={() => handleUpdateHouseholdName()}
-                            disabled={updateHouseholdNameMutation.isPending}
-                            className="w-full py-3 rounded-xl font-semibold transition-all disabled:opacity-50"
-                            style={{
-                              background: updateHouseholdNameMutation.isPending
-                                ? 'var(--surface-secondary)'
-                                : 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-                              color: updateHouseholdNameMutation.isPending
-                                ? 'var(--text-secondary)'
-                                : '#ffffff'
-                            }}
-                          >
-                            {updateHouseholdNameMutation.isPending
-                              ? "Saving..."
-                              : "Save Changes"}
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Invite Code</span>
-                  <div className="flex items-center space-x-3">
-                    <span className="font-mono text-sm px-2 py-1 rounded" style={{
-                      color: 'var(--text-primary)',
-                      background: 'var(--surface-secondary)'
-                    }}>
-                      {(household as any).inviteCode}
-                    </span>
-                    <button
-                      onClick={copyInviteCode}
-                      className="p-2 rounded-lg btn-animated transition-all duration-300 relative"
-                      style={{
-                        background: 'var(--surface-secondary)',
-                        color: 'var(--text-secondary)'
-                      }}
-                    >
-                      <div className={`transition-all duration-300 ease-in-out ${isCopied ? 'scale-0 opacity-0 rotate-90' : 'scale-100 opacity-100 rotate-0'}`}>
-                        <Copy size={14} />
-                      </div>
-                      <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out ${isCopied ? 'scale-100 opacity-100 rotate-0' : 'scale-0 opacity-0 -rotate-90'}`}>
-                        <Check size={14} style={{ color: '#10b981' }} />
-                      </div>
-                    </button>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Members</span>
-                  <span style={{ color: 'var(--text-primary)' }}>
-                    {(household as any).members?.length || 0}
-                  </span>
-                </div>
-                {(household as any).rentAmount && (
-                  <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Monthly Rent</span>
-                    <span style={{ color: 'var(--text-primary)' }}>
-                      ${(household as any).rentAmount}
-                    </span>
-                  </div>
-                )}
-                {(household as any).rentDueDay && (
-                  <div className="flex justify-between items-center py-3">
-                    <span style={{ color: 'var(--text-secondary)' }}>Rent Due Day</span>
-                    <span style={{ color: 'var(--text-primary)' }}>
-                      {(household as any).rentDueDay}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Household Members */}
-        {(household as any)?.members && (
-          <Card className="glass-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)'
-          }}>
-            <CardContent className="p-6">
-              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
-                Household Members
-              </h3>
-              <div className="space-y-3">
-                {(household as any).members.map((member: any) => (
-                  <div
-                    key={member.id}
-                    className="flex items-center justify-between py-3 last:border-b-0"
-                    style={{ borderBottom: '1px solid var(--border)' }}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <ProfileAvatar 
-                        user={member.user} 
-                        size="md" 
-                        gradientType="blue"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>
-                          {member.user.firstName && member.user.lastName
-                            ? `${member.user.firstName} ${member.user.lastName}`
-                            : member.user.firstName ||
-                              member.user.email?.split("@")[0] ||
-                              "Unknown"}
-                        </p>
-                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                          {member.role === "admin" ? "Administrator" : "Member"}
-                        </p>
-                      </div>
-                    </div>
-                    {member.role && (
-                      <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{
-                        color: 'var(--text-secondary)',
-                        background: 'var(--surface-secondary)'
-                      }}>
-                        {member.role}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <Button
-                onClick={handleDeleteAllData}
-                disabled={deleteAllDataMutation.isPending}
-                className="mt-4 w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
-              >
-                <Trash2 size={20} />
-                <span>
-                  {deleteAllDataMutation.isPending
-                    ? "Deleting All Household Data..."
-                    : "Delete All Household Data"}
-                </span>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Notification Settings - Only show if notifications can be served */}
         {canShowNotifications && (
           <Card className="glass-card" style={{
@@ -787,7 +595,7 @@ export default function Profile() {
                   {notificationInfo.supportLevel === 'full' && <Smartphone className="w-4 h-4 text-green-600" />}
                   {notificationInfo.supportLevel === 'partial' && <Monitor className="w-4 h-4 text-blue-600" />}
                   {notificationInfo.supportLevel === 'none' && <AlertTriangle className="w-4 h-4 text-orange-600" />}
-                  
+
                   <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                     {notificationInfo.supportLevel === 'full' && 'Full Support - Push Notifications'}
                     {notificationInfo.supportLevel === 'partial' && 'Partial Support - Browser Notifications'}
@@ -796,7 +604,7 @@ export default function Profile() {
                     )}
                   </span>
                 </div>
-                
+
                 <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                   {notificationInfo.supportLevel === 'full' && 'You can receive notifications even when the app is closed.'}
                   {notificationInfo.supportLevel === 'partial' && 'You can receive notifications while using the browser.'}
@@ -808,7 +616,7 @@ export default function Profile() {
                         : 'Click "Enable Notifications" below to get started.'
                   )}
                 </p>
-                
+
                 {/* Install prompt for mobile users */}
                 {notificationInfo.requiresInstall && (
                   <button 
@@ -951,6 +759,147 @@ export default function Profile() {
         </Card>
         )}
 
+        {/* Household Information */}
+        {household && (
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)'
+          }}>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Household Information
+              </h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>Name</span>
+                  <div className="flex items-center space-x-2">
+                    <span
+                      className="font-semibold truncate"
+                      style={{ color: 'var(--text-primary)' }}
+                      title={(household as any).name}
+                    >
+                      {(household as any).name}
+                    </span>
+                    <Dialog open={isHouseholdEditOpen} onOpenChange={setIsHouseholdEditOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          onClick={() => {
+                            setEditHouseholdName((household as any)?.name || "");
+                          }}
+                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
+                          style={{
+                            background: 'var(--surface-secondary)',
+                            color: 'var(--text-secondary)'
+                          }}
+                        >
+                          <Edit3 size={16} />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader className="px-6 pt-6 pb-6">
+                          <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                            Edit Household Name
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="px-6 pb-6 space-y-4">
+                          <Input
+                            placeholder="Household name"
+                            value={editHouseholdName}
+                            onChange={(e) => setEditHouseholdName(e.target.value)}
+                            className="w-full p-4 rounded-xl"
+                            style={{
+                              background: 'var(--surface-secondary)',
+                              border: '1px solid var(--border)',
+                              color: 'var(--text-primary)'
+                            }}
+                          />
+                          <Button
+                            onClick={() => handleUpdateHouseholdName()}
+                            disabled={updateHouseholdNameMutation.isPending}
+                            className="w-full py-3 rounded-xl font-semibold transition-all disabled:opacity-50"
+                            style={{
+                              background: updateHouseholdNameMutation.isPending
+                                ? 'var(--surface-secondary)'
+                                : 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+                              color: updateHouseholdNameMutation.isPending
+                                ? 'var(--text-secondary)'
+                                : '#ffffff'
+                            }}
+                          >
+                            {updateHouseholdNameMutation.isPending
+                              ? "Saving..."
+                              : "Save Changes"}
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Invite Code</span>
+                  <div className="flex items-center space-x-3">
+                    <span className="font-mono text-sm px-2 py-1 rounded" style={{
+                      color: 'var(--text-primary)',
+                      background: 'var(--surface-secondary)'
+                    }}>
+                      {(household as any).inviteCode}
+                    </span>
+                    <button
+                      onClick={copyInviteCode}
+                      className="p-2 rounded-lg btn-animated transition-all duration-300 relative"
+                      style={{
+                        background: 'var(--surface-secondary)',
+                        color: 'var(--text-secondary)'
+                      }}
+                    >
+                      <div className={`transition-all duration-300 ease-in-out ${isCopied ? 'scale-0 opacity-0 rotate-90' : 'scale-100 opacity-100 rotate-0'}`}>
+                        <Copy size={14} />
+                      </div>
+                      <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out ${isCopied ? 'scale-100 opacity-100 rotate-0' : 'scale-0 opacity-0 -rotate-90'}`}>
+                        <Check size={14} style={{ color: '#10b981' }} />
+                      </div>
+                    </button>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Members</span>
+                  <span style={{ color: 'var(--text-primary)' }}>
+                    {(household as any).members?.length || 0}
+                  </span>
+                </div>
+                {(household as any).rentAmount && (
+                  <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Monthly Rent</span>
+                    <span style={{ color: 'var(--text-primary)' }}>
+                      ${(household as any).rentAmount}
+                    </span>
+                  </div>
+                )}
+                {(household as any).rentDueDay && (
+                  <div className="flex justify-between items-center py-3">
+                    <span style={{ color: 'var(--text-secondary)' }}>Rent Due Day</span>
+                    <span style={{ color: 'var(--text-primary)' }}>
+                      {(household as any).rentDueDay}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <Button
+                onClick={handleDeleteAllData}
+                disabled={deleteAllDataMutation.isPending}
+                className="mt-4 w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
+              >
+                <Trash2 size={20} />
+                <span>
+                  {deleteAllDataMutation.isPending
+                    ? "Deleting All Household Data..."
+                    : "Delete All Household Data"}
+                </span>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Household Members */}
         {(household as any)?.members && (
           <Card className="glass-card" style={{
@@ -997,19 +946,45 @@ export default function Profile() {
                     )}
                   </div>
                 ))}
+                {(household as any) && (
+                  <Button
+                    onClick={async () => {
+                      // Show persistent loading overlay
+                      PersistentLoading.show("Leaving household...");
+
+                      try {
+                        await leaveHouseholdMutation.mutateAsync();
+
+                        // Navigate immediately - loading will persist through refresh
+                        setTimeout(() => {
+                          window.location.href = '/';
+                        }, 500);
+                      } catch (error) {
+                        console.error("Failed to leave household:", error);
+                        setTimeout(() => {
+                          window.location.href = '/';
+                        }, 500);
+                      }
+                    }}
+                    disabled={leaveHouseholdMutation.isPending}
+                    className="w-full bg-orange-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-orange-700 disabled:opacity-50"
+                  >
+                    <UserMinus size={20} />
+                    <span>
+                      {leaveHouseholdMutation.isPending
+                        ? "Leaving..."
+                        : "Leave Household"}
+                    </span>
+                  </Button>
+                )}
+                <Button
+                  onClick={logout}
+                  className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700"
+                >
+                  <LogOut size={20} />
+                  <span>Sign Out</span>
+                </Button>
               </div>
-              <Button
-                onClick={handleDeleteAllData}
-                disabled={deleteAllDataMutation.isPending}
-                className="mt-4 w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
-              >
-                <Trash2 size={20} />
-                <span>
-                  {deleteAllDataMutation.isPending
-                    ? "Deleting All Household Data..."
-                    : "Delete All Household Data"}
-                </span>
-              </Button>
             </CardContent>
           </Card>
         )}
@@ -1057,7 +1032,7 @@ export default function Profile() {
                   <div>Platform: {notificationInfo?.environment?.platform || 'Unknown'}</div>
                   <div>Installed: {notificationInfo?.environment?.isInstalled ? 'Yes' : 'No'}</div>
                   <div>Strategy: {notificationInfo?.strategy || 'None'}</div>
-                  <div>Permission: {notificationInfo?.environment?.permission || 'Unknown'}</div>
+                  <div>Permission: {notificationInfo?.environment?.permission || 'N/A'}</div>
                 </div>
               </div>
 
@@ -1085,46 +1060,7 @@ export default function Profile() {
           border: '1px solid var(--border)'
         }}>
           <CardContent className="p-6">
-            <div className="space-y-3">
-              {(household as any) && (
-                <Button
-                  onClick={async () => {
-                    // Show persistent loading overlay
-                    PersistentLoading.show("Leaving household...");
-                    
-                    try {
-                      await leaveHouseholdMutation.mutateAsync();
-                      
-                      // Navigate immediately - loading will persist through refresh
-                      setTimeout(() => {
-                        window.location.href = '/';
-                      }, 500);
-                    } catch (error) {
-                      console.error("Failed to leave household:", error);
-                      setTimeout(() => {
-                        window.location.href = '/';
-                      }, 500);
-                    }
-                  }}
-                  disabled={leaveHouseholdMutation.isPending}
-                  className="w-full bg-orange-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-orange-700 disabled:opacity-50"
-                >
-                  <UserMinus size={20} />
-                  <span>
-                    {leaveHouseholdMutation.isPending
-                      ? "Leaving..."
-                      : "Leave Household"}
-                  </span>
-                </Button>
-              )}
-              <Button
-                onClick={logout}
-                className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700"
-              >
-                <LogOut size={20} />
-                <span>Sign Out</span>
-              </Button>
-            </div>
+            
           </CardContent>
         </Card>
       </div>
