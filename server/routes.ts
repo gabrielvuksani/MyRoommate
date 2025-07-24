@@ -974,8 +974,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
     try {
       const subscriptions = await storage.getUserPushSubscriptions(userId);
+      console.log(`Found ${subscriptions?.length || 0} push subscriptions for user ${userId}:`, subscriptions);
       
       if (!subscriptions || subscriptions.length === 0) {
+        console.log('No push subscriptions found for user:', userId);
         return false;
       }
 

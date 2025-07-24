@@ -733,16 +733,15 @@ export class DatabaseStorage implements IStorage {
         throw new Error('Missing required subscription fields');
       }
       
-      // Using raw query to match actual database schema
+      // First try to delete any existing subscription for this endpoint
+      await db.execute(sql`
+        DELETE FROM push_subscriptions WHERE endpoint = ${subscription.endpoint}
+      `);
+      
+      // Then insert the new subscription
       const result = await db.execute(sql`
         INSERT INTO push_subscriptions (user_id, endpoint, p256dh_key, auth_key, is_active, created_at)
         VALUES (${subscription.userId}, ${subscription.endpoint}, ${p256dhKey}, ${authKey}, true, NOW())
-        ON CONFLICT (endpoint) 
-        DO UPDATE SET 
-          user_id = ${subscription.userId},
-          p256dh_key = ${p256dhKey},
-          auth_key = ${authKey},
-          is_active = true
         RETURNING *
       `);
       
