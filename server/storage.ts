@@ -717,24 +717,41 @@ export class DatabaseStorage implements IStorage {
 
   // Push subscription operations
   async upsertPushSubscription(subscription: any): Promise<any> {
-    // Extract keys from subscription
-    const p256dhKey = subscription.keys?.p256dh || subscription.keys?.p256dhKey;
-    const authKey = subscription.keys?.auth || subscription.keys?.authKey;
-    
-    // Using raw query to match actual database schema
-    const result = await db.execute(sql`
-      INSERT INTO push_subscriptions (user_id, endpoint, p256dh_key, auth_key, is_active, created_at)
-      VALUES (${subscription.userId}, ${subscription.endpoint}, ${p256dhKey}, ${authKey}, true, NOW())
-      ON CONFLICT (endpoint) 
-      DO UPDATE SET 
-        user_id = ${subscription.userId},
-        p256dh_key = ${p256dhKey},
-        auth_key = ${authKey},
-        is_active = true
-      RETURNING *
-    `);
-    
-    return result.rows[0];
+    try {
+      // Extract keys from subscription
+      const p256dhKey = subscription.keys?.p256dh || subscription.keys?.p256dhKey;
+      const authKey = subscription.keys?.auth || subscription.keys?.authKey;
+      
+      console.log('upsertPushSubscription called with:', {
+        userId: subscription.userId,
+        endpoint: subscription.endpoint,
+        p256dhKey: p256dhKey ? 'present' : 'missing',
+        authKey: authKey ? 'present' : 'missing'
+      });
+      
+      if (!subscription.userId || !subscription.endpoint || !p256dhKey || !authKey) {
+        throw new Error('Missing required subscription fields');
+      }
+      
+      // Using raw query to match actual database schema
+      const result = await db.execute(sql`
+        INSERT INTO push_subscriptions (user_id, endpoint, p256dh_key, auth_key, is_active, created_at)
+        VALUES (${subscription.userId}, ${subscription.endpoint}, ${p256dhKey}, ${authKey}, true, NOW())
+        ON CONFLICT (endpoint) 
+        DO UPDATE SET 
+          user_id = ${subscription.userId},
+          p256dh_key = ${p256dhKey},
+          auth_key = ${authKey},
+          is_active = true
+        RETURNING *
+      `);
+      
+      console.log('Push subscription upserted successfully:', result.rows[0]);
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error in upsertPushSubscription:', error);
+      throw error;
+    }
   }
 
   async deletePushSubscription(userId: string, endpoint: string): Promise<void> {
