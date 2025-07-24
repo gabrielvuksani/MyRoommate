@@ -1,0 +1,61 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="buildingGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F0F8FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E6E6FA;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="skyGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4169E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#87CEEB;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky -->
+  <rect width="400" height="200" fill="url(#skyGradient2)"/>
+  
+  <!-- Ground -->
+  <rect y="200" width="400" height="100" fill="#708090"/>
+  
+  <!-- Modern Apartment Building -->
+  <rect x="100" y="80" width="200" height="140" fill="url(#buildingGradient)" stroke="#999" stroke-width="2"/>
+  
+  <!-- Building Details -->
+  <rect x="90" y="70" width="220" height="10" fill="#4682B4"/>
+  
+  <!-- Windows Grid -->
+  <!-- Floor 1 -->
+  <rect x="120" y="100" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="155" y="100" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="190" y="100" width="25" height="25" fill="#FFD700" stroke="#666" stroke-width="1"/>
+  <rect x="225" y="100" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="260" y="100" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  
+  <!-- Floor 2 -->
+  <rect x="120" y="135" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="155" y="135" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="190" y="135" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="225" y="135" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="260" y="135" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  
+  <!-- Floor 3 -->
+  <rect x="120" y="170" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="155" y="170" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="190" y="170" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="225" y="170" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  <rect x="260" y="170" width="25" height="25" fill="#87CEEB" stroke="#666" stroke-width="1"/>
+  
+  <!-- Entrance -->
+  <rect x="185" y="200" width="30" height="20" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+  
+  <!-- Stanford Tower in Background -->
+  <rect x="320" y="50" width="15" height="80" fill="#8B0000" opacity="0.7"/>
+  <rect x="315" y="45" width="25" height="10" fill="#8B0000" opacity="0.7"/>
+  
+  <!-- Modern Street Elements -->
+  <rect x="50" y="210" width="8" height="15" fill="#666"/>
+  <circle cx="54" cy="208" r="3" fill="#FFD700"/>
+  
+  <!-- Trees -->
+  <ellipse cx="350" cy="180" rx="20" ry="30" fill="#228B22"/>
+  <rect x="347" y="195" width="6" height="15" fill="#8B4513"/>
+</svg>

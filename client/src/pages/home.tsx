@@ -141,7 +141,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="pt-56 sm:pt-52 md:pt-48 px-6 space-y-6">
+        <div className="pt-44 px-6 space-y-6">
           {/* Quick Stats */}
           {(myListings as any[])?.length > 0 && (
             <Card className="glass-card">
@@ -226,8 +226,8 @@ export default function Home() {
           {/* Featured Listings Section */}
           {(myListings as any[])?.length === 0 && (
             <div
-              className="space-y-4 pb-6 border-b"
-              style={{ borderColor: "var(--border-color)" }}
+              className="space-y-4 pb-6"
+              style={{ borderBottom: '1px solid var(--border)' }}
             >
               <div className="flex items-center justify-between">
                 <h3

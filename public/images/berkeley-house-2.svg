@@ -1,0 +1,60 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="kitchenGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFAF0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F5F5DC;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Kitchen Interior -->
+  <rect width="400" height="300" fill="url(#kitchenGradient)"/>
+  
+  <!-- Floor -->
+  <rect y="240" width="400" height="60" fill="#DEB887"/>
+  
+  <!-- Kitchen Counter -->
+  <rect x="20" y="150" width="360" height="40" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+  
+  <!-- Cabinets Above -->
+  <rect x="20" y="100" width="360" height="30" fill="#A0522D" stroke="#8B4513" stroke-width="2"/>
+  
+  <!-- Appliances -->
+  <!-- Refrigerator -->
+  <rect x="320" y="120" width="60" height="120" fill="#C0C0C0" stroke="#999" stroke-width="2"/>
+  <rect x="330" y="130" width="40" height="60" fill="#87CEEB"/>
+  <rect x="330" y="200" width="40" height="30" fill="#87CEEB"/>
+  
+  <!-- Stove -->
+  <rect x="180" y="150" width="60" height="40" fill="#2F4F4F" stroke="#1C1C1C" stroke-width="2"/>
+  <circle cx="195" cy="165" r="8" fill="#FF4500"/>
+  <circle cx="215" cy="165" r="8" fill="#FF4500"/>
+  <circle cx="195" cy="175" r="8" fill="#FF4500"/>
+  <circle cx="215" cy="175" r="8" fill="#FF4500"/>
+  
+  <!-- Sink -->
+  <ellipse cx="100" cy="170" rx="30" ry="15" fill="#C0C0C0" stroke="#999" stroke-width="2"/>
+  
+  <!-- Window Above Sink -->
+  <rect x="60" y="80" width="80" height="50" fill="#87CEEB" stroke="#666" stroke-width="2"/>
+  <line x1="100" y1="80" x2="100" y2="130" stroke="#666" stroke-width="1"/>
+  <line x1="60" y1="105" x2="140" y2="105" stroke="#666" stroke-width="1"/>
+  
+  <!-- Kitchen Island -->
+  <rect x="150" y="200" width="100" height="30" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+  
+  <!-- Bar Stools -->
+  <rect x="170" y="230" width="10" height="15" fill="#8B4513"/>
+  <circle cx="175" cy="228" r="8" fill="#DEB887"/>
+  
+  <rect x="210" y="230" width="10" height="15" fill="#8B4513"/>
+  <circle cx="215" cy="228" r="8" fill="#DEB887"/>
+  
+  <!-- Dishes and Items -->
+  <circle cx="90" cy="155" r="4" fill="#FFFFFF"/>
+  <circle cx="110" cy="155" r="4" fill="#FFFFFF"/>
+  
+  <!-- Fruits -->
+  <circle cx="160" cy="205" r="6" fill="#FF6347"/>
+  <circle cx="175" cy="205" r="6" fill="#FFD700"/>
+  <circle cx="190" cy="205" r="6" fill="#32CD32"/>
+</svg>
