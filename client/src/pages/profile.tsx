@@ -673,7 +673,7 @@ export default function Profile() {
                     </p>
                   </div>
                   <Switch
-                    checked={notificationSettings.enabled && notificationInfo?.permission !== 'denied' && !notificationInfo?.requiresInstall}
+                    checked={notificationSettings.enabled && notificationInfo?.permission === 'granted'}
                     onCheckedChange={(checked) => handleNotificationToggle('enabled', checked)}
                     disabled={notificationInfo?.permission === 'denied' || notificationInfo?.requiresInstall}
                   />

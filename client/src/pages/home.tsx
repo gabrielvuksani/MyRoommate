@@ -134,7 +134,7 @@ export default function Home() {
                   user={user as any}
                   size="lg"
                   gradientType="emerald"
-                  className="rounded-2xl"
+                  className="rounded"
                 />
               </button>
             </div>

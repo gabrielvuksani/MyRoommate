@@ -218,7 +218,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="content-with-header px-6 space-y-6">
+      <div className="content-with-header-compact px-6 space-y-6 pb-32">
         {/* Time Period Filter */}
         <div className="flex justify-center">
           <div
@@ -475,7 +475,7 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <p className="text-lg font-bold text-emerald-600">
-                          ${member.expenseCount > 0 ? (totalExpenseAmount / memberPerformance.filter(m => m.expenseCount > 0).length).toFixed(0) : '0'}
+                          ${member.expenseCount > 0 ? (totalExpenseAmount / memberPerformance.filter((m: any) => m.expenseCount > 0).length).toFixed(0) : '0'}
                         </p>
                         <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
                           Expenses
