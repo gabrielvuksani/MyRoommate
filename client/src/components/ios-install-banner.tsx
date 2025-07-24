@@ -44,10 +44,10 @@ export function IOSInstallBanner() {
     localStorage.setItem('ios-install-banner-dismissed', expiryDate.toISOString());
   };
 
-  const handleInstall = () => {
+  // const handleInstall = () => {
     // On iOS, we can't programmatically install, so we show instructions
     // The banner will stay visible to guide the user through the process
-  };
+  // };
 
   if (!isVisible || isDismissed) {
     return null;
@@ -88,11 +88,11 @@ export function IOSInstallBanner() {
 
         {/* Description */}
         <p className="text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>
-          Add to your home screen for the best experience with push notifications and offline access.
+          Add to your home screen for the best experience with push notifications and more.
         </p>
 
         {/* Installation Steps */}
-        <div className="space-y-2 mb-4">
+        <div className="space-y-2">
           <div className="flex items-center gap-2 text-xs">
             <div className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0">
               <span className="text-[10px] font-bold">1</span>
@@ -116,16 +116,25 @@ export function IOSInstallBanner() {
         </div>
 
         {/* Action Button */}
-        <button
+        {/** <button
           onClick={handleInstall}
-          className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-95"
+          className="mt-4 w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-95"
           style={{
             background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
             color: 'white'
           }}
         >
           Install App
-        </button>
+        </button>  */}
+        
+        {/* Skip Option */}
+        {/** <button
+          onClick={handleDismiss}
+          className="w-full py-2 text-sm mt-3 transition-all hover:opacity-70"
+          style={{ color: 'var(--text-secondary)' }}
+        >
+          Maybe later
+        </button> */}
       </div>
     </div>
   );
