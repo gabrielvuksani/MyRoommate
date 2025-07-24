@@ -34,11 +34,11 @@ const upload = multer({
   }
 });
 
-// Configure web-push with VAPID keys
+// Configure web-push with VAPID keys from environment
 webpush.setVapidDetails(
-  'mailto:notifications@myroommate.app',
-  'BNUBRCnltmYiEEVwd8KD4lVRp8EJgfuI19XNJD2lki87bZZ6IIrAxWo6u6WjXq3h8FIs6b1RYGX6i33DEZmKNZ0', // Public key
-  '8gDdfS0YP9m2JCg7RY9aDsTKCP6iLp0BNsRWch9BJAA' // Private key
+  process.env.VAPID_SUBJECT || 'mailto:notifications@myroommate.app',
+  process.env.VAPID_PUBLIC_KEY!,
+  process.env.VAPID_PRIVATE_KEY!
 );
 
 // High-performance notification queue for millions of users
@@ -989,6 +989,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error creating demo listing:", error);
       res.status(500).json({ message: "Failed to create demo listing" });
     }
+  });
+
+  // Get VAPID public key for client-side push subscription
+  app.get('/api/push/vapid-public-key', (req, res) => {
+    res.json({ publicKey: process.env.VAPID_PUBLIC_KEY });
   });
 
   // Push notification subscription endpoints
