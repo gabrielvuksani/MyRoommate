@@ -418,12 +418,11 @@ export default function Messages() {
         </div>
       </div>
 
-      {/* Scrollable Messages Container - Premium spacing */}
+      {/* Scrollable Messages Container - Consistent spacing */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto transition-all duration-500 ease-out"
+        className="flex-1 overflow-y-auto transition-all duration-500 ease-out page-content"
         style={{ 
-          paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
             ? '160px'  // Extra space for short conversations when keyboard is visible
             : '200px', // Normal space above tab bar
