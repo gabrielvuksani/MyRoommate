@@ -64,9 +64,10 @@ export default function Messages() {
   const { data: serverMessages = [], isLoading } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household && !!user,
-    refetchInterval: connectionStatus === 'connected' ? 5000 : 2000, // Slower polling when connected via WebSocket
-    refetchIntervalInBackground: true,
-    staleTime: connectionStatus === 'connected' ? 30000 : 1000, // Longer stale time when WebSocket is active
+    // No polling needed - push notifications handle real-time updates
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -75,34 +76,10 @@ export default function Messages() {
   const messages = useMemo(() => {
     const sortedMessages = Array.isArray(serverMessages) ? serverMessages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) : [];
     
-    // Check for new messages and trigger notifications (backup for when WebSocket is not connected)
-    if (sortedMessages.length > 0 && user && household) {
-      const currentMessageIds = new Set(sortedMessages.map(msg => msg.id));
-      const previousIds = previousMessageIds.current;
-      
-      // Find new messages that weren't in the previous set
-      const newMessages = sortedMessages.filter(msg => 
-        !previousIds.has(msg.id) && msg.userId !== user.id
-      );
-      
-      // Trigger notifications for new messages from other users
-      newMessages.forEach(msg => {
-        if (msg.user && msg.content) {
-          const userName = formatDisplayName(msg.user.firstName || null, msg.user.lastName || null);
-          const householdName = household.name;
-          console.log('Polling detected new message, attempting notification from:', userName);
-          notificationService.showMessageNotification(userName, msg.content, householdName)
-            .then(success => console.log('Polling notification result:', success))
-            .catch(error => console.error('Polling notification error:', error));
-        }
-      });
-      
-      // Update the previous message IDs
-      previousMessageIds.current = currentMessageIds;
-    }
+    // No need for client-side notifications - handled by server push notifications
     
     return sortedMessages;
-  }, [serverMessages, user, household]);
+  }, [serverMessages]);
 
   const { sendMessage } = useWebSocket({
     onConnect: () => {
@@ -143,15 +120,7 @@ export default function Messages() {
           return updatedMessages;
         });
         
-        // Send notification for new messages (only if not from current user)
-        if (data.message && data.message.userId !== user?.id) {
-          const userName = formatDisplayName(data.message.user?.firstName || null, data.message.user?.lastName || null);
-          const householdName = household?.name;
-          console.log('Attempting to show notification for message from:', userName);
-          notificationService.showMessageNotification(userName, data.message.content || '', householdName)
-            .then(success => console.log('Message notification result:', success))
-            .catch(error => console.error('Message notification error:', error));
-        }
+        // Push notifications are handled server-side for messages
         
         queryClient.invalidateQueries({ 
           queryKey: ["/api/messages"], 
@@ -170,39 +139,20 @@ export default function Messages() {
         
         queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
         
-        // Show notification for chore assignments to current user
-        if (data.chore.assignedTo === user?.id && data.chore.title) {
-          console.log('Attempting real-time chore notification:', data.chore.title);
-          notificationService.showChoreNotification(data.chore.title, 'you')
-            .then(success => console.log('Real-time chore notification result:', success))
-            .catch(error => console.error('Real-time chore notification error:', error));
-        }
+        // Push notifications are handled server-side for chore assignments
       } else if (data.type === "new_expense" && data.expense) {
         console.log('Real-time expense received:', data.expense.id || 'unknown');
         
         queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
         queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
         
-        // Show notification for new expenses (if not the one who created it)
-        if (data.expense.paidBy !== user?.id && data.expense.title) {
-          const amount = parseFloat(data.expense.amount || '0');
-          console.log('Attempting real-time expense notification:', data.expense.title);
-          notificationService.showExpenseNotification(data.expense.title, amount, 'a roommate')
-            .then(success => console.log('Real-time expense notification result:', success))
-            .catch(error => console.error('Real-time expense notification error:', error));
-        }
+        // Push notifications are handled server-side for expenses
       } else if (data.type === "new_calendar_event" && data.event) {
         console.log('Real-time calendar event received:', data.event.id || 'unknown');
         
         queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
         
-        // Show notification for new calendar events (if not the one who created it)
-        if (data.event.createdBy !== user?.id && data.event.title && data.event.startDate) {
-          console.log('Attempting real-time calendar notification:', data.event.title);
-          notificationService.showCalendarNotification(data.event.title, data.event.startDate)
-            .then(success => console.log('Real-time calendar notification result:', success))
-            .catch(error => console.error('Real-time calendar notification error:', error));
-        }
+        // Push notifications are handled server-side for calendar events
       } else if (data.type === "user_typing") {
         if (data.userId !== user?.id && data.userName) {
           setTypingUsers(prev => {

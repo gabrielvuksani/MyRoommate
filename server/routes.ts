@@ -22,9 +22,6 @@ webpush.setVapidDetails(
   '8gDdfS0YP9m2JCg7RY9aDsTKCP6iLp0BNsRWch9BJAA' // Private key
 );
 
-// Store push subscriptions in memory (in production, use database)
-const pushSubscriptions = new Map<string, any>(); // userId -> subscription
-
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
@@ -230,10 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         };
         
-        sendPushNotification(chore.assignedTo, pushPayload)
-          .catch(error => {
-            // Silent fail for push notifications
-          });
+        await sendPushNotification(chore.assignedTo, pushPayload);
       }
       
       res.json(chore);
@@ -264,7 +258,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (processedUpdates.status === 'done' || processedUpdates.completedAt) {
         const membership = await storage.getUserHousehold(userId);
         if (membership) {
-          const householdMembers = await storage.getHouseholdMembers(membership.household.id);
           const completer = await storage.getUser(userId);
           const completerName = completer ? `${completer.firstName || 'Someone'}` : 'Someone';
           
@@ -281,14 +274,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           };
 
-          for (const member of householdMembers) {
-            if (member.userId !== userId) { // Don't notify the completer
-              sendPushNotification(member.userId, pushPayload)
-                .catch(error => {
-                  // Silent fail for push notifications
-                });
-            }
-          }
+          // Send to all household members except the completer
+          await sendHouseholdPushNotifications(membership.household.id, userId, pushPayload);
         }
       }
 
@@ -371,7 +358,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Send push notifications to all household members except the creator (background notifications)
-      const householdMembers = await storage.getHouseholdMembers(membership.household.id);
       const pushPayload = {
         title: '💰 New Expense Added',
         body: `${validatedExpense.title} - $${validatedExpense.amount}`,
@@ -385,14 +371,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
 
-      for (const member of householdMembers) {
-        if (member.userId !== userId) { // Don't notify the creator
-          sendPushNotification(member.userId, pushPayload)
-            .catch(error => {
-              // Silent fail for push notifications
-            });
-        }
-      }
+      // Send to all household members except the creator
+      await sendHouseholdPushNotifications(membership.household.id, userId, pushPayload);
       
       res.json(expense);
     } catch (error) {
@@ -514,7 +494,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Send push notifications to all household members except the creator (background notifications)
-      const householdMembers = await storage.getHouseholdMembers(membership.household.id);
       const eventDate = new Date(data.startDate).toLocaleDateString();
       const pushPayload = {
         title: '📅 New Calendar Event',
@@ -529,14 +508,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
 
-      for (const member of householdMembers) {
-        if (member.userId !== userId) { // Don't notify the creator
-          sendPushNotification(member.userId, pushPayload)
-            .catch(error => {
-              // Silent fail for push notifications
-            });
-        }
-      }
+      // Send to all household members except the creator
+      await sendHouseholdPushNotifications(membership.household.id, userId, pushPayload);
       
       res.json(event);
     } catch (error) {
@@ -611,7 +584,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type: 'text'
       };
       
-      const message = await storage.createMessage(messageData);
+      const message = await storage.createMessage(messageData, req.user);
+      
+      // Send push notifications to all household members except sender
+      const sender = await storage.getUser(userId);
+      const senderName = sender ? `${sender.firstName || 'Someone'}` : 'Someone';
+      
+      const pushPayload = {
+        title: '💬 New Message',
+        body: `${senderName}: ${content.trim().substring(0, 100)}${content.length > 100 ? '...' : ''}`,
+        icon: '/icon-192x192.png',
+        badge: '/icon-72x72.png',
+        tag: 'message-notification',
+        data: {
+          type: 'message',
+          messageId: message.id,
+          url: '/messages'
+        }
+      };
+      
+      // Send to all household members except the sender
+      await sendHouseholdPushNotifications(householdId, userId, pushPayload);
+      
       res.json(message);
     } catch (error) {
       console.error("Error creating message:", error);
@@ -883,10 +877,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid subscription format' });
       }
       
-      // Store subscription for this user with timestamp
-      pushSubscriptions.set(userId, {
-        ...subscription,
-        timestamp: Date.now()
+      // Store subscription in database
+      const pushSubscription = await storage.upsertPushSubscription({
+        userId,
+        endpoint: subscription.endpoint,
+        keys: subscription.keys,
+        deviceInfo: subscription.deviceInfo,
+        active: true
       });
       
       res.json({ success: true, message: 'Push subscription stored successfully' });
@@ -898,8 +895,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/push/unsubscribe', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
-      pushSubscriptions.delete(userId);
-      console.log(`Push subscription removed for user: ${userId}`);
+      const { endpoint } = req.body;
+      
+      if (endpoint) {
+        await storage.deletePushSubscription(userId, endpoint);
+      } else {
+        // Remove all subscriptions for this user
+        const subscriptions = await storage.getUserPushSubscriptions(userId);
+        for (const sub of subscriptions) {
+          await storage.deletePushSubscription(userId, sub.endpoint);
+        }
+      }
       
       res.json({ success: true, message: 'Push subscription removed successfully' });
     } catch (error) {
@@ -908,28 +914,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Push notification sending function with enhanced reliability
+  // Push notification sending function with database storage
   async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
-    const subscription = pushSubscriptions.get(userId);
-    
-    if (!subscription) {
+    try {
+      const subscriptions = await storage.getUserPushSubscriptions(userId);
+      
+      if (!subscriptions || subscriptions.length === 0) {
+        return false;
+      }
+
+      // Send to all active subscriptions for this user (multiple devices)
+      let successCount = 0;
+      for (const sub of subscriptions) {
+        try {
+          await webpush.sendNotification(sub, JSON.stringify(payload), {
+            urgency: 'high',
+            TTL: 30, // 30 seconds for immediate delivery
+            topic: payload.tag || 'instant'
+          });
+          successCount++;
+        } catch (error: any) {
+          // If subscription is invalid/expired, deactivate it
+          if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
+            await storage.deactivatePushSubscription(sub.endpoint);
+          }
+        }
+      }
+      
+      return successCount > 0;
+    } catch (error) {
+      console.error('Error sending push notification:', error);
       return false;
     }
+  }
 
-    // Send push notification with maximum urgency and immediate delivery
+  // Send push notifications to all household members
+  async function sendHouseholdPushNotifications(householdId: string, excludeUserId: string, payload: any): Promise<void> {
     try {
-      await webpush.sendNotification(subscription, JSON.stringify(payload), {
-        urgency: 'high',
-        TTL: 30, // 30 seconds for immediate delivery
-        topic: payload.tag || 'instant'
-      });
-      return true;
-    } catch (error: any) {
-      // If subscription is invalid/expired, remove it immediately
-      if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
-        pushSubscriptions.delete(userId);
+      const subscriptions = await storage.getActivePushSubscriptions(householdId);
+      
+      for (const sub of subscriptions) {
+        if (sub.userId !== excludeUserId) {
+          try {
+            await webpush.sendNotification(sub, JSON.stringify(payload), {
+              urgency: 'high',
+              TTL: 30,
+              topic: payload.tag || 'instant'
+            });
+          } catch (error: any) {
+            // Deactivate invalid subscriptions
+            if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 400) {
+              await storage.deactivatePushSubscription(sub.endpoint);
+            }
+          }
+        }
       }
-      return false;
+    } catch (error) {
+      console.error('Error sending household push notifications:', error);
     }
   }
 

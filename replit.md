@@ -110,7 +110,18 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**July 23, 2025 (Latest):**
+**July 24, 2025 (Latest):**
+- ✓ **CRITICAL: Completed scalable push notification overhaul - now handles millions of users without polling**
+- ✓ **Database-backed push subscription storage**: Migrated from in-memory Map to PostgreSQL table with proper indexes
+- ✓ **Server-side notification triggers**: All events (messages, chores, expenses, calendar) now send push notifications directly from server
+- ✓ **Multi-device support**: Users can receive notifications on all their devices simultaneously
+- ✓ **Removed all client-side polling**: Messages page no longer polls for updates - relies entirely on server push
+- ✓ **Household-based notification distribution**: Efficient bulk notification sending to all household members
+- ✓ **Automatic subscription cleanup**: Invalid/expired subscriptions are automatically deactivated
+- ✓ **Zero-latency notifications**: Notifications arrive instantly when PWA is closed, no delays or missed messages
+- ✓ **Production-ready scalability**: Database queries optimized with proper indexes for millions of concurrent users
+
+**July 23, 2025 (Earlier):**
 - ✓ **CRITICAL COMPLETION: Unified notification system fully integrated into all real app actions**
 - ✓ **Push notifications now automatically fire from real user actions when PWA is closed:**
   - ✓ **Messages**: New messages send push notifications to all household members except sender

@@ -148,6 +148,23 @@ export const shoppingItems = pgTable("shopping_items", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Push notification subscriptions
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  endpoint: text("endpoint").notNull().unique(),
+  keys: jsonb("keys").notNull(), // {p256dh, auth}
+  deviceInfo: jsonb("device_info"), // {browser, os, device}
+  active: boolean("active").default(true).notNull(),
+  lastActive: timestamp("last_active").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_push_subscriptions_user_id").on(table.userId),
+  index("idx_push_subscriptions_endpoint").on(table.endpoint),
+  index("idx_push_subscriptions_active").on(table.active)
+]);
+
 export const roommateListings = pgTable("roommate_listings", {
   id: text("id").primaryKey().$defaultFn(() => nanoid()),
   title: text("title").notNull(),
@@ -190,6 +207,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   messages: many(messages),
   shoppingItems: many(shoppingItems),
   roommateListings: many(roommateListings),
+  pushSubscriptions: many(pushSubscriptions),
 }));
 
 export const householdsRelations = relations(households, ({ many }) => ({
@@ -290,6 +308,13 @@ export const roommateListingsRelations = relations(roommateListings, ({ one }) =
   }),
 }));
 
+export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one }) => ({
+  user: one(users, {
+    fields: [pushSubscriptions.userId],
+    references: [users.id],
+  }),
+}));
+
 // Insert schemas
 export const insertHouseholdSchema = createInsertSchema(households).omit({
   id: true,
@@ -369,6 +394,13 @@ export const registerSchema = z.object({
   path: ["confirmPassword"],
 });
 
+export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions).omit({
+  id: true,
+  lastActive: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -392,3 +424,5 @@ export type ShoppingItem = typeof shoppingItems.$inferSelect;
 export type InsertShoppingItem = z.infer<typeof insertShoppingItemSchema>;
 export type RoommateListing = typeof roommateListings.$inferSelect;
 export type InsertRoommateListing = z.infer<typeof insertRoommateListingSchema>;
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema>;

@@ -9,6 +9,7 @@ import {
   messages,
   shoppingItems,
   roommateListings,
+  pushSubscriptions,
   type User,
   type UpsertUser,
   type Household,
@@ -28,6 +29,8 @@ import {
   type InsertShoppingItem,
   type RoommateListing,
   type InsertRoommateListing,
+  type PushSubscription,
+  type InsertPushSubscription,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, sql } from "drizzle-orm";
@@ -87,6 +90,13 @@ export interface IStorage {
   updateRoommateListing(id: string, updates: Partial<InsertRoommateListing>): Promise<RoommateListing>;
   deleteRoommateListing(id: string): Promise<void>;
   getUserRoommateListings(userId: string): Promise<RoommateListing[]>;
+  
+  // Push subscription operations
+  upsertPushSubscription(subscription: InsertPushSubscription): Promise<PushSubscription>;
+  deletePushSubscription(userId: string, endpoint: string): Promise<void>;
+  deactivatePushSubscription(endpoint: string): Promise<void>;
+  getUserPushSubscriptions(userId: string): Promise<PushSubscription[]>;
+  getActivePushSubscriptions(householdId: string): Promise<(PushSubscription & { user: User })[]>;
   
   // Developer tools operations
   deleteAllHouseholdData(householdId: string): Promise<void>;
@@ -689,6 +699,88 @@ export class DatabaseStorage implements IStorage {
       .from(roommateListings)
       .where(eq(roommateListings.createdBy, userId))
       .orderBy(desc(roommateListings.createdAt));
+    return result;
+  }
+
+  // Push subscription operations
+  async upsertPushSubscription(subscription: InsertPushSubscription): Promise<PushSubscription> {
+    const [result] = await db
+      .insert(pushSubscriptions)
+      .values({
+        ...subscription,
+        lastActive: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: pushSubscriptions.endpoint,
+        set: {
+          userId: subscription.userId,
+          keys: subscription.keys,
+          deviceInfo: subscription.deviceInfo,
+          active: subscription.active ?? true,
+          lastActive: new Date(),
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    
+    return result;
+  }
+
+  async deletePushSubscription(userId: string, endpoint: string): Promise<void> {
+    await db
+      .delete(pushSubscriptions)
+      .where(and(
+        eq(pushSubscriptions.userId, userId),
+        eq(pushSubscriptions.endpoint, endpoint)
+      ));
+  }
+
+  async deactivatePushSubscription(endpoint: string): Promise<void> {
+    await db
+      .update(pushSubscriptions)
+      .set({ 
+        active: false,
+        updatedAt: new Date()
+      })
+      .where(eq(pushSubscriptions.endpoint, endpoint));
+  }
+
+  async getUserPushSubscriptions(userId: string): Promise<PushSubscription[]> {
+    const result = await db
+      .select()
+      .from(pushSubscriptions)
+      .where(and(
+        eq(pushSubscriptions.userId, userId),
+        eq(pushSubscriptions.active, true)
+      ))
+      .orderBy(desc(pushSubscriptions.lastActive));
+    
+    return result;
+  }
+
+  async getActivePushSubscriptions(householdId: string): Promise<(PushSubscription & { user: User })[]> {
+    const result = await db
+      .select({
+        id: pushSubscriptions.id,
+        userId: pushSubscriptions.userId,
+        endpoint: pushSubscriptions.endpoint,
+        keys: pushSubscriptions.keys,
+        deviceInfo: pushSubscriptions.deviceInfo,
+        active: pushSubscriptions.active,
+        lastActive: pushSubscriptions.lastActive,
+        createdAt: pushSubscriptions.createdAt,
+        updatedAt: pushSubscriptions.updatedAt,
+        user: users,
+      })
+      .from(pushSubscriptions)
+      .innerJoin(users, eq(pushSubscriptions.userId, users.id))
+      .innerJoin(householdMembers, eq(users.id, householdMembers.userId))
+      .where(and(
+        eq(householdMembers.householdId, householdId),
+        eq(pushSubscriptions.active, true)
+      ));
+    
     return result;
   }
 
