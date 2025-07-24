@@ -722,12 +722,7 @@ export class DatabaseStorage implements IStorage {
       const p256dhKey = subscription.keys?.p256dh || subscription.keys?.p256dhKey;
       const authKey = subscription.keys?.auth || subscription.keys?.authKey;
       
-      console.log('upsertPushSubscription called with:', {
-        userId: subscription.userId,
-        endpoint: subscription.endpoint,
-        p256dhKey: p256dhKey ? 'present' : 'missing',
-        authKey: authKey ? 'present' : 'missing'
-      });
+
       
       if (!subscription.userId || !subscription.endpoint || !p256dhKey || !authKey) {
         throw new Error('Missing required subscription fields');
@@ -745,7 +740,7 @@ export class DatabaseStorage implements IStorage {
         RETURNING *
       `);
       
-      console.log('Push subscription upserted successfully:', result.rows[0]);
+
       return result.rows[0];
     } catch (error) {
       console.error('Error in upsertPushSubscription:', error);
