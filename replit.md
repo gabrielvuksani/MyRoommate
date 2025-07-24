@@ -111,6 +111,12 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 24, 2025 (Latest):**
+- ✓ **CRITICAL FIX: Resolved environment-specific spacing inconsistencies between development and production**
+- ✓ **Replaced hardcoded pixel values with responsive Tailwind classes**: messages.tsx spacing now uses pt-36, pb-40/pb-52, min-h-[calc(100vh-6rem)] instead of fixed 140px/160px/200px values
+- ✓ **Enhanced viewport detection with Visual Viewport API**: Updated keyboard height detection to use window.visualViewport for better cross-environment consistency
+- ✓ **Implemented dynamic threshold calculations**: Keyboard detection now uses 15% of viewport (minimum 120px) and blur detection uses 5% of viewport (minimum 50px) for adaptive behavior
+- ✓ **Fixed mobile breakpoint detection**: Updated use-mobile.tsx hook to use Visual Viewport API for consistent width detection across environments
+- ✓ **Environment-aware spacing system**: All viewport-dependent calculations now adapt to different screen sizes and deployment environments
 - ✓ **COMPLETED: Push notifications working for closed PWA apps - verified end-to-end functionality**
 - ✓ **Successfully scaled notification system for millions of users with enterprise-grade performance optimizations:**
   - ✓ **Database indexing**: Added optimized indexes on user_id, household_id, endpoint, and created_at for sub-millisecond query performance
