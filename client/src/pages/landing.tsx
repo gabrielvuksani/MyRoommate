@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PersistentLoading } from "@/lib/persistentLoading";
+import { IOSInstallBanner } from "@/components/ios-install-banner";
+
 
 export default function Landing() {
   const [isLoading, setIsLoading] = useState(false);
@@ -69,6 +71,7 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <IOSInstallBanner />
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 dark:from-blue-600/10 dark:to-purple-600/10"></div>

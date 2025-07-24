@@ -4,7 +4,7 @@
  */
 
 export interface PWAEnvironment {
-  platform: 'iOS' | 'Android' | 'Desktop';
+  platform: 'ios' | 'android' | 'desktop';
   isInstalled: boolean;
   displayMode: 'browser' | 'standalone' | 'standalone-ios' | 'twa' | 'fullscreen' | 'minimal-ui';
   canInstall: boolean;
@@ -37,7 +37,7 @@ export class PWADetectionService {
     const isAndroidChrome = isAndroid && /Chrome/.test(userAgent);
 
     let environment: PWAEnvironment = {
-      platform: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
+      platform: isIOS ? 'ios' : isAndroid ? 'android' : 'desktop',
       isInstalled: false,
       displayMode: 'browser',
       canInstall: false,
@@ -125,7 +125,7 @@ export class PWADetectionService {
       return 'pwa'; // Use push notifications for PWA
     }
     
-    if (env.platform === 'Desktop' || (env.platform === 'Android' && env.isAndroidChrome)) {
+    if (env.platform === 'desktop' || (env.platform === 'android' && env.isAndroidChrome)) {
       return 'web'; // Use web notifications for desktop and Android browsers
     }
     
