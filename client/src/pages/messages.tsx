@@ -523,15 +523,14 @@ export default function Messages() {
       {/* Scrollable Messages Container - Premium spacing */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto transition-all duration-500 ease-out"
+        className={`flex-1 overflow-y-auto transition-all duration-500 ease-out pt-36 ${
+          isKeyboardVisible 
+            ? 'pb-40 min-h-[calc(100vh-6rem)]' // pb-40 = 160px, min-h for short conversations
+            : 'pb-52' // pb-52 = 208px, normal space above tab bar
+        }`}
         style={{ 
-          paddingTop: '140px', 
-          paddingBottom: isKeyboardVisible 
-            ? '160px'  // Extra space for short conversations when keyboard is visible
-            : '200px', // Normal space above tab bar
           transform: `translateY(${isKeyboardVisible ? '-5px' : '0px'})`,
-          filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`,
-          minHeight: isKeyboardVisible ? 'calc(100vh - 100px)' : 'auto' // Ensure scrollable area for short conversations
+          filter: `brightness(${isKeyboardVisible ? '1.02' : '1'})`
         }}
       >
         <div className="max-w-3xl mx-auto px-6">

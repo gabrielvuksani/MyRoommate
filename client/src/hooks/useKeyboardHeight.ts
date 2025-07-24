@@ -5,27 +5,30 @@ export function useKeyboardHeight() {
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   useEffect(() => {
-    let initialHeight = window.innerHeight;
+    // Use viewport height instead of window.innerHeight for better cross-environment consistency
+    let initialHeight = window.visualViewport?.height || window.innerHeight;
     let keyboardDetectionTimeout: NodeJS.Timeout;
     
-    // Enhanced keyboard detection with better timing
+    // Enhanced keyboard detection with better timing and environment-aware thresholds
     const checkKeyboard = () => {
-      const currentHeight = window.innerHeight;
+      const currentHeight = window.visualViewport?.height || window.innerHeight;
       const heightDiff = initialHeight - currentHeight;
-      const hasKeyboard = heightDiff > 120; // More reliable threshold
+      // Dynamic threshold based on initial viewport size for better cross-environment support
+      const threshold = Math.max(120, initialHeight * 0.15); // 15% of viewport or 120px minimum
+      const hasKeyboard = heightDiff > threshold;
       
       setKeyboardHeight(hasKeyboard ? heightDiff : 0);
       setIsKeyboardVisible(hasKeyboard);
     };
 
-    // Enhanced resize handling with debouncing
+    // Enhanced resize handling with debouncing and environment-aware viewport detection
     const handleResize = () => {
       clearTimeout(keyboardDetectionTimeout);
       
       keyboardDetectionTimeout = setTimeout(() => {
         // Update initial height if window is resized when keyboard is not visible
         if (!isKeyboardVisible) {
-          initialHeight = window.innerHeight;
+          initialHeight = window.visualViewport?.height || window.innerHeight;
         }
         checkKeyboard();
       }, 50); // Debounce for performance
@@ -42,16 +45,19 @@ export function useKeyboardHeight() {
       }
     };
 
-    // Enhanced blur handling with proper cleanup
+    // Enhanced blur handling with proper cleanup and environment-aware detection
     const handleBlur = () => {
       clearTimeout(keyboardDetectionTimeout);
       
       keyboardDetectionTimeout = setTimeout(() => {
-        const currentHeight = window.innerHeight;
+        const currentHeight = window.visualViewport?.height || window.innerHeight;
         const heightDiff = initialHeight - currentHeight;
         
+        // Dynamic threshold for blur detection based on initial viewport size
+        const blurThreshold = Math.max(50, initialHeight * 0.05); // 5% of viewport or 50px minimum
+        
         // Only hide keyboard if height actually returned to normal
-        if (heightDiff <= 50) {
+        if (heightDiff <= blurThreshold) {
           setKeyboardHeight(0);
           setIsKeyboardVisible(false);
         }

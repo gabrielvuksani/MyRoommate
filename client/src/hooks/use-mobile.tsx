@@ -8,10 +8,14 @@ export function useIsMobile() {
   React.useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+      // Use viewport width or fallback to innerWidth for better cross-environment consistency
+      const currentWidth = window.visualViewport?.width || window.innerWidth
+      setIsMobile(currentWidth < MOBILE_BREAKPOINT)
     }
     mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    // Initial check with environment-aware width detection
+    const currentWidth = window.visualViewport?.width || window.innerWidth
+    setIsMobile(currentWidth < MOBILE_BREAKPOINT)
     return () => mql.removeEventListener("change", onChange)
   }, [])
 
