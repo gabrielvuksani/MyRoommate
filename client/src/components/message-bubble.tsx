@@ -59,7 +59,7 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-[24px_24px_6px_24px] pointer-events-none"></div>
             <p className="text-white font-medium leading-relaxed relative z-10">{message.content}</p>
             <div 
-              className="absolute bottom-0 right-0 w-2 h-2"
+              className="absolute bottom-0 right-0 w-2 h-2 rounded-tl-sm"
               style={{
                 background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
               }}
@@ -108,10 +108,11 @@ export default function MessageBubble({ message, currentUserId }: MessageBubbleP
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 rounded-[24px_24px_24px_6px] pointer-events-none"></div>
           <p className="text-gray-900 font-medium leading-relaxed relative z-10">{message.content}</p>
           <div 
-            className="absolute bottom-0 left-0 w-2 h-2"
+            className="absolute bottom-0 left-0 w-2 h-2 rounded-tr-sm"
             style={{
               background: 'rgba(255, 255, 255, 0.85)',
               backdropFilter: 'blur(20px) saturate(1.8)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
             }}
           ></div>
         </div>
