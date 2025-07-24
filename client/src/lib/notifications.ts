@@ -258,12 +258,12 @@ export class NotificationService {
     const isDocumentVisible = !document.hidden;
     const isInMessages = window.location.pathname === '/messages';
     
-
+    console.log('Notification check:', { type, isDocumentVisible, isInMessages, path: window.location.pathname });
     
     // For message notifications, be more permissive
     if (type === 'message') {
       // Allow message notifications even when user is in messages (they might want to know about new messages)
-
+      console.log('Message notification - always allow for better reliability');
       // Skip to timing checks only, don't block based on page visibility
     } else {
       // If document is visible and user is on the relevant page, reduce notifications for non-message types
@@ -291,16 +291,16 @@ export class NotificationService {
     const throttleTime = throttleTimes[type] || 10000;
     
     if (timeSince < throttleTime) {
-
+      console.log(`Notification throttled for ${type}: ${timeSince}ms < ${throttleTime}ms`);
       return false;
     }
     
-
+    console.log(`Notification timing check passed for ${type}: ${timeSince}ms >= ${throttleTime}ms`);
     
     // Check for notification spam (more than 3 notifications per minute)
     const recentCount = this.recentNotifications.get(type) || 0;
     if (recentCount >= 3) {
-
+      console.log(`Notification spam prevention for ${type}: ${recentCount} recent notifications`);
       return false;
     }
     
@@ -325,25 +325,26 @@ export class NotificationService {
   }
 
   async showNotification(options: NotificationOptions, type: NotificationType = 'message'): Promise<boolean> {
-
+    console.log('showNotification called:', { type, title: options.title, permission: this.permission });
     
     // Check if notifications are supported
     if (!('Notification' in window)) {
+      console.warn('Notifications not supported');
       return false;
     }
     
     // Apply spam prevention
     if (!this.shouldShowNotification(type, options.tag)) {
-
+      console.log('Notification blocked by spam prevention');
       return false;
     }
 
     // Check permission
     if (this.permission !== 'granted') {
-
+      console.log('Permission not granted, requesting...', this.permission);
       const granted = await this.requestPermission();
       if (!granted) {
-
+        console.log('Permission denied');
         return false;
       }
     }
@@ -370,7 +371,7 @@ export class NotificationService {
       // Use service worker for PWA if available
       if (this.serviceWorkerRegistration) {
         await this.serviceWorkerRegistration.showNotification(options.title, notificationOptions);
-
+        console.log('Notification shown via Service Worker');
       } else {
         // Fallback to regular notification for web browsers
         const notification = new Notification(options.title, notificationOptions);
@@ -386,18 +387,18 @@ export class NotificationService {
           notification.close();
         };
 
-
+        console.log('Notification shown via Web API');
       }
       return true;
     } catch (error) {
-
+      console.error('Error showing notification:', error);
       return false;
     }
   }
 
   // Predefined notification types for common app events
   async showMessageNotification(senderName: string, messageContent: string, householdName?: string): Promise<boolean> {
-
+    console.log('showMessageNotification called:', { senderName, messageContent, householdName });
     return this.showNotification({
       title: `New message from ${senderName}`,
       body: householdName ? `${householdName}: ${messageContent}` : messageContent,
@@ -442,6 +443,7 @@ export class NotificationService {
   // Test push notification to verify PWA background notifications work
   async testPushNotification(): Promise<boolean> {
     if (!this.pushSubscription) {
+      console.warn('No push subscription available for test');
       return false;
     }
 
@@ -458,10 +460,10 @@ export class NotificationService {
         throw new Error(`Test push failed: ${response.status}`);
       }
 
-
+      console.log('Test push notification sent');
       return true;
     } catch (error) {
-
+      console.error('Error sending test push notification:', error);
       return false;
     }
   }

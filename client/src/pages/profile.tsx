@@ -72,7 +72,7 @@ export default function Profile() {
       setIsEditOpen(false);
     },
     onError: (error: any) => {
-
+      console.error("Failed to update name:", error);
     },
   });
 
@@ -85,7 +85,7 @@ export default function Profile() {
       setIsHouseholdEditOpen(false);
     },
     onError: (error: any) => {
-
+      console.error("Failed to update household name:", error);
     },
   });
 
@@ -99,7 +99,7 @@ export default function Profile() {
       queryClient.invalidateQueries();
     },
     onError: (error: any) => {
-
+      console.error("Failed to leave household:", error);
       // Don't modify loading state here - button handler will handle it
     },
   });
@@ -113,7 +113,7 @@ export default function Profile() {
       queryClient.clear();
     },
     onError: (error: any) => {
-
+      console.error("Failed to delete all data:", error);
     },
   });
 
@@ -140,7 +140,7 @@ export default function Profile() {
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
       } catch (err) {
-
+        console.error('Failed to copy invite code:', err);
       }
     }
   };
@@ -157,13 +157,13 @@ export default function Profile() {
       try {
         localStorage.clear();
       } catch (e) {
-
+        console.log('localStorage clear failed:', e);
       }
       
       try {
         sessionStorage.clear();
       } catch (e) {
-
+        console.log('sessionStorage clear failed:', e);
       }
       
       // Clear service worker caches if available
@@ -174,7 +174,7 @@ export default function Profile() {
             cacheNames.map(cacheName => caches.delete(cacheName))
           );
         } catch (e) {
-
+          console.log('Cache clearing failed:', e);
         }
       }
       
@@ -193,7 +193,7 @@ export default function Profile() {
       }, 1000);
       
     } catch (error) {
-
+      console.error('Refresh error:', error);
       // Fallback: hide loading and try simple reload
       PersistentLoading.hide();
       setTimeout(() => {
@@ -221,7 +221,7 @@ export default function Profile() {
       }, 1000);
       
     } catch (error) {
-
+      console.error('Delete all data error:', error);
       // Hide loading on error
       PersistentLoading.hide();
       alert('Failed to delete all data. Please try again.');
@@ -263,7 +263,7 @@ export default function Profile() {
       setNotificationInfo(unifiedNotifications.getEnvironmentInfo());
       
     } catch (error) {
-
+      console.error('Test notification failed:', error);
       alert('Failed to send test notification. Please check your browser settings.');
     } finally {
       setIsTestingNotification(false);
@@ -936,7 +936,7 @@ export default function Profile() {
                         window.location.href = '/';
                       }, 500);
                     } catch (error) {
-
+                      console.error("Failed to leave household:", error);
                       setTimeout(() => {
                         window.location.href = '/';
                       }, 500);

@@ -55,18 +55,18 @@ export default function Onboarding() {
 
   const joinHouseholdMutation = useMutation({
     mutationFn: async (inviteCode: string) => {
-
+      console.log("Frontend: Attempting to join household with code:", inviteCode);
       try {
         const result = await apiRequest("POST", "/api/households/join", { inviteCode });
-
+        console.log("Frontend: Join household success:", result);
         return result;
       } catch (error) {
-
+        console.error("Frontend: Join household error:", error);
         throw error;
       }
     },
     onSuccess: (data) => {
-
+      console.log("Frontend: Join mutation success, invalidating queries");
       // Show persistent loading
       PersistentLoading.show("Joining household...");
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
@@ -78,7 +78,7 @@ export default function Onboarding() {
       window.location.href = '/';
     },
     onError: (error: any) => {
-
+      console.error("Frontend: Join mutation error:", error);
       
       // Parse error message from different formats
       let errorText = "";

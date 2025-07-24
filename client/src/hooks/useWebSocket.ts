@@ -14,7 +14,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
 
   useEffect(() => {
     if (!userId || !householdId) {
-
+      console.log('WebSocket not connecting - missing userId or householdId:', { userId: !!userId, householdId: !!householdId });
       return;
     }
 
@@ -22,7 +22,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
     const host = window.location.host;
     const wsUrl = `${protocol}//${host}/ws`;
     
-
+    console.log('WebSocket attempting to connect to:', wsUrl, 'for user:', userId, 'household:', householdId);
     
     let reconnectTimeout: NodeJS.Timeout;
     let heartbeatInterval: NodeJS.Timeout;
@@ -38,7 +38,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
       ws.current = new WebSocket(wsUrl);
 
       ws.current.onopen = () => {
-
+        console.log('WebSocket connected to:', wsUrl);
         connectionSent.current = false;
         
         // Send connection info for user caching
@@ -48,7 +48,7 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
             userId,
             householdId,
           };
-
+          console.log('Sending connect message:', connectMessage);
           ws.current?.send(JSON.stringify(connectMessage));
           connectionSent.current = true;
         }
@@ -71,11 +71,12 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
           const data = JSON.parse(event.data);
           onMessage?.(data);
         } catch (error) {
-
+          console.error('Error parsing WebSocket message:', error);
         }
       };
 
       ws.current.onclose = (event) => {
+        console.log('WebSocket disconnected:', event.code, event.reason, 'attempts:', reconnectAttempts);
         connectionSent.current = false;
         onDisconnect?.();
 
@@ -86,13 +87,25 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
           const baseDelay = event.code === 1006 ? 500 : 1000;
           const delay = Math.min(baseDelay * Math.pow(1.5, reconnectAttempts - 1), 10000);
           
+          console.log(`Reconnecting in ${delay}ms... (attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
           reconnectTimeout = setTimeout(() => {
             connect();
           }, delay);
+        } else if (reconnectAttempts >= maxReconnectAttempts) {
+          console.error('Max WebSocket reconnection attempts reached. Please refresh the page.');
         }
       };
 
       ws.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        console.error('WebSocket URL:', wsUrl);
+        console.error('Connection details:', { 
+          protocol, 
+          host, 
+          readyState: ws.current?.readyState,
+          userId,
+          householdId 
+        });
         onDisconnect?.();
       };
     };
@@ -113,10 +126,12 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
       try {
         const messageStr = JSON.stringify(message);
         ws.current.send(messageStr);
+        console.log('Message sent successfully:', message.type);
       } catch (error) {
-        // Silent error handling
+        console.error('Error sending WebSocket message:', error);
       }
     } else {
+      console.warn('WebSocket not ready, state:', ws.current?.readyState);
       // Message will be lost but WebSocket will auto-reconnect via useEffect
     }
   };

@@ -77,7 +77,7 @@ export default function Chores() {
       });
     },
     onError: (error) => {
-
+      console.error("Failed to create chore:", error);
     },
   });
 
@@ -98,7 +98,7 @@ export default function Chores() {
       }
     },
     onError: (error) => {
-
+      console.error('Error updating chore:', error);
     },
   });
 
@@ -111,7 +111,7 @@ export default function Chores() {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
     },
     onError: (error) => {
-
+      console.error('Error deleting chore:', error);
     },
   });
 

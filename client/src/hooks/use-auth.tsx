@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.location.href = "/";
     },
     onError: (error: Error) => {
-
+      console.error("Login failed:", error.message);
     },
   });
 
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.location.href = "/";
     },
     onError: (error: Error) => {
-
+      console.error("Registration failed:", error.message);
     },
   });
 
@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.location.href = "/";
     },
     onError: (error: Error) => {
-
+      console.error("Logout failed:", error.message);
     },
   });
 

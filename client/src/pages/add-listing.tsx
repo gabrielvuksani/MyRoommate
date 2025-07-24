@@ -87,7 +87,7 @@ export default function AddListing() {
       setLocation("/roommates");
     },
     onError: (error) => {
-
+      console.error("Failed to create listing:", error);
     },
   });
 

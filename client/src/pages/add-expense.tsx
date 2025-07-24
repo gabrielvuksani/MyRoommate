@@ -110,7 +110,7 @@ export default function AddExpense() {
       setLocation("/expenses");
     },
     onError: (error) => {
-
+      console.error("Failed to add expense:", error);
     },
   });
 

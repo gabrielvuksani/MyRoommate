@@ -82,9 +82,9 @@ export class UnifiedNotificationService {
       await this.initializePWANotifications();
     } else if (strategy === 'web') {
       // Web notifications are ready when permission is granted
-
+      console.log('Web notification strategy active');
     } else {
-
+      console.log('No notification support for this environment');
     }
   }
 
@@ -104,7 +104,7 @@ export class UnifiedNotificationService {
         
         await this.setupPushSubscription();
       } catch (error) {
-
+        console.error('Failed to initialize PWA notifications:', error);
       }
     }
   }
@@ -126,7 +126,7 @@ export class UnifiedNotificationService {
         await this.subscribeToPush();
       }
     } catch (error) {
-
+      console.error('Failed to setup push subscription:', error);
     }
   }
 
@@ -157,7 +157,7 @@ export class UnifiedNotificationService {
       await this.sendSubscriptionToServer(this.pushSubscription);
       return true;
     } catch (error) {
-
+      console.error('Failed to subscribe to push notifications:', error);
       return false;
     }
   }
@@ -284,7 +284,7 @@ export class UnifiedNotificationService {
       
       return true;
     } catch (error) {
-
+      console.error('Error showing notification:', error);
       return false;
     }
   }

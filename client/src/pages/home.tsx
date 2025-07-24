@@ -94,7 +94,7 @@ export default function Home() {
     currentHour < 12
       ? "Good morning"
       : currentHour < 17
-        ? "Afternoon"
+        ? "Good afternoon"
         : "Good evening";
 
   const nextChore = activeChores.sort((a: any, b: any) => {

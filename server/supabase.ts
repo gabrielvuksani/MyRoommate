@@ -45,13 +45,13 @@ export async function initializeStorage() {
       });
       
       if (bucketError) {
-
+        console.error('Error creating storage bucket:', bucketError);
       } else {
-
+        console.log(`Created storage bucket: ${STORAGE_BUCKET}`);
       }
     }
   } catch (error) {
-
+    console.error('Error initializing storage:', error);
   }
 }
 
@@ -66,7 +66,7 @@ export async function uploadImage(file: Buffer, fileName: string, contentType: s
       });
 
     if (error) {
-
+      console.error('Error uploading image:', error);
       return null;
     }
 
@@ -77,7 +77,7 @@ export async function uploadImage(file: Buffer, fileName: string, contentType: s
 
     return urlData.publicUrl;
   } catch (error) {
-
+    console.error('Error uploading image:', error);
     return null;
   }
 }
@@ -90,13 +90,13 @@ export async function deleteImage(fileName: string): Promise<boolean> {
       .remove([fileName]);
 
     if (error) {
-
+      console.error('Error deleting image:', error);
       return false;
     }
 
     return true;
   } catch (error) {
-
+    console.error('Error deleting image:', error);
     return false;
   }
 }

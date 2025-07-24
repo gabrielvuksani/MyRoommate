@@ -63,7 +63,7 @@ export default function Calendar() {
       });
     },
     onError: (error) => {
-
+      console.error("Failed to create event:", error);
     },
   });
 
@@ -75,7 +75,7 @@ export default function Calendar() {
       queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
     },
     onError: (error) => {
-
+      console.error('Error deleting event:', error);
     },
   });
 
