@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { Eye, EyeOff, Home, User, Mail, Lock, Sparkles, CheckCircle } from "lucide-react";
 import { SignupAvatarSelector } from "@/components/SignupAvatarSelector";
-import { IOSInstallBanner } from "@/components/ios-install-banner";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
@@ -186,7 +185,6 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <IOSInstallBanner />
       <div className="min-h-screen flex">
         {/* Left Column - Form */}
         <div className="flex-1 flex items-center justify-center p-6 lg:p-8">

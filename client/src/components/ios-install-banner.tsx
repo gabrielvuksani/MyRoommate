@@ -20,8 +20,7 @@ export function IOSInstallBanner() {
     // 2. Not already installed as PWA
     // 3. Not previously dismissed (check localStorage)
     // 4. Using Safari (where installation is possible)
-    const shouldShow = 
-      environment.platform === 'ios' && 
+    const shouldShow = environment.platform === 'ios' && 
       !environment.isInstalled && 
       !localStorage.getItem('ios-install-banner-dismissed') &&
       environment.canInstall;
@@ -55,19 +54,20 @@ export function IOSInstallBanner() {
   }
 
   return (
-    <div className="fixed bottom-20 left-6 right-6 z-50 max-w-md mx-auto">
+    <div className="fixed p-6 bottom-20 left-6 right-6 z-50 max-w mx-auto">
       <div 
-        className="glass-card rounded-2xl p-6 animate-slide-up backdrop-blur-xl border shadow-lg"
+        className="glass-card rounded-2xl animate-slide-up backdrop-blur-xl border shadow-lg "
         style={{
           background: 'var(--surface)',
           borderColor: 'var(--border)',
-          boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+          boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+          padding: '20px'
         }}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center">
               <Download className="w-4 h-4 text-white" />
             </div>
             <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
@@ -125,15 +125,6 @@ export function IOSInstallBanner() {
           }}
         >
           Install App
-        </button>
-
-        {/* Skip Option */}
-        <button
-          onClick={handleDismiss}
-          className="w-full py-2 text-xs mt-2 transition-colors"
-          style={{ color: 'var(--text-secondary)' }}
-        >
-          Maybe later
         </button>
       </div>
     </div>
