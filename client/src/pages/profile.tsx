@@ -840,7 +840,7 @@ export default function Profile() {
                     </Dialog>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                <div className="flex justify-between items-center py-3">
                   <span style={{ color: 'var(--text-secondary)' }}>Invite Code</span>
                   <div className="flex items-center space-x-3">
                     <span className="font-mono text-sm px-2 py-1 rounded" style={{
@@ -866,12 +866,6 @@ export default function Profile() {
                     </button>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Members</span>
-                  <span style={{ color: 'var(--text-primary)' }}>
-                    {(household as any).members?.length || 0}
-                  </span>
-                </div>
                 {(household as any).rentAmount && (
                   <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Monthly Rent</span>
@@ -889,79 +883,51 @@ export default function Profile() {
                   </div>
                 )}
               </div>
-              {isAdmin && (
-                <Button
-                  onClick={handleDeleteAllData}
-                  disabled={deleteAllDataMutation.isPending}
-                  className="mt-4 w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
-                >
-                  <Trash2 size={20} />
-                  <span>
-                    {deleteAllDataMutation.isPending
-                      ? "Deleting All Household Data..."
-                      : "Delete All Household Data"}
-                  </span>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Household Members */}
-        {(household as any)?.members && (
-          <Card className="glass-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)'
-          }}>
-            <CardContent className="p-6">
-              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
-                Household Members
-              </h3>
-              <div className="space-y-3">
-                {(household as any).members.map((member: any) => (
-                  <div
-                    key={member.id}
-                    className="flex items-center justify-between py-3 last:border-b-0"
-                    style={{ borderBottom: '1px solid var(--border)' }}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <ProfileAvatar 
-                        user={member.user} 
-                        size="md" 
-                        gradientType="blue"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>
-                          {member.user.firstName && member.user.lastName
-                            ? `${member.user.firstName} ${member.user.lastName}`
-                            : member.user.firstName ||
-                              member.user.email?.split("@")[0] ||
-                              "Unknown"}
-                        </p>
-                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                          {member.role === "admin" ? "Administrator" : "Member"}
-                        </p>
-                      </div>
+              {(household as any)?.members && (household as any).members.map((member: any) => (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between py-3 last:border-b-0"
+                  style={{ borderBottom: '1px solid var(--border)',
+                         borderTop: '1px solid var(--border)'}}>
+                  <div className="flex items-center space-x-3">
+                    <ProfileAvatar 
+                      user={member.user} 
+                      size="md" 
+                      gradientType="blue"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                        {member.user.firstName && member.user.lastName
+                          ? `${member.user.firstName} ${member.user.lastName}`
+                          : member.user.firstName ||
+                            member.user.email?.split("@")[0] ||
+                            "Unknown"}
+                      </p>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {member.role === "admin" ? "Administrator" : "Member"}
+                      </p>
                     </div>
-                    {member.role && (
-                      <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{
-                        color: 'var(--text-secondary)',
-                        background: 'var(--surface-secondary)'
-                      }}>
-                        {member.role}
-                      </span>
-                    )}
                   </div>
-                ))}
+                  {member.role && (
+                    <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{
+                      color: 'var(--text-secondary)',
+                      background: 'var(--surface-secondary)'
+                    }}>
+                      {member.role}
+                    </span>
+                  )}
+                </div>
+              ))}
+              <div className="space-y-3 pt-3">
                 {(household as any) && (
                   <Button
                     onClick={async () => {
                       // Show persistent loading overlay
                       PersistentLoading.show("Leaving household...");
-
+  
                       try {
                         await leaveHouseholdMutation.mutateAsync();
-
+  
                         // Navigate immediately - loading will persist through refresh
                         setTimeout(() => {
                           window.location.href = '/';
@@ -991,6 +957,20 @@ export default function Profile() {
                   <LogOut size={20} />
                   <span>Sign Out</span>
                 </Button>
+                {isAdmin && (
+                  <Button
+                    onClick={handleDeleteAllData}
+                    disabled={deleteAllDataMutation.isPending}
+                    className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
+                  >
+                    <Trash2 size={20} />
+                    <span>
+                      {deleteAllDataMutation.isPending
+                        ? "Deleting All Household Data..."
+                        : "Delete All Household Data"}
+                    </span>
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
