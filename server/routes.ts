@@ -996,38 +996,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ publicKey: process.env.VAPID_PUBLIC_KEY });
   });
 
-  // Test endpoint to manually send push notifications
-  app.post('/api/push/test', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.id;
-      const { message = '🔔 Test notification from myRoommate!', title = 'Push Notification Test' } = req.body;
-      
-      const payload = {
-        title,
-        body: message,
-        icon: '/icon-192x192.png',
-        badge: '/icon-72x72.png',
-        tag: 'test-notification',
-        requireInteraction: true,
-        data: {
-          type: 'test',
-          timestamp: Date.now()
-        }
-      };
-      
-      const success = await sendPushNotification(userId, payload);
-      
-      res.json({ 
-        success, 
-        message: success ? 'Test notification sent successfully!' : 'No active push subscriptions found',
-        sentTo: userId
-      });
-    } catch (error) {
-      console.error('Error sending test notification:', error);
-      res.status(500).json({ message: 'Failed to send test notification' });
-    }
-  });
-
   // Push notification subscription endpoints
   app.post('/api/push/subscribe', isAuthenticated, async (req: any, res) => {
     try {
