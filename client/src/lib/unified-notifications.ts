@@ -134,14 +134,6 @@ export class UnifiedNotificationService {
     if (!this.serviceWorkerRegistration) return false;
 
     try {
-      // Get VAPID public key from server
-      const response = await fetch('/api/push/vapid-public-key');
-      const { publicKey } = await response.json();
-      
-      if (!publicKey) {
-        throw new Error('VAPID public key not available');
-      }
-
       // Unsubscribe from any existing subscription first
       const existingSubscription = await this.serviceWorkerRegistration.pushManager.getSubscription();
       if (existingSubscription) {
@@ -151,7 +143,9 @@ export class UnifiedNotificationService {
       // Create fresh push subscription
       this.pushSubscription = await this.serviceWorkerRegistration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(publicKey)
+        applicationServerKey: this.urlBase64ToUint8Array(
+          'BNUBRCnltmYiEEVwd8KD4lVRp8EJgfuI19XNJD2lki87bZZ6IIrAxWo6u6WjXq3h8FIs6b1RYGX6i33DEZmKNZ0'
+        )
       });
 
       await this.sendSubscriptionToServer(this.pushSubscription);

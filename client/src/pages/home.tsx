@@ -141,7 +141,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="page-content px-6 space-y-6">
+        <div className="pt-44 px-6 space-y-6">
           {/* Quick Stats */}
           {(myListings as any[])?.length > 0 && (
             <Card className="glass-card">
@@ -378,7 +378,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="page-content px-6 space-y-6">
+      <div className="pt-44 px-6 space-y-6">
         {/* Hero Stats */}
         <div className="grid grid-cols-2 gap-4">
           <Card className="glass-card">

@@ -34,11 +34,11 @@ const upload = multer({
   }
 });
 
-// Configure web-push with VAPID keys from environment
+// Configure web-push with VAPID keys
 webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT || 'mailto:notifications@myroommate.app',
-  process.env.VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
+  'mailto:notifications@myroommate.app',
+  'BNUBRCnltmYiEEVwd8KD4lVRp8EJgfuI19XNJD2lki87bZZ6IIrAxWo6u6WjXq3h8FIs6b1RYGX6i33DEZmKNZ0', // Public key
+  '8gDdfS0YP9m2JCg7RY9aDsTKCP6iLp0BNsRWch9BJAA' // Private key
 );
 
 // High-performance notification queue for millions of users
@@ -172,14 +172,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.id;
       const { inviteCode } = req.body;
       
-
+      console.log("Join household attempt:", { userId, inviteCode, codeLength: inviteCode?.length });
       
       if (!inviteCode || inviteCode.trim().length === 0) {
         return res.status(400).json({ message: "Invite code is required" });
       }
       
       const household = await storage.getHouseholdByInviteCode(inviteCode.trim().toUpperCase());
-
+      console.log("Household lookup result:", household ? `Found: ${household.name}` : "Not found");
       
       if (!household) {
         return res.status(404).json({ message: "Invalid invite code" });
@@ -193,7 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         // Leave current household before joining new one
         await storage.leaveHousehold(userId);
-
+        console.log("User left previous household before joining new one");
       }
       
       const member = await storage.joinHousehold(household.id, userId);
@@ -991,11 +991,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get VAPID public key for client-side push subscription
-  app.get('/api/push/vapid-public-key', (req, res) => {
-    res.json({ publicKey: process.env.VAPID_PUBLIC_KEY });
-  });
-
   // Push notification subscription endpoints
   app.post('/api/push/subscribe', isAuthenticated, async (req: any, res) => {
     try {
@@ -1008,6 +1003,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Store subscription in database
+      console.log('Storing push subscription:', {
+        userId,
+        endpoint: subscription.endpoint,
+        keys: subscription.keys
+      });
       
       const pushSubscription = await storage.upsertPushSubscription({
         userId,
@@ -1017,7 +1017,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         active: true
       });
       
-
+      console.log('Push subscription stored successfully:', pushSubscription);
       res.json({ success: true, message: 'Push subscription stored successfully' });
     } catch (error) {
       console.error('Error storing push subscription:', error);
@@ -1190,7 +1190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Delete all data for the household using storage method
       await storage.deleteAllHouseholdData(householdId);
       
-
+      console.log(`Deleted all data for household: ${householdId}`);
       res.json({ success: true, message: "All household data deleted successfully" });
     } catch (error) {
       console.error("Error deleting all data:", error);

@@ -127,8 +127,11 @@ export default function Messages() {
           refetchType: 'active' 
         });
         
-        // Always scroll to latest message when new message arrives
-        scrollToLatestMessage();
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            scrollToBottom();
+          }, 25);
+        });
       } else if (data.type === "pong") {
         console.log('WebSocket pong received - connection healthy');
       } else if (data.type === "new_chore" && data.chore) {
@@ -162,8 +165,9 @@ export default function Messages() {
             setTypingUsers(prev => prev.filter(name => name !== data.userName!));
           }, 3000);
           
-          // Scroll to show typing indicator
-          scrollToLatestMessage();
+          requestAnimationFrame(() => {
+            setTimeout(() => scrollToBottom(), 50);
+          });
         }
       } else if (data.type === "user_stopped_typing") {
         if (data.userId !== user?.id && data.userName) {
@@ -175,35 +179,99 @@ export default function Messages() {
     householdId: household?.id,
   });
 
-  // Simple, reliable scroll system - always shows latest message
-  const scrollToLatestMessage = useCallback(() => {
+  // Premium scroll system - ensures latest message is always fully visible
+  const scrollToBottom = (options: { force?: boolean; smooth?: boolean; keyboardAware?: boolean } = {}) => {
     const container = messagesContainerRef.current;
     if (!container) return;
 
-    // Simple, reliable scroll to bottom - works for any number of messages
-    requestAnimationFrame(() => {
-      container.scrollTop = container.scrollHeight;
+    const { force = false, smooth = true, keyboardAware = false } = options;
+    
+    // Enhanced scroll calculation for keyboard states
+    const scrollToPosition = () => {
+      // Allow DOM to update container padding for keyboard state
+      requestAnimationFrame(() => {
+        const scrollHeight = container.scrollHeight;
+        const containerHeight = container.clientHeight;
+        const currentScrollTop = container.scrollTop;
+        
+        // Special handling for short conversations when keyboard is visible
+        if (keyboardAware && isKeyboardVisible) {
+          // For keyboard states, ensure we scroll to show the absolute bottom
+          // Even if there's not much content, this ensures input stays visible
+          const maxPossibleScroll = scrollHeight - containerHeight;
+          const targetScroll = Math.max(maxPossibleScroll, 0);
+          
+          console.log('Keyboard scroll (short conversation):', {
+            scrollHeight,
+            containerHeight,
+            maxPossibleScroll,
+            targetScroll,
+            currentScrollTop,
+            messageCount: messages?.length || 0
+          });
+          
+          container.scrollTo({
+            top: targetScroll,
+            behavior: "auto" // Always instant for keyboard
+          });
+        } else {
+          // Normal scroll behavior for non-keyboard scenarios
+          const keyboardBuffer = 0;
+          const optimalScrollTop = Math.max(0, scrollHeight - containerHeight + keyboardBuffer);
+          
+          container.scrollTo({
+            top: optimalScrollTop,
+            behavior: force ? "auto" : (smooth ? "smooth" : "auto")
+          });
+        }
+      });
+    };
+
+    // Premium timing for different scenarios
+    const getDelay = () => {
+      if (keyboardAware && isKeyboardVisible) return 200; // Allow keyboard animation to complete
+      if (force) return 0;
+      return 50;
+    };
+
+    setTimeout(scrollToPosition, getDelay());
+  };
+
+  // Unified smart scroll for all message scenarios - always show latest message fully
+  const handleLatestMessageScroll = (messageCount: number) => {
+    if (messageCount === 0) {
+      // No messages - scroll to top smoothly for clean state
+      const container = messagesContainerRef.current;
+      if (container) {
+        container.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+    
+    // For any number of messages, ensure latest is fully visible with premium timing
+    const forceInstant = messageCount === 1; // Instant for single message
+    scrollToBottom({ 
+      force: forceInstant, 
+      smooth: !forceInstant,
+      keyboardAware: isKeyboardVisible
     });
-  }, []);
+  };
 
-  // Smooth scroll to bottom for user actions
-  const scrollToBottom = useCallback(() => {
-    const container = messagesContainerRef.current;
-    if (!container) return;
-
-    container.scrollTo({
-      top: container.scrollHeight,
-      behavior: "smooth"
-    });
-  }, []);
-
-  // Auto-resize textarea
+  // Premium auto-resize textarea with enhanced mobile optimization
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      const newHeight = Math.min(textarea.scrollHeight, 120);
+      const baseHeight = 36;
+      const maxHeight = isKeyboardVisible ? 100 : 120;
+      const scrollHeight = textarea.scrollHeight;
+      
+      // Smooth height calculation with easing
+      const newHeight = Math.min(Math.max(scrollHeight, baseHeight), maxHeight);
       textarea.style.height = `${newHeight}px`;
+      
+      // Enhanced transition timing for premium feel
+      textarea.style.transition = 'height 0.25s ease-out, transform 0.4s ease-out';
     }
   }, [newMessage, isKeyboardVisible]);
 
@@ -217,15 +285,47 @@ export default function Messages() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Always scroll to latest message when messages load or update
+  // Master scroll handler - intelligently handles all scroll scenarios
+  const masterScrollHandler = useCallback(() => {
+    if (!messages || messages.length === 0) return;
+    
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    
+    // Always scroll to show the latest message fully, regardless of scenario
+    requestAnimationFrame(() => {
+      // Calculate scroll to show the bottom completely
+      const scrollHeight = container.scrollHeight;
+      const containerHeight = container.clientHeight;
+      const targetScrollTop = Math.max(0, scrollHeight - containerHeight);
+      
+      // Choose scroll behavior based on context
+      const shouldBeInstant = isKeyboardVisible || 
+                             (messages.length === 1) || 
+                             Math.abs(container.scrollTop - targetScrollTop) > containerHeight;
+      
+      container.scrollTo({
+        top: targetScrollTop,
+        behavior: shouldBeInstant ? "auto" : "smooth"
+      });
+      
+      console.log('Master scroll:', {
+        messageCount: messages.length,
+        isKeyboardVisible,
+        targetScrollTop,
+        behavior: shouldBeInstant ? "instant" : "smooth"
+      });
+    });
+  }, [messages, isKeyboardVisible]);
+
+  // Single effect to handle all scroll scenarios
   useEffect(() => {
-    if (!isLoading && messages?.length > 0) {
-      // Small delay to ensure DOM is updated, then scroll to latest message
-      setTimeout(() => {
-        scrollToLatestMessage();
-      }, 100);
+    if (!isLoading && messages) {
+      // Initial delay for DOM updates, then ensure latest message is visible
+      const delay = isKeyboardVisible ? 250 : 100;
+      setTimeout(masterScrollHandler, delay);
     }
-  }, [messages, isLoading, scrollToLatestMessage]);
+  }, [isLoading, messages?.length, isKeyboardVisible, masterScrollHandler]);
 
   // Update connection status when user/household data becomes available
   useEffect(() => {
@@ -312,8 +412,10 @@ export default function Messages() {
         message: newMessage,
       });
       
-      // Auto-scroll to show new message
-      scrollToLatestMessage();
+      // Auto-scroll to new message
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
     },
     onError: (error) => {
       console.error("Failed to send message:", error);
@@ -418,11 +520,12 @@ export default function Messages() {
         </div>
       </div>
 
-      {/* Scrollable Messages Container - Consistent spacing */}
+      {/* Scrollable Messages Container - Premium spacing */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto transition-all duration-500 ease-out page-content"
+        className="flex-1 overflow-y-auto transition-all duration-500 ease-out"
         style={{ 
+          paddingTop: '140px', 
           paddingBottom: isKeyboardVisible 
             ? '160px'  // Extra space for short conversations when keyboard is visible
             : '200px', // Normal space above tab bar

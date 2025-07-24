@@ -297,7 +297,7 @@ export default function Calendar() {
         </div>
       </div>
       {/* Calendar Section */}
-      <div className="page-content px-6 mb-6">
+      <div className="pt-32 px-6 mb-6">
         <div className="smart-card p-6 animate-fade-in pl-[3px] pr-[3px]">
           {/* Month Navigation */}
           <div className="flex items-center justify-between mt-[16px] mb-[16px] ml-[4px] mr-[4px]">

@@ -255,7 +255,7 @@ export default function Chores() {
           </div>
         </div>
       </div>
-      <div className="page-content px-6 space-y-6">
+      <div className="pt-32 px-6 space-y-6">
         {/* Today's Focus */}
         {Array.isArray(chores) && chores.length > 0 && (
           <Card className="glass-card" style={{ 
