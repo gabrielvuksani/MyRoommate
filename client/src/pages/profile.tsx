@@ -313,7 +313,7 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="pt-36 px-6 space-y-6">
+      <div className="content-with-header px-6 space-y-6">
         {/* Profile Header */}
         <Card className="glass-card" style={{
           background: 'var(--surface)',
