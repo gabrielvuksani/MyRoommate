@@ -111,6 +111,12 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 24, 2025 (Latest):**
+- ✓ **COMPLETED: Fresh database cleanup for testing environment - preserved all demo data for showcase purposes**
+- ✓ **Wiped all user data except 6 demo users**: Removed all real user accounts, sessions, and personal data
+- ✓ **Preserved 6 demo roommate listings**: All demo listings with Supabase-hosted images remain intact for testing
+- ✓ **Cleared all household data**: Removed all households, members, messages, chores, expenses, calendar events, and shopping items
+- ✓ **Reset all user activity**: No sessions, push subscriptions, or user-generated content remains
+- ✓ **Ready for fresh testing round**: Clean environment with demo listings available for new user interactions
 - ✓ **MAJOR: Migrated all image storage from local server to Supabase storage for improved performance and scalability**
 - ✓ **Installed @supabase/supabase-js package and configured Supabase client with proper admin and public access**
 - ✓ **Created server/supabase.ts with storage bucket initialization, image upload, and delete functions**
