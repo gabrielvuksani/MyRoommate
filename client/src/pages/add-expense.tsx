@@ -5,6 +5,7 @@ import { ArrowLeft, DollarSign, Users, Calendar, Plus, Minus } from "lucide-reac
 import { apiRequest } from "../lib/queryClient";
 import { notificationService } from '../lib/notifications';
 import { Card, CardContent } from "@/components/ui/card";
+import BackButton from "@/components/back-button";
 import {
   Select,
   SelectContent,
@@ -156,13 +157,7 @@ export default function AddExpense() {
         <div className="page-header">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <button
-                onClick={() => setLocation("/expenses")}
-                className="w-10 h-10 rounded-xl flex items-center justify-center hover:scale-105 transition-transform"
-                style={{ background: 'var(--surface-secondary)' }}
-              >
-                <ArrowLeft size={18} style={{ color: 'var(--text-primary)' }} />
-              </button>
+              <BackButton to="/expenses" />
               <div>
                 <h1 className="page-title">Add Expense</h1>
                 <p className="page-subtitle">Split a new expense</p>

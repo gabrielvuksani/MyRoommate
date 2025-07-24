@@ -1035,32 +1035,7 @@ export default function Profile() {
                   <div>Permission: {notificationInfo?.environment?.permission || 'N/A'}</div>
                 </div>
               </div>
-
-              <div className="text-sm text-gray-600 dark:text-gray-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-xl border border-green-200 dark:border-green-800">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Bell size={16} className="text-green-600 dark:text-green-400" />
-                  <span className="font-medium text-green-800 dark:text-green-300">Background Notifications Active</span>
-                </div>
-                <p className="text-xs text-green-700 dark:text-green-400">
-                  Real push notifications now work automatically for:
-                </p>
-                <ul className="text-xs text-green-700 dark:text-green-400 mt-1 ml-4 space-y-1">
-                  <li>• New messages when app is closed</li>
-                  <li>• Chore assignments and completions</li>
-                  <li>• New expenses and calendar events</li>
-                </ul>
-              </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Actions */}
-        <Card className="glass-card" style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)'
-        }}>
-          <CardContent className="p-6">
-            
           </CardContent>
         </Card>
       </div>

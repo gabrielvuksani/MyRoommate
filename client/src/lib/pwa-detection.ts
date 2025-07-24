@@ -4,7 +4,7 @@
  */
 
 export interface PWAEnvironment {
-  platform: 'ios' | 'android' | 'desktop';
+  platform: 'iOS' | 'Android' | 'Desktop';
   isInstalled: boolean;
   displayMode: 'browser' | 'standalone' | 'standalone-ios' | 'twa' | 'fullscreen' | 'minimal-ui';
   canInstall: boolean;
@@ -37,7 +37,7 @@ export class PWADetectionService {
     const isAndroidChrome = isAndroid && /Chrome/.test(userAgent);
 
     let environment: PWAEnvironment = {
-      platform: isIOS ? 'ios' : isAndroid ? 'android' : 'desktop',
+      platform: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
       isInstalled: false,
       displayMode: 'browser',
       canInstall: false,

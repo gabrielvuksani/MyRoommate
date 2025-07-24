@@ -154,7 +154,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="content-with-header px-6 space-y-6">
+      <div className="pt-32 px-6 space-y-6">
         {/* Time Period Filter */}
         <div className="mt-8 flex justify-center">
           <div
