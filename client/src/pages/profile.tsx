@@ -880,6 +880,22 @@ export default function Profile() {
                     : "Test Notifications"}
                 </span>
               </Button>
+              
+              {/* PWA Environment Information */}
+              <div className="mt-4 p-4 rounded-xl border" style={{ 
+                background: 'var(--surface-secondary)', 
+                borderColor: 'var(--border)' 
+              }}>
+                <h4 className="font-semibold text-sm mb-2" style={{ color: 'var(--text-primary)' }}>
+                  Environment Info
+                </h4>
+                <div className="space-y-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  <div>Platform: {notificationInfo?.environment?.platform || 'Unknown'}</div>
+                  <div>Installed: {notificationInfo?.environment?.isInstalled ? 'Yes' : 'No'}</div>
+                  <div>Strategy: {notificationInfo?.strategy || 'None'}</div>
+                  <div>Permission: {notificationInfo?.environment?.permission || 'Unknown'}</div>
+                </div>
+              </div>
 
               <div className="text-sm text-gray-600 dark:text-gray-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-xl border border-green-200 dark:border-green-800">
                 <div className="flex items-center space-x-2 mb-2">

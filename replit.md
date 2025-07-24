@@ -111,6 +111,13 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 24, 2025 (Latest):**
+- ✓ **COMPLETED: Unified notification system fully implemented with PWA/web browser detection and granular user controls**
+- ✓ **Built comprehensive notification settings card**: Per-notification-type toggles for all events (messages, chores, expenses, calendar, household) 
+- ✓ **Created iOS install banner**: Encourages mobile users to install PWA for optimal push notification support with step-by-step instructions
+- ✓ **Added PWA environment indicator**: Moved to developer tools section in profile page showing platform, installation status, notification strategy, and permission state
+- ✓ **Fixed push notification database integration**: Updated storage functions to match actual database schema (separate p256dh_key/auth_key columns, is_active field)
+- ✓ **Tested notification system end-to-end**: Created test user, joined Gabriel's household, sent test messages - system works correctly and waits for users to grant push permissions
+- ✓ **Integrated all components into main app**: iOS banner, environment indicator, notification settings, and unified notification service working together seamlessly
 - ✓ **COMPLETED: Fresh database cleanup for testing environment - preserved all demo data for showcase purposes**
 - ✓ **Wiped all user data except 6 demo users**: Removed all real user accounts, sessions, and personal data
 - ✓ **Preserved 6 demo roommate listings**: All demo listings with Supabase-hosted images remain intact for testing

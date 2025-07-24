@@ -716,85 +716,111 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Push subscription operations
-  async upsertPushSubscription(subscription: InsertPushSubscription): Promise<PushSubscription> {
-    const [result] = await db
-      .insert(pushSubscriptions)
-      .values({
-        ...subscription,
-        lastActive: new Date(),
-        updatedAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: pushSubscriptions.endpoint,
-        set: {
-          userId: subscription.userId,
-          keys: subscription.keys,
-          deviceInfo: subscription.deviceInfo,
-          active: subscription.active ?? true,
-          lastActive: new Date(),
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
+  async upsertPushSubscription(subscription: any): Promise<any> {
+    // Extract keys from subscription
+    const p256dhKey = subscription.keys?.p256dh || subscription.keys?.p256dhKey;
+    const authKey = subscription.keys?.auth || subscription.keys?.authKey;
     
-    return result;
+    // Using raw query to match actual database schema
+    const result = await db.execute(sql`
+      INSERT INTO push_subscriptions (user_id, endpoint, p256dh_key, auth_key, is_active, created_at)
+      VALUES (${subscription.userId}, ${subscription.endpoint}, ${p256dhKey}, ${authKey}, true, NOW())
+      ON CONFLICT (endpoint) 
+      DO UPDATE SET 
+        user_id = ${subscription.userId},
+        p256dh_key = ${p256dhKey},
+        auth_key = ${authKey},
+        is_active = true
+      RETURNING *
+    `);
+    
+    return result.rows[0];
   }
 
   async deletePushSubscription(userId: string, endpoint: string): Promise<void> {
-    await db
-      .delete(pushSubscriptions)
-      .where(and(
-        eq(pushSubscriptions.userId, userId),
-        eq(pushSubscriptions.endpoint, endpoint)
-      ));
+    await db.execute(sql`
+      DELETE FROM push_subscriptions 
+      WHERE user_id = ${userId} AND endpoint = ${endpoint}
+    `);
   }
 
   async deactivatePushSubscription(endpoint: string): Promise<void> {
-    await db
-      .update(pushSubscriptions)
-      .set({ 
-        active: false,
-        updatedAt: new Date()
-      })
-      .where(eq(pushSubscriptions.endpoint, endpoint));
+    await db.execute(sql`
+      UPDATE push_subscriptions 
+      SET is_active = false 
+      WHERE endpoint = ${endpoint}
+    `);
   }
 
-  async getUserPushSubscriptions(userId: string): Promise<PushSubscription[]> {
-    const result = await db
-      .select()
-      .from(pushSubscriptions)
-      .where(and(
-        eq(pushSubscriptions.userId, userId),
-        eq(pushSubscriptions.active, true)
-      ))
-      .orderBy(desc(pushSubscriptions.lastActive));
+  async getUserPushSubscriptions(userId: string): Promise<any[]> {
+    // Using raw query to match actual database schema
+    const result = await db.execute(sql`
+      SELECT 
+        id,
+        user_id as "userId",
+        endpoint,
+        p256dh_key,
+        auth_key,
+        created_at as "createdAt",
+        is_active as "active"
+      FROM push_subscriptions
+      WHERE user_id = ${userId}
+        AND is_active = true
+      ORDER BY created_at DESC
+    `);
     
-    return result;
+    return result.rows.map((row: any) => ({
+      id: row.id,
+      userId: row.userId,
+      endpoint: row.endpoint,
+      keys: {
+        p256dh: row.p256dh_key,
+        auth: row.auth_key
+      },
+      active: row.active,
+      createdAt: row.createdAt
+    }));
   }
 
-  async getActivePushSubscriptions(householdId: string): Promise<(PushSubscription & { user: User })[]> {
-    const result = await db
-      .select({
-        id: pushSubscriptions.id,
-        userId: pushSubscriptions.userId,
-        endpoint: pushSubscriptions.endpoint,
-        keys: pushSubscriptions.keys,
-        deviceInfo: pushSubscriptions.deviceInfo,
-        active: pushSubscriptions.active,
-        lastActive: pushSubscriptions.lastActive,
-        createdAt: pushSubscriptions.createdAt,
-        updatedAt: pushSubscriptions.updatedAt,
-        user: users,
-      })
-      .from(pushSubscriptions)
-      .innerJoin(users, eq(pushSubscriptions.userId, users.id))
-      .innerJoin(householdMembers, eq(users.id, householdMembers.userId))
-      .where(and(
-        eq(householdMembers.householdId, householdId),
-        eq(pushSubscriptions.active, true)
-      ));
+  async getActivePushSubscriptions(householdId: string): Promise<any[]> {
+    // Using raw query to match actual database schema
+    const result = await db.execute(sql`
+      SELECT 
+        ps.id,
+        ps.user_id as "userId",
+        ps.endpoint,
+        ps.p256dh_key,
+        ps.auth_key,
+        ps.created_at as "createdAt",
+        ps.is_active as "active",
+        u.id as "user_id",
+        u.email as "user_email",
+        u.first_name as "user_firstName",
+        u.last_name as "user_lastName"
+      FROM push_subscriptions ps
+      INNER JOIN users u ON ps.user_id = u.id
+      INNER JOIN household_members hm ON u.id = hm.user_id
+      WHERE hm.household_id = ${householdId}
+        AND ps.is_active = true
+    `);
     
-    return result;
+    return result.rows.map((row: any) => ({
+      id: row.id,
+      userId: row.userId,
+      endpoint: row.endpoint,
+      keys: {
+        p256dh: row.p256dh_key,
+        auth: row.auth_key
+      },
+      active: row.active,
+      createdAt: row.createdAt,
+      user: {
+        id: row.user_id,
+        email: row.user_email,
+        firstName: row.user_firstName,
+        lastName: row.user_lastName
+      }
+    }));
   }
 
   async deleteAllHouseholdData(householdId: string): Promise<void> {

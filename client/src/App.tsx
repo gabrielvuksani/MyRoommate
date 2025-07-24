@@ -115,9 +115,6 @@ function Router() {
       
       {/* iOS Install Banner */}
       <IOSInstallBanner />
-      
-      {/* PWA Environment Indicator (for testing) */}
-      {process.env.NODE_ENV === 'development' && <PWAEnvironmentIndicator />}
     </div>
   );
 }
