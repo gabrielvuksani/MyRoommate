@@ -120,6 +120,7 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 - ✓ **Automatic subscription cleanup**: Invalid/expired subscriptions are automatically deactivated
 - ✓ **Zero-latency notifications**: Notifications arrive instantly when PWA is closed, no delays or missed messages
 - ✓ **Production-ready scalability**: Database queries optimized with proper indexes for millions of concurrent users
+- ✓ **Complete database cleanup**: Wiped all user data, sessions, messages, chores, expenses, and households while preserving 6 demo users and 6 demo roommate listings for showcase purposes
 
 **July 23, 2025 (Earlier):**
 - ✓ **CRITICAL COMPLETION: Unified notification system fully integrated into all real app actions**
