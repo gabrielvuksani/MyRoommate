@@ -41,10 +41,30 @@ export default function Profile() {
   const [notificationInfo, setNotificationInfo] = useState<any>(null);
   const [notificationSettings, setNotificationSettings] = useState<any>(null);
   const [isTestingNotification, setIsTestingNotification] = useState(false);
+  const [canShowNotifications, setCanShowNotifications] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
   });
+
+  // Function to check if notifications can be shown
+  const checkNotificationCapability = () => {
+    const info = unifiedNotifications.getEnvironmentInfo();
+    const settings = unifiedNotifications.getSettings();
+    
+    // Notifications can be shown if:
+    // 1. We have a valid strategy (not 'none')
+    // 2. Browser supports notifications
+    // 3. User hasn't permanently blocked notifications in all contexts
+    const canShow = info.strategy !== 'none' || 
+                   ('Notification' in window && Notification.permission !== 'denied');
+    
+    setNotificationInfo(info);
+    setNotificationSettings(settings);
+    setCanShowNotifications(canShow);
+    
+    return canShow;
+  };
 
   useEffect(() => {
     // Scroll to top when page loads
@@ -56,11 +76,33 @@ export default function Profile() {
 
     window.addEventListener("scroll", handleScroll);
     
-    // Check notification environment and settings
-    setNotificationInfo(unifiedNotifications.getEnvironmentInfo());
-    setNotificationSettings(unifiedNotifications.getSettings());
+    // Check notification capability
+    checkNotificationCapability();
     
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Listen for permission changes
+    if ('permissions' in navigator) {
+      navigator.permissions.query({ name: 'notifications' as PermissionName })
+        .then(permissionStatus => {
+          permissionStatus.onchange = () => {
+            checkNotificationCapability();
+          };
+        })
+        .catch(() => {
+          // Fallback for browsers that don't support permission query
+        });
+    }
+    
+    // Check for focus changes to update notification status
+    const handleFocus = () => {
+      checkNotificationCapability();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const updateNameMutation = useMutation({
@@ -231,8 +273,13 @@ export default function Profile() {
   const handleTestNotification = async () => {
     const info = unifiedNotifications.getEnvironmentInfo();
     
-    if (info.strategy === 'none') {
-      alert('Notifications are not supported on mobile browsers. Please install the app to your home screen to receive notifications.');
+    if (info.requiresInstall) {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        alert('To receive notifications on iOS:\n\n1. Tap the Share button (box with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right\n4. Open the app from your home screen');
+      } else {
+        alert('To receive notifications on Android:\n\n1. Tap the menu button (three dots)\n2. Tap "Add to Home screen"\n3. Follow the prompts\n4. Open the app from your home screen');
+      }
       return;
     }
     
@@ -250,17 +297,25 @@ export default function Profile() {
         success = await unifiedNotifications.requestPermission();
         if (!success) {
           alert('Notification permission was denied. Please enable notifications in your browser settings.');
+          checkNotificationCapability(); // Re-check after denial
           return;
         }
       }
       
-      // Send test notification
+      // Send test notification based on support level
       if (info.permission === 'granted' || success) {
-        await unifiedNotifications.testNotification();
+        const testSuccess = await unifiedNotifications.testNotification();
+        if (testSuccess) {
+          if (info.supportLevel === 'full') {
+            alert('Success! You will receive notifications even when the app is closed.');
+          } else if (info.supportLevel === 'partial') {
+            alert('Success! You will receive notifications while the browser is open.');
+          }
+        }
       }
       
-      // Update info after permission change
-      setNotificationInfo(unifiedNotifications.getEnvironmentInfo());
+      // Re-check capability after permission change
+      checkNotificationCapability();
       
     } catch (error) {
       console.error('Test notification failed:', error);
@@ -270,7 +325,18 @@ export default function Profile() {
     }
   };
 
-  const handleNotificationToggle = (type: string, enabled: boolean) => {
+  const handleNotificationToggle = async (type: string, enabled: boolean) => {
+    // If enabling master toggle and no permission yet, request it
+    if (type === 'enabled' && enabled && notificationInfo?.permission === 'default') {
+      const granted = await unifiedNotifications.requestPermission();
+      if (!granted) {
+        // Permission denied, don't enable
+        return;
+      }
+      // Re-check capability after permission change
+      checkNotificationCapability();
+    }
+    
     if (type === 'enabled') {
       unifiedNotifications.updateSettings({ enabled });
     } else {
@@ -475,12 +541,13 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Notification Settings */}
-        <Card className="glass-card" style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)'
-        }}>
-          <CardContent className="p-6">
+        {/* Notification Settings - Only show if notifications can be served */}
+        {canShowNotifications && (
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)'
+          }}>
+            <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                 Notifications
@@ -495,27 +562,46 @@ export default function Profile() {
                 border: '1px solid var(--border)'
               }}>
                 <div className="flex items-center gap-2 mb-2">
-                  {notificationInfo.strategy === 'pwa' && <Smartphone className="w-4 h-4 text-green-600" />}
-                  {notificationInfo.strategy === 'web' && <Monitor className="w-4 h-4 text-blue-600" />}
-                  {notificationInfo.strategy === 'none' && <AlertTriangle className="w-4 h-4 text-orange-600" />}
+                  {notificationInfo.supportLevel === 'full' && <Smartphone className="w-4 h-4 text-green-600" />}
+                  {notificationInfo.supportLevel === 'partial' && <Monitor className="w-4 h-4 text-blue-600" />}
+                  {notificationInfo.supportLevel === 'none' && <AlertTriangle className="w-4 h-4 text-orange-600" />}
                   
                   <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                    {notificationInfo.strategy === 'pwa' && 'PWA Mode - Push Notifications'}
-                    {notificationInfo.strategy === 'web' && 'Browser Mode - Web Notifications'}
-                    {notificationInfo.strategy === 'none' && 'Limited Support'}
+                    {notificationInfo.supportLevel === 'full' && 'Full Support - Push Notifications'}
+                    {notificationInfo.supportLevel === 'partial' && 'Partial Support - Browser Notifications'}
+                    {notificationInfo.supportLevel === 'none' && (
+                      notificationInfo.requiresInstall ? 'Installation Required' : 'Limited Support'
+                    )}
                   </span>
                 </div>
                 
                 <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  {notificationInfo.strategy === 'pwa' && 'You can receive notifications even when the app is closed.'}
-                  {notificationInfo.strategy === 'web' && 'You can receive notifications while using the browser.'}
-                  {notificationInfo.strategy === 'none' && 'Install the app to your home screen to receive notifications.'}
+                  {notificationInfo.supportLevel === 'full' && 'You can receive notifications even when the app is closed.'}
+                  {notificationInfo.supportLevel === 'partial' && 'You can receive notifications while using the browser.'}
+                  {notificationInfo.supportLevel === 'none' && (
+                    notificationInfo.requiresInstall 
+                      ? 'Install the app to your home screen to enable push notifications.'
+                      : notificationInfo.permission === 'denied' 
+                        ? 'Notifications are blocked in your browser settings.'
+                        : 'Click "Enable Notifications" below to get started.'
+                  )}
                 </p>
                 
-                {notificationInfo.permission === 'denied' && (
-                  <p className="text-xs text-red-600 mt-1">
-                    Notifications are blocked. Enable them in your browser settings.
-                  </p>
+                {/* Install prompt for mobile users */}
+                {notificationInfo.requiresInstall && (
+                  <button 
+                    className="mt-3 text-xs text-blue-600 underline hover:text-blue-700"
+                    onClick={() => {
+                      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                      if (isIOS) {
+                        alert('To install on iOS:\n\n1. Tap the Share button (box with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
+                      } else {
+                        alert('To install on Android:\n\n1. Tap the menu button (three dots)\n2. Tap "Add to Home screen"\n3. Follow the prompts');
+                      }
+                    }}
+                  >
+                    How to install the app
+                  </button>
                 )}
               </div>
             )}
@@ -524,18 +610,37 @@ export default function Profile() {
             {notificationSettings && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                  <div>
-                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
-                      Enable Notifications
-                    </span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                        Enable Notifications
+                      </span>
+                      {notificationInfo.permission === 'granted' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                          Allowed
+                        </span>
+                      )}
+                      {notificationInfo.permission === 'denied' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                          Blocked
+                        </span>
+                      )}
+                      {notificationInfo.permission === 'default' && notificationSettings.enabled && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                          Permission needed
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-                      Master control for all notification types
+                      {notificationInfo.permission === 'denied' 
+                        ? 'Enable in browser settings to continue'
+                        : 'Master control for all notification types'}
                     </p>
                   </div>
                   <Switch
                     checked={notificationSettings.enabled}
                     onCheckedChange={(checked) => handleNotificationToggle('enabled', checked)}
-                    disabled={notificationInfo?.strategy === 'none'}
+                    disabled={notificationInfo?.permission === 'denied' || notificationInfo?.requiresInstall}
                   />
                 </div>
 
@@ -623,16 +728,20 @@ export default function Profile() {
                 <div className="pt-4 mt-4" style={{ borderTop: '1px solid var(--border)' }}>
                   <Button
                     onClick={handleTestNotification}
-                    disabled={isTestingNotification || notificationInfo?.strategy === 'none' || !notificationSettings.enabled}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition-colors"
+                    disabled={isTestingNotification || (!notificationSettings.enabled && !notificationInfo?.requiresInstall)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isTestingNotification ? "Sending..." : "Test Notifications"}
+                    {isTestingNotification ? "Sending..." : 
+                     notificationInfo?.requiresInstall ? "Install App for Notifications" :
+                     notificationInfo?.permission === 'denied' ? "Enable in Browser Settings" :
+                     "Test Notifications"}
                   </Button>
                 </div>
               </div>
             )}
           </CardContent>
         </Card>
+        )}
 
         {/* Account Details */}
         <Card className="glass-card" style={{

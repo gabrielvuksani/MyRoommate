@@ -110,7 +110,19 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**July 24, 2025 (Latest):**
+**January 24, 2025 (Latest):**
+- ✓ **COMPLETED: Smart notification system with intelligent capability detection and conditional rendering**
+- ✓ **Fixed switch/slider visibility issues in dark mode app-wide**: Added proper CSS variables --switch-bg-unchecked (#E2E8F0) and dark mode variant (rgba(148, 163, 184, 0.3))
+- ✓ **Enhanced notification section to only show when notifications can be served**: Conditional rendering based on canShowNotifications flag that checks browser support and permissions
+- ✓ **Added real-time permission monitoring**: Notification permission status updates automatically when changed via browser settings or permission prompts
+- ✓ **Implemented smart notification support levels**: 'full' (PWA with push), 'partial' (browser notifications), 'none' (requires install or blocked)
+- ✓ **Added mobile app install prompts**: Detects when mobile users need to install PWA for notifications with platform-specific instructions
+- ✓ **Enhanced test button intelligence**: Dynamic button text and behavior based on notification environment (install needed, permission blocked, ready to test)
+- ✓ **Added permission status badges**: Visual indicators showing 'Allowed', 'Blocked', or 'Permission needed' states next to master toggle
+- ✓ **Improved notification environment detection**: Enhanced getEnvironmentInfo() with isMobile, isStandalone, supportLevel, and requiresInstall flags
+- ✓ **Master toggle smart behavior**: Automatically requests permission when enabling notifications, disabled when blocked or install required
+
+**July 24, 2025 (Earlier):**
 - ✓ **CRITICAL FIX: Resolved environment-specific spacing inconsistencies between development and production**
 - ✓ **Replaced hardcoded pixel values with responsive Tailwind classes**: messages.tsx spacing now uses pt-36, pb-40/pb-52, min-h-[calc(100vh-6rem)] instead of fixed 140px/160px/200px values
 - ✓ **Enhanced viewport detection with Visual Viewport API**: Updated keyboard height detection to use window.visualViewport for better cross-environment consistency

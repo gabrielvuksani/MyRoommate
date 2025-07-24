@@ -348,17 +348,38 @@ export class UnifiedNotificationService {
     permission: NotificationPermission;
     canRequest: boolean;
     isSetup: boolean;
+    isMobile: boolean;
+    isStandalone: boolean;
+    supportLevel: 'full' | 'partial' | 'none';
+    requiresInstall: boolean;
   } {
     const env = pwaDetection.getEnvironment();
     const strategy = pwaDetection.getNotificationStrategy();
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     
     return {
       strategy,
       environment: env,
       permission: this.permission,
       canRequest: this.permission === 'default' && strategy !== 'none',
-      isSetup: this.permission === 'granted' && (strategy !== 'pwa' || this.pushSubscription !== null)
+      isSetup: this.permission === 'granted' && (strategy !== 'pwa' || this.pushSubscription !== null),
+      isMobile,
+      isStandalone,
+      supportLevel: this.getNotificationSupportLevel(),
+      requiresInstall: isMobile && !isStandalone && strategy === 'none'
     };
+  }
+  
+  private getNotificationSupportLevel(): 'full' | 'partial' | 'none' {
+    const strategy = pwaDetection.getNotificationStrategy();
+    
+    if (strategy === 'pwa' && this.permission === 'granted') {
+      return 'full'; // Can receive notifications even when closed
+    } else if (strategy === 'web' && this.permission === 'granted') {
+      return 'partial'; // Can receive notifications while browser is open
+    }
+    return 'none';
   }
 
   // Test functionality

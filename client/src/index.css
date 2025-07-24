@@ -123,6 +123,10 @@
   --surface-glass: rgba(255, 255, 255, 0.6);
   
   --text-primary: #1C1C1E;
+  
+  /* Toggle/Switch specific */
+  --toggle-bg: rgba(0, 0, 0, 0.16);
+  --toggle-bg-hover: rgba(0, 0, 0, 0.20);
   --text-secondary: #8E8E93;
   --text-tertiary: #C7C7CC;
   --text-inverse: #FFFFFF;
@@ -170,6 +174,10 @@
   --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.4);
   --shadow-strong: 0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 0 0 3px rgba(10, 132, 255, 0.2);
+  
+  /* Toggle/Switch specific - more visible in dark mode */
+  --toggle-bg: rgba(255, 255, 255, 0.25);
+  --toggle-bg-hover: rgba(255, 255, 255, 0.35);
 }
 
 /* Shared Variables (Both Light & Dark) */
