@@ -109,7 +109,7 @@ export default function Expenses() {
         </div>
       </div>
 
-      <div className="pt-20 px-4 pb-8 max-w-lg mx-auto">
+      <div className="content-with-header-compact px-4 pb-8 max-w-lg mx-auto">
         {/* Balance Overview */}
         <div className="glass-card p-6 mb-6">
           <div className="flex items-center space-x-3 mb-4">

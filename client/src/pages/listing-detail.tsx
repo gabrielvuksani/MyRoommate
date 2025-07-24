@@ -67,7 +67,7 @@ export default function ListingDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-36 pb-20 px-6 max-w-3xl mx-auto">
+      <div className="min-h-screen content-with-header pb-20 px-6 max-w-3xl mx-auto">
         <div className="space-y-4">
           <div className="h-64 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-3xl animate-pulse" />
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse w-3/4" />
@@ -79,7 +79,7 @@ export default function ListingDetail() {
 
   if (!typedListing) {
     return (
-      <div className="min-h-screen pt-36 pb-20 px-6 max-w-3xl mx-auto">
+      <div className="min-h-screen content-with-header pb-20 px-6 max-w-3xl mx-auto">
         <Card className="glass-card">
           <CardContent className="p-8 text-center">
             <Home className="w-12 h-12 mx-auto mb-4 text-gray-400" />
@@ -127,7 +127,7 @@ export default function ListingDetail() {
         </div>
       </div>
 
-      <div className="pt-44 px-6 max-w-3xl mx-auto space-y-6 page-enter">
+      <div className="content-with-header px-6 max-w-3xl mx-auto space-y-6 page-enter">
         {/* Image Gallery with Featured Badge */}
         <div className="relative">
           {typedListing.images && typedListing.images.length > 0 ? (
