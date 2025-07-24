@@ -1,14 +1,14 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { initializeStorage } from "./supabase";
 import path from "path";
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
-// Serve static files for uploaded images
-app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
+// Note: Images are now hosted on Supabase storage instead of local server
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -41,6 +41,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize Supabase storage
+  await initializeStorage();
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

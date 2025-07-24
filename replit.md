@@ -111,6 +111,18 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **July 24, 2025 (Latest):**
+- ✓ **MAJOR: Migrated all image storage from local server to Supabase storage for improved performance and scalability**
+- ✓ **Installed @supabase/supabase-js package and configured Supabase client with proper admin and public access**
+- ✓ **Created server/supabase.ts with storage bucket initialization, image upload, and delete functions**
+- ✓ **Updated profile image upload system**: All profile images now stored in Supabase storage bucket with unique filenames
+- ✓ **Added roommate listing image upload endpoint**: `/api/roommate-listings/upload-images` supports up to 5 images per listing
+- ✓ **Uploaded all 8 demo listing images to Supabase storage**: Custom SVGs now hosted at Supabase URLs for faster loading
+- ✓ **Updated database with Supabase image URLs**: All demo listings now reference proper Supabase storage URLs
+- ✓ **Removed local static file serving**: No longer serving images from local server, all images now on Supabase
+- ✓ **Enhanced image management**: Automatic cleanup of old images when users update profile pictures or listings
+- ✓ **Production-ready image hosting**: Supabase storage provides CDN, automatic resizing, and unlimited scalability
+
+**July 24, 2025 (Earlier):**
 - ✓ **CRITICAL: Completed scalable push notification overhaul - now handles millions of users without polling**
 - ✓ **Database-backed push subscription storage**: Migrated from in-memory Map to PostgreSQL table with proper indexes
 - ✓ **Server-side notification triggers**: All events (messages, chores, expenses, calendar) now send push notifications directly from server

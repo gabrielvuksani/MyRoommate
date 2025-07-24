@@ -703,6 +703,18 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  async updateRoommateListingImages(id: string, imageUrls: string[]): Promise<RoommateListing> {
+    const [updated] = await db
+      .update(roommateListings)
+      .set({ 
+        images: imageUrls,
+        updatedAt: new Date() 
+      })
+      .where(eq(roommateListings.id, id))
+      .returning();
+    return updated;
+  }
+
   // Push subscription operations
   async upsertPushSubscription(subscription: InsertPushSubscription): Promise<PushSubscription> {
     const [result] = await db

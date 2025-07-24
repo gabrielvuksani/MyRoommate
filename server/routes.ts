@@ -4,6 +4,8 @@ import { WebSocketServer, WebSocket } from "ws";
 import webpush from "web-push";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
+import { uploadImage, deleteImage } from "./supabase";
+import multer from "multer";
 import {
   insertHouseholdSchema,
   insertChoreSchema,
@@ -14,6 +16,23 @@ import {
   insertRoommateListingSchema,
 } from "@shared/schema";
 import { z } from "zod";
+import { nanoid } from "nanoid";
+import path from "path";
+
+// Configure multer for in-memory storage (for Supabase upload)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  }
+});
 
 // Configure web-push with VAPID keys
 webpush.setVapidDetails(
@@ -826,6 +845,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting roommate listing:", error);
       res.status(500).json({ message: "Failed to delete roommate listing" });
+    }
+  });
+
+  // Upload images for roommate listings
+  app.post('/api/roommate-listings/upload-images', isAuthenticated, upload.array('images', 5), async (req: any, res) => {
+    try {
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ message: "No images uploaded" });
+      }
+
+      const userId = req.user.id;
+      const uploadedUrls: string[] = [];
+
+      // Upload each image to Supabase storage
+      for (const file of req.files) {
+        const ext = path.extname(file.originalname);
+        const fileName = `listings/${userId}-${nanoid()}${ext}`;
+        
+        const publicUrl = await uploadImage(file.buffer, fileName, file.mimetype);
+        
+        if (publicUrl) {
+          uploadedUrls.push(publicUrl);
+        }
+      }
+
+      res.json({ imageUrls: uploadedUrls });
+    } catch (error) {
+      console.error("Error uploading listing images:", error);
+      res.status(500).json({ message: "Failed to upload images" });
     }
   });
 

@@ -11,6 +11,7 @@ import { nanoid } from "nanoid";
 import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
+import { uploadImage, deleteImage } from "./supabase";
 
 declare global {
   namespace Express {
@@ -45,27 +46,9 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
-// Configure multer for profile image uploads
-const storage_multer = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'profiles');
-    try {
-      await fs.mkdir(uploadDir, { recursive: true });
-      cb(null, uploadDir);
-    } catch (error) {
-      cb(error as Error, uploadDir);
-    }
-  },
-  filename: (req, file, cb) => {
-    const user = req.user as Express.User;
-    const ext = path.extname(file.originalname);
-    const filename = `${user.id}-${Date.now()}${ext}`;
-    cb(null, filename);
-  }
-});
-
+// Configure multer for in-memory storage (for Supabase upload)
 const upload = multer({
-  storage: storage_multer,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
   },
@@ -321,23 +304,33 @@ export function setupAuth(app: Express) {
       }
 
       const user = req.user as Express.User;
-      const imageUrl = `/uploads/profiles/${req.file.filename}`;
+      
+      // Generate unique filename for Supabase storage
+      const ext = path.extname(req.file.originalname);
+      const fileName = `profiles/${user.id}-${nanoid()}${ext}`;
+      
+      // Upload to Supabase storage
+      const publicUrl = await uploadImage(req.file.buffer, fileName, req.file.mimetype);
+      
+      if (!publicUrl) {
+        return res.status(500).json({ message: "Failed to upload image to storage" });
+      }
       
       // Update user profile image in database
-      const updatedUser = await storage.updateUserProfileImage(user.id, imageUrl);
+      const updatedUser = await storage.updateUserProfileImage(user.id, publicUrl);
       
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Remove old profile image file if it exists
-      if (user.profileImageUrl) {
+      // Remove old profile image from Supabase storage if it exists
+      if (user.profileImageUrl && user.profileImageUrl.includes('supabase')) {
         try {
-          const oldImagePath = path.join(process.cwd(), 'public', user.profileImageUrl);
-          await fs.unlink(oldImagePath);
+          const urlParts = user.profileImageUrl.split('/');
+          const oldFileName = urlParts[urlParts.length - 1];
+          await deleteImage(`profiles/${oldFileName}`);
         } catch (error) {
-          // Ignore errors when removing old file
-          console.log('Could not remove old profile image:', error);
+          console.log('Could not remove old profile image from storage:', error);
         }
       }
 
@@ -360,12 +353,15 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "No profile image to remove" });
       }
 
-      // Remove file from disk
-      try {
-        const imagePath = path.join(process.cwd(), 'public', user.profileImageUrl);
-        await fs.unlink(imagePath);
-      } catch (error) {
-        console.log('Could not remove profile image file:', error);
+      // Remove file from Supabase storage
+      if (user.profileImageUrl.includes('supabase')) {
+        try {
+          const urlParts = user.profileImageUrl.split('/');
+          const fileName = urlParts[urlParts.length - 1];
+          await deleteImage(`profiles/${fileName}`);
+        } catch (error) {
+          console.log('Could not remove profile image from storage:', error);
+        }
       }
 
       // Update user in database
