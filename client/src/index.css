@@ -49,6 +49,22 @@
   display: none; /* WebKit */
 }
 
+/* Slide-up animation for iOS install banner */
+@keyframes slide-up {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
 /* Portrait mode restriction */
 @media screen and (orientation: landscape) and (max-height: 900px) {
   body {

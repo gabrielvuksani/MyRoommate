@@ -11,13 +11,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
-import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell, Trash2 } from "lucide-react";
+import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell, Trash2, Smartphone, Monitor, AlertTriangle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { getProfileInitials } from "@/lib/nameUtils";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useTheme } from "@/lib/ThemeProvider";
 import BackButton from "../components/back-button";
 import { PersistentLoading } from "@/lib/persistentLoading";
-import { notificationService } from "@/lib/notifications";
+import { unifiedNotifications } from "@/lib/unified-notifications";
+import { pwaDetection } from "@/lib/pwa-detection";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -36,8 +38,8 @@ export default function Profile() {
 
 
   const [isCopied, setIsCopied] = useState(false);
-  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  const [notificationStatus, setNotificationStatus] = useState<any>(null);
+  const [notificationInfo, setNotificationInfo] = useState<any>(null);
+  const [notificationSettings, setNotificationSettings] = useState<any>(null);
   const [isTestingNotification, setIsTestingNotification] = useState(false);
 
   const { data: household } = useQuery({
@@ -54,9 +56,9 @@ export default function Profile() {
 
     window.addEventListener("scroll", handleScroll);
     
-    // Check notification permission and detailed status
-    setNotificationPermission(notificationService.getPermissionStatus());
-    setNotificationStatus(notificationService.getDetailedStatus());
+    // Check notification environment and settings
+    setNotificationInfo(unifiedNotifications.getEnvironmentInfo());
+    setNotificationSettings(unifiedNotifications.getSettings());
     
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -227,20 +229,14 @@ export default function Profile() {
   };
 
   const handleTestNotification = async () => {
-    const status = notificationService.getDetailedStatus();
+    const info = unifiedNotifications.getEnvironmentInfo();
     
-    // Handle different scenarios intelligently
-    if (!status.supported) {
-      alert('Your browser does not support notifications.');
+    if (info.strategy === 'none') {
+      alert('Notifications are not supported on mobile browsers. Please install the app to your home screen to receive notifications.');
       return;
     }
     
-    if (!status.secure) {
-      alert('Notifications require a secure connection (HTTPS). They may not work on this connection.');
-      return;
-    }
-    
-    if (status.permission === 'denied') {
+    if (info.permission === 'denied') {
       alert('Notifications are blocked. To enable them:\n\n1. Click the lock icon in your address bar\n2. Select "Allow" for notifications\n3. Refresh the page and try again');
       return;
     }
@@ -250,38 +246,21 @@ export default function Profile() {
       let success = false;
       
       // Request permission if needed
-      if (status.canRequest) {
-        success = await notificationService.requestPermission();
+      if (info.canRequest) {
+        success = await unifiedNotifications.requestPermission();
         if (!success) {
           alert('Notification permission was denied. Please enable notifications in your browser settings.');
           return;
         }
       }
       
-      // Set up push subscription after permission is granted
-      if (status.permission === 'granted' || success) {
-        // Ensure push subscription is set up for background notifications
-        await notificationService.subscribeToPush();
-        
-        await notificationService.showTestNotification();
-        
-        // Send additional demo notifications to showcase different types
-        setTimeout(() => {
-          notificationService.showMessageNotification("Alex", "Hey! Are you free this weekend?");
-        }, 2000);
-        
-        setTimeout(() => {
-          notificationService.showChoreNotification("Take out trash", "Sam");
-        }, 4000);
-        
-        setTimeout(() => {
-          notificationService.showExpenseNotification("Groceries", 45.67, "Jordan");
-        }, 6000);
+      // Send test notification
+      if (info.permission === 'granted' || success) {
+        await unifiedNotifications.testNotification();
       }
       
-      // Update status after permission change
-      setNotificationPermission(notificationService.getPermissionStatus());
-      setNotificationStatus(notificationService.getDetailedStatus());
+      // Update info after permission change
+      setNotificationInfo(unifiedNotifications.getEnvironmentInfo());
       
     } catch (error) {
       console.error('Test notification failed:', error);
@@ -289,6 +268,15 @@ export default function Profile() {
     } finally {
       setIsTestingNotification(false);
     }
+  };
+
+  const handleNotificationToggle = (type: string, enabled: boolean) => {
+    if (type === 'enabled') {
+      unifiedNotifications.updateSettings({ enabled });
+    } else {
+      unifiedNotifications.updateTypeSettings(type as any, enabled);
+    }
+    setNotificationSettings(unifiedNotifications.getSettings());
   };
 
   if (!user) {
@@ -484,6 +472,165 @@ export default function Profile() {
                 }
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Notification Settings */}
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)'
+        }}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                Notifications
+              </h3>
+              <Bell className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
+            </div>
+
+            {/* Environment Info */}
+            {notificationInfo && (
+              <div className="mb-6 p-4 rounded-xl" style={{ 
+                background: 'var(--surface-secondary)',
+                border: '1px solid var(--border)'
+              }}>
+                <div className="flex items-center gap-2 mb-2">
+                  {notificationInfo.strategy === 'pwa' && <Smartphone className="w-4 h-4 text-green-600" />}
+                  {notificationInfo.strategy === 'web' && <Monitor className="w-4 h-4 text-blue-600" />}
+                  {notificationInfo.strategy === 'none' && <AlertTriangle className="w-4 h-4 text-orange-600" />}
+                  
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    {notificationInfo.strategy === 'pwa' && 'PWA Mode - Push Notifications'}
+                    {notificationInfo.strategy === 'web' && 'Browser Mode - Web Notifications'}
+                    {notificationInfo.strategy === 'none' && 'Limited Support'}
+                  </span>
+                </div>
+                
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  {notificationInfo.strategy === 'pwa' && 'You can receive notifications even when the app is closed.'}
+                  {notificationInfo.strategy === 'web' && 'You can receive notifications while using the browser.'}
+                  {notificationInfo.strategy === 'none' && 'Install the app to your home screen to receive notifications.'}
+                </p>
+                
+                {notificationInfo.permission === 'denied' && (
+                  <p className="text-xs text-red-600 mt-1">
+                    Notifications are blocked. Enable them in your browser settings.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Master Toggle */}
+            {notificationSettings && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <div>
+                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                      Enable Notifications
+                    </span>
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                      Master control for all notification types
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notificationSettings.enabled}
+                    onCheckedChange={(checked) => handleNotificationToggle('enabled', checked)}
+                    disabled={notificationInfo?.strategy === 'none'}
+                  />
+                </div>
+
+                {/* Individual Type Controls */}
+                {notificationSettings.enabled && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Messages
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          New messages from roommates
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.message}
+                        onCheckedChange={(checked) => handleNotificationToggle('message', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Chores
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          Chore assignments and completions
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.chore}
+                        onCheckedChange={(checked) => handleNotificationToggle('chore', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Expenses
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          New expenses and bill splits
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.expense}
+                        onCheckedChange={(checked) => handleNotificationToggle('expense', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Calendar
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          New events and reminders
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.calendar}
+                        onCheckedChange={(checked) => handleNotificationToggle('calendar', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Household
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          Important household updates
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.household}
+                        onCheckedChange={(checked) => handleNotificationToggle('household', checked)}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Test Button */}
+                <div className="pt-4 mt-4" style={{ borderTop: '1px solid var(--border)' }}>
+                  <Button
+                    onClick={handleTestNotification}
+                    disabled={isTestingNotification || notificationInfo?.strategy === 'none' || !notificationSettings.enabled}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition-colors"
+                  >
+                    {isTestingNotification ? "Sending..." : "Test Notifications"}
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -723,27 +870,14 @@ export default function Profile() {
               </Button>
               <Button
                 onClick={handleTestNotification}
-                disabled={isTestingNotification || (notificationStatus && !notificationStatus.supported)}
-                className={`w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center space-x-2 disabled:opacity-50 ${
-                  notificationStatus?.blockReason
-                    ? 'bg-gray-600 hover:bg-gray-700'
-                    : notificationStatus?.permission === 'granted'
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-purple-600 hover:bg-purple-700'
-                }`}
+                disabled={isTestingNotification || notificationInfo?.strategy === 'none'}
+                className="w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center space-x-2 disabled:opacity-50 bg-purple-600 hover:bg-purple-700"
               >
                 <Bell size={20} className={isTestingNotification ? "animate-pulse" : ""} />
                 <span>
                   {isTestingNotification
                     ? "Sending test notification..."
-                    : notificationStatus?.blockReason
-                    ? "Notifications Unavailable"
-                    : notificationStatus?.permission === 'granted'
-                    ? "Test Live Notifications"
-                    : notificationStatus?.canRequest
-                    ? "Enable Notifications"
-                    : "Notifications Blocked"
-                  }
+                    : "Test Notifications"}
                 </span>
               </Button>
 

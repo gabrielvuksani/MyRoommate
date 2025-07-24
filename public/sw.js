@@ -1,11 +1,13 @@
 // Service Worker for myRoommate PWA
 // Handles background push notifications, caching, and offline functionality
 
-const CACHE_NAME = 'myroommate-v1';
+const CACHE_NAME = 'myroommate-v2'; // Updated for unified notification system
 const STATIC_CACHE_URLS = [
   '/',
   '/auth',
-  '/manifest.json'
+  '/manifest.json',
+  '/icon-192x192.png',
+  '/icon-72x72.png'
 ];
 
 // Install event - cache static resources
@@ -41,6 +43,7 @@ self.addEventListener('push', (event) => {
       notificationData = event.data.json();
     }
   } catch (error) {
+    console.error('Failed to parse push data:', error);
     notificationData = {
       title: 'myRoommate',
       body: 'You have a new notification',
@@ -48,34 +51,32 @@ self.addEventListener('push', (event) => {
     };
   }
 
+  // Enhanced notification options for unified system
   const options = {
     body: notificationData.body || 'You have a new notification',
     icon: notificationData.icon || '/icon-192x192.png',
-    badge: '/icon-72x72.png',
-    tag: notificationData.tag || Date.now().toString(), // Unique tag for each notification
-    data: notificationData.data || {},
-    requireInteraction: true,
-    vibrate: [300, 100, 300, 100, 300],
-    silent: false,
+    badge: notificationData.badge || '/icon-72x72.png',
+    tag: notificationData.tag || `myroommate-${Date.now()}`,
+    data: {
+      timestamp: Date.now(),
+      type: notificationData.type || 'general',
+      url: '/', // Always open to home page
+      ...notificationData.data
+    },
+    requireInteraction: notificationData.requireInteraction || false,
+    vibrate: notificationData.vibrate || [200, 100, 200],
+    silent: notificationData.silent || false,
     renotify: true,
     timestamp: Date.now(),
     dir: 'ltr',
-    lang: 'en',
-    actions: [
-      {
-        action: 'open',
-        title: 'Open App'
-      }
-    ]
+    lang: 'en'
   };
 
-  // Always show notification immediately
+  // Show notification
   event.waitUntil(
-    Promise.resolve(
-      self.registration.showNotification(
-        notificationData.title || 'myRoommate',
-        options
-      )
+    self.registration.showNotification(
+      notificationData.title || 'myRoommate',
+      options
     )
   );
 });
