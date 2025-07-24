@@ -101,7 +101,7 @@ export default function Roommates() {
         </div>
       </div>
 
-      <div className="pt-48 px-6 pb-24 space-y-6">
+      <div className="content-with-header px-6 pb-24 space-y-6">
         {/* Glass Morphism Tab Bar */}
         <div className="relative pt-2">
           <div 
