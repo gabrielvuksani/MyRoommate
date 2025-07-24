@@ -1,267 +1,208 @@
-// Service Worker for myRoommate PWA
-// Handles background push notifications, caching, and offline functionality
+/**
+ * Enhanced Service Worker for myRoommate PWA
+ * Handles all unified notifications: messages, chores, expenses, calendar events
+ * Optimized for iOS PWA and cross-platform compatibility
+ */
 
-const CACHE_NAME = 'myroommate-enterprise-v1';
-const STATIC_CACHE_URLS = [
-  '/',
-  '/auth',
-  '/manifest.json',
-  '/icon-192x192.png',
-  '/icon-512x512.png'
-];
+const CACHE_NAME = 'myroommate-v1';
+const OFFLINE_URL = '/offline.html';
 
-// Enhanced iOS compatibility and background sync
-const isIOSDevice = /iPad|iPhone|iPod/.test(self.navigator.userAgent || '');
-let notificationPermissionGranted = false;
-
-// Install event - cache static resources
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_CACHE_URLS))
-      .then(() => self.skipWaiting())
-  );
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
-  );
-});
-
-// Enhanced push event handler for iOS background notifications
-self.addEventListener('push', (event) => {
-  let notificationData = {};
+// Enhanced iOS PWA notification event handling
+self.addEventListener('push', function(event) {
+  console.log('Push event received');
   
+  if (!event.data) {
+    console.log('Push event has no data');
+    return;
+  }
+
   try {
-    if (event.data) {
-      notificationData = event.data.json();
-    }
-  } catch (error) {
-    // Fallback notification
-    notificationData = {
-      title: 'myRoommate',
-      body: 'You have a new notification',
-      icon: '/icon-192x192.png'
+    const data = event.data.json();
+    console.log('Push data:', data);
+
+    // Enhanced notification options for all app events
+    const notificationOptions = {
+      body: data.body || 'New notification from myRoommate',
+      icon: data.icon || '/icon-192x192.png',
+      badge: data.badge || '/icon-72x72.png',
+      tag: data.tag || `notification-${Date.now()}`,
+      data: data.data || {},
+      vibrate: data.vibrate || [200, 100, 200],
+      requireInteraction: data.requireInteraction || false,
+      silent: data.silent || false,
+      renotify: true,
+      timestamp: Date.now(),
+      // iOS PWA specific options
+      image: data.image,
+      actions: data.actions || []
     };
+
+    // Enhanced actions based on notification type
+    if (data.type === 'message') {
+      notificationOptions.actions = [
+        { action: 'reply', title: 'Reply', icon: '/icon-72x72.png' },
+        { action: 'view', title: 'View Chat', icon: '/icon-72x72.png' }
+      ];
+    } else if (data.type === 'chore') {
+      notificationOptions.actions = [
+        { action: 'complete', title: 'Mark Done', icon: '/icon-72x72.png' },
+        { action: 'view', title: 'View Chores', icon: '/icon-72x72.png' }
+      ];
+    } else if (data.type === 'expense') {
+      notificationOptions.actions = [
+        { action: 'settle', title: 'Settle Up', icon: '/icon-72x72.png' },
+        { action: 'view', title: 'View Expenses', icon: '/icon-72x72.png' }
+      ];
+    } else if (data.type === 'calendar') {
+      notificationOptions.actions = [
+        { action: 'remind', title: 'Set Reminder', icon: '/icon-72x72.png' },
+        { action: 'view', title: 'View Calendar', icon: '/icon-72x72.png' }
+      ];
+    }
+
+    event.waitUntil(
+      self.registration.showNotification(data.title || 'myRoommate', notificationOptions)
+    );
+  } catch (error) {
+    console.error('Error parsing push data:', error);
+    
+    // Fallback notification
+    event.waitUntil(
+      self.registration.showNotification('myRoommate', {
+        body: 'You have a new notification',
+        icon: '/icon-192x192.png',
+        badge: '/icon-72x72.png',
+        tag: 'fallback-notification',
+        data: { url: '/' }
+      })
+    );
+  }
+});
+
+// Enhanced notification click handling with focus management
+self.addEventListener('notificationclick', function(event) {
+  console.log('Notification clicked:', event.notification.tag, event.action);
+  
+  event.notification.close();
+
+  const urlToOpen = event.notification.data?.url || '/';
+  const action = event.action;
+
+  // Handle different notification actions
+  let targetUrl = urlToOpen;
+  if (action === 'reply' || action === 'view') {
+    targetUrl = '/messages';
+  } else if (action === 'complete' || action === 'view') {
+    targetUrl = '/chores';
+  } else if (action === 'settle' || action === 'view') {
+    targetUrl = '/expenses';
+  } else if (action === 'remind' || action === 'view') {
+    targetUrl = '/calendar';
   }
 
-  // Enhanced iOS-compatible notification options
-  const options = {
-    body: notificationData.body || 'You have a new notification',
-    icon: notificationData.icon || '/icon-192x192.png',
-    badge: notificationData.badge || '/icon-72x72.png',
-    tag: notificationData.tag || `notification-${Date.now()}`,
-    data: notificationData.data || { url: '/' },
-    requireInteraction: true,
-    silent: false,
-    renotify: true,
-    timestamp: Date.now(),
-    dir: 'ltr',
-    lang: 'en',
-    actions: notificationData.actions || [
-      {
-        action: 'open',
-        title: 'Open App',
-        icon: '/icon-72x72.png'
-      }
-    ]
-  };
-
-  // iOS-specific enhancements
-  if (isIOSDevice) {
-    options.vibrate = [200, 100, 200];
-    options.requireInteraction = true;
-    // Force immediate display on iOS
-    options.tag = `ios-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  } else {
-    options.vibrate = [300, 100, 300, 100, 300];
-  }
-
-  // Enhanced promise handling for iOS reliability
   event.waitUntil(
-    new Promise((resolve, reject) => {
-      // Force immediate notification display
-      self.registration.showNotification(
-        notificationData.title || 'myRoommate',
-        options
-      ).then(() => {
-        // Keep service worker alive for iOS
-        setTimeout(resolve, 100);
-      }).catch((error) => {
-        console.error('Notification display failed:', error);
-        resolve(); // Don't fail the entire event
-      });
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+      // Check if app is already open
+      for (let i = 0; i < clientList.length; i++) {
+        const client = clientList[i];
+        if (client.url.includes(self.location.origin)) {
+          // Focus existing window and navigate
+          client.focus();
+          client.postMessage({
+            type: 'notification-click',
+            url: targetUrl,
+            action: action,
+            data: event.notification.data
+          });
+          return;
+        }
+      }
+      
+      // Open new window if no existing window found
+      return clients.openWindow(targetUrl);
     })
   );
 });
 
-// Enhanced notification click handler for iOS PWA compatibility
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-
-  const notificationData = event.notification.data || {};
-  const urlToOpen = notificationData.url || '/';
-  const action = event.action;
-
-  // Skip if dismiss action
-  if (action === 'dismiss') {
-    return;
-  }
-
-  event.waitUntil(
-    (async () => {
-      try {
-        // Get all window clients
-        const windowClients = await self.clients.matchAll({ 
-          type: 'window', 
-          includeUncontrolled: true 
-        });
-
-        // iOS-specific handling for PWA focus
-        if (isIOSDevice) {
-          // On iOS, always try to focus existing client first
-          for (const client of windowClients) {
-            if (client.url.includes(self.location.origin)) {
-              try {
-                await client.focus();
-                // Send navigation message to existing client
-                client.postMessage({
-                  type: 'NOTIFICATION_CLICKED',
-                  data: notificationData,
-                  action: action,
-                  url: urlToOpen
-                });
-                return;
-              } catch (error) {
-                console.error('Focus failed on iOS:', error);
-              }
-            }
-          }
-        } else {
-          // Standard handling for other platforms
-          for (const client of windowClients) {
-            if (client.url.includes(self.location.origin)) {
-              try {
-                await client.focus();
-                return;
-              } catch (error) {
-                console.error('Focus failed:', error);
-              }
-            }
-          }
-        }
-        
-        // If no existing window or focus failed, open new window
-        if (self.clients.openWindow) {
-          try {
-            const newClient = await self.clients.openWindow(urlToOpen);
-            // Send notification data to new window after it loads
-            if (newClient) {
-              setTimeout(() => {
-                newClient.postMessage({
-                  type: 'NOTIFICATION_CLICKED',
-                  data: notificationData,
-                  action: action,
-                  url: urlToOpen
-                });
-              }, 1500); // Wait longer for client to fully load
-            }
-          } catch (error) {
-            console.error('Failed to open window:', error);
-            // Fallback - try to open root
-            try {
-              await self.clients.openWindow('/');
-            } catch (fallbackError) {
-              console.error('Fallback window open failed:', fallbackError);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Notification click handler error:', error);
-      }
-    })()
-  );
-});
-
 // Background sync for offline actions
-self.addEventListener('sync', (event) => {
+self.addEventListener('sync', function(event) {
   console.log('Background sync:', event.tag);
   
   if (event.tag === 'background-sync') {
     event.waitUntil(
-      // Handle offline actions when coming back online
+      // Handle background sync for offline actions
       handleBackgroundSync()
     );
   }
 });
 
-// Message event - handle messages from main app
-self.addEventListener('message', (event) => {
-  console.log('Service Worker received message:', event.data);
+async function handleBackgroundSync() {
+  // Implement background sync logic for offline actions
+  console.log('Handling background sync');
+}
+
+// Enhanced caching strategy
+self.addEventListener('install', function(event) {
+  console.log('Service Worker installing');
   
-  if (event.data && event.data.type === 'CACHE_CLEAR') {
-    // Clear caches when requested
-    event.waitUntil(
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => caches.delete(cacheName))
-        );
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.addAll([
+        '/',
+        '/manifest.json',
+        '/icon-192x192.png',
+        '/icon-72x72.png',
+        OFFLINE_URL
+      ]);
+    }).then(function() {
+      return self.skipWaiting();
+    })
+  );
+});
+
+self.addEventListener('activate', function(event) {
+  console.log('Service Worker activating');
+  
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(function() {
+      return self.clients.claim();
+    })
+  );
+});
+
+// Network-first caching strategy for API calls
+self.addEventListener('fetch', function(event) {
+  if (event.request.url.includes('/api/')) {
+    // Network-first for API calls
+    event.respondWith(
+      fetch(event.request).catch(function() {
+        return caches.match(OFFLINE_URL);
+      })
+    );
+  } else {
+    // Cache-first for static resources
+    event.respondWith(
+      caches.match(event.request).then(function(response) {
+        return response || fetch(event.request);
       })
     );
   }
 });
 
-// Helper function for background sync
-async function handleBackgroundSync() {
-  try {
-    // This could handle queued actions like messages, chores, etc.
-    console.log('Handling background sync...');
-    
-    // You could store offline actions in IndexedDB and replay them here
-    // For now, we'll just log that sync is happening
-    
-    return Promise.resolve();
-  } catch (error) {
-    console.error('Background sync failed:', error);
-    throw error;
+// Handle messages from main thread
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.action === 'skipWaiting') {
+    self.skipWaiting();
   }
-}
-
-// Fetch event - handle network requests with cache fallback
-self.addEventListener('fetch', (event) => {
-  // Only handle GET requests for performance
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  // Skip chrome-extension and non-http requests
-  if (!event.request.url.startsWith('http')) {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      })
-      .catch(() => {
-        // Fallback for offline scenarios
-        if (event.request.destination === 'document') {
-          return caches.match('/');
-        }
-      })
-  );
 });
 
-console.log('Service Worker loaded and ready for push notifications');
+console.log('Enhanced Service Worker loaded for myRoommate PWA');

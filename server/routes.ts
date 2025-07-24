@@ -187,27 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         householdId: membership.household.id,
       });
       
-      // Real-time broadcast for chore assignment
-      const householdClientSet = householdClients.get(membership.household.id);
-      if (householdClientSet) {
-        const broadcastData = JSON.stringify({
-          type: 'new_chore',
-          chore: chore,
-          timestamp: Date.now()
-        });
-        
-        householdClientSet.forEach((client: any) => {
-          try {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(broadcastData);
-            }
-          } catch (error) {
-            console.error('Chore broadcast error:', error);
-          }
-        });
-      }
-
-      // Send enterprise push notification for chore assignment
+      // Send unified push notification for chore assignment
       if (chore.assignedTo && chore.assignedTo !== userId) {
         try {
           await notificationService.sendChoreNotification(
@@ -269,16 +249,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           for (const member of householdMembers) {
             if (member.userId !== userId) { // Don't notify the completer
               try {
-                await notificationService.queueNotification({
-                  userId: member.userId,
-                  householdId: membership.household.id,
-                  type: 'chore',
-                  title: '✅ Chore Completed',
-                  body: `${completerName} completed: ${chore.title}`,
-                  priority: 'normal',
-                  payload: { choreId: chore.id, completerName },
-                  expiresIn: 6 * 60 // 6 hours
-                });
+                await notificationService.sendChoreNotification(
+                  member.userId,
+                  chore.title,
+                  completerName,
+                  membership.household.id,
+                  true // isCompletion = true
+                );
               } catch (error) {
                 // Silent fail for notifications
               }
@@ -598,10 +575,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const message = await storage.createMessage(messageData);
+      // Send unified push notification for messages
+      const householdMembers = await storage.getHouseholdMembers(membership.household.id);
+      const sender = await storage.getUser(userId);
+      const senderName = sender ? `${sender.firstName || 'Someone'}` : 'Someone';
+      
+      for (const member of householdMembers) {
+        if (member.userId !== userId) { // Don't notify the sender
+          try {
+            await notificationService.sendMessageNotification(
+              member.userId,
+              senderName,
+              content,
+              membership.household.id
+            );
+          } catch (error) {
+            // Silent fail for push notifications - reliability built into service
+          }
+        }
+      }
+
       res.json(message);
     } catch (error) {
       console.error("Error creating message:", error);
       res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  // Push notification subscription routes
+  app.post('/api/push/subscribe', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { subscription } = req.body;
+      
+      if (!subscription || !subscription.endpoint) {
+        return res.status(400).json({ message: 'Invalid subscription data' });
+      }
+
+      const success = await notificationService.storePushSubscription(userId, subscription);
+      
+      if (success) {
+        res.json({ message: 'Push subscription stored successfully' });
+      } else {
+        res.status(500).json({ message: 'Failed to store push subscription' });
+      }
+    } catch (error) {
+      console.error('Error storing push subscription:', error);
+      res.status(500).json({ message: 'Failed to store push subscription' });
+    }
+  });
+
+  app.post('/api/push/test', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      
+      const success = await notificationService.sendTestNotification(userId);
+      
+      if (success) {
+        res.json({ message: 'Test notification sent successfully' });
+      } else {
+        res.json({ message: 'Test notification failed - this is expected until VAPID keys are configured' });
+      }
+    } catch (error) {
+      console.error('Error sending test notification:', error);
+      res.status(500).json({ message: 'Failed to send test notification' });
+    }
+  });
+
+  app.get('/api/push/stats', isAuthenticated, async (req: any, res) => {
+    try {
+      const stats = notificationService.getStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('Error getting notification stats:', error);
+      res.status(500).json({ message: 'Failed to get notification stats' });
     }
   });
 

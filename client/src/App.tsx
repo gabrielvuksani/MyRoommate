@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/ThemeProvider";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { UnifiedNotificationProvider } from "@/components/unified-notification-provider";
 import Landing from "@/pages/landing";
 import { useQuery } from "@tanstack/react-query";
 import { getUserFlags } from "@/lib/userUtils";
@@ -118,11 +119,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ThemeProvider>
-          <TooltipProvider>
-            <Router />
-          </TooltipProvider>
-        </ThemeProvider>
+        <UnifiedNotificationProvider>
+          <ThemeProvider>
+            <TooltipProvider>
+              <Router />
+            </TooltipProvider>
+          </ThemeProvider>
+        </UnifiedNotificationProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
