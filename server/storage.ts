@@ -169,9 +169,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getHouseholdByInviteCode(code: string): Promise<Household | undefined> {
-    console.log("Storage: Looking up household with invite code:", code);
     const [household] = await db.select().from(households).where(eq(households.inviteCode, code));
-    console.log("Storage: Household found:", household ? `ID: ${household.id}, Name: ${household.name}` : "Not found");
     return household;
   }
 
@@ -186,7 +184,7 @@ export class DatabaseStorage implements IStorage {
 
   async joinHousehold(householdId: string, userId: string): Promise<HouseholdMember> {
     try {
-      console.log("Attempting to join household:", { householdId, userId });
+
       
       const [member] = await db
         .insert(householdMembers)
@@ -198,7 +196,7 @@ export class DatabaseStorage implements IStorage {
         })
         .returning();
       
-      console.log("Successfully joined household:", member);
+
       return member;
     } catch (error) {
       console.error("Database error joining household:", error);
@@ -823,7 +821,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteAllHouseholdData(householdId: string): Promise<void> {
-    console.log(`Deleting all household data except roommate listings for household: ${householdId}`);
+
     
     // Delete in the correct order to respect foreign key constraints
     // NOTE: Roommate listings are preserved as they're not household-specific
@@ -853,7 +851,7 @@ export class DatabaseStorage implements IStorage {
     // 4. Finally delete the household itself
     await db.delete(households).where(eq(households.id, householdId));
     
-    console.log(`Successfully deleted all household data (roommate listings preserved) for household: ${householdId}`);
+
   }
 }
 
