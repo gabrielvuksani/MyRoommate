@@ -110,8 +110,14 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**January 24, 2025 (Latest):**
-- ✓ **COMPLETED: Enhanced notification UX with intelligent toggle visibility**: Individual notification type toggles now only show when notifications are enabled AND permission is granted
+**January 25, 2025 (Latest):**
+- ✓ **COMPLETED: Implemented household admin permissions system**: Only household creators (admin role) can see and access the "Delete All Household Data" button
+- ✓ **Updated household creation flow**: Creator is now automatically set as admin role when creating a new household
+- ✓ **Enhanced profile page security**: Added role-based access control for destructive actions
+- ✓ **Verified iOS PWA install banner**: Confirmed working implementation that shows for iOS Safari users who haven't installed the app
+
+**January 24, 2025 (Earlier):**
+- ✓ **Enhanced notification UX with intelligent toggle visibility**: Individual notification type toggles now only show when notifications are enabled AND permission is granted
 - ✓ **Reorganized profile page sections for better information hierarchy**: Account details and household information now appear before notifications section
 - ✓ **Unified notification testing functionality**: Removed duplicate test button from notification section, enhanced existing button in developer tools with smart state handling
 - ✓ **Adjusted safe area spacing for different page types**: Home page unchanged (176px), roommates page increased (184px), other pages decreased (144px)

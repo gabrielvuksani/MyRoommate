@@ -125,7 +125,7 @@ export class PWADetectionService {
       return 'pwa'; // Use push notifications for PWA
     }
     
-    if (env.platform === 'desktop' || (env.platform === 'android' && env.isAndroidChrome)) {
+    if (env.platform === 'Desktop' || (env.platform === 'Android' && env.isAndroidChrome)) {
       return 'web'; // Use web notifications for desktop and Android browsers
     }
     

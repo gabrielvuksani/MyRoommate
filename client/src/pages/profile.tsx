@@ -47,6 +47,11 @@ export default function Profile() {
     queryKey: ["/api/households/current"],
   });
 
+  // Check if current user is admin
+  const isAdmin = (household as any)?.members?.find(
+    (member: any) => member.userId === user?.id
+  )?.role === 'admin';
+
   // Function to check if notifications can be shown
   const checkNotificationCapability = () => {
     const info = unifiedNotifications.getEnvironmentInfo();
@@ -884,18 +889,20 @@ export default function Profile() {
                   </div>
                 )}
               </div>
-              <Button
-                onClick={handleDeleteAllData}
-                disabled={deleteAllDataMutation.isPending}
-                className="mt-4 w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
-              >
-                <Trash2 size={20} />
-                <span>
-                  {deleteAllDataMutation.isPending
-                    ? "Deleting All Household Data..."
-                    : "Delete All Household Data"}
-                </span>
-              </Button>
+              {isAdmin && (
+                <Button
+                  onClick={handleDeleteAllData}
+                  disabled={deleteAllDataMutation.isPending}
+                  className="mt-4 w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
+                >
+                  <Trash2 size={20} />
+                  <span>
+                    {deleteAllDataMutation.isPending
+                      ? "Deleting All Household Data..."
+                      : "Delete All Household Data"}
+                  </span>
+                </Button>
+              )}
             </CardContent>
           </Card>
         )}
