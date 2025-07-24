@@ -1047,6 +1047,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test push notification endpoint
+  app.post('/api/push/test', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { title, message, type } = req.body;
+      
+      const payload = {
+        title: title || 'Test Notification',
+        body: message || 'This is a test push notification to verify VAPID integration is working correctly.',
+        icon: '/icon-192x192.png',
+        badge: '/icon-72x72.png',
+        tag: 'test-notification',
+        data: {
+          type: type || 'test',
+          timestamp: Date.now(),
+          url: '/'
+        }
+      };
+      
+      // Send notification using the existing sendPushNotification function
+      const success = await sendPushNotification(userId, payload);
+      
+      if (success) {
+        res.json({ success: true, message: 'Test notification sent successfully' });
+      } else {
+        res.status(400).json({ success: false, message: 'No active push subscriptions found for user' });
+      }
+    } catch (error) {
+      console.error('Error sending test notification:', error);
+      res.status(500).json({ message: 'Failed to send test notification' });
+    }
+  });
+
   // Scalable push notification function for individual users
   async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
     try {
