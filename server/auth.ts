@@ -266,14 +266,17 @@ export function setupAuth(app: Express) {
 
     try {
       const user = req.user as Express.User;
-      const allowedFields = ['firstName', 'lastName', 'profileColor'];
       const updateData: any = {};
       
-      // Only allow specific fields to be updated
-      for (const field of allowedFields) {
-        if (req.body[field] !== undefined) {
-          updateData[field] = req.body[field];
-        }
+      // Only allow specific fields to be updated - using explicit property access
+      if (req.body.firstName !== undefined) {
+        updateData.firstName = req.body.firstName;
+      }
+      if (req.body.lastName !== undefined) {
+        updateData.lastName = req.body.lastName;
+      }
+      if (req.body.profileColor !== undefined) {
+        updateData.profileColor = req.body.profileColor;
       }
 
       if (Object.keys(updateData).length === 0) {
