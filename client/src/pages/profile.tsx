@@ -1,58 +1,66 @@
-import React, { useCallback, useEffect, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell, Trash2, Smartphone, Monitor, AlertTriangle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { getProfileInitials } from "@/lib/nameUtils";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useTheme } from "@/lib/ThemeProvider";
-import { useLocation } from "wouter";
-import BackButton from "@/components/back-button";
+import BackButton from "../components/back-button";
+import { PersistentLoading } from "@/lib/persistentLoading";
 import { unifiedNotifications } from "@/lib/unified-notifications";
+import { pwaDetection } from "@/lib/pwa-detection";
 
-// Import modular components
-import { ProfileHeader } from "@/components/profile/ProfileHeader";
-import { ThemeSelector } from "@/components/profile/ThemeSelector";
-import { HouseholdSection } from "@/components/profile/HouseholdSection";
-import { AccountDetails } from "@/components/profile/AccountDetails";
-import { NotificationSettings } from "@/components/profile/NotificationSettings";
-import { DeveloperTools } from "@/components/profile/DeveloperTools";
-
-// Import types
-import type { User, Household, NotificationInfo, NotificationSettings as NotificationSettingsType } from "@/types/profile";
-
-// Lazy load heavy components for better performance
-const AuthPage = React.lazy(() => import("./auth-page"));
+import { useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Profile() {
   const { user } = useAuth();
   const { theme, effectiveTheme, setTheme } = useTheme();
+
   const [, setLocation] = useLocation();
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editName, setEditName] = useState({ firstName: "", lastName: "" });
+  const [isHouseholdEditOpen, setIsHouseholdEditOpen] = useState(false);
+  const [editHouseholdName, setEditHouseholdName] = useState("");
+  const [headerScrolled, setHeaderScrolled] = useState(false);
 
-  // State management with proper types
-  const [headerScrolled, setHeaderScrolled] = React.useState(false);
-  const [notificationInfo, setNotificationInfo] = React.useState<NotificationInfo | null>(null);
-  const [notificationSettings, setNotificationSettings] = React.useState<NotificationSettingsType | null>(null);
-  const [isTestingNotification, setIsTestingNotification] = React.useState(false);
-  const [canShowNotifications, setCanShowNotifications] = React.useState(false);
 
-  // Fetch household data with proper error handling
-  const { data: household, error: householdError } = useQuery<Household>({
+  const [isCopied, setIsCopied] = useState(false);
+  const [notificationInfo, setNotificationInfo] = useState<any>(null);
+  const [notificationSettings, setNotificationSettings] = useState<any>(null);
+  const [isTestingNotification, setIsTestingNotification] = useState(false);
+  const [canShowNotifications, setCanShowNotifications] = useState(false);
+
+  const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
-    enabled: !!user,
-    retry: 2,
-    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Memoized admin check for performance
-  const isAdmin = useMemo(() => {
-    if (!household?.members || !user?.id) return false;
-    return household.members.find(
-      (member) => member.userId === user.id
-    )?.role === 'admin';
-  }, [household?.members, user?.id]);
+  // Check if current user is admin
+  const isAdmin = (household as any)?.members?.find(
+    (member: any) => member.userId === user?.id
+  )?.role === 'admin';
 
-  // Notification capability check with debouncing
-  const checkNotificationCapability = useCallback(() => {
+  // Function to check if notifications can be shown
+  const checkNotificationCapability = () => {
     const info = unifiedNotifications.getEnvironmentInfo();
     const settings = unifiedNotifications.getSettings();
     
+    // Notifications can be shown if:
+    // 1. We have a valid strategy (not 'none')
+    // 2. Browser supports notifications
+    // 3. User hasn't permanently blocked notifications in all contexts
     const canShow = info.strategy !== 'none' || 
                    ('Notification' in window && Notification.permission !== 'denied');
     
@@ -61,28 +69,22 @@ export default function Profile() {
     setCanShowNotifications(canShow);
     
     return canShow;
-  }, []);
+  };
 
-  // Setup event listeners with cleanup
   useEffect(() => {
+    // Scroll to top when page loads
     window.scrollTo(0, 0);
 
     const handleScroll = () => {
       setHeaderScrolled(window.scrollY > 20);
     };
 
-    // Debounced scroll handler
-    let scrollTimeout: NodeJS.Timeout;
-    const debouncedHandleScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(handleScroll, 16); // ~60fps
-    };
-
-    window.addEventListener("scroll", debouncedHandleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll);
     
+    // Check notification capability
     checkNotificationCapability();
     
-    // Permission monitoring with error handling
+    // Listen for permission changes
     if ('permissions' in navigator) {
       navigator.permissions.query({ name: 'notifications' as PermissionName })
         .then(permissionStatus => {
@@ -91,10 +93,11 @@ export default function Profile() {
           };
         })
         .catch(() => {
-          // Fallback for browsers without permission query support
+          // Fallback for browsers that don't support permission query
         });
     }
     
+    // Check for focus changes to update notification status
     const handleFocus = () => {
       checkNotificationCapability();
     };
@@ -102,11 +105,23 @@ export default function Profile() {
     window.addEventListener('focus', handleFocus);
     
     return () => {
-      window.removeEventListener("scroll", debouncedHandleScroll);
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener('focus', handleFocus);
-      clearTimeout(scrollTimeout);
     };
-  }, [checkNotificationCapability]);
+  }, []);
+
+  const updateNameMutation = useMutation({
+    mutationFn: async (data: { firstName: string; lastName: string }) => {
+      return await apiRequest("PATCH", "/api/auth/user", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      setIsEditOpen(false);
+    },
+    onError: (error: any) => {
+      console.error("Failed to update name:", error);
+    },
+  });
 
   const updateHouseholdNameMutation = useMutation({
     mutationFn: async (name: string) => {
