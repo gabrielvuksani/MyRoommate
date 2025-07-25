@@ -67,14 +67,11 @@ export default function ListingDetail() {
     "Furnished": Home,
     "Balcony": Home,
     "In-unit laundry": Sparkles,
-    "Gym/Fitness": Dumbbell,
     "High-speed WiFi": Wifi,
     "Parking available": Car,
     "Rooftop deck": Home,
     "Central AC/Heating": Shield,
     "Dishwasher": Home,
-    "Full Kitchen": Home,
-    "Balcony/Patio": Home,
   };
 
   if (isLoading) {
@@ -367,30 +364,27 @@ export default function ListingDetail() {
               <>
                 <Separator />
                 <div>
-                  <h3 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                  <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
                     Amenities
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
                     {typedListing.amenities.map((amenity: string, index: number) => {
                       const Icon = amenityIcons[amenity] || Home;
+                      // Format amenity name for display
+                      const displayName = amenity
+                        .replace(/_/g, ' ')
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                        .join(' ');
+                      
                       return (
                         <div 
                           key={index} 
-                          className="p-3 rounded-xl flex items-center gap-3 transition-all hover:scale-[1.02]"
-                          style={{ 
-                            background: 'var(--surface-secondary)',
-                            border: '1px solid var(--border)'
-                          }}
+                          className="flex items-center gap-2"
+                          style={{ color: 'var(--text-secondary)' }}
                         >
-                          <div 
-                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                            style={{ background: 'var(--primary)', opacity: 0.1 }}
-                          >
-                            <Icon className="w-5 h-5" style={{ color: 'var(--primary)', opacity: 1 }} />
-                          </div>
-                          <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                            {amenity}
-                          </span>
+                          <Icon className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                          <span className="text-sm">{displayName}</span>
                         </div>
                       );
                     })}
