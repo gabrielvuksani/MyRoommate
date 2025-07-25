@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Clock, Calendar, User, CheckCircle2, Circle, PlayCircle, AlertTriangle, X, ChevronDown } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface ChoresBoardProps {
   chores: any[];
@@ -9,6 +10,7 @@ interface ChoresBoardProps {
 
 export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: ChoresBoardProps) {
   const [expandedChore, setExpandedChore] = useState<string | null>(null);
+  const [, setLocation] = useLocation();
   
   // Sort chores by priority and due date
   const sortedChores = useMemo(() => {
@@ -329,7 +331,14 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
           <CheckCircle2 size={28} style={{ color: 'var(--text-secondary)' }} />
         </div>
         <h4 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>No chores yet</h4>
-        <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>Create your first chore to get started</p>
+        <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>Start tracking household tasks and responsibilities</p>
+        <button
+          onClick={() => setLocation("/add-chore")}
+          className="px-6 py-3 rounded-xl font-medium btn-animated text-white hover:scale-[1.05] transition-all"
+          style={{ background: 'var(--primary)' }}
+        >
+          Add First Chore
+        </button>
       </div>
     );
   }
