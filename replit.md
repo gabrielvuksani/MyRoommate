@@ -111,9 +111,8 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 25, 2025 (Latest):**
-- ✓ **Fixed persistent TypeScript error in profile.tsx**: Resolved "Type 'unknown' is not assignable to type 'ReactNode'" error by removing conditional rendering from Account Details Card component
+- ✓ **Fixed persistent TypeScript error in profile.tsx**: Resolved "Type 'unknown' is not assignable to type 'ReactNode'" error on line 550 by wrapping Account Details Card in user conditional and simplifying type expressions
 - ✓ **Enhanced amenity icons in listing detail page**: Updated icons to be more unique for each amenity type (WashingMachine for laundry, Sparkles for natural lighting, Bike for bike storage)
-- ✓ **Added unique lifestyle preference icons**: Implemented contextual icons for each lifestyle preference (Moon for night owl, Coffee for social drinker, Dumbbell for fitness enthusiast, etc.) instead of generic badges
 - ✓ **COMPLETED: Implemented household admin permissions system**: Only household creators (admin role) can see and access the "Delete All Household Data" button
 - ✓ **Updated household creation flow**: Creator is now automatically set as admin role when creating a new household
 - ✓ **Enhanced profile page security**: Added role-based access control for destructive actions
