@@ -157,14 +157,14 @@ export function AddChore() {
           <div className="flex items-center space-x-3">
             <BackButton to="/chores" />
             <div>
-              <h1 className="page-title">Create a Chore</h1>
-              <p className="page-subtitle">Add a new task</p>
+              <h1 className="page-title">Create Chore</h1>
+              <p className="page-subtitle">Add a new task or chore</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="content-with-header px-6 space-y-6 pb-32">
+      <div className="content-with-header-compact px-6 space-y-6 pb-32">
         
         {/* Basic Details */}
         <Card className="glass-card">
