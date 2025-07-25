@@ -311,6 +311,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set({ inviteCode: newInviteCode })
         .where(eq(households.id, membership.household.id));
       
+      // Send real-time WebSocket notification to the kicked user
+      const kickedUserClients = userClients.get(targetUserId);
+      if (kickedUserClients && kickedUserClients.size > 0) {
+        const kickMessage = JSON.stringify({
+          type: 'user_kicked',
+          message: 'You have been removed from the household',
+          timestamp: Date.now()
+        });
+        
+        kickedUserClients.forEach((client: any) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(kickMessage);
+          }
+        });
+      }
+      
+      // Also broadcast to household members that someone was removed
+      const householdClientSet = householdClients.get(membership.household.id);
+      if (householdClientSet) {
+        const broadcastData = JSON.stringify({
+          type: 'member_removed',
+          userId: targetUserId,
+          timestamp: Date.now()
+        });
+        
+        householdClientSet.forEach((client: any) => {
+          try {
+            if (client.readyState === WebSocket.OPEN && client.userId !== targetUserId) {
+              client.send(broadcastData);
+            }
+          } catch (error) {
+            console.error('Member removal broadcast error:', error);
+          }
+        });
+      }
+      
       // Send push notification to the removed user
       const adminUser = await storage.getUser(currentUserId);
       const adminName = adminUser?.firstName || 'The administrator';
@@ -327,8 +363,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
       
-      const notificationSent = await sendPushNotification(targetUserId, pushPayload);
-      console.log(`[KICK DEBUG] Push notification result for user ${targetUserId}: ${notificationSent}`);
+      await sendPushNotification(targetUserId, pushPayload);
       
       res.json({ message: "Member removed successfully", newInviteCode });
     } catch (error) {
@@ -1134,7 +1169,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
     try {
       const subscriptions = await storage.getUserPushSubscriptions(userId);
-      console.log(`[PUSH DEBUG] Found ${subscriptions?.length || 0} subscriptions for user ${userId}`);
       
       if (!subscriptions || subscriptions.length === 0) {
         return false;

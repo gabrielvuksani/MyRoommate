@@ -32,10 +32,11 @@ import { AddEvent } from "@/pages/add-event";
 import BottomNavigation from "@/components/bottom-navigation";
 import { IOSInstallBanner } from "@/components/ios-install-banner";
 import { PWAEnvironmentIndicator } from "@/components/pwa-environment-indicator";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 function Router() {
   const { user, isLoading } = useAuth();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { isKeyboardVisible } = useKeyboardHeight();
 
   // Check for persistent loading on page load
@@ -55,6 +56,28 @@ function Router() {
     queryKey: ["/api/households/current"],
     enabled: !!user,
   }) as { data: any };
+
+  // Handle real-time kick events
+  useWebSocket({
+    userId: user?.id,
+    householdId: household?.id,
+    onMessage: (data) => {
+      if (data.type === 'user_kicked') {
+        // User has been kicked - clear household cache and redirect
+        queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+        queryClient.setQueryData(["/api/user/kicked-status"], { wasKicked: true });
+        // Force redirect to home page
+        setLocation('/');
+        // Force a page refresh to ensure all state is cleared
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
+      } else if (data.type === 'member_removed') {
+        // Another member was removed - refresh household data
+        queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+      }
+    }
+  });
 
   // Show loading state during auth transition or initial load
   if (isLoading || AuthTransition.isInProgress()) {
