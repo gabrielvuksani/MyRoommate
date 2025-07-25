@@ -110,14 +110,20 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**January 25, 2025 (Latest - Fixed Storage Layer Field Selection):**
-- ✓ **CRITICAL FIX: Resolved storage layer bug where database queries weren't selecting all fields**
-- ✓ **Fixed getChores()**: Now returns priority, category, estimatedDuration, notes, subtasks, reminder fields
-- ✓ **Fixed getCalendarEvents()**: Now returns location, attendees, reminder, isRecurring, recurrencePattern, allDay, notes fields
-- ✓ **Fixed getExpenses()**: Now returns notes, isRecurring, recurrenceFrequency fields
-- ✓ **Enhanced ExpenseCard component**: Added display for notes and receipt URL in expanded view
-- ✓ **Verified components**: ChoreBoard and CalendarEventCard already had display logic for all fields
-- ✓ **Root cause**: Storage functions were using incomplete SELECT statements, causing data to be saved correctly but not returned to the UI
+**January 25, 2025 (Latest - Component Redesign):**
+- ✓ **MAJOR: Complete premium redesign of core components based on user feedback**
+- ✓ **Redesigned ChoreBoard component (v2)**: Clean card-based design similar to expense cards, smart priority sorting, expandable details with all chore information, quick action buttons for status changes
+- ✓ **Redesigned ExpenseCard component**: Clean category-based design with emoji indicators, expandable cards with split details, smart balance calculations (USER APPROVED - DO NOT CHANGE)
+- ✓ **Created CalendarEventCard component**: Premium event cards with type-based color coding, expandable details with attendee management, sophisticated mobile-optimized layout
+- ✓ **Updated Calendar page**: Now uses the new CalendarEventCard component for consistent design across all main pages
+- ✓ **Enhanced all components with**:
+  - Premium glass morphism effects with proper light/dark mode support
+  - Mobile-first responsive design with touch-optimized interactions
+  - Sophisticated micro-animations and transitions
+  - Consistent design language across all components
+  - Smart information hierarchy and progressive disclosure
+  - Modern color-coded visual indicators
+  - Expandable cards for detailed information
 
 **January 25, 2025 (Earlier - Database Cleanup):**
 - ✓ **COMPLETED: Database wiped clean except demo data**

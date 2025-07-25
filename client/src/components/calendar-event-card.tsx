@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Calendar, Clock, MapPin, Users, Repeat, Bell, Trash2, ChevronDown, Circle, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatDisplayName, getProfileInitials } from "@/lib/nameUtils";
+import { QuickAvatar } from "@/components/ProfileAvatar";
+import { useQuery } from "@tanstack/react-query";
 
 interface CalendarEventCardProps {
   event: any;
@@ -10,6 +13,12 @@ interface CalendarEventCardProps {
 
 export default function CalendarEventCard({ event, onDelete, index = 0 }: CalendarEventCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Fetch household members for attendee info
+  const { data: householdMembers = [] } = useQuery({
+    queryKey: ["/api/households/current/members"],
+    enabled: event.attendees && event.attendees.length > 0
+  });
   
   const getEventTypeConfig = (type: string) => {
     const configs: { [key: string]: { color: string; bg: string; darkBg: string } } = {
@@ -209,27 +218,24 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
                   Attendees ({event.attendees.length})
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {event.attendees.map((attendee: any, idx: number) => {
-                    // Handle both string and object attendees
-                    const attendeeName = typeof attendee === 'string' ? attendee : attendee.name;
-                    const initial = attendeeName?.charAt(0) || '?';
+                  {event.attendees.map((attendeeId: string, idx: number) => {
+                    // Find the attendee's user info from household members
+                    const memberInfo = householdMembers.find((member: any) => member.userId === attendeeId);
+                    const user = memberInfo?.user || {};
+                    const displayName = formatDisplayName(user.firstName, user.lastName, user.email?.split('@')[0] || 'Unknown');
                     
                     return (
                       <div 
                         key={idx}
                         className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50"
                       >
-                        <div 
-                          className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                          style={{
-                            background: `hsl(${(idx * 137.5) % 360}, 70%, 50%)`,
-                            color: 'white'
-                          }}
-                        >
-                          {initial}
-                        </div>
+                        <QuickAvatar 
+                          user={user}
+                          size="xs"
+                          colorKey={idx}
+                        />
                         <span className="text-xs text-gray-700 dark:text-gray-300">
-                          {attendeeName}
+                          {displayName}
                         </span>
                       </div>
                     );

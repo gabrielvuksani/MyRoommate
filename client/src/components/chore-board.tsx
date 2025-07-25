@@ -178,88 +178,35 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                   {chore.title}
                 </h3>
                 
-                {/* First line: Assignee, Date */}
-                <div className="flex items-center gap-3 mt-1 text-xs text-gray-600 dark:text-gray-400">
-                  <div className="flex items-center gap-1">
-                    <User size={12} />
-                    <span>{chore.assignedUser?.firstName || 'Unassigned'}</span>
+                {/* Metadata line - only show in non-expanded view */}
+                {!isExpanded && (
+                  <div className="flex items-center gap-3 mt-1 text-xs text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-1">
+                      <User size={12} />
+                      <span>{chore.assignedUser?.firstName || 'Unassigned'}</span>
+                    </div>
+                    {chore.dueDate && (
+                      <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-600 dark:text-red-400 font-medium' : ''}`}>
+                        <Calendar size={12} />
+                        <span>{formatDate(chore.dueDate)}</span>
+                      </div>
+                    )}
                   </div>
-                  {chore.dueDate && (
-                    <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-600 dark:text-red-400 font-medium' : ''}`}>
-                      <Calendar size={12} />
-                      <span>{formatDate(chore.dueDate)}</span>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Second line: Duration, Recurrence, Reminder */}
-                <div className="flex items-center gap-3 mt-1 text-xs">
-                  {chore.estimatedDuration && (
-                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                      <Timer size={12} />
-                      <span>{chore.estimatedDuration}m</span>
-                    </div>
-                  )}
-                  {chore.recurrence && chore.recurrence !== 'none' && (
-                    <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                      <Repeat size={12} />
-                      <span className="capitalize">{chore.recurrence}</span>
-                    </div>
-                  )}
-                  {chore.reminder && chore.reminder !== 'none' && (
-                    <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
-                      <Bell size={12} />
-                      <span>{chore.reminder}</span>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             </div>
             
-            {/* Priority and category badges */}
-            <div className="flex flex-col items-end gap-1">
-              {/* Priority badge */}
-              <div 
-                className="px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1"
-                style={{
-                  background: chore.priority === 'urgent' ? 'rgba(239, 68, 68, 0.1)' :
-                            chore.priority === 'high' ? 'rgba(251, 146, 60, 0.1)' :
-                            chore.priority === 'medium' ? 'rgba(250, 204, 21, 0.1)' :
-                            'rgba(34, 197, 94, 0.1)',
-                  color: chore.priority === 'urgent' ? '#dc2626' :
-                         chore.priority === 'high' ? '#ea580c' :
-                         chore.priority === 'medium' ? '#ca8a04' :
-                         '#16a34a'
-                }}
-              >
-                <span>{getPriorityEmoji(chore.priority)}</span>
-                <span>{chore.priority?.charAt(0).toUpperCase() + chore.priority?.slice(1) || 'Low'}</span>
-              </div>
+            {/* Priority and category - simplified for non-expanded view */}
+            <div className="flex items-center gap-2">
+              {/* Priority emoji */}
+              <span className="text-lg">{getPriorityEmoji(chore.priority)}</span>
               
-              {/* Category */}
-              <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
-                <span className="text-sm">{getCategoryEmoji(chore.category)}</span>
-                <span>{chore.category?.charAt(0).toUpperCase() + chore.category?.slice(1) || 'General'}</span>
-              </div>
+              {/* Category emoji */}
+              <span className="text-lg">{getCategoryEmoji(chore.category)}</span>
             </div>
           </div>
           
-          {/* Quick action buttons for non-expanded state */}
-          {!isExpanded && chore.status !== 'done' && (
-            <div className="ml-11 flex items-center gap-2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const nextStatus = chore.status === 'todo' ? 'doing' : 'done';
-                  onUpdateChore(chore.id, { status: nextStatus });
-                }}
-                className="px-3 py-1 rounded-lg text-xs font-medium text-white transition-all hover:scale-105 active:scale-95"
-                style={{ background: chore.status === 'todo' ? '#3b82f6' : '#10b981' }}
-              >
-                {chore.status === 'todo' ? 'Start' : 'Complete'}
-              </button>
-            </div>
-          )}
+
           
           {/* Expanded content */}
           {isExpanded && (
@@ -272,6 +219,30 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
               
               {/* Details grid */}
               <div className="grid grid-cols-2 gap-3 mb-4 text-xs">
+                {chore.assignedUser && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Assigned to</span>
+                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
+                      <User size={12} className="text-gray-500" />
+                      {chore.assignedUser.firstName || 'Unassigned'}
+                    </p>
+                  </div>
+                )}
+                
+                {chore.dueDate && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Due date</span>
+                    <p className={`font-medium flex items-center gap-1 ${
+                      new Date(chore.dueDate) < new Date() && chore.status !== 'done' 
+                        ? 'text-red-600 dark:text-red-400' 
+                        : 'text-gray-900 dark:text-white'
+                    }`}>
+                      <Calendar size={12} className="text-gray-500" />
+                      {formatDate(chore.dueDate)}
+                    </p>
+                  </div>
+                )}
+                
                 {chore.category && (
                   <div>
                     <span className="text-gray-500 dark:text-gray-400">Category</span>
