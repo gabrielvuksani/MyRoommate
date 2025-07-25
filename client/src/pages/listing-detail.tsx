@@ -21,7 +21,8 @@ import {
   ArrowRight,
   Star,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  GraduationCap
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
