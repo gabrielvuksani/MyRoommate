@@ -22,7 +22,12 @@ import {
   Star,
   ChevronLeft,
   ChevronRight,
-  GraduationCap
+  GraduationCap,
+  Waves,
+  Bus,
+  Sofa,
+  Trees,
+  Utensils
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
@@ -59,20 +64,23 @@ export default function ListingDetail() {
   const amenityIcons: { [key: string]: any } = {
     "WiFi": Wifi,
     "Laundry": Sparkles,
-    "Kitchen": Home,
+    "Kitchen": Utensils,
+    "Full Kitchen": Utensils,
     "Parking": Car,
     "Gym": Dumbbell,
-    "Pool": Sparkles,
+    "Gym/Fitness": Dumbbell,
+    "Pool": Waves,
     "Near Campus": GraduationCap,
-    "Public Transport": MapPin,
-    "Furnished": Home,
-    "Balcony": Home,
+    "Public Transport": Bus,
+    "Furnished": Sofa,
+    "Balcony": Trees,
+    "Balcony/Patio": Trees,
     "In-unit laundry": Sparkles,
     "High-speed WiFi": Wifi,
     "Parking available": Car,
     "Rooftop deck": Home,
     "Central AC/Heating": Shield,
-    "Dishwasher": Home,
+    "Dishwasher": Utensils,
   };
 
   if (isLoading) {
