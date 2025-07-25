@@ -496,13 +496,6 @@ export default function ListingDetail() {
               <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
                 Contact Information
               </h3>
-              {typedListing.contactInfo && (
-                <div className="p-4 rounded-xl" style={{ background: 'var(--surface-secondary)' }}>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                    {typedListing.contactInfo}
-                  </p>
-                </div>
-              )}
               <Button 
                 className="w-full h-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02]"
                 onClick={() => {
@@ -518,7 +511,7 @@ export default function ListingDetail() {
                 }}
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
-                Contact Poster
+                Contact
               </Button>
               {user ? (
                 <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>

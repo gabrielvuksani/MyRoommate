@@ -158,7 +158,7 @@ export default function BalanceBreakdown({ expenses, currentUserId, householdMem
             These are net balances after simplifying mutual debts
           </p>
           <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
-            Click any expense card above to see full details and splits
+            Click any expense card below to see full details and splits
           </p>
         </div>
       </CardContent>

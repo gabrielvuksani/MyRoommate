@@ -110,7 +110,21 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**January 25, 2025 (Latest - Expense Calculation Fix & Smart Balance Display):**
+**July 25, 2025 (Latest - Tab Bar Enhancements & Privacy Updates):**
+- ✓ **Enhanced tab bar visibility in light mode**: Added borders and subtle shadows to tab bar containers across all pages
+- ✓ **Added separator lines between tab buttons**: Implemented subtle vertical dividers using var(--border-strong) with 0.8 opacity
+- ✓ **Fixed TanStack Query v5 compatibility**: Updated cacheTime to gcTime in roommates.tsx
+- ✓ **Unified tab bar design consistency**: All tab bars now use centered container, surface-secondary background, consistent padding and rounded buttons
+- ✓ **Verified push notifications implementation**: Calendar events and expenses already have push notifications implemented (task 4 complete)
+  - Calendar events send "📅 New Calendar Event" notifications to household members
+  - Expenses send "💰 New Expense Added" notifications to household members
+  - Both follow the same pattern as chore and message notifications
+- ✓ **Enhanced privacy on listing detail page**: Removed direct display of contact information (phone/email) and now only shows "Contact" button
+  - Contact info no longer visible in UI for better privacy protection
+  - Button functionality retained (mailto for email, clipboard copy for phone)
+  - Cleaner, more secure interface for roommate listings
+
+**January 25, 2025 (Earlier - Expense Calculation Fix & Smart Balance Display):**
 - ✓ **Fixed critical expense calculation bug**: Server was overriding `paidBy` field, causing all expenses to be attributed to the creator instead of the actual payer
 - ✓ **Implemented smart "Who Owes Who" breakdown**: Created BalanceBreakdown component that:
   - Calculates net balances between users (simplifies mutual debts)
