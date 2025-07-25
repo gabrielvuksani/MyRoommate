@@ -110,7 +110,14 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**January 25, 2025 (Latest - Component Redesign):**
+**January 25, 2025 (Latest - Database Cleanup):**
+- ✓ **COMPLETED: Database wiped clean except demo data**
+- ✓ **Deleted all user data**: Removed all push subscriptions, expense splits, expenses, calendar events, chores, messages, shopping items, household members, households, and sessions
+- ✓ **Preserved demo listings**: 3 demo roommate listings remain (Berkeley, Mission District, Tech Hub)
+- ✓ **Preserved demo users**: 3 demo users associated with listings (Emma Chen, John Smith, Alex Rodriguez)
+- ✓ **Database ready for fresh testing**: Clean state with only demo marketplace data
+
+**January 25, 2025 (Component Redesign):**
 - ✓ **MAJOR: Complete premium redesign of core components based on user feedback**
 - ✓ **Redesigned ChoreBoard component (v2)**: Clean card-based design similar to expense cards, smart priority sorting, expandable details with all chore information, quick action buttons for status changes
 - ✓ **Redesigned ExpenseCard component**: Clean category-based design with emoji indicators, expandable cards with split details, smart balance calculations (USER APPROVED - DO NOT CHANGE)
