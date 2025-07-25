@@ -185,6 +185,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Invalid invite code" });
       }
       
+      // Check if user was kicked from this household
+      const wasKicked = await storage.wasUserKickedFromHousehold(userId, household.id);
+      if (wasKicked) {
+        return res.status(403).json({ message: "You cannot rejoin a household you were removed from" });
+      }
+      
       // Check if user is already a member of ANY household (leave first)
       const existingMembership = await storage.getUserHousehold(userId);
       if (existingMembership) {
@@ -300,6 +306,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove the member
       await storage.removeMemberFromHousehold(membership.household.id, targetUserId);
       
+      // Add record to kicked users table
+      await storage.addKickedUser(targetUserId, membership.household.id, currentUserId);
+      
       // Set the kicked flag on the user
       await storage.setUserKickedFlag(targetUserId, true);
       
@@ -319,8 +328,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
       
-      const notificationSent = await sendPushNotification(targetUserId, pushPayload);
-      console.log(`Push notification for kicked user ${targetUserId}: ${notificationSent ? 'sent' : 'failed'}`);
+      await sendPushNotification(targetUserId, pushPayload);
       
       res.json({ message: "Member removed successfully" });
     } catch (error) {
@@ -1126,10 +1134,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
     try {
       const subscriptions = await storage.getUserPushSubscriptions(userId);
-      console.log(`Push subscriptions for user ${userId}:`, subscriptions?.length || 0);
       
       if (!subscriptions || subscriptions.length === 0) {
-        console.log(`No push subscriptions found for user ${userId}`);
         return false;
       }
 

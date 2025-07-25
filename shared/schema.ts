@@ -6,6 +6,7 @@ import {
   date,
   jsonb,
   index,
+  uniqueIndex,
   serial,
   integer,
   boolean,
@@ -213,6 +214,19 @@ export const roommateListings = pgTable("roommate_listings", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+// Kicked users tracking
+export const kickedUsers = pgTable("kicked_users", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  householdId: varchar("household_id").references(() => households.id).notNull(),
+  kickedBy: varchar("kicked_by").references(() => users.id),
+  kickedAt: timestamp("kicked_at").defaultNow(),
+}, (table) => [
+  index("idx_kicked_users_user_id").on(table.userId),
+  index("idx_kicked_users_household_id").on(table.householdId),
+  uniqueIndex("idx_kicked_users_user_household").on(table.userId, table.householdId)
+]);
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
