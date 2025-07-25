@@ -511,31 +511,39 @@ export default function AddExpense() {
       {/* Pinned Create Button Above Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 z-30 pointer-events-none">
         <div className="max-w-[430px] mx-auto px-4 pb-28">
-          <button
-            onClick={handleCreateExpense}
-            disabled={!canCreateExpense || createExpenseMutation.isPending}
-            className={`w-full py-4 rounded-2xl font-semibold text-base transition-all duration-300 pointer-events-auto transform ${
-              canCreateExpense && !createExpenseMutation.isPending
-                ? 'hover:scale-[1.02] active:scale-[0.98]'
-                : 'opacity-60 cursor-not-allowed'
-            }`}
+          <div 
+            className="p-3 rounded-2xl pointer-events-auto"
             style={{
-              background: canCreateExpense && !createExpenseMutation.isPending
-                ? 'linear-gradient(135deg, var(--primary) 0%, #6366f1 100%)'
-                : 'var(--surface-secondary)',
-              color: canCreateExpense && !createExpenseMutation.isPending
-                ? 'white'
-                : 'var(--text-secondary)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: canCreateExpense && !createExpenseMutation.isPending
-                ? '0 8px 32px rgba(59, 130, 246, 0.3), inset 0 2px 12px rgba(255, 255, 255, 0.2)'
-                : '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 2px 8px rgba(255, 255, 255, 0.1)'
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(248, 250, 252, 0.06) 50%, rgba(255, 255, 255, 0.04) 100%)',
+              backdropFilter: 'blur(24px) saturate(180%) brightness(102%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(180%) brightness(102%)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              boxShadow: '0 12px 32px rgba(31, 38, 135, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04), inset 0 2px 16px rgba(255, 255, 255, 0.35), inset 1px 1px 0 rgba(255, 255, 255, 0.45), inset -1px -1px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
-            {createExpenseMutation.isPending ? "Creating..." : "Create Expense"}
-          </button>
+            <button
+              onClick={handleCreateExpense}
+              disabled={!canCreateExpense || createExpenseMutation.isPending}
+              className={`w-full py-4 rounded-xl font-semibold text-base transition-all duration-300 transform ${
+                canCreateExpense && !createExpenseMutation.isPending
+                  ? 'hover:scale-[1.02] active:scale-[0.98]'
+                  : 'opacity-60 cursor-not-allowed'
+              }`}
+              style={{
+                background: canCreateExpense && !createExpenseMutation.isPending
+                  ? 'linear-gradient(135deg, var(--primary) 0%, #6366f1 100%)'
+                  : 'var(--surface-secondary)',
+                color: canCreateExpense && !createExpenseMutation.isPending
+                  ? 'white'
+                  : 'var(--text-secondary)',
+                boxShadow: canCreateExpense && !createExpenseMutation.isPending
+                  ? '0 4px 16px rgba(59, 130, 246, 0.2)'
+                  : 'none'
+              }}
+            >
+              {createExpenseMutation.isPending ? "Creating..." : "Create Expense"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
