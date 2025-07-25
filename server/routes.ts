@@ -1121,7 +1121,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Store subscription in database
-
+      console.log('Storing push subscription:', {
+        userId,
+        endpoint: subscription.endpoint,
+        keys: subscription.keys
+      });
       
       const pushSubscription = await storage.upsertPushSubscription({
         userId,
