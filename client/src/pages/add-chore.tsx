@@ -82,10 +82,8 @@ export function AddChore() {
 
   const createChoreMutation = useMutation({
     mutationFn: async (choreData: any) => {
-      return apiRequest("/api/chores", {
-        method: "POST",
-        body: JSON.stringify(choreData),
-      });
+      const response = await apiRequest("POST", "/api/chores", choreData);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
@@ -166,7 +164,7 @@ export function AddChore() {
         </div>
       </div>
 
-      <div className="content-with-header px-6 space-y-6">
+      <div className="content-with-header px-6 space-y-6 pb-32">
         
         {/* Basic Details */}
         <Card className="glass-card">

@@ -95,10 +95,8 @@ export function AddEvent() {
 
   const createEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
-      return apiRequest("/api/calendar", {
-        method: "POST",
-        body: JSON.stringify(eventData),
-      });
+      const response = await apiRequest("POST", "/api/calendar", eventData);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
@@ -180,7 +178,7 @@ export function AddEvent() {
         </div>
       </div>
 
-      <div className="content-with-header px-6 space-y-6">
+      <div className="content-with-header px-6 space-y-6 pb-32">
         
         {/* Basic Details */}
         <Card className="glass-card">

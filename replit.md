@@ -111,6 +111,10 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 25, 2025 (Latest):**
+- ✓ **Fixed pinned Create buttons on add pages**: Moved Create buttons from headers to fixed position above bottom navigation on add-chore, add-event, and add-expense pages
+- ✓ **Fixed API call format**: Updated chore and event creation to use correct apiRequest format (method, url, data) matching expense page implementation
+- ✓ **Added bottom spacing**: Added pb-32 padding to all three add pages to ensure content isn't hidden behind pinned Create button
+- ✓ **Enhanced button design**: Premium glass morphism styling with gradient backgrounds, backdrop blur, and smooth transitions
 - ✓ **Fixed calendar picker responsiveness issues**: Applied fontSize: '16px' to all date/time inputs to prevent iOS zoom
 - ✓ **Created dedicated add-chore page**: Comprehensive chore creation with priorities, recurrence, assignments, categories, duration, subtasks
 - ✓ **Created dedicated add-event page**: Full event management with attendees, location, recurrence, reminders, color coding
