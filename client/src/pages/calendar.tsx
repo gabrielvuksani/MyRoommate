@@ -5,7 +5,234 @@ import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { notificationService } from "@/lib/notifications";
 
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Clock, MapPin, Users, Repeat, Trash2, Bell, MoreVertical } from "lucide-react";
+
+// Calendar Event Card Component
+const CalendarEventCard = ({ event, onDelete, index }: { event: any; onDelete: (id: string) => void; index: number }) => {
+  const [showDetails, setShowDetails] = useState(false);
+  
+  const getEventTypeConfig = (type: string) => {
+    switch (type?.toLowerCase()) {
+      case 'meeting':
+        return {
+          icon: '👥',
+          gradient: 'from-blue-500 to-cyan-500',
+          bgLight: 'bg-blue-50',
+          bgDark: 'bg-blue-950/20',
+          textColor: 'text-blue-600 dark:text-blue-400'
+        };
+      case 'appointment':
+        return {
+          icon: '📅',
+          gradient: 'from-purple-500 to-pink-500',
+          bgLight: 'bg-purple-50',
+          bgDark: 'bg-purple-950/20',
+          textColor: 'text-purple-600 dark:text-purple-400'
+        };
+      case 'social':
+        return {
+          icon: '🎉',
+          gradient: 'from-orange-500 to-amber-500',
+          bgLight: 'bg-orange-50',
+          bgDark: 'bg-orange-950/20',
+          textColor: 'text-orange-600 dark:text-orange-400'
+        };
+      case 'personal':
+        return {
+          icon: '⭐',
+          gradient: 'from-green-500 to-emerald-500',
+          bgLight: 'bg-green-50',
+          bgDark: 'bg-green-950/20',
+          textColor: 'text-green-600 dark:text-green-400'
+        };
+      default:
+        return {
+          icon: '📍',
+          gradient: 'from-gray-500 to-gray-600',
+          bgLight: 'bg-gray-50',
+          bgDark: 'bg-gray-800/20',
+          textColor: 'text-gray-600 dark:text-gray-400'
+        };
+    }
+  };
+  
+  const typeConfig = getEventTypeConfig(event.type);
+  const eventColor = event.color || '#007AFF';
+  
+  return (
+    <div 
+      className={`
+        group relative overflow-hidden transition-all duration-300 animate-fade-in
+        ${showDetails ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
+      `}
+      style={{
+        borderRadius: '20px',
+        background: 'var(--glass-card)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid var(--glass-border)',
+        boxShadow: showDetails 
+          ? '0 20px 40px -10px rgba(0, 0, 0, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)'
+          : '0 4px 24px -2px rgba(0, 0, 0, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
+        animationDelay: `${index * 100}ms`
+      }}
+    >
+      {/* Event color accent */}
+      <div 
+        className="absolute top-0 left-0 w-1 h-full opacity-80"
+        style={{ backgroundColor: eventColor }}
+      />
+      
+      {/* Main content */}
+      <div className="p-5 pl-6">
+        <div className="flex items-start justify-between gap-4">
+          {/* Left side - event info */}
+          <div className="flex items-start gap-4 flex-1">
+            {/* Type icon */}
+            <div className={`
+              w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0
+              bg-gradient-to-br ${typeConfig.gradient} shadow-lg
+            `}>
+              <span className="text-white text-xl">{typeConfig.icon}</span>
+            </div>
+            
+            {/* Event details */}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                {event.title}
+              </h3>
+              
+              {event.description && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                  {event.description}
+                </p>
+              )}
+              
+              {/* Meta information */}
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                {/* Time */}
+                <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                  <Clock size={14} />
+                  <span>
+                    {event.allDay ? 'All Day' : new Date(event.startDate).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit'
+                    })}
+                    {event.endDate && !event.allDay && (
+                      <span className="text-gray-500 dark:text-gray-500">
+                        {' - '}
+                        {new Date(event.endDate).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    )}
+                  </span>
+                </div>
+                
+                {/* Location */}
+                {event.location && (
+                  <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                    <MapPin size={14} />
+                    <span className="truncate max-w-[150px]">{event.location}</span>
+                  </div>
+                )}
+                
+                {/* Attendees */}
+                {event.attendees && event.attendees.length > 0 && (
+                  <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                    <Users size={14} />
+                    <span>{event.attendees.length} attendees</span>
+                  </div>
+                )}
+              </div>
+              
+              {/* Tags */}
+              <div className="flex flex-wrap items-center gap-2 mt-3">
+                {/* Type badge */}
+                <div className={`
+                  flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
+                  ${typeConfig.bgLight} dark:${typeConfig.bgDark} ${typeConfig.textColor}
+                `}>
+                  <span className="capitalize">{event.type || 'Event'}</span>
+                </div>
+                
+                {/* Recurring badge */}
+                {event.isRecurring && event.recurrencePattern && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                    <Repeat size={12} />
+                    <span className="capitalize">{event.recurrencePattern}</span>
+                  </div>
+                )}
+                
+                {/* Reminder badge */}
+                {event.reminderMinutes && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                    <Bell size={12} />
+                    <span>{event.reminderMinutes}m reminder</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {/* Right side - actions */}
+          <div className="flex items-start gap-2">
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+              className="p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <MoreVertical size={16} className="text-gray-500" />
+            </button>
+            <button
+              onClick={() => onDelete(event.id)}
+              className="p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              <Trash2 size={16} className="text-red-600 dark:text-red-400" />
+            </button>
+          </div>
+        </div>
+        
+        {/* Expanded content */}
+        {showDetails && (
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/50 animate-fade-in">
+            {/* Notes */}
+            {event.notes && (
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
+                  {event.notes}
+                </p>
+              </div>
+            )}
+            
+            {/* Full attendees list */}
+            {event.attendees && event.attendees.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Attendees</h4>
+                <div className="space-y-2">
+                  {event.attendees.map((attendee: string, idx: number) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-xs font-medium text-gray-700 dark:text-gray-300">
+                        {attendee.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{attendee}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Creator info */}
+            <div className="mt-4 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <span>Created by {event.creator?.firstName || 'Unknown'}</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -247,86 +474,12 @@ export default function Calendar() {
             ) : (
               <div className="space-y-4">
                 {getDayEvents(selectedDate.getDate()).map((event: any, index: number) => (
-                  <div 
+                  <CalendarEventCard 
                     key={event.id} 
-                    className="rounded-2xl p-5 animate-fade-in"
-                    style={{ 
-                      backgroundColor: 'var(--bg-secondary)',
-                      borderColor: 'var(--border-color)',
-                      border: '1px solid',
-                      animationDelay: `${index * 100}ms` 
-                    }}
-                  >
-                    <div className="flex items-start space-x-4">
-                      <div 
-                        className="w-4 h-16 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: event.color || '#007AFF' }}
-                      ></div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>{event.title}</h4>
-                          <button
-                            onClick={() => handleDeleteEvent(event.id)}
-                            className="px-2 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                        {event.description && (
-                          <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>{event.description}</p>
-                        )}
-                        {event.location && (
-                          <div className="mb-3 flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            <span>📍</span>
-                            <span>{event.location}</span>
-                          </div>
-                        )}
-                        {event.attendees && event.attendees.length > 0 && (
-                          <div className="mb-3 flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            <span>👥</span>
-                            <span>{event.attendees.length} attendees</span>
-                          </div>
-                        )}
-                        {event.isRecurring && event.recurrencePattern && (
-                          <div className="mb-3 flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            <span>🔄</span>
-                            <span>Repeats {event.recurrencePattern}</span>
-                          </div>
-                        )}
-                        <div className="flex items-start flex-wrap gap-2">
-                          <div className="px-3 py-2 rounded-xl shadow-sm" style={{ backgroundColor: 'var(--bg-primary)' }}>
-                            <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
-                              {event.allDay ? 'All Day' : new Date(event.startDate).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit'
-                              })}
-                              {event.endDate && !event.allDay && (
-                                <span style={{ color: 'var(--text-secondary)' }}>
-                                  {' - '}
-                                  {new Date(event.endDate).toLocaleTimeString('en-US', {
-                                    hour: 'numeric',
-                                    minute: '2-digit'
-                                  })}
-                                </span>
-                              )}
-                            </span>
-                          </div>
-                          <div className="px-3 py-2 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-                            <span className="font-semibold text-sm" style={{ color: 'var(--text-secondary)' }}>
-                              {event.creator?.firstName || 'Unknown'}
-                            </span>
-                          </div>
-                          {event.type && (
-                            <div className="px-3 py-2 rounded-xl" style={{ backgroundColor: 'var(--blue-light)' }}>
-                              <span className="capitalize font-semibold text-sm" style={{ color: 'var(--accent-blue)' }}>
-                                {event.type}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    event={event} 
+                    onDelete={handleDeleteEvent} 
+                    index={index} 
+                  />
                 ))}
               </div>
             )}

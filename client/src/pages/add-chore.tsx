@@ -82,8 +82,10 @@ export function AddChore() {
 
   const createChoreMutation = useMutation({
     mutationFn: async (choreData: any) => {
-      const response = await apiRequest("POST", "/api/chores", choreData);
-      return response.json();
+      return apiRequest("/api/chores", {
+        method: "POST",
+        body: JSON.stringify(choreData),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
@@ -175,7 +177,7 @@ export function AddChore() {
                 color: canCreateChore && !createChoreMutation.isPending ? 'white' : 'var(--text-secondary)'
               }}
             >
-              {createChoreMutation.isPending ? "Creating..." : "Create"}
+              {createChoreMutation.isPending ? "Adding..." : "Add"}
             </button>
           </div>
         </div>

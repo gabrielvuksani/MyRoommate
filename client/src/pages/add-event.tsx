@@ -95,8 +95,10 @@ export function AddEvent() {
 
   const createEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
-      const response = await apiRequest("POST", "/api/calendar", eventData);
-      return response.json();
+      return apiRequest("/api/calendar", {
+        method: "POST",
+        body: JSON.stringify(eventData),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
@@ -189,7 +191,7 @@ export function AddEvent() {
                 color: canCreateEvent && !createEventMutation.isPending ? 'white' : 'var(--text-secondary)'
               }}
             >
-              {createEventMutation.isPending ? "Creating..." : "Create"}
+              {createEventMutation.isPending ? "Adding..." : "Add"}
             </button>
           </div>
         </div>

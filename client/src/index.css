@@ -65,8 +65,8 @@
   animation: slide-up 0.3s ease-out forwards;
 }
 
-/* Portrait mode restriction */
-@media screen and (orientation: landscape) and (max-height: 900px) {
+/* Portrait mode restriction - temporarily disabled for testing */
+/* @media screen and (orientation: landscape) and (max-height: 900px) {
   body {
     overflow: hidden;
   }
@@ -104,7 +104,7 @@
     max-width: 300px;
     line-height: 1.5;
   }
-}
+} */
 
 /* visionOS-inspired Design System - Light Mode */
 :root {
