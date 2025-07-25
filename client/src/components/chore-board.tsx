@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Clock, Calendar, User, CheckCircle2, Circle, PlayCircle, AlertTriangle, X, ChevronDown } from "lucide-react";
+import { Clock, Calendar, User, CheckCircle2, Circle, PlayCircle, AlertTriangle, Trash2, ChevronDown } from "lucide-react";
 import { useLocation } from "wouter";
 
 interface ChoresBoardProps {
@@ -314,7 +314,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                   }}
                   className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                 >
-                  <X size={16} />
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>

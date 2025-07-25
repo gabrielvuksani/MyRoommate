@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, MapPin, Users, Repeat, Bell, X, ChevronDown, Circle } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Repeat, Bell, Trash2, ChevronDown, Circle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface CalendarEventCardProps {
@@ -234,7 +234,7 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
                   }}
                   className="p-1.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                 >
-                  <X size={14} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             )}

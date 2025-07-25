@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DollarSign, Calendar, Users, Repeat, CheckCircle, Clock, X, ChevronDown, TrendingUp, TrendingDown } from "lucide-react";
+import { DollarSign, Calendar, Users, Repeat, CheckCircle, Clock, Trash2, ChevronDown, TrendingUp, TrendingDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -244,7 +244,7 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
                   }}
                   className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                 >
-                  <X size={16} />
+                  <Trash2 size={16} />
                 </button>
               </div>
             )}
