@@ -82,10 +82,7 @@ export function AddChore() {
 
   const createChoreMutation = useMutation({
     mutationFn: async (choreData: any) => {
-      return apiRequest("/api/chores", {
-        method: "POST",
-        body: JSON.stringify(choreData),
-      });
+      return apiRequest("POST", "/api/chores", choreData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
