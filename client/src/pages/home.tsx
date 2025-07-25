@@ -1091,9 +1091,7 @@ export default function Home() {
                   <CardContent className="p-4">
                     <button
                       onClick={() => setLocation("/dashboard")}
-                      className="w-full flex items-center justify-between p-3 rounded-xl transition-all hover:scale-[1.02]"
-                      style={{ background: "var(--surface-secondary)" }}
-                    >
+                      className="w-full flex items-center justify-between p-3 rounded-xl transition-all hover:scale-[1.02]">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-xl flex items-center justify-center">
                           <TrendingUp className="w-5 h-5 text-white" />
