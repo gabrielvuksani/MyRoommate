@@ -114,7 +114,7 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
               <div className="flex items-center gap-3 mt-1 text-xs text-gray-600 dark:text-gray-400">
                 <div className="flex items-center gap-1">
                   <Users size={12} />
-                  <span>Paid by {expense.paidByUser?.firstName || 'Unknown'}</span>
+                  <span>{expense.paidByUser?.firstName || 'Unknown'}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Calendar size={12} />
