@@ -23,9 +23,10 @@ import { pwaDetection } from "@/lib/pwa-detection";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
-export default function Profile() {
+export default function Profile(): ReactNode {
   const { user } = useAuth();
   const { theme, effectiveTheme, setTheme } = useTheme();
 
@@ -547,34 +548,34 @@ export default function Profile() {
         </Card>
 
         {/* Account Details */}
-        <Card className="glass-card" style={{
+        <div className="glass-card" style={{
           background: 'var(--surface)',
-          border: '1px solid var(--border)'
+          border: '1px solid var(--border)',
+          borderRadius: '12px',
+          padding: '24px'
         }}>
-          <CardContent className="p-6">
-            <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
-              Account details
-            </h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>User ID</span>
-                <span
-                  className="font-mono text-sm truncate ml-4"
-                  style={{ color: 'var(--text-primary)' }}
-                  title={(user as any).id}
-                >
-                  {(user as any).id}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-3">
-                <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
-                <span style={{ color: 'var(--text-primary)' }}>
-                  {new Date((user as any).createdAt).toLocaleDateString()}
-                </span>
-              </div>
+          <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+            Account details
+          </h3>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+              <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>User ID</span>
+              <span
+                className="font-mono text-sm truncate ml-4"
+                style={{ color: 'var(--text-primary)' }}
+                title={(user as any)?.id?.toString() ?? ''}
+              >
+                {(user as any)?.id?.toString() ?? 'N/A'}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex justify-between items-center py-3">
+              <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
+              <span style={{ color: 'var(--text-primary)' }}>
+                {(user as any)?.createdAt ? new Date((user as any).createdAt).toLocaleDateString() : 'N/A'}
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* Notification Settings - Only show if notifications can be served */}
         {canShowNotifications && (
@@ -602,24 +603,24 @@ export default function Profile() {
                   {notificationInfo.supportLevel === 'none' && <AlertTriangle className="w-4 h-4 text-orange-600" />}
 
                   <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                    {notificationInfo.supportLevel === 'full' && 'Full Support - Push Notifications'}
-                    {notificationInfo.supportLevel === 'partial' && 'Partial Support - Browser Notifications'}
-                    {notificationInfo.supportLevel === 'none' && (
-                      notificationInfo.requiresInstall ? 'Installation Required' : 'Limited Support'
-                    )}
+                    {notificationInfo.supportLevel === 'full' ? 'Full Support - Push Notifications' : 
+                     notificationInfo.supportLevel === 'partial' ? 'Partial Support - Browser Notifications' :
+                     notificationInfo.supportLevel === 'none' ? (
+                       notificationInfo.requiresInstall ? 'Installation Required' : 'Limited Support'
+                     ) : null}
                   </span>
                 </div>
 
                 <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  {notificationInfo.supportLevel === 'full' && 'You can receive notifications even when the app is closed.'}
-                  {notificationInfo.supportLevel === 'partial' && 'You can receive notifications while using the browser.'}
-                  {notificationInfo.supportLevel === 'none' && (
-                    notificationInfo.requiresInstall 
-                      ? 'Install the app to your home screen to enable push notifications.'
-                      : notificationInfo.permission === 'denied' 
-                        ? 'Notifications are blocked in your browser settings.'
-                        : 'Click "Enable Notifications" below to get started.'
-                  )}
+                  {notificationInfo.supportLevel === 'full' ? 'You can receive notifications even when the app is closed.' :
+                   notificationInfo.supportLevel === 'partial' ? 'You can receive notifications while using the browser.' :
+                   notificationInfo.supportLevel === 'none' ? (
+                     notificationInfo.requiresInstall 
+                       ? 'Install the app to your home screen to enable push notifications.'
+                       : notificationInfo.permission === 'denied' 
+                         ? 'Notifications are blocked in your browser settings.'
+                         : 'Click "Enable Notifications" below to get started.'
+                   ) : null}
                 </p>
 
                 {/* Install prompt for mobile users */}
@@ -673,7 +674,7 @@ export default function Profile() {
                     </p>
                   </div>
                   <Switch
-                    checked={notificationSettings.enabled && notificationInfo?.permission === 'granted'}
+                    checked={notificationSettings.enabled && notificationInfo?.permission !== 'denied' && !notificationInfo?.requiresInstall}
                     onCheckedChange={(checked) => handleNotificationToggle('enabled', checked)}
                     disabled={notificationInfo?.permission === 'denied' || notificationInfo?.requiresInstall}
                   />
@@ -774,7 +775,7 @@ export default function Profile() {
               <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
                 Household Information
               </h3>
-              <div className="space-y-4">
+              <div className="pt-3">
                 <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
                   <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>Name</span>
                   <div className="flex items-center space-x-2">
