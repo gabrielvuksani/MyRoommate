@@ -35,13 +35,13 @@ export default function Roommates() {
       return fetch(`/api/roommate-listings${params}`).then(res => res.json());
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const { data: myListings = [] } = useQuery({
     queryKey: ["/api/roommate-listings/my"],
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   // Memoize arrays and sorting for performance
@@ -102,53 +102,46 @@ export default function Roommates() {
       </div>
 
       <div className="content-with-header-roommates px-6 pb-24 space-y-6">
-        {/* Glass Morphism Tab Bar */}
-        <div className="relative pt-2">
-          <div 
-            className="flex rounded-2xl p-1 backdrop-blur-xl border"
-            style={{
-              background: 'var(--surface-secondary)',
-              border: '1px solid var(--border)',
-              backdropFilter: 'blur(20px) saturate(1.8)',
-            }}
+        {/* Tab Bar */}
+        <div className="flex justify-center">
+          <div
+            className="flex space-x-1 p-1 rounded-2xl"
+            style={{ background: "var(--surface-secondary)" }}
           >
-            {/* Tab Background Indicator */}
-            <div 
-              className="absolute top-1 bottom-1 rounded-xl transition-all duration-500 ease-out"
-              style={{
-                background: 'var(--surface)',
-                boxShadow: 'var(--shadow-soft)',
-                width: 'calc(50% - 4px)',
-                transform: `translateX(${activeTab === 'browse' ? '2px' : 'calc(100% + 2px)'})`,
-              }}
-            />
-            
-            {/* Browse Tab */}
             <button
               onClick={() => setActiveTab("browse")}
-              className="relative flex-1 flex items-center justify-center py-3 px-4 rounded-xl transition-all duration-300 z-10"
+              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center"
+              style={{
+                background:
+                  activeTab === "browse"
+                    ? "var(--primary)"
+                    : "transparent",
+                color:
+                  activeTab === "browse"
+                    ? "white"
+                    : "var(--text-secondary)",
+              }}
             >
-              <Search className="w-4 h-4 mr-2" style={{ color: activeTab === 'browse' ? 'var(--primary)' : 'var(--text-secondary)' }} />
-              <span 
-                className="font-medium"
-                style={{ color: activeTab === 'browse' ? 'var(--text-primary)' : 'var(--text-secondary)' }}
-              >
-                Browse ({listingsArray.length})
-              </span>
+              <Search className="w-4 h-4 mr-2" />
+              Browse ({listingsArray.length})
             </button>
             
-            {/* My Listings Tab */}
             <button
               onClick={() => setActiveTab("my-listings")}
-              className="relative flex-1 flex items-center justify-center py-3 px-4 rounded-xl transition-all duration-300 z-10"
+              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center"
+              style={{
+                background:
+                  activeTab === "my-listings"
+                    ? "var(--primary)"
+                    : "transparent",
+                color:
+                  activeTab === "my-listings"
+                    ? "white"
+                    : "var(--text-secondary)",
+              }}
             >
-              <Home className="w-4 h-4 mr-2" style={{ color: activeTab === 'my-listings' ? 'var(--primary)' : 'var(--text-secondary)' }} />
-              <span 
-                className="font-medium"
-                style={{ color: activeTab === 'my-listings' ? 'var(--text-primary)' : 'var(--text-secondary)' }}
-              >
-                My Listings ({myListingsArray.length})
-              </span>
+              <Home className="w-4 h-4 mr-2" />
+              My Listings ({myListingsArray.length})
             </button>
           </div>
         </div>

@@ -135,29 +135,35 @@ export default function Expenses() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex space-x-2 mb-6">
-          {[
-            { key: "all", label: "All", count: expenses.length },
-            { key: "unsettled", label: "Unsettled", count: expenses.filter((e: any) => e.splits?.some((s: any) => !s.settled)).length },
-            { key: "settled", label: "Settled", count: expenses.filter((e: any) => e.splits?.every((s: any) => s.settled)).length }
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
-              className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all ${
-                activeTab === tab.key
-                  ? 'btn-animated text-white shadow-lg'
-                  : 'text-secondary hover:scale-[1.02]'
-              }`}
-              style={{
-                background: activeTab === tab.key ? 'var(--primary)' : 'var(--surface-secondary)',
-                color: activeTab === tab.key ? 'white' : 'var(--text-secondary)',
-                border: activeTab === tab.key ? 'none' : '1px solid var(--border-color)'
-              }}
-            >
-              {tab.label} ({tab.count})
-            </button>
-          ))}
+        <div className="flex justify-center mb-6">
+          <div
+            className="flex space-x-1 p-1 rounded-2xl"
+            style={{ background: "var(--surface-secondary)" }}
+          >
+            {[
+              { key: "all", label: "All", count: expenses.length },
+              { key: "unsettled", label: "Unsettled", count: expenses.filter((e: any) => e.splits?.some((s: any) => !s.settled)).length },
+              { key: "settled", label: "Settled", count: expenses.filter((e: any) => e.splits?.every((s: any) => s.settled)).length }
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key as any)}
+                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                style={{
+                  background:
+                    activeTab === tab.key
+                      ? "var(--primary)"
+                      : "transparent",
+                  color:
+                    activeTab === tab.key
+                      ? "white"
+                      : "var(--text-secondary)",
+                }}
+              >
+                {tab.label} ({tab.count})
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Expenses List */}
