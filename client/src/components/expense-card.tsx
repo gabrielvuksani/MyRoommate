@@ -78,8 +78,8 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
   return (
     <Card 
       className={`
-        glass-card relative overflow-hidden transition-all duration-300 cursor-pointer
-        ${isExpanded ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''}
+        glass-card relative overflow-hidden transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-lg
+        ${isExpanded ? 'ring-2 ring-blue-500 dark:ring-blue-400 scale-[1.02]' : ''}
       `}
       onClick={() => setIsExpanded(!isExpanded)}
     >
@@ -134,20 +134,26 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
           </div>
           
           {/* Amount and status */}
-          <div className="text-right">
-            <div className="text-lg font-bold text-gray-900 dark:text-white">
-              ${formatAmount(expense.amount)}
+          <div className="flex items-start gap-2">
+            <div className="text-right">
+              <div className="text-lg font-bold text-gray-900 dark:text-white">
+                ${formatAmount(expense.amount)}
+              </div>
+              {isFullySettled ? (
+                <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400 mt-0.5">
+                  <CheckCircle size={12} />
+                  <span>Settled</span>
+                </div>
+              ) : settlementPercentage > 0 ? (
+                <div className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                  {Math.round(settlementPercentage)}% settled
+                </div>
+              ) : null}
             </div>
-            {isFullySettled ? (
-              <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400 mt-0.5">
-                <CheckCircle size={12} />
-                <span>Settled</span>
-              </div>
-            ) : settlementPercentage > 0 ? (
-              <div className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                {Math.round(settlementPercentage)}% settled
-              </div>
-            ) : null}
+            <ChevronDown 
+              size={20} 
+              className={`text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+            />
           </div>
         </div>
         
