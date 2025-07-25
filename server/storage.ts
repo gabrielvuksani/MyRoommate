@@ -10,7 +10,6 @@ import {
   shoppingItems,
   roommateListings,
   pushSubscriptions,
-  kickedUsers,
   type User,
   type UpsertUser,
   type InsertUser,
@@ -101,11 +100,6 @@ export interface IStorage {
   deactivatePushSubscription(endpoint: string): Promise<void>;
   getUserPushSubscriptions(userId: string): Promise<PushSubscription[]>;
   getActivePushSubscriptions(householdId: string): Promise<(PushSubscription & { user: User })[]>;
-  
-  // Kicked users tracking
-  addKickedUser(userId: string, householdId: string, kickedBy: string): Promise<void>;
-  wasUserKickedFromHousehold(userId: string, householdId: string): Promise<boolean>;
-  getKickedHouseholdsCount(userId: string): Promise<number>;
   
   // Developer tools operations
   deleteAllHouseholdData(householdId: string): Promise<void>;
@@ -654,7 +648,6 @@ export class DatabaseStorage implements IStorage {
         phoneNumber: null,
         dateOfBirth: null,
         idVerified: false,
-        wasKickedFromHousehold: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       }
@@ -718,7 +711,6 @@ export class DatabaseStorage implements IStorage {
         phoneNumber: null,
         dateOfBirth: null,
         idVerified: false,
-        wasKickedFromHousehold: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       }
@@ -869,36 +861,6 @@ export class DatabaseStorage implements IStorage {
       },
       createdAt: row.createdAt
     }));
-  }
-
-  // Kicked users tracking
-  async addKickedUser(userId: string, householdId: string, kickedBy: string): Promise<void> {
-    await db.insert(kickedUsers).values({
-      userId,
-      householdId,
-      kickedBy,
-    }).onConflictDoNothing();
-  }
-
-  async wasUserKickedFromHousehold(userId: string, householdId: string): Promise<boolean> {
-    const result = await db
-      .select()
-      .from(kickedUsers)
-      .where(
-        and(
-          eq(kickedUsers.userId, userId),
-          eq(kickedUsers.householdId, householdId)
-        )
-      );
-    return result.length > 0;
-  }
-
-  async getKickedHouseholdsCount(userId: string): Promise<number> {
-    const result = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(kickedUsers)
-      .where(eq(kickedUsers.userId, userId));
-    return result[0]?.count || 0;
   }
 
   async deleteAllHouseholdData(householdId: string): Promise<void> {
