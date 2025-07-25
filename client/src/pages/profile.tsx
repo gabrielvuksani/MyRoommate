@@ -404,11 +404,14 @@ export default function Profile() {
                 />
                 <div className="flex-1 min-w-0">
                   <h2 className="text-2xl font-bold truncate" style={{ color: 'var(--text-primary)' }}>
-                    {(user as any).firstName && (user as any).lastName
-                      ? `${(user as any).firstName} ${(user as any).lastName}`
-                      : (user as any).firstName ||
-                        (user as any).email?.split("@")[0] ||
-                        "Unknown User"}
+                    {(() => {
+                      if ((user as any).firstName && (user as any).lastName) {
+                        return `${(user as any).firstName} ${(user as any).lastName}`;
+                      }
+                      return (user as any).firstName || 
+                             (user as any).email?.split("@")[0] || 
+                             "Unknown User";
+                    })()}
                   </h2>
                   <p className="truncate" style={{ color: 'var(--text-secondary)' }} title={(user as any).email}>
                     {(user as any).email}
@@ -548,43 +551,39 @@ export default function Profile() {
         </Card>
 
         {/* Account Details */}
-        {(() => {
-          if (!typedUser) return null;
-          
-          return (
-            <Card 
-              className="glass-card" 
-              style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border)'
-              }}
-            >
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
-                  Account details
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                    <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>User ID</span>
-                    <span
-                      className="font-mono text-sm truncate ml-4"
-                      style={{ color: 'var(--text-primary)' }}
-                      title={String(typedUser.id || '')}
-                    >
-                      {String(typedUser.id || 'N/A')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-3">
-                    <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
-                    <span style={{ color: 'var(--text-primary)' }}>
-                      {typedUser.createdAt ? new Date(typedUser.createdAt).toLocaleDateString() : 'N/A'}
-                    </span>
-                  </div>
+        {typedUser && (
+          <Card 
+            className="glass-card" 
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)'
+            }}
+          >
+            <CardContent className="p-6">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Account details
+              </h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>User ID</span>
+                  <span
+                    className="font-mono text-sm truncate ml-4"
+                    style={{ color: 'var(--text-primary)' }}
+                    title={String(typedUser.id || '')}
+                  >
+                    {String(typedUser.id || 'N/A')}
+                  </span>
                 </div>
-              </CardContent>
-            </Card>
-          );
-        })()}
+                <div className="flex justify-between items-center py-3">
+                  <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
+                  <span style={{ color: 'var(--text-primary)' }}>
+                    {typedUser.createdAt ? new Date(typedUser.createdAt).toLocaleDateString() : 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Notification Settings - Only show if notifications can be served */}
         {canShowNotifications && (

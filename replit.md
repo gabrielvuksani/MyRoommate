@@ -111,7 +111,7 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 25, 2025 (Latest):**
-- ✓ **FIXED: Resolved TypeScript error in profile.tsx theme section**: Fixed missing closing brace in JSX expression that was causing "Type 'unknown' is not assignable to type 'ReactNode'" error - simple bracket issue in theme picker conditional
+- ✓ **FIXED: Resolved TypeScript error in profile.tsx**: Fixed complex ternary operator in Profile Header section (lines 407-411) that was causing "Type 'unknown' is not assignable to type 'ReactNode'" error by replacing with cleaner IIFE pattern and simplified conditional rendering throughout the profile page
 - ✓ **Enhanced lifestyle preference icons with unique context-specific icons**: Updated all lifestyle preference icons to be more unique and meaningful (Users for gender, GraduationCap for student year, BookOpen for study habits, Coffee for social preferences)
 - ✓ **Added iconified lifestyle preference pills**: Lifestyle preference array items now display as enhanced pills with unique icons (CigaretteOff for no smoking, Heart for pet friendly, Leaf for vegetarian, Sparkle for clean, VolumeX for quiet, Coffee for social)
 - ✓ **Enhanced amenity icons in listing detail page**: Updated icons to be more unique for each amenity type (WashingMachine for laundry, Sparkles for natural lighting, Bike for bike storage)
