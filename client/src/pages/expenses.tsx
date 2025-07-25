@@ -148,8 +148,12 @@ export default function Expenses() {
         {/* Filter Tabs */}
         <div className="flex justify-center mb-6">
           <div
-            className="flex space-x-1 p-1 rounded-2xl"
-            style={{ background: "var(--surface-secondary)" }}
+            className="flex space-x-1 p-1 rounded-2xl border"
+            style={{ 
+              background: "var(--surface-secondary)",
+              borderColor: "var(--border)",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)"
+            }}
           >
             {[
               { key: "all", label: "All", count: expenses.length },

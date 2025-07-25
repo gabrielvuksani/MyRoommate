@@ -222,8 +222,12 @@ export default function Dashboard() {
         {/* Time Period Filter */}
         <div className="flex justify-center">
           <div
-            className="flex space-x-1 p-1 rounded-2xl"
-            style={{ background: "var(--surface-secondary)" }}
+            className="flex space-x-1 p-1 rounded-2xl border"
+            style={{ 
+              background: "var(--surface-secondary)",
+              borderColor: "var(--border)",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)"
+            }}
           >
             {["week", "month", "all"].map((period) => (
               <button
