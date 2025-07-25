@@ -23,12 +23,22 @@ import { pwaDetection } from "@/lib/pwa-detection";
 
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
-import type { ReactNode } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
-export default function Profile(): ReactNode {
+export default function Profile() {
   const { user } = useAuth();
   const { theme, effectiveTheme, setTheme } = useTheme();
+  
+  // Type guard for user
+  const userData = user as { 
+    id?: string; 
+    email?: string; 
+    firstName?: string; 
+    lastName?: string; 
+    createdAt?: string;
+    profileImage?: string;
+    profileImageUrl?: string;
+  } | null;
 
   const [, setLocation] = useLocation();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -394,23 +404,25 @@ export default function Profile(): ReactNode {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4 flex-1 min-w-0">
-                <ProfileAvatar 
-                  user={user as any} 
-                  size="xl" 
-                  editable={true} 
-                  gradientType="emerald"
-                  className="rounded-3xl"
-                />
+                {userData && (
+                  <ProfileAvatar 
+                    user={userData as any} 
+                    size="xl" 
+                    editable={true} 
+                    gradientType="emerald"
+                    className="rounded-3xl"
+                  />
+                )}
                 <div className="flex-1 min-w-0">
                   <h2 className="text-2xl font-bold truncate" style={{ color: 'var(--text-primary)' }}>
-                    {(user as any).firstName && (user as any).lastName
-                      ? `${(user as any).firstName} ${(user as any).lastName}`
-                      : (user as any).firstName ||
-                        (user as any).email?.split("@")[0] ||
+                    {userData?.firstName && userData?.lastName
+                      ? `${userData.firstName} ${userData.lastName}`
+                      : userData?.firstName ||
+                        userData?.email?.split("@")[0] ||
                         "Unknown User"}
                   </h2>
-                  <p className="truncate" style={{ color: 'var(--text-secondary)' }} title={(user as any).email}>
-                    {(user as any).email}
+                  <p className="truncate" style={{ color: 'var(--text-secondary)' }} title={userData?.email}>
+                    {userData?.email || ''}
                   </p>
                 </div>
               </div>
@@ -420,8 +432,8 @@ export default function Profile(): ReactNode {
                   <Button
                     onClick={() => {
                       setEditName({
-                        firstName: (user as any).firstName || "",
-                        lastName: (user as any).lastName || "",
+                        firstName: userData?.firstName || "",
+                        lastName: userData?.lastName || "",
                       });
                     }}
                     className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
@@ -548,11 +560,9 @@ export default function Profile(): ReactNode {
         </Card>
 
         {/* Account Details */}
-        <div className="glass-card" style={{
+        <div className="glass-card rounded-2xl p-6" style={{
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: '12px',
-          padding: '24px'
+          border: '1px solid var(--border)'
         }}>
           <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
             Account details
@@ -563,15 +573,18 @@ export default function Profile(): ReactNode {
               <span
                 className="font-mono text-sm truncate ml-4"
                 style={{ color: 'var(--text-primary)' }}
-                title={(user as any)?.id?.toString() ?? ''}
+                title={userData?.id || ''}
               >
-                {(user as any)?.id?.toString() ?? 'N/A'}
+                {userData?.id || 'N/A'}
               </span>
             </div>
             <div className="flex justify-between items-center py-3">
               <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
               <span style={{ color: 'var(--text-primary)' }}>
-                {(user as any)?.createdAt ? new Date((user as any).createdAt).toLocaleDateString() : 'N/A'}
+                {userData?.createdAt 
+                  ? new Date(userData.createdAt).toLocaleDateString() 
+                  : 'N/A'
+                }
               </span>
             </div>
           </div>

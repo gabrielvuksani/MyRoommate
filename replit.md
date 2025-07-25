@@ -111,7 +111,11 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 25, 2025 (Latest):**
-- ✓ **COMPLETED: Implemented household admin permissions system**: Only household creators (admin role) can see and access the "Delete All Household Data" button
+- ✓ **COMPLETED: Fixed persistent TypeScript error in profile.tsx**: Resolved "Type 'unknown' is not assignable to type 'ReactNode'" error by replacing Card component with plain div in Account Details section
+- ✓ **Enhanced notification slider UI**: Fixed notification toggle to correctly display "off" state when permission is required or blocked
+- ✓ **Fixed dashboard scrolling**: Added proper bottom padding and CSS classes to prevent content being cut off
+- ✓ **Redesigned listing detail page**: Created premium appearance with separated location and price sections, enhanced typography and visual hierarchy
+- ✓ **Implemented household admin permissions system**: Only household creators (admin role) can see and access the "Delete All Household Data" button
 - ✓ **Updated household creation flow**: Creator is now automatically set as admin role when creating a new household
 - ✓ **Enhanced profile page security**: Added role-based access control for destructive actions
 - ✓ **Verified iOS PWA install banner**: Confirmed working implementation that shows for iOS Safari users who haven't installed the app
