@@ -253,6 +253,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/households/current/members', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const membership = await storage.getUserHousehold(userId);
+      if (!membership) {
+        return res.status(404).json({ message: "No household found" });
+      }
+      
+      const members = await storage.getHouseholdMembers(membership.household.id);
+      res.json(members);
+    } catch (error) {
+      console.error("Error fetching household members:", error);
+      res.status(500).json({ message: "Failed to fetch household members" });
+    }
+  });
+
   // Chore routes
   app.get('/api/chores', isAuthenticated, async (req: any, res) => {
     try {

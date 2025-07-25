@@ -147,12 +147,12 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           border: '1px solid var(--glass-border)',
-          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)'
+          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)'
         }}
       >
         <div className="p-4">
           {/* Header */}
-          <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 flex-1">
               {/* Status icon button */}
               <button
@@ -247,7 +247,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                   <div>
                     <span className="text-gray-500 dark:text-gray-400">Category</span>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {getCategoryEmoji(chore.category)} {chore.category.charAt(0).toUpperCase() + chore.category.slice(1)}
+                      {getCategoryEmoji(chore.category)}  {chore.category.charAt(0).toUpperCase() + chore.category.slice(1)}
                     </p>
                   </div>
                 )}
@@ -256,7 +256,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                   <div>
                     <span className="text-gray-500 dark:text-gray-400">Priority</span>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {getPriorityEmoji(chore.priority)} {chore.priority.charAt(0).toUpperCase() + chore.priority.slice(1)}
+                      {getPriorityEmoji(chore.priority)}  {chore.priority.charAt(0).toUpperCase() + chore.priority.slice(1)}
                     </p>
                   </div>
                 )}

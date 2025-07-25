@@ -15,7 +15,7 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
   const [isExpanded, setIsExpanded] = useState(false);
   
   // Fetch household members for attendee info
-  const { data: householdMembers = [] } = useQuery({
+  const { data: householdMembers = [] } = useQuery<any[]>({
     queryKey: ["/api/households/current/members"],
     enabled: event.attendees && event.attendees.length > 0
   });
@@ -231,8 +231,8 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
                       >
                         <QuickAvatar 
                           user={user}
-                          size="xs"
-                          colorKey={idx}
+                          size="sm"
+                          gradientType={user.profileColor || 'blue'}
                         />
                         <span className="text-xs text-gray-700 dark:text-gray-300">
                           {displayName}

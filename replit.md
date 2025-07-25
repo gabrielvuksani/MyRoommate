@@ -110,7 +110,16 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**January 25, 2025 (Latest - Component Redesign):**
+**January 25, 2025 (Latest - Bug Fixes & Improvements):**
+- ✓ **Fixed calendar event attendees showing "unknown"**: Added missing `/api/households/current/members` endpoint to properly fetch household member data
+- ✓ **Enhanced attendee display**: Calendar events now show profile avatars and full names for all attendees
+- ✓ **Simplified ChoreBoard non-expanded view**: Removed secondary metadata and quick action buttons to reduce clutter per user request
+- ✓ **Component improvements**:
+  - Fixed TypeScript errors in calendar-event-card component  
+  - Updated QuickAvatar usage with proper gradientType prop
+  - Ensured all chore details are preserved in expanded view
+  
+**January 25, 2025 (Earlier - Component Redesign):**
 - ✓ **MAJOR: Complete premium redesign of core components based on user feedback**
 - ✓ **Redesigned ChoreBoard component (v2)**: Clean card-based design similar to expense cards, smart priority sorting, expandable details with all chore information, quick action buttons for status changes
 - ✓ **Redesigned ExpenseCard component**: Clean category-based design with emoji indicators, expandable cards with split details, smart balance calculations (USER APPROVED - DO NOT CHANGE)
