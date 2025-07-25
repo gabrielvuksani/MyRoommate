@@ -110,15 +110,7 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**July 25, 2025 (Latest - Task 5 Expanded Card Streamlining):**
-- ✓ **Streamlined expanded card views**: Reduced redundancy in all three expandable card components (ChoreBoard, ExpenseCard, CalendarEventCard)
-- ✓ **ChoreBoard improvements**: Expanded view now shows only description, time/recurrence, and subtasks - removed redundant details grid
-- ✓ **ExpenseCard simplification**: Removed notes, receipt sections, and complex split details - now shows clean split list with inline settle buttons
-- ✓ **CalendarEventCard optimization**: Displays only location, description, and attendee count - removed detailed attendee list and reminder grid
-- ✓ **Consistent action buttons**: All delete buttons now smaller (14px icons) and positioned consistently across components
-- ✓ **Enhanced user experience**: Faster card interactions with less visual clutter in expanded states
-
-**July 25, 2025 (Earlier - Sign Out & Real-Time Fixes):**
+**July 25, 2025 (Latest - Sign Out & Real-Time Fixes):**
 - ✓ **Fixed sign out button visibility**: Sign out button now appears in separate card and is always visible regardless of household status
 - ✓ **Enhanced WebSocket real-time messaging**: Verified WebSocket implementation works with both HTTP (ws://) and HTTPS (wss://) protocols
 - ✓ **Production-ready real-time architecture**: WebSocket connects to /ws endpoint on same host for compatibility across all environments

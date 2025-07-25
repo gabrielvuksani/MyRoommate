@@ -177,34 +177,123 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
           </div>
         </div>
         
-        {/* Expanded content - Streamlined */}
+        {/* Expanded content */}
         {isExpanded && (
           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700/50 animate-fade-in ml-11">
             {/* Location */}
             {event.location && event.location.trim() !== '' && (
-              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-2">
-                <MapPin size={12} />
-                <span>{event.location}</span>
+              <div className="mb-3">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <MapPin size={12} />
+                  Location
+                </h4>
+                <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                  {event.location}
+                </p>
               </div>
             )}
             
             {/* Description */}
             {event.description && event.description.trim() !== '' && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                {event.description}
-              </p>
-            )}
-            
-            {/* Attendees - simplified */}
-            {event.attendees && event.attendees.length > 0 && (
-              <div className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                {event.attendees.length} attendee{event.attendees.length > 1 ? 's' : ''}
+              <div className="mb-3">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                  Description
+                </h4>
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {event.description}
+                </p>
               </div>
             )}
             
-            {/* Delete button */}
+            {/* Notes */}
+            {event.notes && event.notes.trim() !== '' && (
+              <div className="mb-3">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <FileText size={12} />
+                  Notes
+                </h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
+                  {event.notes}
+                </p>
+              </div>
+            )}
+            
+            {/* Attendees */}
+            {event.attendees && Array.isArray(event.attendees) && event.attendees.length > 0 && (
+              <div className="mb-3">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1">
+                  <Users size={12} />
+                  Attendees ({event.attendees.length})
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {event.attendees.map((attendeeId: string, idx: number) => {
+                    // Find the attendee's user info from household members
+                    const memberInfo = householdMembers.find((member: any) => member.userId === attendeeId);
+                    const user = memberInfo?.user || {};
+                    const displayName = formatDisplayName(user.firstName, user.lastName, user.email?.split('@')[0] || 'Unknown');
+                    
+                    return (
+                      <div 
+                        key={idx}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50"
+                      >
+                        <QuickAvatar 
+                          user={user}
+                          size="sm"
+                          gradientType={user.profileColor || 'blue'}
+                        />
+                        <span className="text-xs text-gray-700 dark:text-gray-300">
+                          {displayName}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            
+            {/* Additional info */}
+            <div className="space-y-2 text-xs">
+              {/* Event details grid */}
+              <div className="grid grid-cols-2 gap-3">
+                {event.startDate && event.endDate && event.startDate !== event.endDate && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Duration</span>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(event.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </p>
+                  </div>
+                )}
+                
+                {event.reminder && event.reminder !== 'none' && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Reminder</span>
+                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
+                      <Bell size={12} className="text-orange-500" />
+                      {event.reminder === '5min' ? '5 minutes' :
+                       event.reminder === '15min' ? '15 minutes' :
+                       event.reminder === '30min' ? '30 minutes' :
+                       event.reminder === '1hour' ? '1 hour' :
+                       event.reminder === '2hours' ? '2 hours' :
+                       event.reminder === '1day' ? '1 day' :
+                       event.reminder === '1week' ? '1 week' :
+                       event.reminder} before
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              {event.color && (
+                <div className="flex items-center gap-2 pt-2">
+                  <Circle size={16} fill={event.color} color={event.color} />
+                  <span className="text-gray-600 dark:text-gray-400">Event color</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Actions */}
             {onDelete && (
-              <div className="flex justify-end">
+              <div className="flex justify-end mt-3 pt-3 border-t border-gray-200 dark:border-gray-700/50">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
