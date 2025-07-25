@@ -112,9 +112,8 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
       
-      {/* Navigation - Only show for users with households and not on add pages */}
-      {user && hasHousehold && !needsOnboarding && !isKeyboardVisible && 
-       location !== '/add-chore' && location !== '/add-event' && location !== '/add-expense' && (
+      {/* Navigation - Only show for users with households */}
+      {user && hasHousehold && !needsOnboarding && !isKeyboardVisible && (
         <BottomNavigation />
       )}
       
