@@ -427,8 +427,7 @@ export default function Profile() {
                 <ProfileAvatar 
                   user={user as any} 
                   size="xl" 
-                  editable={true} 
-                  gradientType="emerald"
+                  editable={true}
                   className="rounded-3xl"
                 />
                 <div className="flex-1 min-w-0">

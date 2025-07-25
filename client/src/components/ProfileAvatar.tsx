@@ -226,7 +226,7 @@ export function ProfileAvatar({
           <Button
             variant="outline"
             size="sm"
-            className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full p-0 bg-white dark:bg-gray-800 border-2 border-white dark:border-gray-800 shadow-lg hover:scale-110 transition-transform"
+            className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full p-0 bg-white dark:bg-gray-800 border-2 border-white dark:border-gray-800 shadow-lg hover:scale-110 transition-transform hover:bg-gray-50 dark:hover:bg-gray-700"
             onClick={() => setShowUploadOptions(!showUploadOptions)}
             disabled={uploading || uploadMutation.isPending || deleteMutation.isPending}
           >
