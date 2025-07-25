@@ -112,8 +112,8 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 **January 25, 2025 (Latest - Component Redesign):**
 - ✓ **MAJOR: Complete premium redesign of core components based on user feedback**
-- ✓ **Redesigned ChoreBoard component**: Collapsible sections with status-based grouping, premium mobile-first design with sophisticated animations and interactions
-- ✓ **Redesigned ExpenseCard component**: Clean category-based design with emoji indicators, expandable cards with split details, smart balance calculations
+- ✓ **Redesigned ChoreBoard component (v2)**: Clean card-based design similar to expense cards, smart priority sorting, expandable details with all chore information, quick action buttons for status changes
+- ✓ **Redesigned ExpenseCard component**: Clean category-based design with emoji indicators, expandable cards with split details, smart balance calculations (USER APPROVED - DO NOT CHANGE)
 - ✓ **Created CalendarEventCard component**: Premium event cards with type-based color coding, expandable details with attendee management, sophisticated mobile-optimized layout
 - ✓ **Enhanced all components with**:
   - Premium glass morphism effects with proper light/dark mode support

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Clock, Calendar, User, CheckCircle2, Circle, PlayCircle, AlertTriangle, Flame, Target, Sparkles, Timer, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Clock, Calendar, User, CheckCircle2, Circle, PlayCircle, AlertTriangle, X, ChevronDown } from "lucide-react";
 
 interface ChoresBoardProps {
   chores: any[];
@@ -8,127 +8,95 @@ interface ChoresBoardProps {
 }
 
 export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: ChoresBoardProps) {
-  const [expandedSection, setExpandedSection] = useState<string | null>('todo');
-  const [selectedChore, setSelectedChore] = useState<string | null>(null);
+  const [expandedChore, setExpandedChore] = useState<string | null>(null);
   
-  // Enhanced sorting with multiple criteria
-  const sortChoresByPriority = (choreList: any[]) => {
+  // Sort chores by priority and due date
+  const sortedChores = useMemo(() => {
     const priorityOrder: { [key: string]: number } = { urgent: 4, high: 3, medium: 2, low: 1 };
-    return choreList.sort((a, b) => {
-      // First by overdue status
-      const aOverdue = a.dueDate && new Date(a.dueDate) < new Date() && a.status !== 'done';
-      const bOverdue = b.dueDate && new Date(b.dueDate) < new Date() && b.status !== 'done';
-      if (aOverdue && !bOverdue) return -1;
-      if (!aOverdue && bOverdue) return 1;
+    
+    return [...chores].sort((a, b) => {
+      // Done chores go to the bottom
+      if (a.status === 'done' && b.status !== 'done') return 1;
+      if (a.status !== 'done' && b.status === 'done') return -1;
       
-      // Then by priority
-      const aPriority = priorityOrder[a.priority?.toLowerCase()] || 1;
-      const bPriority = priorityOrder[b.priority?.toLowerCase()] || 1;
-      if (aPriority !== bPriority) return bPriority - aPriority;
-      
-      // Finally by due date
-      if (a.dueDate && b.dueDate) {
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      // For non-done chores, sort by overdue status, then priority, then due date
+      if (a.status !== 'done' && b.status !== 'done') {
+        const aOverdue = a.dueDate && new Date(a.dueDate) < new Date();
+        const bOverdue = b.dueDate && new Date(b.dueDate) < new Date();
+        
+        if (aOverdue && !bOverdue) return -1;
+        if (!aOverdue && bOverdue) return 1;
+        
+        const aPriority = priorityOrder[a.priority?.toLowerCase()] || 1;
+        const bPriority = priorityOrder[b.priority?.toLowerCase()] || 1;
+        
+        if (aPriority !== bPriority) return bPriority - aPriority;
+        
+        if (a.dueDate && b.dueDate) {
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        }
       }
       
       return 0;
     });
-  };
-
-  const todoChores = useMemo(() => sortChoresByPriority(chores.filter(chore => chore.status === 'todo' || !chore.status)), [chores]);
-  const doingChores = useMemo(() => sortChoresByPriority(chores.filter(chore => chore.status === 'doing')), [chores]);
-  const doneChores = useMemo(() => chores.filter(chore => chore.status === 'done').slice(0, 5), [chores]);
+  }, [chores]);
 
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'todo': 
         return { 
           icon: Circle, 
-          label: 'To Do',
-          color: '#9ca3af',
-          bg: 'rgba(156, 163, 175, 0.1)'
+          color: '#6b7280',
+          bg: 'rgba(107, 114, 128, 0.08)'
         };
       case 'doing': 
         return { 
           icon: PlayCircle, 
-          label: 'In Progress',
           color: '#3b82f6',
-          bg: 'rgba(59, 130, 246, 0.1)'
+          bg: 'rgba(59, 130, 246, 0.08)'
         };
       case 'done': 
         return { 
           icon: CheckCircle2, 
-          label: 'Completed',
           color: '#10b981',
-          bg: 'rgba(16, 185, 129, 0.1)'
+          bg: 'rgba(16, 185, 129, 0.08)'
         };
       default: 
         return { 
           icon: Circle, 
-          label: 'To Do',
-          color: '#9ca3af',
-          bg: 'rgba(156, 163, 175, 0.1)'
+          color: '#6b7280',
+          bg: 'rgba(107, 114, 128, 0.08)'
         };
     }
   };
 
-  const getPriorityConfig = (priority: string) => {
+  const getPriorityEmoji = (priority: string) => {
     switch (priority?.toLowerCase()) {
-      case 'urgent':
-        return {
-          icon: AlertTriangle,
-          label: 'Urgent',
-          color: '#ef4444',
-          bg: 'rgba(239, 68, 68, 0.08)'
-        };
-      case 'high':
-        return {
-          icon: Flame,
-          label: 'High',
-          color: '#f97316',
-          bg: 'rgba(249, 115, 22, 0.08)'
-        };
-      case 'medium':
-        return {
-          icon: Target,
-          label: 'Medium',
-          color: '#3b82f6',
-          bg: 'rgba(59, 130, 246, 0.08)'
-        };
-      case 'low':
-        return {
-          icon: Sparkles,
-          label: 'Low',
-          color: '#6b7280',
-          bg: 'rgba(107, 114, 128, 0.08)'
-        };
-      default:
-        return {
-          icon: Sparkles,
-          label: 'Low',
-          color: '#6b7280',
-          bg: 'rgba(107, 114, 128, 0.08)'
-        };
+      case 'urgent': return '🔴';
+      case 'high': return '🟠';
+      case 'medium': return '🟡';
+      case 'low': return '🟢';
+      default: return '🟢';
     }
   };
 
   const getCategoryEmoji = (category: string) => {
     const categories: { [key: string]: string } = {
-      cleaning: '✨',
-      cooking: '🍳',
-      maintenance: '🔧',
-      shopping: '🛍️',
-      finance: '💰',
-      laundry: '👔',
-      organizing: '📦',
+      general: '🏠',
+      kitchen: '🍳',
+      bathroom: '🚿',
+      bedroom: '🛏️',
+      living: '🛋️',
       outdoor: '🌿',
-      pet: '🐾',
-      general: '📌'
+      laundry: '👔',
+      maintenance: '🔧',
+      shopping: '🛒',
+      finance: '💰'
     };
-    return categories[category?.toLowerCase()] || '📌';
+    return categories[category?.toLowerCase()] || '🏠';
   };
 
-  const formatDueDate = (dateString: string) => {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = date.getTime() - now.getTime();
@@ -137,164 +105,214 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Tomorrow';
     if (diffDays === -1) return 'Yesterday';
-    if (diffDays > 0 && diffDays <= 7) return `In ${diffDays} days`;
-    if (diffDays < 0) return `${Math.abs(diffDays)} days overdue`;
+    if (diffDays < -1) return `${Math.abs(diffDays)} days overdue`;
+    if (diffDays > 1 && diffDays <= 7) return `In ${diffDays} days`;
     
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   const ChoreCard = ({ chore }: { chore: any }) => {
+    const isExpanded = expandedChore === chore.id;
     const isOverdue = chore.dueDate && new Date(chore.dueDate) < new Date() && chore.status !== 'done';
-    const isSelected = selectedChore === chore.id;
     const statusConfig = getStatusConfig(chore.status);
-    const priorityConfig = getPriorityConfig(chore.priority);
     const StatusIcon = statusConfig.icon;
-    const PriorityIcon = priorityConfig.icon;
-    
-    const progress = chore.subtasks?.length > 0 
-      ? (chore.subtasks.filter((st: any) => st.completed).length / chore.subtasks.length) * 100
-      : chore.status === 'done' ? 100 : chore.status === 'doing' ? 50 : 0;
     
     return (
       <div 
         className={`
-          relative overflow-hidden transition-all duration-300 cursor-pointer active:scale-[0.99]
-          ${isSelected ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''}
+          relative overflow-hidden transition-all duration-300 cursor-pointer
+          ${isExpanded ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''}
         `}
-        onClick={() => setSelectedChore(isSelected ? null : chore.id)}
+        onClick={() => setExpandedChore(isExpanded ? null : chore.id)}
         style={{
           borderRadius: '20px',
-          background: isOverdue 
-            ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.03) 0%, transparent 100%), var(--glass-card)'
-            : 'var(--glass-card)',
+          background: 'var(--glass-card)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           border: '1px solid var(--glass-border)',
           boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)'
         }}
       >
-        {/* Priority accent line */}
-        <div 
-          className="absolute top-0 left-0 w-full h-0.5"
-          style={{ background: priorityConfig.color }}
-        />
-        
-        {/* Progress bar */}
-        {progress > 0 && progress < 100 && (
-          <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gray-200 dark:bg-gray-700">
-            <div 
-              className="h-full transition-all duration-500"
-              style={{
-                width: `${progress}%`,
-                background: statusConfig.color
-              }}
-            />
-          </div>
-        )}
-        
         <div className="p-4">
           {/* Header */}
-          <div className="flex items-start justify-between gap-3 mb-2">
+          <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-start gap-3 flex-1">
-              {/* Status button */}
+              {/* Status icon button */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   const nextStatus = chore.status === 'todo' ? 'doing' : chore.status === 'doing' ? 'done' : 'todo';
                   onUpdateChore(chore.id, { status: nextStatus });
                 }}
-                className="mt-0.5 p-1.5 -m-1.5 rounded-lg transition-all hover:scale-110 active:scale-95"
+                className="p-2 rounded-xl flex-shrink-0 transition-all hover:scale-105 active:scale-95"
                 style={{
-                  color: statusConfig.color,
-                  background: statusConfig.bg
+                  background: statusConfig.bg,
+                  color: statusConfig.color
                 }}
               >
-                <StatusIcon size={18} />
+                <StatusIcon size={20} />
               </button>
               
+              {/* Chore info */}
               <div className="flex-1 min-w-0">
-                <h3 className={`
-                  text-sm font-semibold leading-tight transition-all
-                  ${chore.status === 'done' ? 'text-gray-500 dark:text-gray-400 line-through' : 'text-gray-900 dark:text-white'}
-                `}>
+                <h3 className={`text-sm font-semibold ${chore.status === 'done' ? 'line-through' : ''}`} style={{
+                  color: chore.status === 'done' ? 'var(--text-secondary)' : 'var(--text-primary)'
+                }}>
                   {chore.title}
                 </h3>
                 
-                {chore.description && !isSelected && (
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 line-clamp-1">
-                    {chore.description}
-                  </p>
-                )}
+                <div className="flex items-center gap-3 mt-1 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-1">
+                    <User size={12} />
+                    <span>{chore.assignedUser?.firstName || 'Unassigned'}</span>
+                  </div>
+                  {chore.dueDate && (
+                    <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-600 dark:text-red-400 font-medium' : ''}`}>
+                      <Calendar size={12} />
+                      <span>{formatDate(chore.dueDate)}</span>
+                    </div>
+                  )}
+                  {chore.estimatedDuration && (
+                    <div className="flex items-center gap-1">
+                      <Clock size={12} />
+                      <span>{chore.estimatedDuration}m</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             
-            {/* Priority indicator */}
-            <div 
-              className="p-1.5 rounded-lg"
-              style={{
-                color: priorityConfig.color,
-                background: priorityConfig.bg
-              }}
-            >
-              <PriorityIcon size={14} />
+            {/* Priority and category */}
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{getCategoryEmoji(chore.category)}</span>
+              <span className="text-base">{getPriorityEmoji(chore.priority)}</span>
             </div>
           </div>
           
-          {/* Meta info */}
-          <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400 ml-9">
-            <div className="flex items-center gap-1.5">
-              <span className="text-base">{getCategoryEmoji(chore.category)}</span>
-              <span>{chore.assignedUser?.firstName || 'Unassigned'}</span>
+          {/* Quick action buttons for non-expanded state */}
+          {!isExpanded && chore.status !== 'done' && (
+            <div className="ml-11 flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const nextStatus = chore.status === 'todo' ? 'doing' : 'done';
+                  onUpdateChore(chore.id, { status: nextStatus });
+                }}
+                className="px-3 py-1 rounded-lg text-xs font-medium text-white transition-all hover:scale-105 active:scale-95"
+                style={{ background: chore.status === 'todo' ? '#3b82f6' : '#10b981' }}
+              >
+                {chore.status === 'todo' ? 'Start' : 'Complete'}
+              </button>
             </div>
-            
-            {chore.dueDate && (
-              <div className={`flex items-center gap-1 ${
-                isOverdue ? 'text-red-600 dark:text-red-400 font-medium' : ''
-              }`}>
-                <Calendar size={12} />
-                <span>{formatDueDate(chore.dueDate)}</span>
-              </div>
-            )}
-            
-            {chore.estimatedDuration && (
-              <div className="flex items-center gap-1">
-                <Timer size={12} />
-                <span>{chore.estimatedDuration}m</span>
-              </div>
-            )}
-          </div>
+          )}
           
           {/* Expanded content */}
-          {isSelected && (
-            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700/50 animate-fade-in space-y-3 ml-9">
+          {isExpanded && (
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/50 animate-fade-in">
               {chore.description && (
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
                   {chore.description}
                 </p>
               )}
               
+              {/* Details grid */}
+              <div className="grid grid-cols-2 gap-3 mb-4 text-xs">
+                {chore.category && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Category</span>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {getCategoryEmoji(chore.category)} {chore.category.charAt(0).toUpperCase() + chore.category.slice(1)}
+                    </p>
+                  </div>
+                )}
+                
+                {chore.priority && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Priority</span>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {getPriorityEmoji(chore.priority)} {chore.priority.charAt(0).toUpperCase() + chore.priority.slice(1)}
+                    </p>
+                  </div>
+                )}
+                
+                {chore.recurrence && chore.recurrence !== 'none' && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Recurrence</span>
+                    <p className="font-medium text-gray-900 dark:text-white capitalize">{chore.recurrence}</p>
+                  </div>
+                )}
+                
+                {chore.reminder && chore.reminder !== 'none' && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Reminder</span>
+                    <p className="font-medium text-gray-900 dark:text-white">{chore.reminder}</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Subtasks */}
+              {chore.subtasks && chore.subtasks.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                    Subtasks
+                  </h4>
+                  <div className="space-y-1">
+                    {chore.subtasks.map((subtask: string, idx: number) => (
+                      <div key={idx} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                        <Circle size={12} />
+                        <span>{subtask}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Notes */}
+              {chore.notes && (
+                <div className="mb-4">
+                  <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                    Notes
+                  </h4>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{chore.notes}</p>
+                </div>
+              )}
+              
               {/* Actions */}
               <div className="flex items-center justify-between">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const nextStatus = chore.status === 'todo' ? 'doing' : chore.status === 'doing' ? 'done' : 'todo';
-                    onUpdateChore(chore.id, { status: nextStatus });
-                  }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-white transition-all hover:scale-105 active:scale-95"
-                  style={{ background: statusConfig.color }}
-                >
-                  {chore.status === 'todo' ? 'Start' : chore.status === 'doing' ? 'Complete' : 'Reopen'}
-                </button>
+                {chore.status !== 'done' && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const nextStatus = chore.status === 'todo' ? 'doing' : 'done';
+                      onUpdateChore(chore.id, { status: nextStatus });
+                    }}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-white transition-all hover:scale-105 active:scale-95"
+                    style={{ background: chore.status === 'todo' ? '#3b82f6' : '#10b981' }}
+                  >
+                    {chore.status === 'todo' ? 'Start Task' : 'Mark Complete'}
+                  </button>
+                )}
+                
+                {chore.status === 'done' && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUpdateChore(chore.id, { status: 'todo' });
+                    }}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-500 text-white hover:bg-gray-600 transition-all hover:scale-105 active:scale-95"
+                  >
+                    Reopen
+                  </button>
+                )}
                 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onDeleteChore(chore.id);
                   }}
-                  className="p-1.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                  className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                 >
-                  <X size={14} />
+                  <X size={16} />
                 </button>
               </div>
             </div>
@@ -304,57 +322,23 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
     );
   };
 
-  const Section = ({ title, count, status, chores }: { title: string; count: number; status: string; chores: any[] }) => {
-    const isExpanded = expandedSection === status;
-    const statusConfig = getStatusConfig(status);
-    const Icon = statusConfig.icon;
-    
+  if (sortedChores.length === 0) {
     return (
-      <div className="glass-card rounded-2xl overflow-hidden">
-        <button
-          onClick={() => setExpandedSection(isExpanded ? null : status)}
-          className="w-full p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <div 
-              className="p-2 rounded-xl"
-              style={{
-                color: statusConfig.color,
-                background: statusConfig.bg
-              }}
-            >
-              <Icon size={20} />
-            </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>
-              <p className="text-xs text-gray-600 dark:text-gray-400">{count} {count === 1 ? 'task' : 'tasks'}</p>
-            </div>
-          </div>
-          {count > 0 && (
-            <div className="text-gray-400">
-              {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </div>
-          )}
-        </button>
-        
-        {isExpanded && count > 0 && (
-          <div className="px-4 pb-4 space-y-3 animate-fade-in">
-            {chores.map((chore) => (
-              <ChoreCard key={chore.id} chore={chore} />
-            ))}
-          </div>
-        )}
+      <div className="text-center py-12">
+        <div className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+          <CheckCircle2 size={28} style={{ color: 'var(--text-secondary)' }} />
+        </div>
+        <h4 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>No chores yet</h4>
+        <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>Create your first chore to get started</p>
       </div>
     );
-  };
+  }
 
   return (
-    <div className="space-y-4">
-      <Section title="To Do" count={todoChores.length} status="todo" chores={todoChores} />
-      <Section title="In Progress" count={doingChores.length} status="doing" chores={doingChores} />
-      {doneChores.length > 0 && (
-        <Section title="Recently Completed" count={doneChores.length} status="done" chores={doneChores} />
-      )}
+    <div className="space-y-3">
+      {sortedChores.map((chore) => (
+        <ChoreCard key={chore.id} chore={chore} />
+      ))}
     </div>
   );
 }
