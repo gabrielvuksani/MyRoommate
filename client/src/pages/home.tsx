@@ -79,9 +79,22 @@ export default function Home() {
     };
 
     // Check if user was kicked from household
-    const wasKicked = localStorage.getItem('wasKickedFromHousehold');
-    if (wasKicked === 'true' && !household) {
-      setShowKickedNotice(true);
+    const checkKickedStatus = async () => {
+      try {
+        const response = await fetch('/api/user/kicked-status');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.wasKicked && !household) {
+            setShowKickedNotice(true);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check kicked status:', error);
+      }
+    };
+    
+    if (!household) {
+      checkKickedStatus();
     }
 
     window.addEventListener("scroll", handleScroll);
@@ -170,9 +183,16 @@ export default function Home() {
                     </div>
                   </div>
                   <Button
-                    onClick={() => {
+                    onClick={async () => {
                       setShowKickedNotice(false);
-                      localStorage.removeItem('wasKickedFromHousehold');
+                      try {
+                        await fetch('/api/user/clear-kicked-flag', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' }
+                        });
+                      } catch (error) {
+                        console.error('Failed to clear kicked flag:', error);
+                      }
                     }}
                     className="p-1.5 rounded-lg hover:scale-110 transition-all"
                     style={{

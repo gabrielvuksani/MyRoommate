@@ -300,6 +300,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove the member
       await storage.removeMemberFromHousehold(membership.household.id, targetUserId);
       
+      // Set the kicked flag on the user
+      await storage.setUserKickedFlag(targetUserId, true);
+      
       // Send push notification to the removed user
       const adminUser = await storage.getUser(currentUserId);
       const adminName = adminUser?.firstName || 'The administrator';
@@ -317,9 +320,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       await sendPushNotification(targetUserId, pushPayload);
-      
-      // Set a flag in the user's session data to show notification
-      // This will be picked up by the frontend
       
       res.json({ message: "Member removed successfully" });
     } catch (error) {

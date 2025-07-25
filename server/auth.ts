@@ -165,6 +165,7 @@ export function setupAuth(app: Express) {
         idVerified: false,
         profileImageUrl: null,
         profileColor: 'blue', // Default avatar color
+        wasKickedFromHousehold: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -379,6 +380,34 @@ export function setupAuth(app: Express) {
     } catch (error) {
       console.error("Profile image removal error:", error);
       res.status(500).json({ message: "Failed to remove profile image" });
+    }
+  });
+
+  // Check if user was kicked from household
+  app.get("/api/user/kicked-status", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Unauthorized" });
+    
+    try {
+      const user = req.user as Express.User;
+      const freshUser = await storage.getUser(user.id);
+      res.json({ wasKicked: freshUser?.wasKickedFromHousehold || false });
+    } catch (error) {
+      console.error("Failed to get kicked status:", error);
+      res.status(500).json({ message: "Failed to get kicked status" });
+    }
+  });
+
+  // Clear kicked flag
+  app.post("/api/user/clear-kicked-flag", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Unauthorized" });
+    
+    try {
+      const user = req.user as Express.User;
+      await storage.setUserKickedFlag(user.id, false);
+      res.json({ message: "Kicked flag cleared" });
+    } catch (error) {
+      console.error("Failed to clear kicked flag:", error);
+      res.status(500).json({ message: "Failed to clear kicked flag" });
     }
   });
 }

@@ -44,6 +44,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<InsertUser>): Promise<User | undefined>;
   updateUserProfileImage(id: string, profileImageUrl: string | null): Promise<User | undefined>;
+  setUserKickedFlag(id: string, kicked: boolean): Promise<void>;
   
   // Household operations
   createHousehold(household: InsertHousehold & { inviteCode: string }): Promise<Household>;
@@ -157,6 +158,16 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return user || undefined;
+  }
+
+  async setUserKickedFlag(id: string, kicked: boolean): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        wasKickedFromHousehold: kicked,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id));
   }
 
   async createHousehold(household: InsertHousehold & { inviteCode: string, createdBy: string }): Promise<Household> {

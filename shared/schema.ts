@@ -42,6 +42,7 @@ export const users = pgTable("users", {
   phoneNumber: varchar("phone_number"),
   dateOfBirth: date("date_of_birth"),
   idVerified: boolean("id_verified").default(false),
+  wasKickedFromHousehold: boolean("was_kicked_from_household").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
