@@ -163,7 +163,7 @@ export default function Expenses() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border"
                 style={{
                   background:
                     activeTab === tab.key
@@ -173,6 +173,10 @@ export default function Expenses() {
                     activeTab === tab.key
                       ? "white"
                       : "var(--text-secondary)",
+                  borderColor:
+                    activeTab === tab.key
+                      ? "transparent"
+                      : "rgba(0, 0, 0, 0.06)",
                 }}
               >
                 {tab.label} ({tab.count})

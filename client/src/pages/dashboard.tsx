@@ -233,7 +233,7 @@ export default function Dashboard() {
               <button
                 key={period}
                 onClick={() => setSelectedPeriod(period)}
-                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border"
                 style={{
                   background:
                     selectedPeriod === period
@@ -243,6 +243,10 @@ export default function Dashboard() {
                     selectedPeriod === period
                       ? "white"
                       : "var(--text-secondary)",
+                  borderColor:
+                    selectedPeriod === period
+                      ? "transparent"
+                      : "rgba(0, 0, 0, 0.06)",
                 }}
               >
                 {period === 'week' ? 'This Week' : period === 'month' ? 'This Month' : 'All Time'}

@@ -114,7 +114,7 @@ export default function Roommates() {
           >
             <button
               onClick={() => setActiveTab("browse")}
-              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center"
+              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center border"
               style={{
                 background:
                   activeTab === "browse"
@@ -124,6 +124,10 @@ export default function Roommates() {
                   activeTab === "browse"
                     ? "white"
                     : "var(--text-secondary)",
+                borderColor:
+                  activeTab === "browse"
+                    ? "transparent"
+                    : "rgba(0, 0, 0, 0.06)",
               }}
             >
               <Search className="w-4 h-4 mr-2" />
@@ -132,7 +136,7 @@ export default function Roommates() {
             
             <button
               onClick={() => setActiveTab("my-listings")}
-              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center"
+              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center border"
               style={{
                 background:
                   activeTab === "my-listings"
@@ -142,6 +146,10 @@ export default function Roommates() {
                   activeTab === "my-listings"
                     ? "white"
                     : "var(--text-secondary)",
+                borderColor:
+                  activeTab === "my-listings"
+                    ? "transparent"
+                    : "rgba(0, 0, 0, 0.06)",
               }}
             >
               <Home className="w-4 h-4 mr-2" />
