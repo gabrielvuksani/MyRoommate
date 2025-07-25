@@ -110,7 +110,19 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**July 25, 2025 (Latest - Tab Bar Enhancements & Privacy Updates):**
+**July 25, 2025 (Latest - Real-Time Kick & Admin Features):**
+- ✓ **Implemented real-time kick functionality**: Admin members can now instantly remove household members with live WebSocket updates
+  - Kicked users are immediately redirected to home page without refresh
+  - WebSocket broadcasts kick events for instant UI updates
+  - All household data is cleared in real-time for kicked users
+- ✓ **Enhanced security with automatic invite code regeneration**: New invite codes generated when users are kicked to prevent unauthorized rejoining
+  - Old invite codes become invalid immediately upon member removal
+  - Admin UI updates with new code instantly
+- ✓ **Added kick button to admin interface**: Premium glass morphism design with red gradient styling
+- ✓ **Fixed push subscription storage**: Proper UPSERT handling for duplicate key constraints
+- ✓ **Global WebSocket architecture**: Refactored WebSocket variables to global scope for cross-endpoint access
+
+**July 25, 2025 (Earlier - Tab Bar Enhancements & Privacy Updates):**
 - ✓ **Enhanced tab bar visibility in light mode**: Added borders and subtle shadows to tab bar containers across all pages
 - ✓ **Added separator lines between tab buttons**: Implemented subtle vertical dividers using var(--border-strong) with 0.8 opacity
 - ✓ **Fixed TanStack Query v5 compatibility**: Updated cacheTime to gcTime in roommates.tsx

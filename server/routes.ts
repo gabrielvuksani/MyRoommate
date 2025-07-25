@@ -44,6 +44,10 @@ webpush.setVapidDetails(
   '8gDdfS0YP9m2JCg7RY9aDsTKCP6iLp0BNsRWch9BJAA' // Private key
 );
 
+// Global WebSocket references for real-time communication
+let wss: WebSocketServer;
+const householdClients = new Map<string, Set<WebSocket>>();
+
 // High-performance notification queue for millions of users
 class NotificationQueue {
   private queue: Array<{ userId?: string, householdId?: string, excludeUserId?: string, payload: any }> = [];
@@ -312,20 +316,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(eq(households.id, membership.household.id));
       
       // Send real-time WebSocket notification to the kicked user
-      const kickedUserClients = userClients.get(targetUserId);
-      if (kickedUserClients && kickedUserClients.size > 0) {
-        const kickMessage = JSON.stringify({
-          type: 'user_kicked',
-          message: 'You have been removed from the household',
-          timestamp: Date.now()
-        });
-        
-        kickedUserClients.forEach((client: any) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(kickMessage);
-          }
-        });
-      }
+      wss.clients.forEach((client: any) => {
+        if (client._userId === targetUserId && client.readyState === WebSocket.OPEN) {
+          const kickMessage = JSON.stringify({
+            type: 'user_kicked',
+            message: 'You have been removed from the household',
+            timestamp: Date.now()
+          });
+          client.send(kickMessage);
+        }
+      });
       
       // Also broadcast to household members that someone was removed
       const householdClientSet = householdClients.get(membership.household.id);
@@ -1319,12 +1319,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
   // High-performance WebSocket setup with user caching
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  wss = new WebSocketServer({ server: httpServer, path: '/ws' });
   
   // Performance optimization caches
   const userCache = new Map<string, any>();
   const clientsById = new Map<string, WebSocket>();
-  const householdClients = new Map<string, Set<WebSocket>>();
   
   // Performance monitoring
   let messageCount = 0;
