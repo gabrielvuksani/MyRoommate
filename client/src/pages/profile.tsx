@@ -539,8 +539,7 @@ export default function Profile() {
               <p className="text-xs mt-3" style={{ color: 'var(--text-secondary)' }}>
                 {theme === 'auto' 
                   ? `Following system (currently ${effectiveTheme || 'light'})`
-                  : `Using ${theme} mode`
-                }
+                  : `Using ${theme} mode`}
               </p>
             </div>
           </CardContent>
