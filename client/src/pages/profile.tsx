@@ -543,7 +543,7 @@ export default function Profile() {
         </Card>
 
         {/* Account Details */}
-        {user && (
+        {user && <>
           <Card 
             className="glass-card" 
             style={{
@@ -575,7 +575,7 @@ export default function Profile() {
               </div>
             </CardContent>
           </Card>
-        )}
+        </>}
 
         {/* Notification Settings - Only show if notifications can be served */}
         {canShowNotifications && (
