@@ -18,6 +18,8 @@ import {
   Plus,
   AlertCircle,
   X,
+  Zap,
+  Receipt,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,6 +53,10 @@ export default function Home() {
 
   const { data: balance } = useQuery({
     queryKey: ["/api/balance"],
+  });
+
+  const { data: expenses = [] } = useQuery({
+    queryKey: ["/api/expenses"],
   });
 
   // Fetch featured roommate listings for all users
@@ -822,16 +828,24 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* Performance Insights */}
+        {/* Household Insights */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2
-              className="text-xl font-bold flex items-center"
-              style={{ color: "var(--text-primary)" }}
-            >
-              <BarChart3 className="w-5 h-5 mr-2 text-primary" />
-              Household Performance
-            </h2>
+            <div>
+              <h2
+                className="text-xl font-bold flex items-center"
+                style={{ color: "var(--text-primary)" }}
+              >
+                <BarChart3 className="w-5 h-5 mr-2 text-primary" />
+                Household Insights
+                <span className="ml-2 px-2 py-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs rounded-full">
+                  Live
+                </span>
+              </h2>
+              <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+                Real-time analytics for your household
+              </p>
+            </div>
             <button
               onClick={() => setLocation("/dashboard")}
               className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all btn-animated"
@@ -865,7 +879,7 @@ export default function Home() {
                     style={{ color: "var(--text-secondary)" }}
                   >
                     Start tracking chores and expenses to see your household
-                    performance!
+                    insights!
                   </p>
                   <div className="flex justify-center space-x-4">
                     <button
@@ -885,105 +899,320 @@ export default function Home() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {(() => {
-                const completedChores =
-                  (chores as any[])?.filter((c: any) => c.status === "done") ||
-                  [];
-                const totalChores = (chores as any[])?.length || 0;
-                const completionRate =
-                  totalChores > 0
-                    ? (completedChores.length / totalChores) * 100
-                    : 0;
+            <div className="space-y-6">
+              {/* Primary Metrics Row */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {(() => {
+                  const completedChores =
+                    (chores as any[])?.filter((c: any) => c.status === "done") ||
+                    [];
+                  const totalChores = (chores as any[])?.length || 0;
+                  const completionRate =
+                    totalChores > 0
+                      ? (completedChores.length / totalChores) * 100
+                      : 0;
 
-                const memberPerformance =
-                  (household as any)?.members?.map((member: any) => {
-                    const memberChores =
-                      (chores as any[])?.filter(
-                        (c: any) => c.assignedTo === member.userId,
-                      ) || [];
-                    const completedMemberChores = memberChores.filter(
-                      (c: any) => c.status === "done",
-                    );
-                    return {
-                      ...member,
-                      completionRate:
-                        memberChores.length > 0
-                          ? (completedMemberChores.length /
-                              memberChores.length) *
-                            100
-                          : 0,
-                    };
-                  }) || [];
+                  // Calculate weekly trend
+                  const weekAgo = new Date();
+                  weekAgo.setDate(weekAgo.getDate() - 7);
+                  const recentCompletions = completedChores.filter((c: any) => 
+                    c.completedAt && new Date(c.completedAt) > weekAgo
+                  ).length;
 
-                const topPerformer = memberPerformance.sort(
-                  (a: any, b: any) => b.completionRate - a.completionRate,
-                )[0];
+                  // Active chores
+                  const activeChores = (chores as any[])?.filter(
+                    (c: any) => c.status !== "done"
+                  ) || [];
+                  
+                  // Urgent chores (due within 24 hours)
+                  const urgentChores = activeChores.filter((chore: any) => {
+                    if (!chore.dueDate) return false;
+                    const dueDate = new Date(chore.dueDate);
+                    const now = new Date();
+                    const diffTime = dueDate.getTime() - now.getTime();
+                    const diffHours = diffTime / (1000 * 60 * 60);
+                    return diffHours <= 24 && diffHours >= 0;
+                  });
 
-                return (
-                  <>
-                    <Card className="glass-card">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                          <TrendingUp className="w-6 h-6 text-white" />
+                  const memberPerformance =
+                    (household as any)?.members?.map((member: any) => {
+                      const memberChores =
+                        (chores as any[])?.filter(
+                          (c: any) => c.assignedTo === member.userId,
+                        ) || [];
+                      const completedMemberChores = memberChores.filter(
+                        (c: any) => c.status === "done",
+                      );
+                      return {
+                        ...member,
+                        totalChores: memberChores.length,
+                        completedChores: completedMemberChores.length,
+                        completionRate:
+                          memberChores.length > 0
+                            ? (completedMemberChores.length /
+                                memberChores.length) *
+                              100
+                            : 0,
+                      };
+                    }) || [];
+
+                  const topPerformer = memberPerformance.sort(
+                    (a: any, b: any) => b.completionRate - a.completionRate,
+                  )[0];
+
+                  return (
+                    <>
+                      <Card className="glass-card overflow-hidden">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center">
+                              <TrendingUp className="w-5 h-5 text-white" />
+                            </div>
+                            <span className="text-xs px-2 py-1 rounded-full" style={{
+                              background: completionRate >= 80 ? 'rgba(34, 197, 94, 0.1)' : 
+                                        completionRate >= 50 ? 'rgba(251, 191, 36, 0.1)' :
+                                        'rgba(239, 68, 68, 0.1)',
+                              color: completionRate >= 80 ? '#22c55e' : 
+                                     completionRate >= 50 ? '#fbbf24' :
+                                     '#ef4444'
+                            }}>
+                              {completionRate >= 80 ? 'Excellent' : 
+                               completionRate >= 50 ? 'Good' : 'Needs Work'}
+                            </span>
+                          </div>
+                          <p
+                            className="text-3xl font-bold mb-1"
+                            style={{ color: "var(--text-primary)" }}
+                          >
+                            {completionRate.toFixed(0)}%
+                          </p>
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
+                            Completion Rate
+                          </p>
+                          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
+                            <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                              {recentCompletions} tasks this week
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="glass-card overflow-hidden">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center">
+                              <Award className="w-5 h-5 text-white" />
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                                {topPerformer?.completionRate?.toFixed(0) || 0}%
+                              </span>
+                            </div>
+                          </div>
+                          <p
+                            className="text-xl font-bold mb-1 truncate"
+                            style={{ color: "var(--text-primary)" }}
+                          >
+                            {topPerformer?.user?.firstName || "Team"}
+                          </p>
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
+                            Top Performer
+                          </p>
+                          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
+                            <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                              {topPerformer?.completedChores || 0} of {topPerformer?.totalChores || 0} tasks
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="glass-card overflow-hidden">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center">
+                              <DollarSign className="w-5 h-5 text-white" />
+                            </div>
+                            <span className="text-xs px-2 py-1 rounded-full" style={{
+                              background: 'rgba(168, 85, 247, 0.1)',
+                              color: '#a855f7'
+                            }}>
+                              Balance
+                            </span>
+                          </div>
+                          <p
+                            className="text-2xl font-bold mb-1"
+                            style={{ color: "var(--text-primary)" }}
+                          >
+                            ${Math.abs(netBalance).toFixed(0)}
+                          </p>
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
+                            {netBalance > 0 ? "Owed to you" : netBalance < 0 ? "You owe" : "All settled"}
+                          </p>
+                          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
+                            <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                              Track expenses
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="glass-card overflow-hidden">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center">
+                              <CheckSquare className="w-5 h-5 text-white" />
+                            </div>
+                            <Zap className="w-4 h-4" style={{ color: '#fbbf24' }} />
+                          </div>
+                          <p
+                            className="text-3xl font-bold mb-1"
+                            style={{ color: "var(--text-primary)" }}
+                          >
+                            {activeChores.length}
+                          </p>
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
+                            Active Tasks
+                          </p>
+                          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
+                            <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                              {urgentChores.length} urgent
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </>
+                  );
+                })()}
+              </div>
+
+              {/* Member Performance Chart */}
+              <Card className="glass-card">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-4 flex items-center" style={{ color: "var(--text-primary)" }}>
+                    <Users className="w-4 h-4 mr-2" />
+                    Member Performance
+                  </h3>
+                  <div className="space-y-3">
+                    {(() => {
+                      const memberPerformance =
+                        (household as any)?.members?.map((member: any) => {
+                          const memberChores =
+                            (chores as any[])?.filter(
+                              (c: any) => c.assignedTo === member.userId,
+                            ) || [];
+                          const completedMemberChores = memberChores.filter(
+                            (c: any) => c.status === "done",
+                          );
+                          return {
+                            ...member,
+                            completionRate:
+                              memberChores.length > 0
+                                ? (completedMemberChores.length /
+                                    memberChores.length) *
+                                  100
+                                : 0,
+                            totalChores: memberChores.length,
+                            completedChores: completedMemberChores.length,
+                          };
+                        }) || [];
+
+                      return memberPerformance.map((member: any) => (
+                        <div key={member.userId} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-medium">
+                                {member.user?.firstName?.[0] || '?'}
+                              </div>
+                              <div>
+                                <p className="font-medium" style={{ color: "var(--text-primary)" }}>
+                                  {member.user?.firstName || 'Unknown'}
+                                </p>
+                                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                                  {member.completedChores} of {member.totalChores} tasks completed
+                                </p>
+                              </div>
+                            </div>
+                            <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                              {member.completionRate.toFixed(0)}%
+                            </span>
+                          </div>
+                          <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: "var(--surface-secondary)" }}>
+                            <div 
+                              className="h-full bg-gradient-to-r from-blue-400 to-cyan-500 transition-all duration-500"
+                              style={{ width: `${member.completionRate}%` }}
+                            />
+                          </div>
                         </div>
-                        <p
-                          className="text-2xl font-bold"
-                          style={{ color: "var(--text-primary)" }}
-                        >
-                          {completionRate.toFixed(0)}%
-                        </p>
-                        <p
-                          className="text-sm"
-                          style={{ color: "var(--text-secondary)" }}
-                        >
-                          Completion Rate
-                        </p>
-                      </CardContent>
-                    </Card>
+                      ));
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
 
-                    <Card className="glass-card">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                          <Award className="w-6 h-6 text-white" />
+              {/* Quick Actions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="glass-card">
+                  <CardContent className="p-4">
+                    <button
+                      onClick={() => setLocation("/dashboard")}
+                      className="w-full flex items-center justify-between p-3 rounded-xl transition-all hover:scale-[1.02]"
+                      style={{ background: "var(--surface-secondary)" }}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-xl flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 text-white" />
                         </div>
-                        <p
-                          className="text-lg font-bold"
-                          style={{ color: "var(--text-primary)" }}
-                        >
-                          {topPerformer?.user?.firstName || "Team"}
-                        </p>
-                        <p
-                          className="text-sm"
-                          style={{ color: "var(--text-secondary)" }}
-                        >
-                          Top Performer
-                        </p>
-                      </CardContent>
-                    </Card>
+                        <div className="text-left">
+                          <p className="font-medium" style={{ color: "var(--text-primary)" }}>
+                            View Full Dashboard
+                          </p>
+                          <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                            Detailed analytics & trends
+                          </p>
+                        </div>
+                      </div>
+                      <ArrowRight size={16} style={{ color: "var(--text-secondary)" }} />
+                    </button>
+                  </CardContent>
+                </Card>
 
-                    <Card className="glass-card">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                          <CheckSquare className="w-6 h-6 text-white" />
+                <Card className="glass-card">
+                  <CardContent className="p-4">
+                    <button
+                      onClick={() => setLocation("/expenses")}
+                      className="w-full flex items-center justify-between p-3 rounded-xl transition-all hover:scale-[1.02]"
+                      style={{ background: "var(--surface-secondary)" }}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center">
+                          <Receipt className="w-5 h-5 text-white" />
                         </div>
-                        <p
-                          className="text-2xl font-bold"
-                          style={{ color: "var(--text-primary)" }}
-                        >
-                          {activeChores.length}
-                        </p>
-                        <p
-                          className="text-sm"
-                          style={{ color: "var(--text-secondary)" }}
-                        >
-                          Active Tasks
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </>
-                );
-              })()}
+                        <div className="text-left">
+                          <p className="font-medium" style={{ color: "var(--text-primary)" }}>
+                            Expense History
+                          </p>
+                          <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                            Track spending patterns
+                          </p>
+                        </div>
+                      </div>
+                      <ArrowRight size={16} style={{ color: "var(--text-secondary)" }} />
+                    </button>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           )}
         </div>
