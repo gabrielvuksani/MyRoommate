@@ -6,11 +6,13 @@ import { useLocation } from "wouter";
 import { apiRequest } from "../lib/queryClient";
 import ExpenseCard from "../components/expense-card";
 import { Card, CardContent } from "@/components/ui/card";
+import { AnimatePresence } from "framer-motion";
 
 export default function Expenses() {
   const [, setLocation] = useLocation();
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "unsettled" | "settled">("all");
+  const [activeExpenseIndex, setActiveExpenseIndex] = useState(0);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -142,7 +144,10 @@ export default function Expenses() {
           ].map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
+              onClick={() => {
+                setActiveTab(tab.key as any);
+                setActiveExpenseIndex(0);
+              }}
               className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all ${
                 activeTab === tab.key
                   ? 'btn-animated text-white shadow-lg'
@@ -160,44 +165,50 @@ export default function Expenses() {
         </div>
 
         {/* Expenses List */}
-        <div className="space-y-4">
-          {filteredExpenses.length === 0 ? (
-            <Card className="glass-card">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 rounded-xl mx-auto mb-4 flex items-center justify-center" style={{ background: 'var(--surface-secondary)' }}>
-                  <DollarSign size={32} style={{ color: 'var(--text-secondary)' }} />
-                </div>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  {activeTab === "all" ? "No Expenses Yet" : `No ${activeTab} Expenses`}
-                </h3>
-                <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                  {activeTab === "all" 
-                    ? "Start tracking shared expenses with your household"
-                    : `You have no ${activeTab} expenses at the moment`
-                  }
-                </p>
-                {activeTab === "all" && (
-                  <button
-                    onClick={() => setLocation("/add-expense")}
-                    className="px-6 py-3 rounded-xl font-medium btn-animated text-white hover:scale-[1.05] transition-all"
-                    style={{ background: 'var(--primary)' }}
-                  >
-                    Add First Expense
-                  </button>
-                )}
-              </CardContent>
-            </Card>
-          ) : (
-            filteredExpenses.map((expense: any) => (
-              <ExpenseCard
-                key={expense.id}
-                expense={expense}
-                onSettleExpense={handleSettleExpense}
-                onDeleteExpense={handleDeleteExpense}
-              />
-            ))
-          )}
-        </div>
+        {filteredExpenses.length === 0 ? (
+          <Card className="glass-card">
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 rounded-xl mx-auto mb-4 flex items-center justify-center" style={{ background: 'var(--surface-secondary)' }}>
+                <DollarSign size={32} style={{ color: 'var(--text-secondary)' }} />
+              </div>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                {activeTab === "all" ? "No Expenses Yet" : `No ${activeTab} Expenses`}
+              </h3>
+              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+                {activeTab === "all" 
+                  ? "Start tracking shared expenses with your household"
+                  : `You have no ${activeTab} expenses at the moment`
+                }
+              </p>
+              {activeTab === "all" && (
+                <button
+                  onClick={() => setLocation("/add-expense")}
+                  className="px-6 py-3 rounded-xl font-medium btn-animated text-white hover:scale-[1.05] transition-all"
+                  style={{ background: 'var(--primary)' }}
+                >
+                  Add First Expense
+                </button>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="relative" style={{ minHeight: `${Math.max(250, 220 + (filteredExpenses.length - 1) * 12)}px` }}>
+            <AnimatePresence>
+              {filteredExpenses.map((expense: any, index: number) => (
+                <ExpenseCard
+                  key={expense.id}
+                  expense={expense}
+                  index={index}
+                  totalCards={filteredExpenses.length}
+                  isActive={activeExpenseIndex === index}
+                  onActivate={() => setActiveExpenseIndex(index)}
+                  onSettleExpense={handleSettleExpense}
+                  onDeleteExpense={handleDeleteExpense}
+                />
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </div>
   );
