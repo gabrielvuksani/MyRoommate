@@ -171,7 +171,7 @@ export function AddEvent() {
           <div className="flex items-center space-x-3">
             <BackButton to="/calendar" />
             <div>
-              <h1 className="page-title">Create a New Event</h1>
+              <h1 className="page-title">Create an Event</h1>
               <p className="page-subtitle">Add a new calendar event</p>
             </div>
           </div>

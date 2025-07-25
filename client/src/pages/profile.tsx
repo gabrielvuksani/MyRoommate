@@ -779,7 +779,7 @@ export default function Profile() {
               <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
                 Household Information
               </h3>
-              <div className="space-y-4">
+              <div style={{padding: '0px 0 0px 0'}}>
                 <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
                   <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>Name</span>
                   <div className="flex items-center space-x-2">
@@ -845,7 +845,7 @@ export default function Profile() {
                     </Dialog>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-3">
+                <div className="flex justify-between items-center py-3 pt-4 pb-4">
                   <span style={{ color: 'var(--text-secondary)' }}>Invite Code</span>
                   <div className="flex items-center space-x-3">
                     <span className="font-mono text-sm px-2 py-1 rounded" style={{
