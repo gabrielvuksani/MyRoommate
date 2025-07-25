@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DollarSign, Calendar, Users, Repeat, CheckCircle, Clock, Trash2, ChevronDown, TrendingUp, TrendingDown } from "lucide-react";
+import { DollarSign, Calendar, Users, Repeat, CheckCircle, Clock, Trash2, ChevronDown, TrendingUp, TrendingDown, FileText, Receipt, Image } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -178,6 +178,39 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
               <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
                 {expense.description}
               </p>
+            )}
+            
+            {/* Notes */}
+            {expense.notes && expense.notes.trim() !== '' && (
+              <div className="mb-4">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <FileText size={12} />
+                  Notes
+                </h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
+                  {expense.notes}
+                </p>
+              </div>
+            )}
+            
+            {/* Receipt */}
+            {expense.receiptUrl && (
+              <div className="mb-4">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <Receipt size={12} />
+                  Receipt
+                </h4>
+                <a 
+                  href={expense.receiptUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  <Image size={14} />
+                  View Receipt
+                </a>
+              </div>
             )}
             
             {/* Split details */}

@@ -110,7 +110,16 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**January 25, 2025 (Latest - Database Cleanup):**
+**January 25, 2025 (Latest - Fixed Storage Layer Field Selection):**
+- ✓ **CRITICAL FIX: Resolved storage layer bug where database queries weren't selecting all fields**
+- ✓ **Fixed getChores()**: Now returns priority, category, estimatedDuration, notes, subtasks, reminder fields
+- ✓ **Fixed getCalendarEvents()**: Now returns location, attendees, reminder, isRecurring, recurrencePattern, allDay, notes fields
+- ✓ **Fixed getExpenses()**: Now returns notes, isRecurring, recurrenceFrequency fields
+- ✓ **Enhanced ExpenseCard component**: Added display for notes and receipt URL in expanded view
+- ✓ **Verified components**: ChoreBoard and CalendarEventCard already had display logic for all fields
+- ✓ **Root cause**: Storage functions were using incomplete SELECT statements, causing data to be saved correctly but not returned to the UI
+
+**January 25, 2025 (Earlier - Database Cleanup):**
 - ✓ **COMPLETED: Database wiped clean except demo data**
 - ✓ **Deleted all user data**: Removed all push subscriptions, expense splits, expenses, calendar events, chores, messages, shopping items, household members, households, and sessions
 - ✓ **Preserved demo listings**: 3 demo roommate listings remain (Berkeley, Mission District, Tech Hub)
