@@ -30,7 +30,18 @@ import {
   Utensils,
   WashingMachine,
   Bike,
-  Train
+  Train,
+  Users,
+  BookOpen,
+  Volume2,
+  Music,
+  Library,
+  Cigarette,
+  Dog,
+  PartyPopper,
+  Moon,
+  Sun,
+  Coffee
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
@@ -342,7 +353,7 @@ export default function ListingDetail() {
                   <div className="grid grid-cols-2 gap-3">
                     {typedListing.genderPreference && (
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <Users className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {typedListing.genderPreference.charAt(0).toUpperCase() + typedListing.genderPreference.slice(1)} roommates
                         </span>
@@ -350,7 +361,7 @@ export default function ListingDetail() {
                     )}
                     {typedListing.studentYear && typedListing.studentYear !== 'any' && (
                       <div className="flex items-center gap-2">
-                        <Home className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <GraduationCap className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {typedListing.studentYear.charAt(0).toUpperCase() + typedListing.studentYear.slice(1)} students
                         </span>
@@ -358,7 +369,9 @@ export default function ListingDetail() {
                     )}
                     {typedListing.studyHabits && (
                       <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        {typedListing.studyHabits === 'quiet' && <Library className="w-4 h-4" style={{ color: 'var(--primary)' }} />}
+                        {typedListing.studyHabits === 'moderate' && <BookOpen className="w-4 h-4" style={{ color: 'var(--primary)' }} />}
+                        {typedListing.studyHabits === 'flexible' && <Coffee className="w-4 h-4" style={{ color: 'var(--primary)' }} />}
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {typedListing.studyHabits.charAt(0).toUpperCase() + typedListing.studyHabits.slice(1)} study habits
                         </span>
@@ -366,7 +379,9 @@ export default function ListingDetail() {
                     )}
                     {typedListing.socialPreferences && (
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        {typedListing.socialPreferences === 'social' && <PartyPopper className="w-4 h-4" style={{ color: 'var(--primary)' }} />}
+                        {typedListing.socialPreferences === 'balanced' && <Users className="w-4 h-4" style={{ color: 'var(--primary)' }} />}
+                        {typedListing.socialPreferences === 'quiet' && <Moon className="w-4 h-4" style={{ color: 'var(--primary)' }} />}
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {typedListing.socialPreferences.charAt(0).toUpperCase() + typedListing.socialPreferences.slice(1)} social style
                         </span>
@@ -374,21 +389,35 @@ export default function ListingDetail() {
                     )}
                   </div>
                   {typedListing.lifestylePreferences && typedListing.lifestylePreferences.length > 0 && (
-                    <div className="mt-3">
-                      <div className="flex flex-wrap gap-2">
-                        {typedListing.lifestylePreferences.map((pref: string, index: number) => (
-                          <Badge 
-                            key={index} 
-                            className="text-xs border-0" 
-                            style={{
-                              background: 'var(--surface-secondary)',
-                              color: 'var(--text-primary)'
-                            }}
-                          >
-                            {pref.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                          </Badge>
-                        ))}
-                      </div>
+                    <div className="mt-3 space-y-2">
+                      {typedListing.lifestylePreferences.map((pref: string, index: number) => {
+                        let icon = Shield;
+                        if (pref === 'night-owl' || pref === 'night_owl') icon = Moon;
+                        else if (pref === 'early-bird' || pref === 'early_bird') icon = Sun;
+                        else if (pref === 'pet-friendly' || pref === 'pet_friendly') icon = Cat;
+                        else if (pref === 'non-smoker' || pref === 'non_smoker') icon = Cigarette;
+                        else if (pref === 'vegan' || pref === 'vegetarian') icon = Utensils;
+                        else if (pref === 'music-lover' || pref === 'music_lover') icon = Music;
+                        else if (pref === 'fitness-enthusiast' || pref === 'fitness_enthusiast') icon = Dumbbell;
+                        else if (pref === 'quiet-hours' || pref === 'quiet_hours') icon = Volume2;
+                        else if (pref === 'clean-freak' || pref === 'clean_freak' || pref === 'cleanliness') icon = Sparkles;
+                        else if (pref === 'social-butterfly' || pref === 'social_butterfly') icon = Users;
+                        else if (pref === 'study-focused' || pref === 'study_focused') icon = BookOpen;
+                        else if (pref === 'party-friendly' || pref === 'party_friendly') icon = PartyPopper;
+                        else if (pref === 'dog-friendly' || pref === 'dog_friendly') icon = Dog;
+                        
+                        const IconComponent = icon;
+                        const displayName = pref.replace(/_/g, ' ').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        
+                        return (
+                          <div key={index} className="flex items-center gap-2">
+                            <IconComponent className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                              {displayName}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
