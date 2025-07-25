@@ -327,7 +327,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
       
-      await sendPushNotification(targetUserId, pushPayload);
+      const notificationSent = await sendPushNotification(targetUserId, pushPayload);
+      console.log(`[KICK DEBUG] Push notification result for user ${targetUserId}: ${notificationSent}`);
       
       res.json({ message: "Member removed successfully", newInviteCode });
     } catch (error) {
@@ -1133,6 +1134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
     try {
       const subscriptions = await storage.getUserPushSubscriptions(userId);
+      console.log(`[PUSH DEBUG] Found ${subscriptions?.length || 0} subscriptions for user ${userId}`);
       
       if (!subscriptions || subscriptions.length === 0) {
         return false;

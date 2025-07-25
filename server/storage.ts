@@ -756,30 +756,23 @@ export class DatabaseStorage implements IStorage {
       const p256dhKey = subscription.keys?.p256dh || subscription.keys?.p256dhKey;
       const authKey = subscription.keys?.auth || subscription.keys?.authKey;
       
-      console.log('upsertPushSubscription called with:', {
-        userId: subscription.userId,
-        endpoint: subscription.endpoint,
-        p256dhKey: p256dhKey ? 'present' : 'missing',
-        authKey: authKey ? 'present' : 'missing'
-      });
-      
       if (!subscription.userId || !subscription.endpoint || !p256dhKey || !authKey) {
         throw new Error('Missing required subscription fields');
       }
       
-      // First try to delete any existing subscription for this endpoint
-      await db.execute(sql`
-        DELETE FROM push_subscriptions WHERE endpoint = ${subscription.endpoint}
-      `);
-      
-      // Then insert the new subscription
+      // Use INSERT ON CONFLICT to handle updates properly
       const result = await db.execute(sql`
         INSERT INTO push_subscriptions (user_id, endpoint, p256dh_key, auth_key, is_active, created_at)
         VALUES (${subscription.userId}, ${subscription.endpoint}, ${p256dhKey}, ${authKey}, true, NOW())
+        ON CONFLICT (user_id, endpoint) 
+        DO UPDATE SET 
+          p256dh_key = EXCLUDED.p256dh_key,
+          auth_key = EXCLUDED.auth_key,
+          is_active = true,
+          created_at = push_subscriptions.created_at
         RETURNING *
       `);
       
-      console.log('Push subscription upserted successfully:', result.rows[0]);
       return result.rows[0];
     } catch (error) {
       console.error('Error in upsertPushSubscription:', error);
