@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DollarSign, Calendar, Users, Repeat, CheckCircle, Clock, X, ChevronDown, TrendingUp, TrendingDown } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 interface ExpenseCardProps {
   expense: any;
@@ -10,6 +11,7 @@ interface ExpenseCardProps {
 
 export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense, showSettlement = true }: ExpenseCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { user } = useAuth();
   
   const getCategoryConfig = (category: string) => {
     const configs: { [key: string]: { emoji: string; color: string; bg: string } } = {
@@ -54,12 +56,23 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const myUserId = expense.splits?.[0]?.userId; // Get current user ID from first split
-  const myBalance = splits.find((split: any) => split.userId === myUserId);
-  const amIOwe = myBalance && !myBalance.settled && parseFloat(myBalance.amount) > 0;
-  const othersOweMe = splits.some((split: any) => 
-    split.userId !== expense.paidBy && !split.settled && parseFloat(split.amount) > 0
-  );
+  const currentUserId = user?.id;
+  const mySplit = splits.find((split: any) => split.userId === currentUserId);
+  const didIPay = expense.paidBy === currentUserId;
+  
+  // Calculate what I owe or what others owe me
+  let myOwedAmount = 0;
+  let myOwingAmount = 0;
+  
+  if (didIPay) {
+    // I paid, so others owe me their unsettled portions
+    myOwedAmount = splits
+      .filter((split: any) => split.userId !== currentUserId && !split.settled)
+      .reduce((sum: number, split: any) => sum + parseFloat(split.amount), 0);
+  } else if (mySplit && !mySplit.settled) {
+    // Someone else paid, I owe my portion
+    myOwingAmount = parseFloat(mySplit.amount);
+  }
 
   return (
     <div 
@@ -148,17 +161,17 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
         {/* Quick split info */}
         {!isExpanded && splits.length > 0 && (
           <div className="ml-11 space-y-1">
-            {amIOwe && myBalance && (
+            {myOwingAmount > 0 && (
               <div className="flex items-center justify-between text-xs">
                 <span className="text-red-600 dark:text-red-400 font-medium">You owe</span>
-                <span className="text-red-600 dark:text-red-400 font-bold">${formatAmount(myBalance.amount)}</span>
+                <span className="text-red-600 dark:text-red-400 font-bold">${formatAmount(myOwingAmount)}</span>
               </div>
             )}
-            {othersOweMe && expense.paidBy === myUserId && (
+            {myOwedAmount > 0 && (
               <div className="flex items-center justify-between text-xs">
                 <span className="text-green-600 dark:text-green-400 font-medium">Others owe you</span>
                 <span className="text-green-600 dark:text-green-400 font-bold">
-                  ${formatAmount(splits.filter((s: any) => s.userId !== myUserId && !s.settled).reduce((sum: number, s: any) => sum + parseFloat(s.amount), 0))}
+                  ${formatAmount(myOwedAmount)}
                 </span>
               </div>
             )}
