@@ -52,6 +52,7 @@ export interface IStorage {
   updateHousehold(id: string, updates: Partial<InsertHousehold>): Promise<Household>;
   joinHousehold(householdId: string, userId: string, role?: string): Promise<HouseholdMember>;
   leaveHousehold(userId: string): Promise<void>;
+  removeMemberFromHousehold(householdId: string, userId: string): Promise<void>;
   getHouseholdMembers(householdId: string): Promise<(HouseholdMember & { user: User })[]>;
   getUserHousehold(userId: string): Promise<(HouseholdMember & { household: Household }) | undefined>;
   
@@ -208,6 +209,14 @@ export class DatabaseStorage implements IStorage {
 
   async leaveHousehold(userId: string): Promise<void> {
     await db.delete(householdMembers).where(eq(householdMembers.userId, userId));
+  }
+
+  async removeMemberFromHousehold(householdId: string, userId: string): Promise<void> {
+    await db.delete(householdMembers)
+      .where(and(
+        eq(householdMembers.householdId, householdId),
+        eq(householdMembers.userId, userId)
+      ));
   }
 
   async getHouseholdMembers(householdId: string): Promise<(HouseholdMember & { user: User })[]> {

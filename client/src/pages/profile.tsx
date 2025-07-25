@@ -164,6 +164,20 @@ export default function Profile() {
     },
   });
 
+  const kickMemberMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const result = await apiRequest("DELETE", `/api/households/members/${userId}`, {});
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+    },
+    onError: (error: any) => {
+      console.error("Failed to remove member:", error);
+      alert("Failed to remove member from household");
+    },
+  });
+
   const handleUpdateName = () => {
     if (!editName.firstName.trim()) return;
     updateNameMutation.mutate(editName);
@@ -913,14 +927,33 @@ export default function Profile() {
                       </p>
                     </div>
                   </div>
-                  {member.role && (
-                    <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{
-                      color: 'var(--text-secondary)',
-                      background: 'var(--surface-secondary)'
-                    }}>
-                      {member.role}
-                    </span>
-                  )}
+                  <div className="flex items-center space-x-2">
+                    {member.role && (
+                      <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{
+                        color: 'var(--text-secondary)',
+                        background: 'var(--surface-secondary)'
+                      }}>
+                        {member.role}
+                      </span>
+                    )}
+                    {isAdmin && member.userId !== user?.id && (
+                      <Button
+                        onClick={async () => {
+                          if (confirm(`Are you sure you want to remove ${member.user.firstName || member.user.email?.split('@')[0]} from the household?`)) {
+                            await kickMemberMutation.mutateAsync(member.userId);
+                          }
+                        }}
+                        className="px-3 py-1 text-xs rounded-lg transition-all hover:scale-[1.05]"
+                        style={{
+                          background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+                          color: 'white',
+                          border: 'none'
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
               <div className="space-y-3 pt-3">

@@ -269,6 +269,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete('/api/households/members/:userId', isAuthenticated, async (req: any, res) => {
+    try {
+      const currentUserId = req.user.id;
+      const targetUserId = req.params.userId;
+      
+      // Get current user's household membership
+      const membership = await storage.getUserHousehold(currentUserId);
+      if (!membership) {
+        return res.status(404).json({ message: "No household found" });
+      }
+      
+      // Check if current user is admin
+      if (membership.role !== 'admin') {
+        return res.status(403).json({ message: "Only household admins can remove members" });
+      }
+      
+      // Prevent admin from removing themselves
+      if (currentUserId === targetUserId) {
+        return res.status(400).json({ message: "You cannot remove yourself from the household" });
+      }
+      
+      // Check if target user is in the household
+      const members = await storage.getHouseholdMembers(membership.household.id);
+      const targetMember = members.find(m => m.userId === targetUserId);
+      if (!targetMember) {
+        return res.status(404).json({ message: "Member not found in household" });
+      }
+      
+      // Remove the member
+      await storage.removeMemberFromHousehold(membership.household.id, targetUserId);
+      
+      res.json({ message: "Member removed successfully" });
+    } catch (error) {
+      console.error("Error removing member:", error);
+      res.status(500).json({ message: "Failed to remove member" });
+    }
+  });
+
   // Chore routes
   app.get('/api/chores', isAuthenticated, async (req: any, res) => {
     try {
