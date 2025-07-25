@@ -930,14 +930,6 @@ export default function Profile() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    {member.role && (
-                      <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{
-                        color: 'var(--text-secondary)',
-                        background: 'var(--surface-secondary)'
-                      }}>
-                        {member.role}
-                      </span>
-                    )}
                     {isAdmin && member.userId !== user?.id && (
                       <Button
                         onClick={async () => {
@@ -955,6 +947,14 @@ export default function Profile() {
                       >
                         <UserMinus size={16} style={{ color: '#DC2626' }} />
                       </Button>
+                    )}
+                    {member.role && (
+                      <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{
+                        color: 'var(--text-secondary)',
+                        background: 'var(--surface-secondary)'
+                      }}>
+                        {member.role}
+                      </span>
                     )}
                   </div>
                 </div>
