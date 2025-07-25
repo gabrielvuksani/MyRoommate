@@ -95,116 +95,133 @@ const CalendarEventCard = ({
 
   return (
     <motion.div
-      className="mb-3 cursor-pointer"
+      className="mb-4"
       initial={{ 
-        y: 30, 
-        opacity: 0,
-        scale: 0.95 
+        y: 20, 
+        opacity: 0
       }}
       animate={{ 
         y: 0,
-        scale: 1,
         opacity: 1
       }}
       transition={{ 
         type: "spring", 
-        stiffness: 300, 
+        stiffness: 500, 
         damping: 30,
-        delay: index * 0.05
+        delay: index * 0.03
       }}
     >
       <div 
-        className={`
-          relative overflow-hidden rounded-2xl
-          shadow-md hover:shadow-xl
-          transition-all duration-300 hover:scale-[1.02]
-          ${isActive ? 'ring-2 ring-offset-2' : ''}
-        `}
+        className="glass-card overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-lg cursor-pointer"
         style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
-          backdropFilter: 'blur(20px) saturate(1.8)',
-          WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-          border: '1px solid rgba(255, 255, 255, 0.5)',
-          boxShadow: isActive ? `0 10px 40px ${typeConfig.glow}` : undefined,
-          ringColor: eventColor
+          background: 'var(--surface)',
+          border: '1px solid var(--border-color)'
         }}
-        onClick={onActivate}
+        onClick={() => setIsExpanded(!isExpanded)}
       >
-        {/* Pattern overlay */}
-        <div className={`absolute inset-0 opacity-30 ${typeConfig.pattern}`} />
-        
-        {/* Time strip */}
-        <div className={`absolute top-0 left-0 right-0 h-12 bg-gradient-to-r ${typeConfig.gradient} opacity-90`}>
-          <div className="flex items-center justify-between h-full px-4">
-            <div className="flex items-center gap-2">
-              <Clock size={14} className="text-white/80" />
-              <span className="text-sm font-medium text-white">
-                {event.allDay ? 'All Day' : new Date(event.startDate).toLocaleTimeString('en-US', {
-                  hour: 'numeric',
-                  minute: '2-digit'
-                })}
-              </span>
-            </div>
-            <span className="text-2xl">{typeConfig.icon}</span>
-          </div>
-        </div>
-        
-        {/* Main content */}
-        <div className="pt-14 p-4">
-          <div className="flex items-start justify-between gap-4">
-            {/* Left side - event info */}
-            <div className="flex-1">
+        <div className="p-4">
+          {/* Header with time and type */}
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-3">
+              {/* Type icon with gradient background */}
+              <div 
+                className={`w-10 h-10 rounded-xl bg-gradient-to-r ${typeConfig.gradient} flex items-center justify-center shadow-sm`}
+              >
+                <span className="text-lg">{typeConfig.icon}</span>
+              </div>
               
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                {event.title}
-              </h3>
-              
-              {event.description && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
-                  {event.description}
-                </p>
-              )}
-              
-              {/* Info chips */}
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Location */}
-                {event.location && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-xs">
-                    <MapPin size={12} />
-                    <span className="truncate max-w-[120px]">{event.location}</span>
-                  </div>
-                )}
-                
-                {/* Attendees */}
-                {event.attendees && event.attendees.length > 0 && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-xs">
-                    <Users size={12} />
-                    <span>{event.attendees.length}</span>
-                  </div>
-                )}
-                
-                {/* Recurring */}
-                {event.isRecurring && event.recurrencePattern && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-xs text-blue-700 dark:text-blue-300">
-                    <Repeat size={12} />
-                    <span className="capitalize">{event.recurrencePattern}</span>
-                  </div>
-                )}
+              {/* Time info */}
+              <div>
+                <div className="flex items-center gap-2">
+                  <Clock size={14} style={{ color: typeConfig.color }} />
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    {event.allDay ? 'All Day' : new Date(event.startDate).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  {new Date(event.startDate).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </span>
               </div>
             </div>
             
-            {/* Right side - actions */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsExpanded(!isExpanded);
+            {/* Expand/collapse indicator */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(!isExpanded);
+              }}
+              className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <ChevronDown 
+                size={16} 
+                className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                style={{ color: 'var(--text-secondary)' }}
+              />
+            </button>
+          </div>
+          
+          {/* Title and description */}
+          <div className="mb-3">
+            <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+              {event.title}
+            </h3>
+            {event.description && (
+              <p className="text-sm line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
+                {event.description}
+              </p>
+            )}
+          </div>
+          
+          {/* Info badges */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Location */}
+            {event.location && (
+              <div 
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
+                style={{
+                  background: `${typeConfig.color}15`,
+                  color: typeConfig.color
                 }}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
-                <MoreVertical size={16} className="text-gray-600 dark:text-gray-400" />
-              </button>
-            </div>
+                <MapPin size={12} />
+                <span className="truncate max-w-[120px]">{event.location}</span>
+              </div>
+            )}
+            
+            {/* Attendees */}
+            {event.attendees && event.attendees.length > 0 && (
+              <div 
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
+                style={{
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                <Users size={12} />
+                <span>{event.attendees.length} attending</span>
+              </div>
+            )}
+            
+            {/* Recurring badge */}
+            {event.isRecurring && event.recurrencePattern && (
+              <div 
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
+                style={{
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  color: 'var(--primary)'
+                }}
+              >
+                <Repeat size={12} />
+                <span className="capitalize">{event.recurrencePattern}</span>
+              </div>
+            )}
           </div>
         </div>
         
@@ -218,36 +235,44 @@ const CalendarEventCard = ({
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="px-4 pb-4 pt-2 space-y-3 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-3 mt-3 space-y-3" style={{ borderTop: '1px solid var(--border-color)' }}>
+                {/* Full description if truncated */}
+                {event.description && event.description.length > 80 && (
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    {event.description}
+                  </p>
+                )}
+                
                 {/* Reminder info */}
                 {event.reminderMinutes && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                     <Bell size={14} />
-                    <span>Reminder set for {event.reminderMinutes} minutes before</span>
+                    <span>Reminder {event.reminderMinutes} minutes before</span>
                   </div>
                 )}
                 
-                {/* Delete button */}
-                <div className="flex justify-end">
+                {/* Delete action */}
+                <div className="flex justify-end pt-2">
                   {!showDeleteConfirm ? (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setShowDeleteConfirm(true);
                       }}
-                      className="text-sm text-red-600 hover:text-red-700 transition-colors"
+                      className="text-sm text-red-600 hover:text-red-700 transition-colors font-medium"
                     >
                       Delete Event
                     </button>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Delete?</span>
+                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Delete?</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowDeleteConfirm(false);
                         }}
-                        className="px-2 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="px-3 py-1 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        style={{ color: 'var(--text-secondary)' }}
                       >
                         Cancel
                       </button>
@@ -256,7 +281,7 @@ const CalendarEventCard = ({
                           e.stopPropagation();
                           handleDelete();
                         }}
-                        className="px-2 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
+                        className="px-3 py-1 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors font-medium"
                       >
                         Delete
                       </button>

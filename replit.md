@@ -111,17 +111,17 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 25, 2025 (Latest):**
-- ✓ **CRITICAL FIX: Resolved expense page layout issues**: Fixed absolute positioning bug that caused multiple expense cards to overlap - cards now display properly with sequential layout
-- ✓ **Enhanced chore card legibility**: Increased card transparency from 0.8/0.6 to 0.95/0.85 opacity for significantly better text readability while maintaining premium glass morphism aesthetic
-- ✓ **Creative calendar event card redesign**: 
-  - ✓ Replaced stacked cards with individual event cards featuring gradient time strips
-  - ✓ Added vibrant category-specific gradients (meeting: blue-cyan, appointment: purple-pink, social: orange-rose, personal: emerald-teal)
-  - ✓ Implemented pattern overlays and glow effects for enhanced visual depth
-  - ✓ Time information prominently displayed in colored header strip with icon
-  - ✓ Streamlined expand/collapse with three-dot menu instead of chevron
-  - ✓ Improved information hierarchy with chips for location, attendees, and recurring status
-- ✓ **Simplified event card interactions**: Removed complex stacking animations for better performance and cleaner UX
-- ✓ **Updated calendar rendering**: Switched from fixed-height stacked layout to dynamic space-y-3 list layout for better scalability
+- ✓ **CRITICAL FIX: Resolved expense page layout issues**: Fixed absolute positioning bug that caused multiple expense cards to overlap - cards now display properly with sequential layout using margin-bottom spacing
+- ✓ **Optimized chores page performance**: Reduced task count calculations from 3 separate filter operations to single-pass iteration, improving performance for large chore lists
+- ✓ **Complete calendar event card redesign with clean glass morphism**: 
+  - ✓ Removed complex gradient time strips for cleaner header with icon and time
+  - ✓ Simplified to single glass-card design matching app-wide consistency
+  - ✓ Event type icons now in compact gradient boxes (meeting: blue-cyan, appointment: purple-pink, social: orange-rose, personal: emerald-teal)
+  - ✓ Cleaner information hierarchy with title, description, and info badges
+  - ✓ Streamlined expand/collapse with chevron indicator
+  - ✓ Improved readability with proper CSS variable usage for colors
+- ✓ **Enhanced chore board spacing**: Fixed responsive spacing issues in stacked card view
+- ✓ **Updated calendar rendering**: Events display in clean list layout with proper spacing between cards
 - ✓ **Maintained security and scalability**: All changes preserve PWA functionality, secure authentication, and million-user scalability requirements
 
 **January 25, 2025 (Earlier):**

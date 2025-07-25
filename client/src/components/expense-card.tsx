@@ -155,31 +155,25 @@ export default function ExpenseCard({
 
   return (
     <motion.div
-      className="cursor-pointer"
+      className="cursor-pointer mb-4"
       initial={{ 
-        y: 50, 
-        opacity: 0,
-        scale: 0.95 
+        y: 20, 
+        opacity: 0
       }}
       animate={{ 
         y: 0,
-        scale: 1,
         opacity: 1
       }}
       exit={{ 
         x: 300,
         opacity: 0,
-        scale: 0.8,
-        rotate: 15
+        scale: 0.9
       }}
       transition={{ 
         type: "spring", 
         stiffness: 300, 
         damping: 30,
         delay: index * 0.05
-      }}
-      style={{ 
-        zIndex: 1
       }}
     >
       <div 
