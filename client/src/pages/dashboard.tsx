@@ -178,15 +178,15 @@ export default function Dashboard() {
     ...completedChores.map((chore: any) => ({
       type: 'chore',
       title: chore.title,
-      user: chore.assignedToName || 'Someone',
+      user: chore.assignedToUser?.firstName || chore.assignedToName || 'Someone',
       time: chore.updatedAt || chore.createdAt,
       icon: CheckCircle,
       color: 'emerald'
     })),
     ...filteredExpenses.map((expense: any) => ({
       type: 'expense',
-      title: `$${expense.amount} - ${expense.description}`,
-      user: expense.paidByName || 'Someone',
+      title: `$${expense.amount} - ${expense.title || expense.description}`,
+      user: expense.paidByUser?.firstName || expense.paidByName || 'Someone',
       time: expense.createdAt,
       icon: DollarSign,
       color: 'blue'
@@ -194,7 +194,7 @@ export default function Dashboard() {
     ...filteredMessages.slice(-5).map((message: any) => ({
       type: 'message',
       title: message.content.substring(0, 50) + (message.content.length > 50 ? '...' : ''),
-      user: message.user?.firstName || 'Someone',
+      user: message.user?.firstName || message.sender?.firstName || 'Someone',
       time: message.createdAt,
       icon: MessageCircle,
       color: 'purple'

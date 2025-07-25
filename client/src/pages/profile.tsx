@@ -169,10 +169,10 @@ export default function Profile() {
       const result = await apiRequest("DELETE", `/api/households/members/${userId}`, {});
       return result;
     },
-    onSuccess: (data, userId) => {
+    onSuccess: (data: any, userId) => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
       // Update the invite code if a new one was generated
-      if (data.newInviteCode) {
+      if (data?.newInviteCode) {
         queryClient.setQueryData(["/api/households/current"], (old: any) => {
           if (old) {
             return { ...old, inviteCode: data.newInviteCode };
@@ -595,15 +595,15 @@ export default function Profile() {
                   <span
                     className="font-mono text-sm truncate ml-4"
                     style={{ color: 'var(--text-primary)' }}
-                    title={String((user as any).id || '')}
+                    title={String((user as any)?.id || '')}
                   >
-                    {String((user as any).id || 'N/A')}
+                    {String((user as any)?.id || 'N/A')}
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-3">
                   <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
                   <span style={{ color: 'var(--text-primary)' }}>
-                    {(user as any).createdAt ? new Date((user as any).createdAt).toLocaleDateString() : 'N/A'}
+                    {(user as any)?.createdAt ? new Date((user as any).createdAt).toLocaleDateString() : 'N/A'}
                   </span>
                 </div>
               </div>
