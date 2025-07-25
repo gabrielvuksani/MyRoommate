@@ -95,7 +95,10 @@ export function AddEvent() {
 
   const createEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
-      return apiRequest("POST", "/api/calendar", eventData);
+      return apiRequest("/api/calendar", {
+        method: "POST",
+        body: JSON.stringify(eventData),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
