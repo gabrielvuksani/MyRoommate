@@ -27,6 +27,8 @@ import Roommates from "@/pages/roommates";
 import ListingDetail from "@/pages/listing-detail";
 import AddListing from "@/pages/add-listing";
 import AddExpense from "@/pages/add-expense";
+import { AddChore } from "@/pages/add-chore";
+import { AddEvent } from "@/pages/add-event";
 import BottomNavigation from "@/components/bottom-navigation";
 import { IOSInstallBanner } from "@/components/ios-install-banner";
 import { PWAEnvironmentIndicator } from "@/components/pwa-environment-indicator";
@@ -103,6 +105,8 @@ function Router() {
             <Route path="/listings/:id" component={ListingDetail} />
             <Route path="/add-listing" component={AddListing} />
             <Route path="/add-expense" component={hasHousehold ? AddExpense : Home} />
+            <Route path="/add-chore" component={hasHousehold ? AddChore : Home} />
+            <Route path="/add-event" component={hasHousehold ? AddEvent : Home} />
           </>
         )}
         <Route component={NotFound} />

@@ -1,11 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { notificationService } from "@/lib/notifications";
 
@@ -13,17 +10,8 @@ import ChoreBoard from "@/components/chore-board";
 import { Plus } from "lucide-react";
 
 export default function Chores() {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [headerScrolled, setHeaderScrolled] = useState(false);
-
-  const [newChore, setNewChore] = useState({
-    title: '',
-    description: '',
-    assignedTo: '',
-    dueDate: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
-    recurrence: '',
-    priority: 'medium',
-  });
+  const [, navigate] = useLocation();
   
   const queryClient = useQueryClient();
 
@@ -54,32 +42,6 @@ export default function Chores() {
 
   // Use household members if available, otherwise fall back to separate members query
   const householdMembers = (household as any)?.members || members;
-
-  const createChoreMutation = useMutation({
-    mutationFn: async (choreData: any) => {
-      const dataToSend = {
-        ...choreData,
-        dueDate: choreData.dueDate ? new Date(choreData.dueDate).toISOString() : null,
-      };
-      await apiRequest("POST", "/api/chores", dataToSend);
-    },
-    onSuccess: (_, choreData) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
-      
-      setIsCreateOpen(false);
-      setNewChore({
-        title: '',
-        description: '',
-        assignedTo: '',
-        dueDate: new Date().toISOString().split('T')[0], // Reset to today's date
-        recurrence: '',
-        priority: 'medium',
-      });
-    },
-    onError: (error) => {
-      console.error("Failed to create chore:", error);
-    },
-  });
 
   const updateChoreMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
@@ -115,19 +77,6 @@ export default function Chores() {
     },
   });
 
-  const handleCreateChore = () => {
-    if (!newChore.title.trim()) return;
-    
-    createChoreMutation.mutate({
-      ...newChore,
-      assignedTo: newChore.assignedTo || null,
-    });
-  };
-
-  const canCreateChore = newChore.title.trim().length > 0 && 
-                         newChore.assignedTo.length > 0 && 
-                         newChore.dueDate.length > 0;
-
   const handleUpdateChore = (id: string, updates: any) => {
     updateChoreMutation.mutate({ id, updates });
   };
@@ -157,102 +106,11 @@ export default function Chores() {
               <p className="page-subtitle">Manage household tasks</p>
             </div>
             
-            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-              <DialogTrigger asChild>
-                <button className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated">
-                  <Plus size={24} className="text-white" />
-                </button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader className="px-6 pt-6 pb-6">
-                  <DialogTitle className="text-title-2 font-bold text-primary">Create New Chore</DialogTitle>
-                </DialogHeader>
-                <div className="px-6 pb-6 space-y-5">
-                  <input
-                    placeholder="Chore title"
-                    value={newChore.title}
-                    onChange={(e) => setNewChore({ ...newChore, title: e.target.value })}
-                    className="input-modern w-full"
-                  />
-                  <input
-                    placeholder="Description (optional)"
-                    value={newChore.description}
-                    onChange={(e) => setNewChore({ ...newChore, description: e.target.value })}
-                    className="input-modern w-full"
-                  />
-                  <Select value={newChore.assignedTo} onValueChange={(value) => setNewChore({ ...newChore, assignedTo: value })} required>
-                    <SelectTrigger className="input-modern" style={{
-                      background: 'var(--surface-secondary)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-primary)'
-                    }}>
-                      <SelectValue placeholder="Assign to... *" />
-                    </SelectTrigger>
-                    <SelectContent style={{
-                      background: 'var(--surface)',
-                      border: '1px solid var(--border-color)'
-                    }}>
-                      {Array.isArray(householdMembers) && householdMembers.map((member: any) => (
-                        <SelectItem key={member.userId} value={member.userId} style={{ color: 'var(--text-primary)' }}>
-                          {member.user.firstName || member.user.email?.split('@')[0]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <input 
-                    type="date"
-                    value={newChore.dueDate}
-                    onChange={(e) => setNewChore({ ...newChore, dueDate: e.target.value })}
-                    className="input-modern w-full"
-                    style={{ fontSize: '16px' }}
-                    required
-                  />
-                  <Select value={newChore.recurrence} onValueChange={(value) => setNewChore({ ...newChore, recurrence: value })}>
-                    <SelectTrigger className="input-modern" style={{
-                      background: 'var(--surface-secondary)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-primary)'
-                    }}>
-                      <SelectValue placeholder="Recurrence..." />
-                    </SelectTrigger>
-                    <SelectContent style={{
-                      background: 'var(--surface)',
-                      border: '1px solid var(--border-color)'
-                    }}>
-                      <SelectItem value="daily" style={{ color: 'var(--text-primary)' }}>Daily</SelectItem>
-                      <SelectItem value="weekly" style={{ color: 'var(--text-primary)' }}>Weekly</SelectItem>
-                      <SelectItem value="monthly" style={{ color: 'var(--text-primary)' }}>Monthly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  <Select value={newChore.priority} onValueChange={(value) => setNewChore({ ...newChore, priority: value })}>
-                    <SelectTrigger className="input-modern" style={{
-                      background: 'var(--surface-secondary)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-primary)'
-                    }}>
-                      <SelectValue placeholder="Priority..." />
-                    </SelectTrigger>
-                    <SelectContent style={{
-                      background: 'var(--surface)',
-                      border: '1px solid var(--border-color)'
-                    }}>
-                      <SelectItem value="low" style={{ color: 'var(--text-primary)' }}>Low Priority</SelectItem>
-                      <SelectItem value="medium" style={{ color: 'var(--text-primary)' }}>Medium Priority</SelectItem>
-                      <SelectItem value="high" style={{ color: 'var(--text-primary)' }}>High Priority</SelectItem>
-                      <SelectItem value="urgent" style={{ color: 'var(--text-primary)' }}>Urgent</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <button
-                    onClick={handleCreateChore}
-                    disabled={!canCreateChore || createChoreMutation.isPending}
-                    className="btn-primary w-full"
-                  >
-                    {createChoreMutation.isPending ? "Creating..." : "Create Chore"}
-                  </button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <button 
+              onClick={() => navigate('/add-chore')}
+              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated">
+              <Plus size={24} className="text-white" />
+            </button>
           </div>
         </div>
       </div>

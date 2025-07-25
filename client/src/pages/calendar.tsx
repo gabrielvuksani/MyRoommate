@@ -1,26 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { notificationService } from "@/lib/notifications";
 
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react";
 
 export default function Calendar() {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [currentDate, setCurrentDate] = useState(new Date());
   const [headerScrolled, setHeaderScrolled] = useState(false);
-  const [newEvent, setNewEvent] = useState({
-    title: '',
-    description: '',
-    startDate: '',
-    endDate: '',
-    color: '#3B82F6',
-    type: 'social',
-  });
+  const [, navigate] = useLocation();
   
   const queryClient = useQueryClient();
 
@@ -40,33 +31,6 @@ export default function Calendar() {
     queryKey: ["/api/calendar"],
   });
 
-  const createEventMutation = useMutation({
-    mutationFn: async (eventData: any) => {
-      const dataToSend = {
-        ...eventData,
-        startDate: new Date(eventData.startDate).toISOString(),
-        endDate: eventData.endDate ? new Date(eventData.endDate).toISOString() : null,
-      };
-      await apiRequest("POST", "/api/calendar", dataToSend);
-    },
-    onSuccess: (_, eventData) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
-      
-      setIsCreateOpen(false);
-      setNewEvent({
-        title: '',
-        description: '',
-        startDate: '',
-        endDate: '',
-        color: '#3B82F6',
-        type: 'social',
-      });
-    },
-    onError: (error) => {
-      console.error("Failed to create event:", error);
-    },
-  });
-
   const deleteEventMutation = useMutation({
     mutationFn: async (id: string) => {
       await apiRequest("DELETE", `/api/calendar-events/${id}`);
@@ -78,28 +42,6 @@ export default function Calendar() {
       console.error('Error deleting event:', error);
     },
   });
-
-  const handleCreateEvent = () => {
-    if (!canCreateEvent) return;
-    
-    const startDateTime = new Date(newEvent.startDate);
-    const endDateTime = newEvent.endDate ? 
-      new Date(newEvent.endDate) : 
-      new Date(startDateTime.getTime() + 60 * 60 * 1000); // 1 hour later if no end time
-    
-    const eventData = {
-      title: newEvent.title,
-      description: newEvent.description || '',
-      startDate: startDateTime.toISOString(),
-      endDate: endDateTime.toISOString(),
-      color: newEvent.color || '#3B82F6',
-      type: newEvent.type || 'personal'
-    };
-    
-    createEventMutation.mutate(eventData);
-  };
-
-  const canCreateEvent = newEvent.title.trim().length > 0 && newEvent.startDate.trim().length > 0;
 
   const handleDeleteEvent = (id: string) => {
     deleteEventMutation.mutate(id);
@@ -171,130 +113,12 @@ export default function Calendar() {
               <p className="page-subtitle">Your household schedule</p>
             </div>
             
-            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-              <DialogTrigger asChild>
-                <button className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05]">
-                  <Plus size={24} className="text-white" />
-                </button>
-              </DialogTrigger>
-              <DialogContent>
-                <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-6 text-white">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-bold text-white">Create Event</DialogTitle>
-                    <DialogDescription className="text-purple-100 text-sm mt-1">Schedule something for your household</DialogDescription>
-                  </DialogHeader>
-                </div>
-                
-                <div className="p-6 space-y-5">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Event Title *</label>
-                    <input
-                      type="text"
-                      placeholder="What's happening?"
-                      value={newEvent.title}
-                      onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Description</label>
-                    <input
-                      type="text"
-                      placeholder="Add details (optional)..."
-                      value={newEvent.description}
-                      onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Start Time</label>
-                      <input
-                        type="datetime-local"
-                        value={newEvent.startDate}
-                        onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-sm"
-                        style={{ fontSize: '16px' }}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>End Time (Optional)</label>
-                      <input
-                        type="datetime-local"
-                        value={newEvent.endDate}
-                        onChange={(e) => setNewEvent({ ...newEvent, endDate: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-sm"
-                        placeholder="Leave empty for 1-hour duration"
-                        style={{ fontSize: '16px' }}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Event Type</label>
-                    <Select value={newEvent.type} onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}>
-                      <SelectTrigger className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500">
-                        <SelectValue placeholder="Choose event type" />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl border-0 shadow-xl">
-                        <SelectItem value="social" className="rounded-lg">🎉 Social</SelectItem>
-                        <SelectItem value="work" className="rounded-lg">💼 Work</SelectItem>
-                        <SelectItem value="personal" className="rounded-lg">👤 Personal</SelectItem>
-                        <SelectItem value="household" className="rounded-lg">🏠 Household</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Event Color</label>
-                    <div className="flex items-center space-x-3">
-                      <input
-                        type="color"
-                        value={newEvent.color}
-                        onChange={(e) => setNewEvent({ ...newEvent, color: e.target.value })}
-                        className="w-16 h-12 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer"
-                      />
-                      <div className="flex space-x-2">
-                        {['#3B82F6', '#10B981', '#EF4444', '#8B5CF6', '#F59E0B', '#000000'].map((color) => (
-                          <button
-                            key={color}
-                            type="button"
-                            onClick={() => setNewEvent({ ...newEvent, color })}
-                            className={`w-8 h-8 rounded-full border-2 transition-all ${
-                              newEvent.color === color ? 'border-gray-800 scale-110' : 'border-gray-300'
-                            }`}
-                            style={{ backgroundColor: color }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-end space-x-3 pt-[0px] pb-[0px] pl-[12px] pr-[12px] mt-[12px] mb-[12px]">
-                  <button 
-                    onClick={() => setIsCreateOpen(false)}
-                    className="px-6 py-3 font-semibold rounded-xl transition-colors btn-animated"
-                    style={{ 
-                      color: 'var(--text-secondary)',
-                      backgroundColor: 'transparent'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    onClick={handleCreateEvent} 
-                    disabled={!canCreateEvent || createEventMutation.isPending}
-                    className="bg-primary text-white px-6 py-3 rounded-xl font-bold shadow-lg btn-animated disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {createEventMutation.isPending ? "Creating..." : "Create Event"}
-                  </button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <button 
+              onClick={() => navigate('/add-event')}
+              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg btn-animated transition-all hover:scale-[1.05]">
+              <Plus size={24} className="text-white" />
+            </button>
+
           </div>
         </div>
       </div>
@@ -399,11 +223,7 @@ export default function Calendar() {
                  })}
               </h3>
               <button
-                onClick={() => {
-                  const dateString = selectedDate.toISOString().split('T')[0];
-                  setNewEvent(prev => ({ ...prev, startDate: dateString }));
-                  setIsCreateOpen(true);
-                }}
+                onClick={() => navigate('/add-event')}
                 className="bg-primary text-white px-4 py-2 rounded-xl font-semibold btn-animated"
               >
                 Add Event
@@ -418,7 +238,7 @@ export default function Calendar() {
                 <h4 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>No events scheduled</h4>
                 <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>This day is completely free</p>
                 <button 
-                  onClick={() => setIsCreateOpen(true)}
+                  onClick={() => navigate('/add-event')}
                   className="bg-primary text-white px-6 py-3 rounded-xl font-semibold btn-animated"
                 >
                   Add Event

@@ -111,6 +111,14 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 25, 2025 (Latest):**
+- ✓ **Fixed calendar picker responsiveness issues**: Applied fontSize: '16px' to all date/time inputs to prevent iOS zoom
+- ✓ **Created dedicated add-chore page**: Comprehensive chore creation with priorities, recurrence, assignments, categories, duration, subtasks
+- ✓ **Created dedicated add-event page**: Full event management with attendees, location, recurrence, reminders, color coding
+- ✓ **Converted modal-based creation to page navigation**: Chores and calendar now use dedicated pages (/add-chore, /add-event) for better UX
+- ✓ **Updated routing**: Added /add-chore and /add-event routes to App.tsx
+- ✓ **Removed modal dialogs from chores and calendar pages**: Replaced with navigation buttons for cleaner code and better mobile experience
+
+**January 25, 2025 (Earlier):**
 - ✓ **Enhanced lifestyle preference icons with unique context-specific icons**: Updated all lifestyle preference icons to be more unique and meaningful (Users for gender, GraduationCap for student year, BookOpen for study habits, Coffee for social preferences)
 - ✓ **Added iconified lifestyle preference pills**: Lifestyle preference array items now display as enhanced pills with unique icons (CigaretteOff for no smoking, Heart for pet friendly, Leaf for vegetarian, Sparkle for clean, VolumeX for quiet, Coffee for social)
 - ✓ **Fixed persistent TypeScript error in profile.tsx**: Resolved "Type 'unknown' is not assignable to type 'ReactNode'" error on line 550 by wrapping Account Details Card in user conditional and simplifying type expressions
