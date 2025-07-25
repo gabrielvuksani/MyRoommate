@@ -212,7 +212,7 @@ export default function ListingDetail() {
             <div className="p-4 rounded-2xl" style={{ background: 'var(--surface-secondary)' }}>
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="w-5 h-5" style={{ color: 'var(--primary)' }} />
-                <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                <span className="text-lg font-semibold" style={{ color: 'var(--text-secondary)' }}>
                   Monthly Rent
                 </span>
               </div>

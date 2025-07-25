@@ -86,7 +86,7 @@ export default function Roommates() {
               <BackButton to="/" className="bg-transparent flex-shrink-0" />
               <div className="min-w-0 flex-1">
                 <h1 className="page-title">Find Your Roommates</h1>
-                <p className="page-subtitle">Discover your perfect living situation</p>
+                <p className="page-subtitle">Discover your perfect roommate and living situation</p>
               </div>
             </div>
             <div className="flex-shrink-0 ml-4">
