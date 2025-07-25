@@ -169,10 +169,17 @@ export default function Profile() {
       const result = await apiRequest("DELETE", `/api/households/members/${userId}`, {});
       return result;
     },
-    onSuccess: (_, userId) => {
+    onSuccess: (data, userId) => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
-      // Set a flag so the kicked user sees a notice on their home page
-      // This will be picked up by their client when they reload
+      // Update the invite code if a new one was generated
+      if (data.newInviteCode) {
+        queryClient.setQueryData(["/api/households/current"], (old: any) => {
+          if (old) {
+            return { ...old, inviteCode: data.newInviteCode };
+          }
+          return old;
+        });
+      }
     },
     onError: (error: any) => {
       console.error("Failed to remove member:", error);

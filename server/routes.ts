@@ -6,6 +6,8 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
 import { uploadImage, deleteImage } from "./supabase";
 import multer from "multer";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 import {
   insertHouseholdSchema,
   insertChoreSchema,
@@ -14,6 +16,7 @@ import {
   insertMessageSchema,
   insertShoppingItemSchema,
   insertRoommateListingSchema,
+  households,
 } from "@shared/schema";
 import { z } from "zod";
 import { nanoid } from "nanoid";
@@ -172,14 +175,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.id;
       const { inviteCode } = req.body;
       
-      console.log("Join household attempt:", { userId, inviteCode, codeLength: inviteCode?.length });
-      
       if (!inviteCode || inviteCode.trim().length === 0) {
         return res.status(400).json({ message: "Invite code is required" });
       }
       
       const household = await storage.getHouseholdByInviteCode(inviteCode.trim().toUpperCase());
-      console.log("Household lookup result:", household ? `Found: ${household.name}` : "Not found");
       
       if (!household) {
         return res.status(404).json({ message: "Invalid invite code" });
@@ -193,7 +193,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         // Leave current household before joining new one
         await storage.leaveHousehold(userId);
-        console.log("User left previous household before joining new one");
       }
       
       const member = await storage.joinHousehold(household.id, userId);
@@ -303,6 +302,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set the kicked flag on the user
       await storage.setUserKickedFlag(targetUserId, true);
       
+      // Generate a new invite code for the household to prevent rejoining
+      const newInviteCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+      
+      // Update the household invite code in the database
+      await db
+        .update(households)
+        .set({ inviteCode: newInviteCode })
+        .where(eq(households.id, membership.household.id));
+      
       // Send push notification to the removed user
       const adminUser = await storage.getUser(currentUserId);
       const adminName = adminUser?.firstName || 'The administrator';
@@ -319,10 +327,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
       
-      const notificationSent = await sendPushNotification(targetUserId, pushPayload);
-      console.log(`Push notification for kicked user ${targetUserId}: ${notificationSent ? 'sent' : 'failed'}`);
+      await sendPushNotification(targetUserId, pushPayload);
       
-      res.json({ message: "Member removed successfully" });
+      res.json({ message: "Member removed successfully", newInviteCode });
     } catch (error) {
       console.error("Error removing member:", error);
       res.status(500).json({ message: "Failed to remove member" });
@@ -1126,10 +1133,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async function sendPushNotification(userId: string, payload: any): Promise<boolean> {
     try {
       const subscriptions = await storage.getUserPushSubscriptions(userId);
-      console.log(`Push subscriptions for user ${userId}:`, subscriptions?.length || 0);
       
       if (!subscriptions || subscriptions.length === 0) {
-        console.log(`No push subscriptions found for user ${userId}`);
         return false;
       }
 
