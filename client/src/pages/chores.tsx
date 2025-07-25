@@ -204,6 +204,7 @@ export default function Chores() {
                     value={newChore.dueDate}
                     onChange={(e) => setNewChore({ ...newChore, dueDate: e.target.value })}
                     className="input-modern w-full"
+                    style={{ fontSize: '16px' }}
                     required
                   />
                   <Select value={newChore.recurrence} onValueChange={(value) => setNewChore({ ...newChore, recurrence: value })}>

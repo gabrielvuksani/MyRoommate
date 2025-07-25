@@ -209,14 +209,15 @@ export default function Calendar() {
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Start Time</label>
                       <input
                         type="datetime-local"
                         value={newEvent.startDate}
                         onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-sm"
+                        style={{ fontSize: '16px' }}
                       />
                     </div>
                     
@@ -226,8 +227,9 @@ export default function Calendar() {
                         type="datetime-local"
                         value={newEvent.endDate}
                         onChange={(e) => setNewEvent({ ...newEvent, endDate: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-sm"
                         placeholder="Leave empty for 1-hour duration"
+                        style={{ fontSize: '16px' }}
                       />
                     </div>
                   </div>

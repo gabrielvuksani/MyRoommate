@@ -571,6 +571,7 @@ export default function AddListing() {
                       availableFrom: e.target.value,
                     })
                   }
+                  style={{ fontSize: '16px' }}
                 />
               </div>
 
@@ -590,6 +591,7 @@ export default function AddListing() {
                       availableTo: e.target.value,
                     })
                   }
+                  style={{ fontSize: '16px' }}
                 />
               </div>
             </div>

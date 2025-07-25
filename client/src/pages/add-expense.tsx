@@ -319,7 +319,8 @@ export default function AddExpense() {
             style={{ 
               background: 'var(--surface-secondary)', 
               border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)'
+              color: 'var(--text-primary)',
+              fontSize: '16px'
             }}
           />
 
