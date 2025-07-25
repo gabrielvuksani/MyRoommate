@@ -57,7 +57,7 @@ export default function Expenses() {
 
   const settleMutation = useMutation({
     mutationFn: async ({ splitId, settled }: { splitId: string; settled: boolean }) => {
-      await apiRequest("PATCH", `/api/expenses/splits/${splitId}`, { settled });
+      await apiRequest("PATCH", `/api/expense-splits/${splitId}`, { settled });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
