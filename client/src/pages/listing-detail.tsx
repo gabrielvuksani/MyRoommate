@@ -27,7 +27,10 @@ import {
   Bus,
   Sofa,
   Trees,
-  Utensils
+  Utensils,
+  WashingMachine,
+  Bike,
+  Train
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
@@ -62,8 +65,9 @@ export default function ListingDetail() {
   }, []);
 
   const amenityIcons: { [key: string]: any } = {
+    // From add-listing.tsx options
     "WiFi": Wifi,
-    "Laundry": Sparkles,
+    "Laundry": WashingMachine,
     "Kitchen": Utensils,
     "Full Kitchen": Utensils,
     "Parking": Car,
@@ -75,12 +79,35 @@ export default function ListingDetail() {
     "Furnished": Sofa,
     "Balcony": Trees,
     "Balcony/Patio": Trees,
-    "In-unit laundry": Sparkles,
+    
+    // From demo listing
     "High-speed WiFi": Wifi,
+    "In-unit laundry": WashingMachine,
+    "Modern kitchen": Utensils,
+    "Backyard/garden": Trees,
+    "Desk and chair": Sofa,
+    "Natural lighting": Sparkles,
+    "Shared living spaces": Home,
+    "Near public transit": Bus,
+    "Bike storage": Bike,
+    "Study-friendly environment": GraduationCap,
     "Parking available": Car,
     "Rooftop deck": Home,
     "Central AC/Heating": Shield,
     "Dishwasher": Utensils,
+    
+    // Lowercase versions (from API)
+    "wifi": Wifi,
+    "laundry": WashingMachine,
+    "kitchen": Utensils,
+    "parking": Car,
+    "gym": Dumbbell,
+    "pool": Waves,
+    "near campus": GraduationCap,
+    "public transport": Bus,
+    "furnished": Sofa,
+    "balcony": Trees,
+    "study_space": GraduationCap
   };
 
   if (isLoading) {

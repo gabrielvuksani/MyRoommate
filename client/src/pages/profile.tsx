@@ -547,10 +547,13 @@ export default function Profile() {
         </Card>
 
         {/* Account Details */}
-        <Card className="glass-card" style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)'
-        }}>
+        <Card 
+          className="glass-card" 
+          style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)'
+          }}
+        >
           <CardContent className="p-6">
             <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
               Account details
