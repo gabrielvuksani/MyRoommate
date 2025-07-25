@@ -174,113 +174,56 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
           </div>
         )}
         
-        {/* Expanded content */}
+        {/* Expanded content - Streamlined */}
         {isExpanded && (
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/50 animate-fade-in">
             {expense.description && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
                 {expense.description}
               </p>
             )}
             
-            {/* Notes */}
-            {expense.notes && expense.notes.trim() !== '' && (
-              <div className="mb-4">
-                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 flex items-center gap-1">
-                  <FileText size={12} />
-                  Notes
-                </h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
-                  {expense.notes}
-                </p>
-              </div>
-            )}
-            
-            {/* Receipt */}
-            {expense.receiptUrl && (
-              <div className="mb-4">
-                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 flex items-center gap-1">
-                  <Receipt size={12} />
-                  Receipt
-                </h4>
-                <a 
-                  href={expense.receiptUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="inline-flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  <Image size={14} />
-                  View Receipt
-                </a>
-              </div>
-            )}
-            
-            {/* Split details */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3">
-                Split Details
-              </h4>
+            {/* Simple split list */}
+            <div className="space-y-1.5 mb-3">
               {splits.map((split: any) => (
-                <div 
-                  key={split.id}
-                  className="flex items-center justify-between p-3 rounded-xl"
-                  style={{
-                    background: split.settled 
-                      ? 'rgba(16, 185, 129, 0.05)' 
-                      : 'var(--surface-secondary)'
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`
-                      w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold
-                      ${split.settled ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}
-                    `}>
-                      {split.user?.firstName?.charAt(0) || '?'}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {split.user?.firstName || 'Unknown'}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {split.userId === expense.paidBy ? 'Paid' : 'Owes'} ${formatAmount(split.amount)}
-                      </p>
-                    </div>
+                <div key={split.id} className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      {split.user?.firstName || 'Unknown'}
+                      {split.userId === expense.paidBy && <span className="text-green-600 dark:text-green-400 ml-1">(paid)</span>}
+                    </span>
                   </div>
-                  
-                  {showSettlement && !split.settled && split.userId !== expense.paidBy && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSettleExpense?.({ splitId: split.id, settled: true });
-                      }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-500 text-white hover:bg-green-600 transition-all hover:scale-105 active:scale-95"
-                    >
-                      Settle
-                    </button>
-                  )}
-                  
-                  {split.settled && (
-                    <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
-                      <CheckCircle size={12} />
-                      <span>Settled</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span className={split.settled ? 'text-gray-500 line-through' : 'font-medium'}>
+                      ${formatAmount(split.amount)}
+                    </span>
+                    {showSettlement && !split.settled && split.userId !== expense.paidBy && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSettleExpense?.({ splitId: split.id, settled: true });
+                        }}
+                        className="text-green-600 hover:text-green-700 font-medium"
+                      >
+                        Settle
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
             
-            {/* Actions */}
+            {/* Delete button - only if not settled */}
             {!isFullySettled && onDeleteExpense && (
-              <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/50">
+              <div className="flex justify-end mt-3">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onDeleteExpense(expense.id);
                   }}
-                  className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                  className="p-1.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             )}

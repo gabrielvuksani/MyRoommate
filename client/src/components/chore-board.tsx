@@ -214,104 +214,37 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
           
 
           
-          {/* Expanded content */}
+          {/* Expanded content - Streamlined */}
           {isExpanded && (
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/50 animate-fade-in">
+              {/* Description and Notes only */}
               {chore.description && (
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
                   {chore.description}
                 </p>
               )}
               
-              {/* Details grid */}
-              <div className="grid grid-cols-2 gap-3 mb-4 text-xs">
-                {chore.assignedUser && (
-                  <div>
-                    <span className="text-gray-500 dark:text-gray-400">Assigned to</span>
-                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
-                      <User size={12} className="text-gray-500" />
-                      {chore.assignedUser.firstName || 'Unassigned'}
-                    </p>
-                  </div>
-                )}
-                
-                {chore.dueDate && (
-                  <div>
-                    <span className="text-gray-500 dark:text-gray-400">Due date</span>
-                    <p className={`font-medium flex items-center gap-1 ${
-                      new Date(chore.dueDate) < new Date() && chore.status !== 'done' 
-                        ? 'text-red-600 dark:text-red-400' 
-                        : 'text-gray-900 dark:text-white'
-                    }`}>
-                      <Calendar size={12} className="text-gray-500" />
-                      {formatDate(chore.dueDate)}
-                    </p>
-                  </div>
-                )}
-                
-                {chore.category && (
-                  <div>
-                    <span className="text-gray-500 dark:text-gray-400">Category</span>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {getCategoryEmoji(chore.category)}  {chore.category.charAt(0).toUpperCase() + chore.category.slice(1)}
-                    </p>
-                  </div>
-                )}
-                
-                {chore.priority && (
-                  <div>
-                    <span className="text-gray-500 dark:text-gray-400">Priority</span>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {getPriorityEmoji(chore.priority)}  {chore.priority.charAt(0).toUpperCase() + chore.priority.slice(1)}
-                    </p>
-                  </div>
-                )}
-                
-                {chore.dueDate && formatTime(chore.dueDate) && (
-                  <div>
-                    <span className="text-gray-500 dark:text-gray-400">Time</span>
-                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
-                      <Clock size={12} className="text-gray-500" />
-                      {formatTime(chore.dueDate)}
-                    </p>
-                  </div>
-                )}
-                
-                {chore.recurrence && chore.recurrence !== 'none' && (
-                  <div>
-                    <span className="text-gray-500 dark:text-gray-400">Recurrence</span>
-                    <p className="font-medium text-gray-900 dark:text-white capitalize">{chore.recurrence}</p>
-                  </div>
-                )}
-                
-                {chore.reminder && chore.reminder !== 'none' && (
-                  <div>
-                    <span className="text-gray-500 dark:text-gray-400">Reminder</span>
-                    <p className="font-medium text-gray-900 dark:text-white">{chore.reminder}</p>
-                  </div>
-                )}
-                
-                {chore.estimatedDuration && (
-                  <div>
-                    <span className="text-gray-500 dark:text-gray-400">Duration</span>
-                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
-                      <Timer size={12} className="text-gray-500" />
-                      {chore.estimatedDuration} minutes
-                    </p>
-                  </div>
-                )}
-              </div>
+              {/* Time info - only if different from collapsed view */}
+              {chore.dueDate && formatTime(chore.dueDate) && (
+                <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-3">
+                  <Clock size={12} />
+                  <span>Due at {formatTime(chore.dueDate)}</span>
+                  {chore.recurrence && chore.recurrence !== 'none' && (
+                    <>
+                      <span>•</span>
+                      <span>Repeats {chore.recurrence}</span>
+                    </>
+                  )}
+                </div>
+              )}
               
-              {/* Subtasks - check if array exists and has items */}
+              {/* Subtasks - simplified */}
               {chore.subtasks && Array.isArray(chore.subtasks) && chore.subtasks.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
-                    Subtasks ({chore.subtasks.length})
-                  </h4>
+                <div className="mb-3">
                   <div className="space-y-1">
                     {chore.subtasks.map((subtask: string, idx: number) => (
                       <div key={idx} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                        <Circle size={12} className="text-gray-400" />
+                        <Circle size={10} className="text-gray-400" />
                         <span>{subtask}</span>
                       </div>
                     ))}
@@ -319,21 +252,8 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                 </div>
               )}
               
-              {/* Notes - check if exists and not empty */}
-              {chore.notes && chore.notes.trim() !== '' && (
-                <div className="mb-4">
-                  <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1">
-                    <FileText size={12} />
-                    Notes
-                  </h4>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
-                    {chore.notes}
-                  </p>
-                </div>
-              )}
-              
-              {/* Actions */}
-              <div className="flex items-center justify-between">
+              {/* Actions - simplified */}
+              <div className="flex items-center gap-2 mt-4">
                 {chore.status !== 'done' && (
                   <button
                     onClick={(e) => {
@@ -341,7 +261,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                       const nextStatus = chore.status === 'todo' ? 'doing' : 'done';
                       onUpdateChore(chore.id, { status: nextStatus });
                     }}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-white transition-all hover:scale-105 active:scale-95"
+                    className="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition-all hover:scale-105 active:scale-95"
                     style={{ background: chore.status === 'todo' ? '#3b82f6' : '#10b981' }}
                   >
                     {chore.status === 'todo' ? 'Start Task' : 'Mark Complete'}
@@ -354,9 +274,9 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                       e.stopPropagation();
                       onUpdateChore(chore.id, { status: 'todo' });
                     }}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-500 text-white hover:bg-gray-600 transition-all hover:scale-105 active:scale-95"
+                    className="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-500 text-white hover:bg-gray-600 transition-all hover:scale-105 active:scale-95"
                   >
-                    Reopen
+                    Reopen Task
                   </button>
                 )}
                 
@@ -365,9 +285,9 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                     e.stopPropagation();
                     onDeleteChore(chore.id);
                   }}
-                  className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                  className="p-1.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             </div>
