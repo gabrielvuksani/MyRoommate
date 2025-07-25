@@ -110,7 +110,13 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**July 25, 2025 (Latest - Real-Time Kick & Admin Features):**
+**July 25, 2025 (Latest - Household Insights Redesign):**
+- ✓ **Major household insights redesign**: Streamlined insights section by removing redundant cards (balance, active tasks, expense history) that duplicate information shown elsewhere
+- ✓ **Enhanced analytics layout**: Updated to 2-column grid showing completion rate and top performer with detailed member performance charts
+- ✓ **Improved information hierarchy**: Focused insights on unique analytics not displayed in other sections for cleaner user experience
+- ✓ **Premium visual design**: Maintained glass morphism styling with smart status indicators and performance badges
+
+**July 25, 2025 (Earlier - Real-Time Kick & Admin Features):**
 - ✓ **Implemented real-time kick functionality**: Admin members can now instantly remove household members with live WebSocket updates
   - Kicked users are immediately redirected to home page without refresh
   - WebSocket broadcasts kick events for instant UI updates

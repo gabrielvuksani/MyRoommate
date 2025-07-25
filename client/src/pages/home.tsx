@@ -837,7 +837,7 @@ export default function Home() {
                 style={{ color: "var(--text-primary)" }}
               >
                 <BarChart3 className="w-5 h-5 mr-2 text-primary" />
-                Household Insights
+                Dashboard
                 <span className="ml-2 px-2 py-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs rounded-full">
                   Live
                 </span>
@@ -901,7 +901,7 @@ export default function Home() {
           ) : (
             <div className="space-y-6">
               {/* Primary Metrics Row */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {(() => {
                   const completedChores =
                     (chores as any[])?.filter((c: any) => c.status === "done") ||
@@ -918,21 +918,6 @@ export default function Home() {
                   const recentCompletions = completedChores.filter((c: any) => 
                     c.completedAt && new Date(c.completedAt) > weekAgo
                   ).length;
-
-                  // Active chores
-                  const activeChores = (chores as any[])?.filter(
-                    (c: any) => c.status !== "done"
-                  ) || [];
-                  
-                  // Urgent chores (due within 24 hours)
-                  const urgentChores = activeChores.filter((chore: any) => {
-                    if (!chore.dueDate) return false;
-                    const dueDate = new Date(chore.dueDate);
-                    const now = new Date();
-                    const diffTime = dueDate.getTime() - now.getTime();
-                    const diffHours = diffTime / (1000 * 60 * 60);
-                    return diffHours <= 24 && diffHours >= 0;
-                  });
 
                   const memberPerformance =
                     (household as any)?.members?.map((member: any) => {
@@ -1031,67 +1016,6 @@ export default function Home() {
                           </div>
                         </CardContent>
                       </Card>
-
-                      <Card className="glass-card overflow-hidden">
-                        <CardContent className="p-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center">
-                              <DollarSign className="w-5 h-5 text-white" />
-                            </div>
-                            <span className="text-xs px-2 py-1 rounded-full" style={{
-                              background: 'rgba(168, 85, 247, 0.1)',
-                              color: '#a855f7'
-                            }}>
-                              Balance
-                            </span>
-                          </div>
-                          <p
-                            className="text-2xl font-bold mb-1"
-                            style={{ color: "var(--text-primary)" }}
-                          >
-                            ${Math.abs(netBalance).toFixed(0)}
-                          </p>
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--text-secondary)" }}
-                          >
-                            {netBalance > 0 ? "Owed to you" : netBalance < 0 ? "You owe" : "All settled"}
-                          </p>
-                          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
-                            <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                              Track expenses
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="glass-card overflow-hidden">
-                        <CardContent className="p-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center">
-                              <CheckSquare className="w-5 h-5 text-white" />
-                            </div>
-                            <Zap className="w-4 h-4" style={{ color: '#fbbf24' }} />
-                          </div>
-                          <p
-                            className="text-3xl font-bold mb-1"
-                            style={{ color: "var(--text-primary)" }}
-                          >
-                            {activeChores.length}
-                          </p>
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--text-secondary)" }}
-                          >
-                            Active Tasks
-                          </p>
-                          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
-                            <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                              {urgentChores.length} urgent
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
                     </>
                   );
                 })()}
@@ -1162,7 +1086,7 @@ export default function Home() {
               </Card>
 
               {/* Quick Actions */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <Card className="glass-card">
                   <CardContent className="p-4">
                     <button
@@ -1180,31 +1104,6 @@ export default function Home() {
                           </p>
                           <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
                             Detailed analytics & trends
-                          </p>
-                        </div>
-                      </div>
-                      <ArrowRight size={16} style={{ color: "var(--text-secondary)" }} />
-                    </button>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass-card">
-                  <CardContent className="p-4">
-                    <button
-                      onClick={() => setLocation("/expenses")}
-                      className="w-full flex items-center justify-between p-3 rounded-xl transition-all hover:scale-[1.02]"
-                      style={{ background: "var(--surface-secondary)" }}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center">
-                          <Receipt className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="text-left">
-                          <p className="font-medium" style={{ color: "var(--text-primary)" }}>
-                            Expense History
-                          </p>
-                          <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                            Track spending patterns
                           </p>
                         </div>
                       </div>
