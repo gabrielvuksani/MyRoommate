@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DollarSign, Calendar, Users, Repeat, CheckCircle, Clock, X, ChevronDown, TrendingUp, TrendingDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ExpenseCardProps {
   expense: any;
@@ -75,20 +76,12 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
   }
 
   return (
-    <div 
+    <Card 
       className={`
-        relative overflow-hidden transition-all duration-300 cursor-pointer
+        glass-card relative overflow-hidden transition-all duration-300 cursor-pointer
         ${isExpanded ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''}
       `}
       onClick={() => setIsExpanded(!isExpanded)}
-      style={{
-        borderRadius: '20px',
-        background: 'var(--glass-card)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid var(--glass-border)',
-        boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)'
-      }}
     >
       {/* Settlement progress bar */}
       {settlementPercentage > 0 && settlementPercentage < 100 && (
@@ -100,7 +93,7 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
         </div>
       )}
       
-      <div className="p-4">
+      <CardContent className="p-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-start gap-3 flex-1">
@@ -257,7 +250,7 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
             )}
           </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Calendar, Clock, MapPin, Users, Repeat, Bell, X, ChevronDown, Circle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface CalendarEventCardProps {
   event: any;
@@ -73,20 +74,14 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
   };
 
   return (
-    <div 
+    <Card 
       className={`
-        relative overflow-hidden transition-all duration-300 cursor-pointer
+        glass-card relative overflow-hidden transition-all duration-300 cursor-pointer animate-fade-in
         ${isExpanded ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''}
       `}
       onClick={() => setIsExpanded(!isExpanded)}
       style={{
-        animationDelay: `${index * 50}ms`,
-        borderRadius: '20px',
-        background: 'var(--glass-card)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid var(--glass-border)',
-        boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)'
+        animationDelay: `${index * 50}ms`
       }}
     >
       {/* Event type accent */}
@@ -95,7 +90,7 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
         style={{ background: eventConfig.color }}
       />
       
-      <div className="p-4 pl-5">
+      <CardContent className="p-4 pl-5">
         {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-start gap-3 flex-1">
@@ -163,10 +158,23 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
         {/* Expanded content */}
         {isExpanded && (
           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700/50 animate-fade-in ml-11">
+            {event.description && (
+              <div className="mb-3">
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {event.description}
+                </p>
+              </div>
+            )}
+            
             {event.notes && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                {event.notes}
-              </p>
+              <div className="mb-3">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                  Notes
+                </h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  {event.notes}
+                </p>
+              </div>
             )}
             
             {/* Attendees */}
@@ -200,18 +208,18 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
             )}
             
             {/* Additional info */}
-            <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="space-y-2 text-xs">
               {event.reminder && (
                 <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                   <Bell size={12} />
-                  <span>{event.reminder} before</span>
+                  <span>Reminder: {event.reminder} before</span>
                 </div>
               )}
               
               {event.color && (
                 <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                   <Circle size={12} fill={event.color} color={event.color} />
-                  <span>Color tag</span>
+                  <span>Color: {event.color}</span>
                 </div>
               )}
             </div>
@@ -232,7 +240,7 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
             )}
           </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
