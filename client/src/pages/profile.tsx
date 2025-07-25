@@ -1,56 +1,48 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
+
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell, Trash2, Smartphone, Monitor, AlertTriangle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { getProfileInitials } from "@/lib/nameUtils";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useTheme } from "@/lib/ThemeProvider";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import BackButton from "../components/back-button";
 import { PersistentLoading } from "@/lib/persistentLoading";
 import { unifiedNotifications } from "@/lib/unified-notifications";
-import BackButton from "../components/back-button";
+import { pwaDetection } from "@/lib/pwa-detection";
 
-// Component imports
-import ProfileHeader from "./profile/ProfileHeader";
-import ThemePicker from "./profile/ThemePicker";
-import AccountDetails from "./profile/AccountDetails";
-import NotificationSettings from "./profile/NotificationSettings";
-import HouseholdInfo from "./profile/HouseholdInfo";
-import DeveloperTools from "./profile/DeveloperTools";
-
-// Types
-interface NotificationInfo {
-  environment?: any;
-  strategy?: string;
-  permission?: string;
-  requiresInstall?: boolean;
-  canRequest?: boolean;
-  supportLevel?: string;
-}
+import { useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Profile() {
-  // Auth and routing
   const { user } = useAuth();
+  const { theme, effectiveTheme, setTheme } = useTheme();
+
   const [, setLocation] = useLocation();
-
-  // UI State
-  const [headerScrolled, setHeaderScrolled] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
-
-  // Edit dialogs state
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState({ firstName: "", lastName: "" });
   const [isHouseholdEditOpen, setIsHouseholdEditOpen] = useState(false);
   const [editHouseholdName, setEditHouseholdName] = useState("");
+  const [headerScrolled, setHeaderScrolled] = useState(false);
 
-  // Notification state
-  const [notificationInfo, setNotificationInfo] = useState<NotificationInfo | null>(null);
+
+  const [isCopied, setIsCopied] = useState(false);
+  const [notificationInfo, setNotificationInfo] = useState<any>(null);
   const [notificationSettings, setNotificationSettings] = useState<any>(null);
   const [isTestingNotification, setIsTestingNotification] = useState(false);
   const [canShowNotifications, setCanShowNotifications] = useState(false);
 
-  // Theme
-  const { theme, effectiveTheme, setTheme } = useTheme();
-
-  // Data queries
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
   });
@@ -60,7 +52,64 @@ export default function Profile() {
     (member: any) => member.userId === user?.id
   )?.role === 'admin';
 
-  // Mutations
+  // Function to check if notifications can be shown
+  const checkNotificationCapability = () => {
+    const info = unifiedNotifications.getEnvironmentInfo();
+    const settings = unifiedNotifications.getSettings();
+    
+    // Notifications can be shown if:
+    // 1. We have a valid strategy (not 'none')
+    // 2. Browser supports notifications
+    // 3. User hasn't permanently blocked notifications in all contexts
+    const canShow = info.strategy !== 'none' || 
+                   ('Notification' in window && Notification.permission !== 'denied');
+    
+    setNotificationInfo(info);
+    setNotificationSettings(settings);
+    setCanShowNotifications(canShow);
+    
+    return canShow;
+  };
+
+  useEffect(() => {
+    // Scroll to top when page loads
+    window.scrollTo(0, 0);
+
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    
+    // Check notification capability
+    checkNotificationCapability();
+    
+    // Listen for permission changes
+    if ('permissions' in navigator) {
+      navigator.permissions.query({ name: 'notifications' as PermissionName })
+        .then(permissionStatus => {
+          permissionStatus.onchange = () => {
+            checkNotificationCapability();
+          };
+        })
+        .catch(() => {
+          // Fallback for browsers that don't support permission query
+        });
+    }
+    
+    // Check for focus changes to update notification status
+    const handleFocus = () => {
+      checkNotificationCapability();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   const updateNameMutation = useMutation({
     mutationFn: async (data: { firstName: string; lastName: string }) => {
       return await apiRequest("PATCH", "/api/auth/user", data);
@@ -74,9 +123,9 @@ export default function Profile() {
     },
   });
 
-  const updateHouseholdMutation = useMutation({
-    mutationFn: async (data: { name: string }) => {
-      return await apiRequest("PATCH", "/api/households/current", data);
+  const updateHouseholdNameMutation = useMutation({
+    mutationFn: async (name: string) => {
+      return await apiRequest("PATCH", "/api/households/current", { name });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
@@ -89,105 +138,44 @@ export default function Profile() {
 
   const leaveHouseholdMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("POST", "/api/households/leave");
+      const result = await apiRequest("POST", "/api/households/leave", {});
+      return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/household-members"] });
-      
-      setTimeout(() => {
-        PersistentLoading.hide();
-        window.location.reload();
-      }, 1500);
+      // Don't modify loading state here - button handler controls entire sequence
+      queryClient.invalidateQueries();
     },
     onError: (error: any) => {
       console.error("Failed to leave household:", error);
-      PersistentLoading.hide();
+      // Don't modify loading state here - button handler will handle it
     },
   });
 
   const deleteAllDataMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("DELETE", "/api/households/delete-all");
+      const result = await apiRequest("DELETE", "/api/dev/delete-all-data", {});
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.clear();
     },
     onError: (error: any) => {
       console.error("Failed to delete all data:", error);
     },
   });
 
-  // Effects
-  useEffect(() => {
-    window.scrollTo(0, 0);
-
-    const handleScroll = () => {
-      setHeaderScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    checkNotificationCapability();
-    
-    // Listen for permission changes
-    if ('permissions' in navigator) {
-      navigator.permissions.query({ name: 'notifications' as PermissionName })
-        .then(permissionStatus => {
-          permissionStatus.onchange = () => {
-            checkNotificationCapability();
-          };
-        })
-        .catch(() => {});
-    }
-    
-    const handleFocus = () => {
-      checkNotificationCapability();
-    };
-    
-    window.addEventListener('focus', handleFocus);
-    
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, []);
-
-  // Notification helpers
-  const checkNotificationCapability = () => {
-    const info = unifiedNotifications.getEnvironmentInfo();
-    const settings = unifiedNotifications.getSettings();
-    
-    const canShow = info.strategy !== 'none' || 
-                   ('Notification' in window && Notification.permission !== 'denied');
-    
-    setNotificationInfo(info);
-    setNotificationSettings(settings);
-    setCanShowNotifications(canShow);
-    
-    return canShow;
-  };
-
-  // Event handlers
   const handleUpdateName = () => {
-    if (editName.firstName.trim()) {
-      updateNameMutation.mutate({
-        firstName: editName.firstName.trim(),
-        lastName: editName.lastName.trim(),
-      });
-    }
+    if (!editName.firstName.trim()) return;
+    updateNameMutation.mutate(editName);
   };
 
-  const handleUpdateHousehold = () => {
-    if (editHouseholdName.trim()) {
-      updateHouseholdMutation.mutate({ name: editHouseholdName.trim() });
-    }
-  };
-
-  const handleLeaveHousehold = async () => {
-    if (window.confirm("Are you sure you want to leave this household?")) {
-      PersistentLoading.show("Leaving household...");
-      leaveHouseholdMutation.mutate();
-    }
+  const handleUpdateHouseholdName = () => {
+    if (!editHouseholdName.trim()) return;
+    updateHouseholdNameMutation.mutate(editHouseholdName);
   };
 
   const logout = () => {
+    // Show persistent loading overlay
     PersistentLoading.show("Signing out...");
     window.location.href = "/api/logout";
   };
@@ -206,10 +194,13 @@ export default function Profile() {
 
   const handleRefresh = async () => {
     try {
+      // Show loading state
       PersistentLoading.show("Refreshing app data...");
       
+      // Clear all caches step by step for PWA compatibility
       await queryClient.clear();
       
+      // Clear browser storage
       try {
         localStorage.clear();
       } catch (e) {
@@ -222,6 +213,7 @@ export default function Profile() {
         console.log('sessionStorage clear failed:', e);
       }
       
+      // Clear service worker caches if available
       if ('serviceWorker' in navigator && 'caches' in window) {
         try {
           const cacheNames = await caches.keys();
@@ -233,18 +225,23 @@ export default function Profile() {
         }
       }
       
+      // Use a more PWA-friendly navigation approach
       setTimeout(() => {
+        // Hide the loading first
         PersistentLoading.hide();
         
+        // For PWA, use location.replace instead of href to avoid navigation issues
         if (window.location.pathname !== '/') {
           window.location.replace('/');
         } else {
+          // If already on home, force a reload
           window.location.reload();
         }
       }, 1000);
       
     } catch (error) {
       console.error('Refresh error:', error);
+      // Fallback: hide loading and try simple reload
       PersistentLoading.hide();
       setTimeout(() => {
         window.location.reload();
@@ -253,15 +250,18 @@ export default function Profile() {
   };
 
   const handleDeleteAllData = async () => {
+    // Show confirmation dialog
     if (!window.confirm('Are you sure you want to delete all household data? This action cannot be undone and will remove all chores, expenses, messages, calendar events, and household members. Your roommate listings will be preserved.')) {
       return;
     }
 
     try {
+      // Show loading state
       PersistentLoading.show("Deleting all data...");
       
       await deleteAllDataMutation.mutateAsync();
       
+      // Navigate to home after successful deletion
       setTimeout(() => {
         PersistentLoading.hide();
         window.location.replace('/');
@@ -269,6 +269,7 @@ export default function Profile() {
       
     } catch (error) {
       console.error('Delete all data error:', error);
+      // Hide loading on error
       PersistentLoading.hide();
       alert('Failed to delete all data. Please try again.');
     }
@@ -296,15 +297,17 @@ export default function Profile() {
     try {
       let success = false;
       
+      // Request permission if needed
       if (info.canRequest) {
         success = await unifiedNotifications.requestPermission();
         if (!success) {
           alert('Notification permission was denied. Please enable notifications in your browser settings.');
-          checkNotificationCapability();
+          checkNotificationCapability(); // Re-check after denial
           return;
         }
       }
       
+      // Send test notification based on support level
       if (info.permission === 'granted' || success) {
         const testSuccess = await unifiedNotifications.testNotification();
         if (testSuccess) {
@@ -316,6 +319,7 @@ export default function Profile() {
         }
       }
       
+      // Re-check capability after permission change
       checkNotificationCapability();
       
     } catch (error) {
@@ -327,11 +331,14 @@ export default function Profile() {
   };
 
   const handleNotificationToggle = async (type: string, enabled: boolean) => {
+    // If enabling master toggle and no permission yet, request it
     if (type === 'enabled' && enabled && notificationInfo?.permission === 'default') {
       const granted = await unifiedNotifications.requestPermission();
       if (!granted) {
+        // Permission denied, don't enable
         return;
       }
+      // Re-check capability after permission change
       checkNotificationCapability();
     }
     
@@ -356,8 +363,13 @@ export default function Profile() {
     );
   }
 
+
+
+
+
   return (
     <div className="page-container page-transition">
+      
       <div className={`floating-header ${headerScrolled ? "scrolled" : ""}`}>
         <div className="page-header">
           <div className="flex items-center space-x-4">
@@ -373,56 +385,651 @@ export default function Profile() {
       </div>
 
       <div className="content-with-header-compact px-6 space-y-6">
-        <ProfileHeader
-          user={user}
-          isEditOpen={isEditOpen}
-          setIsEditOpen={setIsEditOpen}
-          editName={editName}
-          setEditName={setEditName}
-          handleUpdateName={handleUpdateName}
-          updateNameMutation={updateNameMutation}
-          theme={theme}
-          effectiveTheme={effectiveTheme}
-          setTheme={setTheme}
-        />
+        {/* Profile Header */}
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)'
+        }}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4 flex-1 min-w-0">
+                <ProfileAvatar 
+                  user={user as any} 
+                  size="xl" 
+                  editable={true} 
+                  gradientType="emerald"
+                  className="rounded-3xl"
+                />
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-2xl font-bold truncate" style={{ color: 'var(--text-primary)' }}>
+                    {(user as any).firstName && (user as any).lastName
+                      ? `${(user as any).firstName} ${(user as any).lastName}`
+                      : (user as any).firstName ||
+                        (user as any).email?.split("@")[0] ||
+                        "Unknown User"}
+                  </h2>
+                  <p className="truncate" style={{ color: 'var(--text-secondary)' }} title={(user as any).email}>
+                    {(user as any).email}
+                  </p>
+                </div>
+              </div>
 
+              <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    onClick={() => {
+                      setEditName({
+                        firstName: (user as any).firstName || "",
+                        lastName: (user as any).lastName || "",
+                      });
+                    }}
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
+                    style={{
+                      background: 'var(--surface-secondary)',
+                      color: 'var(--text-secondary)'
+                    }}
+                  >
+                    <Edit3 size={16} />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader className="px-6 pt-6 pb-6">
+                    <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                      Edit Name
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="px-6 pb-6 space-y-4">
+                    <Input
+                      placeholder="First name"
+                      value={editName.firstName}
+                      onChange={(e) =>
+                        setEditName({ ...editName, firstName: e.target.value })
+                      }
+                      className="w-full p-4 rounded-xl"
+                      style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}
+                    />
+                    <Input
+                      placeholder="Last name"
+                      value={editName.lastName}
+                      onChange={(e) =>
+                        setEditName({ ...editName, lastName: e.target.value })
+                      }
+                      className="w-full p-4 rounded-xl"
+                      style={{
+                        background: 'var(--surface-secondary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)'
+                      }}
+                    />
+                    <Button
+                      onClick={handleUpdateName}
+                      disabled={
+                        !editName.firstName.trim() ||
+                        updateNameMutation.isPending
+                      }
+                      className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
+                    >
+                      {updateNameMutation.isPending
+                        ? "Saving..."
+                        : "Save Changes"}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            {/* Theme Picker */}
+            <div className="pt-6 mt-6" style={{ borderTop: '1px solid var(--border)' }}>
+              <h4 className="text-sm font-medium mb-4" style={{ color: 'var(--text-secondary)' }}>
+                Appearance
+              </h4>
+              <div className="grid grid-cols-3 gap-3">
+                <Button
+                  onClick={() => setTheme("auto")}
+                  className={`h-20 rounded-2xl font-medium flex flex-col items-center justify-center space-y-2 transition-all border-2 ${
+                    theme === 'auto' ? 'border-blue-500 shadow-lg' : 'border-transparent'
+                  }`}
+                  style={{
+                    background: theme === 'auto' ? 'var(--primary)' : 'var(--surface-secondary)',
+                    color: theme === 'auto' ? '#ffffff' : 'var(--text-primary)'
+                  }}
+                >
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-r from-orange-400 to-blue-500 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-slate-800 rounded-full" style={{ 
+                      clipPath: 'polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%)' 
+                    }}></div>
+                  </div>
+                  <span className="text-xs font-semibold">Auto</span>
+                </Button>
+                <Button
+                  onClick={() => setTheme("light")}
+                  className={`h-20 rounded-2xl font-medium flex flex-col items-center justify-center space-y-2 transition-all border-2 ${
+                    theme === 'light' ? 'border-blue-500 shadow-lg' : 'border-transparent'
+                  }`}
+                  style={{
+                    background: theme === 'light' ? 'var(--primary)' : 'var(--surface-secondary)',
+                    color: theme === 'light' ? '#ffffff' : 'var(--text-primary)'
+                  }}
+                >
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-sm">
+                    <Sun size={16} className="text-white drop-shadow-sm" />
+                  </div>
+                  <span className="text-xs font-semibold">Light</span>
+                </Button>
+                <Button
+                  onClick={() => setTheme("dark")}
+                  className={`h-20 rounded-2xl font-medium flex flex-col items-center justify-center space-y-2 transition-all border-2 ${
+                    theme === 'dark' ? 'border-blue-500 shadow-lg' : 'border-transparent'
+                  }`}
+                  style={{
+                    background: theme === 'dark' ? 'var(--primary)' : 'var(--surface-secondary)',
+                    color: theme === 'dark' ? '#ffffff' : 'var(--text-primary)'
+                  }}
+                >
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shadow-sm">
+                    <Moon size={16} className="text-slate-300 drop-shadow-sm" />
+                  </div>
+                  <span className="text-xs font-semibold">Dark</span>
+                </Button>
+              </div>
+              <p className="text-xs mt-3" style={{ color: 'var(--text-secondary)' }}>
+                {theme === 'auto' 
+                  ? `Following system (currently ${effectiveTheme || 'light'})`
+                  : `Using ${theme} mode`
+                }
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Account Details */}
         {user && (
-          <AccountDetails user={user} />
+          <Card 
+            className="glass-card" 
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)'
+            }}
+          >
+            <CardContent className="p-6">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Account details
+              </h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>User ID</span>
+                  <span
+                    className="font-mono text-sm truncate ml-4"
+                    style={{ color: 'var(--text-primary)' }}
+                    title={String((user as any).id || '')}
+                  >
+                    {String((user as any).id || 'N/A')}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-3">
+                  <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
+                  <span style={{ color: 'var(--text-primary)' }}>
+                    {(user as any).createdAt ? new Date((user as any).createdAt).toLocaleDateString() : 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
+        {/* Notification Settings - Only show if notifications can be served */}
         {canShowNotifications && (
-          <NotificationSettings
-            notificationInfo={notificationInfo}
-            notificationSettings={notificationSettings}
-            handleNotificationToggle={handleNotificationToggle}
-          />
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)'
+          }}>
+            <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                Notifications
+              </h3>
+              <Bell className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
+            </div>
+
+            {/* Environment Info */}
+            {notificationInfo && (
+              <div className="mb-6 p-4 rounded-xl" style={{ 
+                background: 'var(--surface-secondary)',
+                border: '1px solid var(--border)'
+              }}>
+                <div className="flex items-center gap-2 mb-2">
+                  {notificationInfo.supportLevel === 'full' && <Smartphone className="w-4 h-4 text-green-600" />}
+                  {notificationInfo.supportLevel === 'partial' && <Monitor className="w-4 h-4 text-blue-600" />}
+                  {notificationInfo.supportLevel === 'none' && <AlertTriangle className="w-4 h-4 text-orange-600" />}
+
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    {notificationInfo.supportLevel === 'full' && 'Full Support - Push Notifications'}
+                    {notificationInfo.supportLevel === 'partial' && 'Partial Support - Browser Notifications'}
+                    {notificationInfo.supportLevel === 'none' && (
+                      notificationInfo.requiresInstall ? 'Installation Required' : 'Limited Support'
+                    )}
+                  </span>
+                </div>
+
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  {notificationInfo.supportLevel === 'full' && 'You can receive notifications even when the app is closed.'}
+                  {notificationInfo.supportLevel === 'partial' && 'You can receive notifications while using the browser.'}
+                  {notificationInfo.supportLevel === 'none' && (
+                    notificationInfo.requiresInstall 
+                      ? 'Install the app to your home screen to enable push notifications.'
+                      : notificationInfo.permission === 'denied' 
+                        ? 'Notifications are blocked in your browser settings.'
+                        : 'Click "Enable Notifications" below to get started.'
+                  )}
+                </p>
+
+                {/* Install prompt for mobile users */}
+                {notificationInfo.requiresInstall && (
+                  <button 
+                    className="mt-3 text-xs text-blue-600 underline hover:text-blue-700"
+                    onClick={() => {
+                      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                      if (isIOS) {
+                        alert('To install on iOS:\n\n1. Tap the Share button (box with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
+                      } else {
+                        alert('To install on Android:\n\n1. Tap the menu button (three dots)\n2. Tap "Add to Home screen"\n3. Follow the prompts');
+                      }
+                    }}
+                  >
+                    How to install the app
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Master Toggle */}
+            {notificationSettings && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                        Enable Notifications
+                      </span>
+                      {notificationInfo.permission === 'granted' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                          Allowed
+                        </span>
+                      )}
+                      {notificationInfo.permission === 'denied' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                          Blocked
+                        </span>
+                      )}
+                      {notificationInfo.permission === 'default' && notificationSettings.enabled && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                          Permission needed
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                      {notificationInfo.permission === 'denied' 
+                        ? 'Enable in browser settings to continue'
+                        : 'Master control for all notification types'}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notificationSettings.enabled && notificationInfo?.permission === 'granted'}
+                    onCheckedChange={(checked) => handleNotificationToggle('enabled', checked)}
+                    disabled={notificationInfo?.permission === 'denied' || notificationInfo?.requiresInstall}
+                  />
+                </div>
+
+                {/* Individual Type Controls - Only show when notifications are enabled and allowed */}
+                {notificationSettings.enabled && notificationInfo?.permission === 'granted' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Messages
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          New messages from roommates
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.message}
+                        onCheckedChange={(checked) => handleNotificationToggle('message', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Chores
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          Chore assignments and completions
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.chore}
+                        onCheckedChange={(checked) => handleNotificationToggle('chore', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Expenses
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          New expenses and bill splits
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.expense}
+                        onCheckedChange={(checked) => handleNotificationToggle('expense', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Calendar
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          New events and reminders
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.calendar}
+                        onCheckedChange={(checked) => handleNotificationToggle('calendar', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          Household
+                        </span>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          Important household updates
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.types.household}
+                        onCheckedChange={(checked) => handleNotificationToggle('household', checked)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
         )}
 
+        {/* Household Information */}
         {household && (
-          <HouseholdInfo
-            household={household}
-            isAdmin={isAdmin}
-            isCopied={isCopied}
-            isHouseholdEditOpen={isHouseholdEditOpen}
-            setIsHouseholdEditOpen={setIsHouseholdEditOpen}
-            editHouseholdName={editHouseholdName}
-            setEditHouseholdName={setEditHouseholdName}
-            handleUpdateHousehold={handleUpdateHousehold}
-            updateHouseholdMutation={updateHouseholdMutation}
-            copyInviteCode={copyInviteCode}
-            handleLeaveHousehold={handleLeaveHousehold}
-            handleDeleteAllData={handleDeleteAllData}
-            logout={logout}
-          />
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)'
+          }}>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Household Information
+              </h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>Name</span>
+                  <div className="flex items-center space-x-2">
+                    <span
+                      className="font-semibold truncate"
+                      style={{ color: 'var(--text-primary)' }}
+                      title={(household as any).name}
+                    >
+                      {(household as any).name}
+                    </span>
+                    <Dialog open={isHouseholdEditOpen} onOpenChange={setIsHouseholdEditOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          onClick={() => {
+                            setEditHouseholdName((household as any)?.name || "");
+                          }}
+                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all p-0 flex-shrink-0"
+                          style={{
+                            background: 'var(--surface-secondary)',
+                            color: 'var(--text-secondary)'
+                          }}
+                        >
+                          <Edit3 size={16} />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader className="px-6 pt-6 pb-6">
+                          <DialogTitle className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                            Edit Household Name
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="px-6 pb-6 space-y-4">
+                          <Input
+                            placeholder="Household name"
+                            value={editHouseholdName}
+                            onChange={(e) => setEditHouseholdName(e.target.value)}
+                            className="w-full p-4 rounded-xl"
+                            style={{
+                              background: 'var(--surface-secondary)',
+                              border: '1px solid var(--border)',
+                              color: 'var(--text-primary)'
+                            }}
+                          />
+                          <Button
+                            onClick={() => handleUpdateHouseholdName()}
+                            disabled={updateHouseholdNameMutation.isPending}
+                            className="w-full py-3 rounded-xl font-semibold transition-all disabled:opacity-50"
+                            style={{
+                              background: updateHouseholdNameMutation.isPending
+                                ? 'var(--surface-secondary)'
+                                : 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+                              color: updateHouseholdNameMutation.isPending
+                                ? 'var(--text-secondary)'
+                                : '#ffffff'
+                            }}
+                          >
+                            {updateHouseholdNameMutation.isPending
+                              ? "Saving..."
+                              : "Save Changes"}
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center py-3">
+                  <span style={{ color: 'var(--text-secondary)' }}>Invite Code</span>
+                  <div className="flex items-center space-x-3">
+                    <span className="font-mono text-sm px-2 py-1 rounded" style={{
+                      color: 'var(--text-primary)',
+                      background: 'var(--surface-secondary)'
+                    }}>
+                      {(household as any).inviteCode}
+                    </span>
+                    <button
+                      onClick={copyInviteCode}
+                      className="p-2 rounded-lg btn-animated transition-all duration-300 relative"
+                      style={{
+                        background: 'var(--surface-secondary)',
+                        color: 'var(--text-secondary)'
+                      }}
+                    >
+                      <div className={`transition-all duration-300 ease-in-out ${isCopied ? 'scale-0 opacity-0 rotate-90' : 'scale-100 opacity-100 rotate-0'}`}>
+                        <Copy size={14} />
+                      </div>
+                      <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out ${isCopied ? 'scale-100 opacity-100 rotate-0' : 'scale-0 opacity-0 -rotate-90'}`}>
+                        <Check size={14} style={{ color: '#10b981' }} />
+                      </div>
+                    </button>
+                  </div>
+                </div>
+                {(household as any).rentAmount && (
+                  <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Monthly Rent</span>
+                    <span style={{ color: 'var(--text-primary)' }}>
+                      ${(household as any).rentAmount}
+                    </span>
+                  </div>
+                )}
+                {(household as any).rentDueDay && (
+                  <div className="flex justify-between items-center py-3">
+                    <span style={{ color: 'var(--text-secondary)' }}>Rent Due Day</span>
+                    <span style={{ color: 'var(--text-primary)' }}>
+                      {(household as any).rentDueDay}
+                    </span>
+                  </div>
+                )}
+              </div>
+              {(household as any)?.members && (household as any).members.map((member: any) => (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between py-3 last:border-b-0"
+                  style={{ borderBottom: '1px solid var(--border)',
+                         borderTop: '1px solid var(--border)'}}>
+                  <div className="flex items-center space-x-3">
+                    <ProfileAvatar 
+                      user={member.user} 
+                      size="md" 
+                      gradientType="blue"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                        {member.user.firstName && member.user.lastName
+                          ? `${member.user.firstName} ${member.user.lastName}`
+                          : member.user.firstName ||
+                            member.user.email?.split("@")[0] ||
+                            "Unknown"}
+                      </p>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {member.role === "admin" ? "Administrator" : "Member"}
+                      </p>
+                    </div>
+                  </div>
+                  {member.role && (
+                    <span className="text-sm capitalize px-2 py-1 rounded flex-shrink-0" style={{
+                      color: 'var(--text-secondary)',
+                      background: 'var(--surface-secondary)'
+                    }}>
+                      {member.role}
+                    </span>
+                  )}
+                </div>
+              ))}
+              <div className="space-y-3 pt-3">
+                {(household as any) && (
+                  <Button
+                    onClick={async () => {
+                      // Show persistent loading overlay
+                      PersistentLoading.show("Leaving household...");
+  
+                      try {
+                        await leaveHouseholdMutation.mutateAsync();
+  
+                        // Navigate immediately - loading will persist through refresh
+                        setTimeout(() => {
+                          window.location.href = '/';
+                        }, 500);
+                      } catch (error) {
+                        console.error("Failed to leave household:", error);
+                        setTimeout(() => {
+                          window.location.href = '/';
+                        }, 500);
+                      }
+                    }}
+                    disabled={leaveHouseholdMutation.isPending}
+                    className="w-full bg-orange-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-orange-700 disabled:opacity-50"
+                  >
+                    <UserMinus size={20} />
+                    <span>
+                      {leaveHouseholdMutation.isPending
+                        ? "Leaving..."
+                        : "Leave Household"}
+                    </span>
+                  </Button>
+                )}
+                <Button
+                  onClick={logout}
+                  className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700"
+                >
+                  <LogOut size={20} />
+                  <span>Sign Out</span>
+                </Button>
+                {isAdmin && (
+                  <Button
+                    onClick={handleDeleteAllData}
+                    disabled={deleteAllDataMutation.isPending}
+                    className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700 disabled:opacity-50"
+                  >
+                    <Trash2 size={20} />
+                    <span>
+                      {deleteAllDataMutation.isPending
+                        ? "Deleting All Household Data..."
+                        : "Delete All Household Data"}
+                    </span>
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
-        <DeveloperTools
-          handleRefresh={handleRefresh}
-          handleTestNotification={handleTestNotification}
-          isTestingNotification={isTestingNotification}
-          notificationSettings={notificationSettings}
-          notificationInfo={notificationInfo}
-        />
+        {/* Developer Tools */}
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)'
+        }}>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+              Developer Tools
+            </h3>
+            <div className="space-y-3">
+              <Button
+                onClick={handleRefresh}
+                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-blue-700"
+              >
+                <RefreshCw size={20} />
+                <span>Refresh App & Data</span>
+              </Button>
+              <Button
+                onClick={handleTestNotification}
+                disabled={isTestingNotification || (!notificationSettings?.enabled && !notificationInfo?.requiresInstall)}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Bell size={20} className={isTestingNotification ? "animate-pulse" : ""} />
+                <span>
+                  {isTestingNotification ? "Sending test notification..." : 
+                   notificationInfo?.requiresInstall ? "Install App for Notifications" :
+                   notificationInfo?.permission === 'denied' ? "Enable in Browser Settings" :
+                   "Test Notifications"}
+                </span>
+              </Button>
+              
+              {/* PWA Environment Information */}
+              <div className="mt-4 p-4 rounded-xl border" style={{ 
+                background: 'var(--surface-secondary)', 
+                borderColor: 'var(--border)' 
+              }}>
+                <h4 className="font-semibold text-sm mb-2" style={{ color: 'var(--text-primary)' }}>
+                  Environment Info
+                </h4>
+                <div className="space-y-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  <div>Platform: {notificationInfo?.environment?.platform || 'Unknown'}</div>
+                  <div>Installed: {notificationInfo?.environment?.isInstalled ? 'Yes' : 'No'}</div>
+                  <div>Strategy: {notificationInfo?.strategy || 'None'}</div>
+                  <div>Permission: {notificationInfo?.environment?.permission || 'N/A'}</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
