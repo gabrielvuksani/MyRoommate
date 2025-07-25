@@ -222,35 +222,42 @@ export default function Dashboard() {
         {/* Time Period Filter */}
         <div className="flex justify-center">
           <div
-            className="flex space-x-1 p-1 rounded-2xl border"
+            className="flex p-1 rounded-2xl border"
             style={{ 
               background: "var(--surface-secondary)",
               borderColor: "var(--border)",
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)"
             }}
           >
-            {["week", "month", "all"].map((period) => (
-              <button
-                key={period}
-                onClick={() => setSelectedPeriod(period)}
-                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border"
-                style={{
-                  background:
-                    selectedPeriod === period
-                      ? "var(--primary)"
-                      : "transparent",
-                  color:
-                    selectedPeriod === period
-                      ? "white"
-                      : "var(--text-secondary)",
-                  borderColor:
-                    selectedPeriod === period
-                      ? "transparent"
-                      : "rgba(0, 0, 0, 0.06)",
-                }}
-              >
+            {["week", "month", "all"].map((period, index) => (
+              <>
+                <button
+                  key={period}
+                  onClick={() => setSelectedPeriod(period)}
+                  className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                  style={{
+                    background:
+                      selectedPeriod === period
+                        ? "var(--primary)"
+                        : "transparent",
+                    color:
+                      selectedPeriod === period
+                        ? "white"
+                        : "var(--text-secondary)",
+                  }}
+                >
                 {period === 'week' ? 'This Week' : period === 'month' ? 'This Month' : 'All Time'}
               </button>
+              {index < 2 && (
+                <div 
+                  className="w-px my-2"
+                  style={{ 
+                    background: "var(--border)",
+                    opacity: 0.3
+                  }}
+                />
+              )}
+            </>
             ))}
           </div>
         </div>

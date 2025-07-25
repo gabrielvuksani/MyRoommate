@@ -13,7 +13,7 @@ export default function BalanceBreakdown({ expenses, currentUserId, householdMem
   const balanceDetails = useMemo(() => {
     // Calculate individual balances between the current user and each household member
     const memberBalances: Record<string, { owesMe: number; iOweThey: number; member: any }> = {};
-    
+
     // Initialize member balances for all household members except current user
     householdMembers.forEach(member => {
       if (member.userId !== currentUserId) {
@@ -24,19 +24,19 @@ export default function BalanceBreakdown({ expenses, currentUserId, householdMem
         };
       }
     });
-    
+
     // Process all expenses
     expenses.forEach(expense => {
       if (!expense.splits || !Array.isArray(expense.splits)) return;
-      
+
       // For each expense, process all splits
       expense.splits.forEach((split: any) => {
         // Skip if split is already settled
         if (split.settled) return;
-        
+
         const splitAmount = parseFloat(split.amount) || 0;
         if (splitAmount <= 0) return; // Skip invalid amounts
-        
+
         // Case 1: Current user paid for this expense
         if (expense.paidBy === currentUserId) {
           // Other users owe the current user their split amounts
@@ -51,7 +51,7 @@ export default function BalanceBreakdown({ expenses, currentUserId, householdMem
         }
       });
     });
-    
+
     // Calculate net balances and create final array
     const netBalances = Object.entries(memberBalances)
       .map(([userId, balance]) => {
@@ -67,7 +67,7 @@ export default function BalanceBreakdown({ expenses, currentUserId, householdMem
       })
       .filter(b => b.hasBalance) // Only show non-zero balances
       .sort((a, b) => Math.abs(b.netAmount) - Math.abs(a.netAmount)); // Sort by absolute amount
-    
+
     return netBalances;
   }, [expenses, currentUserId, householdMembers]);
 
@@ -100,12 +100,12 @@ export default function BalanceBreakdown({ expenses, currentUserId, householdMem
             {balanceDetails.length} {balanceDetails.length === 1 ? 'balance' : 'balances'}
           </span>
         </div>
-        
+
         <div className="space-y-3">
           {balanceDetails.map(({ userId, member, netAmount, owesMe, iOweThey }) => {
             const displayName = member.user?.firstName || member.user?.email?.split('@')[0] || 'Unknown';
             const isOwedToMe = netAmount > 0;
-            
+
             return (
               <div 
                 key={userId}
@@ -132,7 +132,7 @@ export default function BalanceBreakdown({ expenses, currentUserId, householdMem
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <div className="text-right">
                     <p 
@@ -147,22 +147,13 @@ export default function BalanceBreakdown({ expenses, currentUserId, householdMem
                       </p>
                     )}
                   </div>
-                  {isOwedToMe ? (
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(16, 185, 129, 0.1)' }}>
-                      <ArrowRight size={16} className="text-green-500" />
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(239, 68, 68, 0.1)' }}>
-                      <ArrowRight size={16} className="text-red-500 rotate-180" />
-                    </div>
-                  )}
                 </div>
               </div>
             );
           })}
         </div>
-        
-        <div className="mt-4 pt-4 border-t space-y-1" style={{ borderColor: 'var(--border-color)' }}>
+
+        <div className="pt-4 space-y-1">
           <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
             These are net balances after simplifying mutual debts
           </p>

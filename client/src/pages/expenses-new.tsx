@@ -137,7 +137,7 @@ export default function Expenses() {
         {/* Filter Tabs */}
         <div className="flex justify-center mb-6">
           <div
-            className="flex space-x-1 p-1 rounded-2xl border"
+            className="flex p-1 rounded-2xl border"
             style={{ 
               background: "var(--surface-secondary)",
               borderColor: "var(--border)",
@@ -148,28 +148,35 @@ export default function Expenses() {
               { key: "all", label: "All", count: expenses.length },
               { key: "unsettled", label: "Unsettled", count: expenses.filter((e: any) => e.splits?.some((s: any) => !s.settled)).length },
               { key: "settled", label: "Settled", count: expenses.filter((e: any) => e.splits?.every((s: any) => s.settled)).length }
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key as any)}
-                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border"
-                style={{
-                  background:
-                    activeTab === tab.key
-                      ? "var(--primary)"
-                      : "transparent",
-                  color:
-                    activeTab === tab.key
-                      ? "white"
-                      : "var(--text-secondary)",
-                  borderColor:
-                    activeTab === tab.key
-                      ? "transparent"
-                      : "rgba(0, 0, 0, 0.06)",
-                }}
-              >
-                {tab.label} ({tab.count})
-              </button>
+            ].map((tab, index) => (
+              <>
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key as any)}
+                  className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                  style={{
+                    background:
+                      activeTab === tab.key
+                        ? "var(--primary)"
+                        : "transparent",
+                    color:
+                      activeTab === tab.key
+                        ? "white"
+                        : "var(--text-secondary)",
+                  }}
+                >
+                  {tab.label} ({tab.count})
+                </button>
+                {index < 2 && (
+                  <div 
+                    className="w-px my-2"
+                    style={{ 
+                      background: "var(--border)",
+                      opacity: 0.3
+                    }}
+                  />
+                )}
+              </>
             ))}
           </div>
         </div>

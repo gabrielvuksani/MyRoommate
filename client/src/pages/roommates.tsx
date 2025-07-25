@@ -105,7 +105,7 @@ export default function Roommates() {
         {/* Tab Bar */}
         <div className="flex justify-center">
           <div
-            className="flex space-x-1 p-1 rounded-2xl border"
+            className="flex p-1 rounded-2xl border"
             style={{ 
               background: "var(--surface-secondary)",
               borderColor: "var(--border)",
@@ -114,7 +114,7 @@ export default function Roommates() {
           >
             <button
               onClick={() => setActiveTab("browse")}
-              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center border"
+              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center"
               style={{
                 background:
                   activeTab === "browse"
@@ -124,19 +124,23 @@ export default function Roommates() {
                   activeTab === "browse"
                     ? "white"
                     : "var(--text-secondary)",
-                borderColor:
-                  activeTab === "browse"
-                    ? "transparent"
-                    : "rgba(0, 0, 0, 0.06)",
               }}
             >
               <Search className="w-4 h-4 mr-2" />
               Browse ({listingsArray.length})
             </button>
             
+            <div 
+              className="w-px my-2"
+              style={{ 
+                background: "var(--border)",
+                opacity: 0.3
+              }}
+            />
+            
             <button
               onClick={() => setActiveTab("my-listings")}
-              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center border"
+              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center"
               style={{
                 background:
                   activeTab === "my-listings"
@@ -146,10 +150,6 @@ export default function Roommates() {
                   activeTab === "my-listings"
                     ? "white"
                     : "var(--text-secondary)",
-                borderColor:
-                  activeTab === "my-listings"
-                    ? "transparent"
-                    : "rgba(0, 0, 0, 0.06)",
               }}
             >
               <Home className="w-4 h-4 mr-2" />
