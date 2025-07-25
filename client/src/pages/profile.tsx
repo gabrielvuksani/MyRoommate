@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { User } from "@shared/schema";
 import { LogOut, Edit3, Copy, UserMinus, RefreshCw, Moon, Sun, Check, Bell, Trash2, Smartphone, Monitor, AlertTriangle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { getProfileInitials } from "@/lib/nameUtils";
@@ -27,6 +28,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Profile() {
   const { user } = useAuth();
+  const typedUser: User | null = user;
   const { theme, effectiveTheme, setTheme } = useTheme();
 
   const [, setLocation] = useLocation();
@@ -546,39 +548,43 @@ export default function Profile() {
         </Card>
 
         {/* Account Details */}
-        {user && (
-          <Card 
-            className="glass-card" 
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)'
-            }}
-          >
-            <CardContent className="p-6">
-              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
-                Account details
-              </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                  <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>User ID</span>
-                  <span
-                    className="font-mono text-sm truncate ml-4"
-                    style={{ color: 'var(--text-primary)' }}
-                    title={String((user as any).id || '')}
-                  >
-                    {String((user as any).id || 'N/A')}
-                  </span>
+        {(() => {
+          if (!typedUser) return null;
+          
+          return (
+            <Card 
+              className="glass-card" 
+              style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)'
+              }}
+            >
+              <CardContent className="p-6">
+                <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                  Account details
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                    <span className="flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>User ID</span>
+                    <span
+                      className="font-mono text-sm truncate ml-4"
+                      style={{ color: 'var(--text-primary)' }}
+                      title={String(typedUser.id || '')}
+                    >
+                      {String(typedUser.id || 'N/A')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-3">
+                    <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
+                    <span style={{ color: 'var(--text-primary)' }}>
+                      {typedUser.createdAt ? new Date(typedUser.createdAt).toLocaleDateString() : 'N/A'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-3">
-                  <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
-                  <span style={{ color: 'var(--text-primary)' }}>
-                    {(user as any).createdAt ? new Date((user as any).createdAt).toLocaleDateString() : 'N/A'}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         {/* Notification Settings - Only show if notifications can be served */}
         {canShowNotifications && (
