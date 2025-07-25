@@ -30,7 +30,17 @@ import {
   Utensils,
   WashingMachine,
   Bike,
-  Train
+  Train,
+  Users,
+  BookOpen,
+  Coffee,
+  Cigarette,
+  CigaretteOff,
+  Heart,
+  Leaf,
+  Volume2,
+  VolumeX,
+  Sparkle
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
@@ -342,7 +352,7 @@ export default function ListingDetail() {
                   <div className="grid grid-cols-2 gap-3">
                     {typedListing.genderPreference && (
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <Users className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {typedListing.genderPreference.charAt(0).toUpperCase() + typedListing.genderPreference.slice(1)} roommates
                         </span>
@@ -350,7 +360,7 @@ export default function ListingDetail() {
                     )}
                     {typedListing.studentYear && typedListing.studentYear !== 'any' && (
                       <div className="flex items-center gap-2">
-                        <Home className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <GraduationCap className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {typedListing.studentYear.charAt(0).toUpperCase() + typedListing.studentYear.slice(1)} students
                         </span>
@@ -358,7 +368,7 @@ export default function ListingDetail() {
                     )}
                     {typedListing.studyHabits && (
                       <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <BookOpen className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {typedListing.studyHabits.charAt(0).toUpperCase() + typedListing.studyHabits.slice(1)} study habits
                         </span>
@@ -366,7 +376,7 @@ export default function ListingDetail() {
                     )}
                     {typedListing.socialPreferences && (
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                        <Coffee className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                         <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {typedListing.socialPreferences.charAt(0).toUpperCase() + typedListing.socialPreferences.slice(1)} social style
                         </span>
@@ -376,18 +386,41 @@ export default function ListingDetail() {
                   {typedListing.lifestylePreferences && typedListing.lifestylePreferences.length > 0 && (
                     <div className="mt-3">
                       <div className="flex flex-wrap gap-2">
-                        {typedListing.lifestylePreferences.map((pref: string, index: number) => (
-                          <Badge 
-                            key={index} 
-                            className="text-xs border-0" 
-                            style={{
+                        {typedListing.lifestylePreferences.map((pref: string, index: number) => {
+                          // Map lifestyle preferences to icons
+                          const lifestyleIcons: { [key: string]: any } = {
+                            "no_smoking": CigaretteOff,
+                            "pet_friendly": Heart,
+                            "vegetarian": Leaf,
+                            "clean": Sparkle,
+                            "quiet": VolumeX,
+                            "social": Coffee,
+                          };
+                          
+                          const Icon = lifestyleIcons[pref];
+                          const displayName = pref.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                          
+                          return Icon ? (
+                            <div key={index} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs" style={{
                               background: 'var(--surface-secondary)',
                               color: 'var(--text-primary)'
-                            }}
-                          >
-                            {pref.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                          </Badge>
-                        ))}
+                            }}>
+                              <Icon className="w-3 h-3" style={{ color: 'var(--primary)' }} />
+                              <span>{displayName}</span>
+                            </div>
+                          ) : (
+                            <Badge 
+                              key={index} 
+                              className="text-xs border-0" 
+                              style={{
+                                background: 'var(--surface-secondary)',
+                                color: 'var(--text-primary)'
+                              }}
+                            >
+                              {displayName}
+                            </Badge>
+                          );
+                        })}
                       </div>
                     </div>
                   )}

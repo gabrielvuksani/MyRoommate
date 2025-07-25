@@ -111,6 +111,8 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 25, 2025 (Latest):**
+- ✓ **Enhanced lifestyle preference icons with unique context-specific icons**: Updated all lifestyle preference icons to be more unique and meaningful (Users for gender, GraduationCap for student year, BookOpen for study habits, Coffee for social preferences)
+- ✓ **Added iconified lifestyle preference pills**: Lifestyle preference array items now display as enhanced pills with unique icons (CigaretteOff for no smoking, Heart for pet friendly, Leaf for vegetarian, Sparkle for clean, VolumeX for quiet, Coffee for social)
 - ✓ **Fixed persistent TypeScript error in profile.tsx**: Resolved "Type 'unknown' is not assignable to type 'ReactNode'" error on line 550 by wrapping Account Details Card in user conditional and simplifying type expressions
 - ✓ **Enhanced amenity icons in listing detail page**: Updated icons to be more unique for each amenity type (WashingMachine for laundry, Sparkles for natural lighting, Bike for bike storage)
 - ✓ **COMPLETED: Implemented household admin permissions system**: Only household creators (admin role) can see and access the "Delete All Household Data" button
