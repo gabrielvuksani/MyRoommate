@@ -170,29 +170,12 @@ export function AddEvent() {
       {/* visionOS Header */}
       <div className={`floating-header ${headerScrolled ? 'scrolled' : ''}`}>
         <div className="page-header">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <BackButton to="/calendar" />
-              <div>
-                <h1 className="page-title">Create a New Event</h1>
-                <p className="page-subtitle">Add a new calendar event</p>
-              </div>
+          <div className="flex items-center space-x-3">
+            <BackButton to="/calendar" />
+            <div>
+              <h1 className="page-title">Create a New Event</h1>
+              <p className="page-subtitle">Add a new calendar event</p>
             </div>
-            <button
-              onClick={handleCreateEvent}
-              disabled={!canCreateEvent || createEventMutation.isPending}
-              className={`px-6 py-3 rounded-xl font-medium transition-all ${
-                canCreateEvent && !createEventMutation.isPending
-                  ? 'btn-animated text-white shadow-lg hover:scale-[1.05]'
-                  : 'opacity-50 cursor-not-allowed'
-              }`}
-              style={{ 
-                background: canCreateEvent && !createEventMutation.isPending ? 'var(--primary)' : 'var(--surface-secondary)',
-                color: canCreateEvent && !createEventMutation.isPending ? 'white' : 'var(--text-secondary)'
-              }}
-            >
-              {createEventMutation.isPending ? "Adding..." : "Add"}
-            </button>
           </div>
         </div>
       </div>
@@ -562,6 +545,37 @@ export function AddEvent() {
             />
           </CardContent>
         </Card>
+      </div>
+
+      {/* Pinned Create Button Above Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 pointer-events-none">
+        <div className="max-w-[430px] mx-auto px-4 pb-28">
+          <button
+            onClick={handleCreateEvent}
+            disabled={!canCreateEvent || createEventMutation.isPending}
+            className={`w-full py-4 rounded-2xl font-semibold text-base transition-all duration-300 pointer-events-auto transform ${
+              canCreateEvent && !createEventMutation.isPending
+                ? 'hover:scale-[1.02] active:scale-[0.98]'
+                : 'opacity-60 cursor-not-allowed'
+            }`}
+            style={{
+              background: canCreateEvent && !createEventMutation.isPending
+                ? 'linear-gradient(135deg, var(--primary) 0%, #6366f1 100%)'
+                : 'var(--surface-secondary)',
+              color: canCreateEvent && !createEventMutation.isPending
+                ? 'white'
+                : 'var(--text-secondary)',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: canCreateEvent && !createEventMutation.isPending
+                ? '0 8px 32px rgba(59, 130, 246, 0.3), inset 0 2px 12px rgba(255, 255, 255, 0.2)'
+                : '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 2px 8px rgba(255, 255, 255, 0.1)'
+            }}
+          >
+            {createEventMutation.isPending ? "Creating..." : "Create Event"}
+          </button>
+        </div>
       </div>
     </div>
   );
