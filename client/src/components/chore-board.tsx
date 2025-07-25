@@ -203,6 +203,12 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
               
               {/* Category emoji */}
               <span className="text-lg">{getCategoryEmoji(chore.category)}</span>
+              
+              {/* Expandable arrow */}
+              <ChevronDown 
+                size={20} 
+                className={`text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+              />
             </div>
           </div>
           

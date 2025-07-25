@@ -77,10 +77,7 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
 
   return (
     <Card 
-      className={`
-        glass-card relative overflow-hidden transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-lg
-        ${isExpanded ? 'ring-2 ring-blue-500 dark:ring-blue-400 scale-[1.02]' : ''}
-      `}
+      className="glass-card relative overflow-hidden transition-all duration-300 cursor-pointer"
       onClick={() => setIsExpanded(!isExpanded)}
     >
       {/* Settlement progress bar */}

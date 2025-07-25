@@ -158,14 +158,22 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
           </div>
           
           {/* Event type badge */}
-          <div 
-            className="px-2.5 py-1 rounded-lg text-xs font-medium"
-            style={{
-              color: eventConfig.color,
-              background: eventConfig.bg
-            }}
-          >
-            {event.eventType}
+          <div className="flex items-center gap-2">
+            <div 
+              className="px-2.5 py-1 rounded-lg text-xs font-medium"
+              style={{
+                color: eventConfig.color,
+                background: eventConfig.bg
+              }}
+            >
+              {event.eventType}
+            </div>
+            
+            {/* Expandable arrow */}
+            <ChevronDown 
+              size={20} 
+              className={`text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+            />
           </div>
         </div>
         
