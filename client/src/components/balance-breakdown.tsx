@@ -147,13 +147,22 @@ export default function BalanceBreakdown({ expenses, currentUserId, householdMem
                       </p>
                     )}
                   </div>
+                  {isOwedToMe ? (
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(16, 185, 129, 0.1)' }}>
+                      <ArrowRight size={16} className="text-green-500" />
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(239, 68, 68, 0.1)' }}>
+                      <ArrowRight size={16} className="text-red-500 rotate-180" />
+                    </div>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
         
-        <div className="pt-4 space-y-1">
+        <div className="mt-4 pt-4 border-t space-y-1" style={{ borderColor: 'var(--border-color)' }}>
           <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
             These are net balances after simplifying mutual debts
           </p>
