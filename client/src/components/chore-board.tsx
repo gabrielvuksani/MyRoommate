@@ -178,7 +178,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                   {chore.title}
                 </h3>
                 
-                {/* First line: Assignee, Date/Time */}
+                {/* First line: Assignee, Date */}
                 <div className="flex items-center gap-3 mt-1 text-xs text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <User size={12} />
@@ -188,11 +188,6 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                     <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-600 dark:text-red-400 font-medium' : ''}`}>
                       <Calendar size={12} />
                       <span>{formatDate(chore.dueDate)}</span>
-                      {formatTime(chore.dueDate) && (
-                        <span className="text-gray-500 dark:text-gray-400">
-                          • {formatTime(chore.dueDate)}
-                        </span>
-                      )}
                     </div>
                   )}
                 </div>
@@ -295,6 +290,16 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                   </div>
                 )}
                 
+                {chore.dueDate && formatTime(chore.dueDate) && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Time</span>
+                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
+                      <Clock size={12} className="text-gray-500" />
+                      {formatTime(chore.dueDate)}
+                    </p>
+                  </div>
+                )}
+                
                 {chore.recurrence && chore.recurrence !== 'none' && (
                   <div>
                     <span className="text-gray-500 dark:text-gray-400">Recurrence</span>
@@ -320,16 +325,16 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                 )}
               </div>
               
-              {/* Subtasks */}
-              {chore.subtasks && chore.subtasks.length > 0 && (
+              {/* Subtasks - check if array exists and has items */}
+              {chore.subtasks && Array.isArray(chore.subtasks) && chore.subtasks.length > 0 && (
                 <div className="mb-4">
                   <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
-                    Subtasks
+                    Subtasks ({chore.subtasks.length})
                   </h4>
                   <div className="space-y-1">
                     {chore.subtasks.map((subtask: string, idx: number) => (
                       <div key={idx} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                        <Circle size={12} />
+                        <Circle size={12} className="text-gray-400" />
                         <span>{subtask}</span>
                       </div>
                     ))}
@@ -337,13 +342,16 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                 </div>
               )}
               
-              {/* Notes */}
-              {chore.notes && (
+              {/* Notes - check if exists and not empty */}
+              {chore.notes && chore.notes.trim() !== '' && (
                 <div className="mb-4">
-                  <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                  <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1">
+                    <FileText size={12} />
                     Notes
                   </h4>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">{chore.notes}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
+                    {chore.notes}
+                  </p>
                 </div>
               )}
               

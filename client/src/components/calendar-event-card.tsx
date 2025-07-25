@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, MapPin, Users, Repeat, Bell, Trash2, ChevronDown, Circle } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Repeat, Bell, Trash2, ChevronDown, Circle, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface CalendarEventCardProps {
@@ -163,51 +163,77 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
         {/* Expanded content */}
         {isExpanded && (
           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700/50 animate-fade-in ml-11">
-            {event.description && (
+            {/* Location */}
+            {event.location && event.location.trim() !== '' && (
               <div className="mb-3">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <MapPin size={12} />
+                  Location
+                </h4>
+                <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                  {event.location}
+                </p>
+              </div>
+            )}
+            
+            {/* Description */}
+            {event.description && event.description.trim() !== '' && (
+              <div className="mb-3">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                  Description
+                </h4>
                 <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {event.description}
                 </p>
               </div>
             )}
             
-            {event.notes && (
+            {/* Notes */}
+            {event.notes && event.notes.trim() !== '' && (
               <div className="mb-3">
-                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <FileText size={12} />
                   Notes
                 </h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
                   {event.notes}
                 </p>
               </div>
             )}
             
             {/* Attendees */}
-            {event.attendees && event.attendees.length > 0 && (
+            {event.attendees && Array.isArray(event.attendees) && event.attendees.length > 0 && (
               <div className="mb-3">
-                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
-                  Attendees
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1">
+                  <Users size={12} />
+                  Attendees ({event.attendees.length})
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {event.attendees.map((attendee: any, idx: number) => (
-                    <div 
-                      key={idx}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50"
-                    >
+                  {event.attendees.map((attendee: any, idx: number) => {
+                    // Handle both string and object attendees
+                    const attendeeName = typeof attendee === 'string' ? attendee : attendee.name;
+                    const initial = attendeeName?.charAt(0) || '?';
+                    
+                    return (
                       <div 
-                        className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                        style={{
-                          background: `hsl(${(idx * 137.5) % 360}, 70%, 50%)`,
-                          color: 'white'
-                        }}
+                        key={idx}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/50"
                       >
-                        {attendee.name?.charAt(0) || '?'}
+                        <div 
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                          style={{
+                            background: `hsl(${(idx * 137.5) % 360}, 70%, 50%)`,
+                            color: 'white'
+                          }}
+                        >
+                          {initial}
+                        </div>
+                        <span className="text-xs text-gray-700 dark:text-gray-300">
+                          {attendeeName}
+                        </span>
                       </div>
-                      <span className="text-xs text-gray-700 dark:text-gray-300">
-                        {attendee.name}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
