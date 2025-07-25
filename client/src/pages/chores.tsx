@@ -30,10 +30,17 @@ export default function Chores() {
     queryKey: ["/api/households/current"],
   });
 
-  const { data: chores = [], isLoading } = useQuery({
+  const { data: chores = [], isLoading, refetch } = useQuery({
     queryKey: ["/api/chores"],
     enabled: !!household,
   });
+  
+  // Force refetch on mount to get fresh data with all fields
+  useEffect(() => {
+    if (household) {
+      refetch();
+    }
+  }, [household]);
 
   const { data: members = [] } = useQuery({
     queryKey: ["/api/households/current/members"],
