@@ -95,10 +95,8 @@ export function AddEvent() {
 
   const createEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
-      return apiRequest("/api/calendar", {
-        method: "POST",
-        body: JSON.stringify(eventData),
-      });
+      const response = await apiRequest("POST", "/api/calendar", eventData);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
@@ -174,8 +172,8 @@ export function AddEvent() {
             <div className="flex items-center space-x-3">
               <BackButton to="/calendar" />
               <div>
-                <h1 className="page-title">Add Event</h1>
-                <p className="page-subtitle">Create a new calendar event</p>
+                <h1 className="page-title">Create a New Event</h1>
+                <p className="page-subtitle">Add a new calendar event</p>
               </div>
             </div>
             <button

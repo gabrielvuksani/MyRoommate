@@ -82,10 +82,8 @@ export function AddChore() {
 
   const createChoreMutation = useMutation({
     mutationFn: async (choreData: any) => {
-      return apiRequest("/api/chores", {
-        method: "POST",
-        body: JSON.stringify(choreData),
-      });
+      const response = await apiRequest("POST", "/api/chores", choreData);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chores"] });
@@ -160,8 +158,8 @@ export function AddChore() {
             <div className="flex items-center space-x-3">
               <BackButton to="/chores" />
               <div>
-                <h1 className="page-title">Add Chore</h1>
-                <p className="page-subtitle">Create a new household task</p>
+                <h1 className="page-title">Create a New Chore</h1>
+                <p className="page-subtitle">Add a new task</p>
               </div>
             </div>
             <button

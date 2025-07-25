@@ -81,6 +81,12 @@ export const chores = pgTable("chores", {
   recurrenceInterval: integer("recurrence_interval").default(1),
   streak: integer("streak").default(0),
   completedAt: timestamp("completed_at"),
+  priority: varchar("priority").default("medium"), // urgent, high, medium, low
+  category: varchar("category").default("general"), // general, cleaning, cooking, maintenance, shopping, finance
+  estimatedDuration: integer("estimated_duration"), // in minutes
+  notes: text("notes"),
+  subtasks: text("subtasks").array(), // array of subtask strings
+  reminder: varchar("reminder"), // none, ontime, 15min, 30min, 1hour, 1day
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -95,6 +101,9 @@ export const expenses = pgTable("expenses", {
   category: varchar("category"),
   splitType: varchar("split_type").default("equal"), // equal, custom, percentage
   receiptUrl: varchar("receipt_url"),
+  notes: text("notes"),
+  isRecurring: boolean("is_recurring").default(false),
+  recurrenceFrequency: varchar("recurrence_frequency"), // weekly, monthly, quarterly, yearly
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -118,7 +127,14 @@ export const calendarEvents = pgTable("calendar_events", {
   startDate: timestamp("start_date").notNull(),
   endDate: timestamp("end_date"),
   color: varchar("color").default("#007AFF"),
-  type: varchar("type"), // rent, utility, social, chore, bill
+  type: varchar("type"), // rent, utility, social, chore, bill, meeting, personal, other
+  location: text("location"),
+  attendees: text("attendees").array(), // array of user IDs
+  reminder: varchar("reminder"), // none, ontime, 15min, 30min, 1hour, 1day
+  isRecurring: boolean("is_recurring").default(false),
+  recurrencePattern: varchar("recurrence_pattern"), // daily, weekly, monthly, yearly
+  allDay: boolean("all_day").default(false),
+  notes: text("notes"),
   createdBy: varchar("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
 });

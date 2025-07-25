@@ -95,7 +95,28 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                   </span>
                 </>
               )}
+              {chore.estimatedDuration && (
+                <>
+                  <span>•</span>
+                  <span>⏱️ {chore.estimatedDuration} min</span>
+                </>
+              )}
             </div>
+            {chore.category && chore.category !== 'general' && (
+              <div className="mt-2">
+                <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}>
+                  🏷️ {chore.category.charAt(0).toUpperCase() + chore.category.slice(1)}
+                </span>
+              </div>
+            )}
+            {chore.subtasks && chore.subtasks.length > 0 && (
+              <div className="mt-2 text-footnote" style={{ color: 'var(--text-secondary)' }}>
+                <span>📋 {chore.subtasks.filter((st: string) => st).length} subtasks</span>
+              </div>
+            )}
           </div>
           
           <div className="flex flex-col items-end space-y-2">

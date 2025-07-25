@@ -275,14 +275,32 @@ export default function Calendar() {
                         {event.description && (
                           <p className="mb-3" style={{ color: 'var(--text-secondary)' }}>{event.description}</p>
                         )}
+                        {event.location && (
+                          <div className="mb-3 flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            <span>📍</span>
+                            <span>{event.location}</span>
+                          </div>
+                        )}
+                        {event.attendees && event.attendees.length > 0 && (
+                          <div className="mb-3 flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            <span>👥</span>
+                            <span>{event.attendees.length} attendees</span>
+                          </div>
+                        )}
+                        {event.isRecurring && event.recurrencePattern && (
+                          <div className="mb-3 flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            <span>🔄</span>
+                            <span>Repeats {event.recurrencePattern}</span>
+                          </div>
+                        )}
                         <div className="flex items-start flex-wrap gap-2">
                           <div className="px-3 py-2 rounded-xl shadow-sm" style={{ backgroundColor: 'var(--bg-primary)' }}>
                             <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
-                              {new Date(event.startDate).toLocaleTimeString('en-US', {
+                              {event.allDay ? 'All Day' : new Date(event.startDate).toLocaleTimeString('en-US', {
                                 hour: 'numeric',
                                 minute: '2-digit'
                               })}
-                              {event.endDate && (
+                              {event.endDate && !event.allDay && (
                                 <span style={{ color: 'var(--text-secondary)' }}>
                                   {' - '}
                                   {new Date(event.endDate).toLocaleTimeString('en-US', {

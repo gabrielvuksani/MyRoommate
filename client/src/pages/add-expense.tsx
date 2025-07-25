@@ -159,8 +159,8 @@ export default function AddExpense() {
             <div className="flex items-center space-x-3">
               <BackButton to="/expenses" />
               <div>
-                <h1 className="page-title">Add Expense</h1>
-                <p className="page-subtitle">Split a new expense</p>
+                <h1 className="page-title">Create an Expense</h1>
+                <p className="page-subtitle">Add & split a new expense</p>
               </div>
             </div>
             <button

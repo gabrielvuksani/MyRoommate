@@ -72,6 +72,9 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
             </p>
             <p className="text-footnote" style={{ color: 'var(--text-secondary)' }}>
               {new Date(expense.createdAt).toLocaleDateString()}
+              {expense.isRecurring && expense.recurrenceFrequency && (
+                <span> • 🔄 Repeats {expense.recurrenceFrequency}</span>
+              )}
             </p>
           </div>
         </div>
@@ -114,6 +117,14 @@ export default function ExpenseCard({ expense, onSettleExpense, onDeleteExpense,
           )}
         </div>
       </div>
+
+      {expense.notes && (
+        <div className="mb-3 p-3 rounded-lg" style={{ background: 'var(--surface-secondary)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            📝 {expense.notes}
+          </p>
+        </div>
+      )}
 
       {/* Split Details */}
       <div className="space-y-2">
