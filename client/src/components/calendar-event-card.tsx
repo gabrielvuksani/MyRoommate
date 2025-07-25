@@ -115,6 +115,11 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
               <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
                 <Clock size={12} />
                 <span className="font-medium">{formatDateRange()}</span>
+                {event.allDay && (
+                  <span className="px-1.5 py-0.5 rounded text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                    All Day
+                  </span>
+                )}
               </div>
               
               {/* Quick info */}
@@ -133,10 +138,10 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
                   </div>
                 )}
                 
-                {event.isRecurring && (
+                {event.recurrence && event.recurrence !== 'none' && (
                   <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
                     <Repeat size={12} />
-                    <span className="capitalize">{event.recurrencePattern}</span>
+                    <span className="capitalize">{event.recurrence}</span>
                   </div>
                 )}
               </div>
@@ -209,17 +214,39 @@ export default function CalendarEventCard({ event, onDelete, index = 0 }: Calend
             
             {/* Additional info */}
             <div className="space-y-2 text-xs">
-              {event.reminder && (
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <Bell size={12} />
-                  <span>Reminder: {event.reminder} before</span>
-                </div>
-              )}
+              {/* Event details grid */}
+              <div className="grid grid-cols-2 gap-3">
+                {event.startDate && event.endDate && event.startDate !== event.endDate && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Duration</span>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(event.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </p>
+                  </div>
+                )}
+                
+                {event.reminder && event.reminder !== 'none' && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Reminder</span>
+                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
+                      <Bell size={12} className="text-orange-500" />
+                      {event.reminder === '5min' ? '5 minutes' :
+                       event.reminder === '15min' ? '15 minutes' :
+                       event.reminder === '30min' ? '30 minutes' :
+                       event.reminder === '1hour' ? '1 hour' :
+                       event.reminder === '2hours' ? '2 hours' :
+                       event.reminder === '1day' ? '1 day' :
+                       event.reminder === '1week' ? '1 week' :
+                       event.reminder} before
+                    </p>
+                  </div>
+                )}
+              </div>
               
               {event.color && (
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <Circle size={12} fill={event.color} color={event.color} />
-                  <span>Color: {event.color}</span>
+                <div className="flex items-center gap-2 pt-2">
+                  <Circle size={16} fill={event.color} color={event.color} />
+                  <span className="text-gray-600 dark:text-gray-400">Event color</span>
                 </div>
               )}
             </div>

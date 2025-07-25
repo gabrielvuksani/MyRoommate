@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Clock, Calendar, User, CheckCircle2, Circle, PlayCircle, AlertTriangle, Trash2, ChevronDown } from "lucide-react";
+import { Clock, Calendar, User, CheckCircle2, Circle, PlayCircle, AlertTriangle, Trash2, ChevronDown, Timer, Bell, Repeat, Tag, FileText } from "lucide-react";
 import { useLocation } from "wouter";
 
 interface ChoresBoardProps {
@@ -113,6 +113,21 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    
+    // Don't show time if it's 23:59 (default when no time is set)
+    if (hours === 23 && minutes === 59) return null;
+    
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
+
   const ChoreCard = ({ chore }: { chore: any }) => {
     const isExpanded = expandedChore === chore.id;
     const isOverdue = chore.dueDate && new Date(chore.dueDate) < new Date() && chore.status !== 'done';
@@ -163,6 +178,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                   {chore.title}
                 </h3>
                 
+                {/* First line: Assignee, Date/Time */}
                 <div className="flex items-center gap-3 mt-1 text-xs text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <User size={12} />
@@ -172,22 +188,64 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                     <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-600 dark:text-red-400 font-medium' : ''}`}>
                       <Calendar size={12} />
                       <span>{formatDate(chore.dueDate)}</span>
+                      {formatTime(chore.dueDate) && (
+                        <span className="text-gray-500 dark:text-gray-400">
+                          • {formatTime(chore.dueDate)}
+                        </span>
+                      )}
                     </div>
                   )}
+                </div>
+                
+                {/* Second line: Duration, Recurrence, Reminder */}
+                <div className="flex items-center gap-3 mt-1 text-xs">
                   {chore.estimatedDuration && (
-                    <div className="flex items-center gap-1">
-                      <Clock size={12} />
+                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                      <Timer size={12} />
                       <span>{chore.estimatedDuration}m</span>
+                    </div>
+                  )}
+                  {chore.recurrence && chore.recurrence !== 'none' && (
+                    <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                      <Repeat size={12} />
+                      <span className="capitalize">{chore.recurrence}</span>
+                    </div>
+                  )}
+                  {chore.reminder && chore.reminder !== 'none' && (
+                    <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
+                      <Bell size={12} />
+                      <span>{chore.reminder}</span>
                     </div>
                   )}
                 </div>
               </div>
             </div>
             
-            {/* Priority and category */}
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{getCategoryEmoji(chore.category)}</span>
-              <span className="text-base">{getPriorityEmoji(chore.priority)}</span>
+            {/* Priority and category badges */}
+            <div className="flex flex-col items-end gap-1">
+              {/* Priority badge */}
+              <div 
+                className="px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1"
+                style={{
+                  background: chore.priority === 'urgent' ? 'rgba(239, 68, 68, 0.1)' :
+                            chore.priority === 'high' ? 'rgba(251, 146, 60, 0.1)' :
+                            chore.priority === 'medium' ? 'rgba(250, 204, 21, 0.1)' :
+                            'rgba(34, 197, 94, 0.1)',
+                  color: chore.priority === 'urgent' ? '#dc2626' :
+                         chore.priority === 'high' ? '#ea580c' :
+                         chore.priority === 'medium' ? '#ca8a04' :
+                         '#16a34a'
+                }}
+              >
+                <span>{getPriorityEmoji(chore.priority)}</span>
+                <span>{chore.priority?.charAt(0).toUpperCase() + chore.priority?.slice(1) || 'Low'}</span>
+              </div>
+              
+              {/* Category */}
+              <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+                <span className="text-sm">{getCategoryEmoji(chore.category)}</span>
+                <span>{chore.category?.charAt(0).toUpperCase() + chore.category?.slice(1) || 'General'}</span>
+              </div>
             </div>
           </div>
           
@@ -248,6 +306,16 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
                   <div>
                     <span className="text-gray-500 dark:text-gray-400">Reminder</span>
                     <p className="font-medium text-gray-900 dark:text-white">{chore.reminder}</p>
+                  </div>
+                )}
+                
+                {chore.estimatedDuration && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Duration</span>
+                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
+                      <Timer size={12} className="text-gray-500" />
+                      {chore.estimatedDuration} minutes
+                    </p>
                   </div>
                 )}
               </div>
