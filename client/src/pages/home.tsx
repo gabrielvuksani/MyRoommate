@@ -16,6 +16,8 @@ import {
   Search,
   Star,
   Plus,
+  AlertCircle,
+  X,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,7 @@ export default function Home() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [showKickedNotice, setShowKickedNotice] = useState(false);
 
   const { data: household } = useQuery({
     queryKey: ["/api/households/current"],
@@ -75,9 +78,15 @@ export default function Home() {
       setHeaderScrolled(window.scrollY > 10);
     };
 
+    // Check if user was kicked from household
+    const wasKicked = localStorage.getItem('wasKickedFromHousehold');
+    if (wasKicked === 'true' && !household) {
+      setShowKickedNotice(true);
+    }
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [household]);
 
   // Consolidated variables for both household and non-household users
   const activeChores =
@@ -142,6 +151,42 @@ export default function Home() {
         </div>
 
         <div className="content-with-header px-6 space-y-6">
+          {/* Kicked Notice */}
+          {showKickedNotice && (
+            <Card className="glass-card border-orange-200 dark:border-orange-800">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center shadow-lg">
+                      <AlertCircle size={20} className="text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+                        Removed from Household
+                      </h4>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        The household administrator has removed you from your previous household. You can join a new household or find roommates below.
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      setShowKickedNotice(false);
+                      localStorage.removeItem('wasKickedFromHousehold');
+                    }}
+                    className="p-1.5 rounded-lg hover:scale-110 transition-all"
+                    style={{
+                      background: 'var(--surface-secondary)',
+                      border: 'none'
+                    }}
+                  >
+                    <X size={16} style={{ color: 'var(--text-secondary)' }} />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Quick Stats */}
           {(myListings as any[])?.length > 0 && (
             <Card className="glass-card">

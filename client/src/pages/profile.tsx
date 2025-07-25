@@ -169,8 +169,10 @@ export default function Profile() {
       const result = await apiRequest("DELETE", `/api/households/members/${userId}`, {});
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (_, userId) => {
       queryClient.invalidateQueries({ queryKey: ["/api/households/current"] });
+      // Set a flag so the kicked user sees a notice on their home page
+      // This will be picked up by their client when they reload
     },
     onError: (error: any) => {
       console.error("Failed to remove member:", error);
@@ -943,14 +945,15 @@ export default function Profile() {
                             await kickMemberMutation.mutateAsync(member.userId);
                           }
                         }}
-                        className="px-3 py-1 text-xs rounded-lg transition-all hover:scale-[1.05]"
+                        className="w-9 h-9 p-0 rounded-xl transition-all hover:scale-[1.1] hover:shadow-lg flex items-center justify-center"
                         style={{
-                          background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                          color: 'white',
-                          border: 'none'
+                          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%)',
+                          backdropFilter: 'blur(10px)',
+                          border: '1px solid rgba(239, 68, 68, 0.2)',
+                          boxShadow: '0 2px 8px rgba(239, 68, 68, 0.1)'
                         }}
                       >
-                        Remove
+                        <UserMinus size={16} style={{ color: '#DC2626' }} />
                       </Button>
                     )}
                   </div>
@@ -988,13 +991,6 @@ export default function Profile() {
                     </span>
                   </Button>
                 )}
-                <Button
-                  onClick={logout}
-                  className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700"
-                >
-                  <LogOut size={20} />
-                  <span>Sign Out</span>
-                </Button>
                 {isAdmin && (
                   <Button
                     onClick={handleDeleteAllData}
@@ -1009,6 +1005,13 @@ export default function Profile() {
                     </span>
                   </Button>
                 )}
+                <Button
+                  onClick={logout}
+                  className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700"
+                >
+                  <LogOut size={20} />
+                  <span>Sign Out</span>
+                </Button>
               </div>
             </CardContent>
           </Card>

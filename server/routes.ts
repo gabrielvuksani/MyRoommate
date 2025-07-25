@@ -300,6 +300,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove the member
       await storage.removeMemberFromHousehold(membership.household.id, targetUserId);
       
+      // Send push notification to the removed user
+      const adminUser = await storage.getUser(currentUserId);
+      const adminName = adminUser?.firstName || 'The administrator';
+      
+      const pushPayload = {
+        title: '🏠 Removed from Household',
+        body: `${adminName} has removed you from the household`,
+        icon: '/icon-192x192.png',
+        badge: '/icon-72x72.png',
+        tag: 'household-removal',
+        data: {
+          type: 'household-removal',
+          url: '/'
+        }
+      };
+      
+      await sendPushNotification(targetUserId, pushPayload);
+      
+      // Set a flag in the user's session data to show notification
+      // This will be picked up by the frontend
+      
       res.json({ message: "Member removed successfully" });
     } catch (error) {
       console.error("Error removing member:", error);
