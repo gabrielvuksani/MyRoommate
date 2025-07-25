@@ -164,7 +164,7 @@ export default function Expenses() {
           {filteredExpenses.length === 0 ? (
             <Card className="glass-card">
               <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 rounded-xl mx-auto mb-4 flex items-center justify-center" style={{ background: 'var(--surface-secondary)' }}>
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <DollarSign size={32} style={{ color: 'var(--text-secondary)' }} />
                 </div>
                 <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>

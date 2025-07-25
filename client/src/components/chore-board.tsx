@@ -327,7 +327,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
   if (sortedChores.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+        <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
           <CheckCircle2 size={28} style={{ color: 'var(--text-secondary)' }} />
         </div>
         <h4 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>No chores yet</h4>
