@@ -98,3 +98,26 @@ export function getPreviousOnboardingStep(currentStep: number, isReturningUser: 
   }
   return currentStep;
 }
+
+/**
+ * Get profile initials from user object
+ * @param user - User object with firstName, lastName, and email
+ * @returns Two character initials
+ */
+export function getProfileInitials(user: any): string {
+  if (!user) return 'U';
+  
+  const firstName = user.firstName || '';
+  const lastName = user.lastName || '';
+  const email = user.email || '';
+  
+  if (firstName && lastName) {
+    return (firstName[0] + lastName[0]).toUpperCase();
+  } else if (firstName) {
+    return firstName[0].toUpperCase();
+  } else if (email) {
+    return email[0].toUpperCase();
+  }
+  
+  return 'U';
+}

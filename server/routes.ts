@@ -444,7 +444,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         {
           ...validatedExpense,
           householdId: membership.household.id,
-          paidBy: userId,
         },
         splits
       );

@@ -5,13 +5,16 @@ import { Plus, DollarSign } from "lucide-react";
 import { useLocation } from "wouter";
 import { apiRequest } from "../lib/queryClient";
 import ExpenseCard from "../components/expense-card";
+import BalanceBreakdown from "../components/balance-breakdown";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from '@/hooks/use-auth';
 
 export default function Expenses() {
   const [, setLocation] = useLocation();
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "unsettled" | "settled">("all");
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -132,6 +135,15 @@ export default function Expenses() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Who Owes Who Breakdown */}
+        {household?.members && user && (
+          <BalanceBreakdown 
+            expenses={expenses}
+            currentUserId={user.id}
+            householdMembers={household.members}
+          />
+        )}
 
         {/* Filter Tabs */}
         <div className="flex space-x-2 mb-6">

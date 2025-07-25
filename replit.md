@@ -110,7 +110,18 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**January 25, 2025 (Latest - Bug Fixes & Improvements):**
+**January 25, 2025 (Latest - Expense Calculation Fix & Smart Balance Display):**
+- ✓ **Fixed critical expense calculation bug**: Server was overriding `paidBy` field, causing all expenses to be attributed to the creator instead of the actual payer
+- ✓ **Implemented smart "Who Owes Who" breakdown**: Created BalanceBreakdown component that:
+  - Calculates net balances between users (simplifies mutual debts)
+  - Shows clear visual breakdown of who owes whom
+  - Displays "All expenses are settled!" when no outstanding balances
+  - Shows net amounts with detailed breakdowns (e.g., "net of $20.00 - $5.00")
+- ✓ **Enhanced expense tracking accuracy**: Expenses now properly track who actually paid vs who owes money
+- ✓ **Created QuickAvatar component**: Reusable avatar component for consistent user display
+- ✓ **Added getProfileInitials utility**: Properly formats user initials for avatar display
+
+**January 25, 2025 (Earlier - Bug Fixes & Improvements):**
 - ✓ **Fixed calendar event attendees showing "unknown"**: Added missing `/api/households/current/members` endpoint to properly fetch household member data
 - ✓ **Enhanced attendee display**: Calendar events now show profile avatars and full names for all attendees
 - ✓ **Simplified ChoreBoard non-expanded view**: Removed secondary metadata and quick action buttons to reduce clutter per user request
