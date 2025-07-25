@@ -561,15 +561,15 @@ export default function Profile() {
                 <span
                   className="font-mono text-sm truncate ml-4"
                   style={{ color: 'var(--text-primary)' }}
-                  title={(user as any).id}
+                  title={(user as any)?.id}
                 >
-                  {(user as any).id}
+                  {(user as any)?.id}
                 </span>
               </div>
               <div className="flex justify-between items-center py-3">
                 <span style={{ color: 'var(--text-secondary)' }}>Member since</span>
                 <span style={{ color: 'var(--text-primary)' }}>
-                  {new Date((user as any).createdAt).toLocaleDateString()}
+                  {(user as any)?.createdAt ? new Date((user as any).createdAt).toLocaleDateString() : 'N/A'}
                 </span>
               </div>
             </div>
