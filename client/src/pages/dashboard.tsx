@@ -74,7 +74,7 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <BackButton to="/" />
               <div>
-                <h1 className="page-title">Analytics</h1>
+                <h1 className="page-title">Household Dashboard</h1>
                 <p className="page-subtitle">Join a household to view insights</p>
               </div>
             </div>
@@ -209,9 +209,9 @@ export default function Dashboard() {
           <div className="flex items-center space-x-4">
             <BackButton to="/" />
             <div>
-              <h1 className="page-title">Analytics</h1>
+              <h1 className="page-title">Dashboard</h1>
               <p className="page-subtitle">
-                {(household as any).name} insights
+                {(household as any).name} household insights
               </p>
             </div>
           </div>
@@ -334,99 +334,6 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Top Performer & Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top Performer */}
-          {topPerformer && (
-            <Card className="glass-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center space-x-2" style={{ color: "var(--text-primary)" }}>
-                  <Star className="w-5 h-5 text-yellow-500" />
-                  <span>Top Performer</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 pt-0">
-                <div className="flex items-center space-x-4 p-4 rounded-2xl" style={{ background: "var(--surface-secondary)" }}>
-                  <div className="relative">
-                    <QuickAvatar user={topPerformer.user} size="lg" gradientType="emerald" />
-                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-                      <Star className="w-3 h-3 text-yellow-800" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold" style={{ color: "var(--text-primary)" }}>
-                      {topPerformer.user.firstName || topPerformer.user.email?.split("@")[0]}
-                    </h3>
-                    <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                      Most active this {selectedPeriod}
-                    </p>
-                    <div className="flex items-center space-x-4 mt-2">
-                      <div className="text-center">
-                        <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
-                          {topPerformer.activityScore}
-                        </p>
-                        <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                          Activity Score
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-lg font-bold text-emerald-600">
-                          {topPerformer.completionRate.toFixed(0)}%
-                        </p>
-                        <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                          Tasks Done
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Recent Activity */}
-          <Card className="glass-card">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center space-x-2" style={{ color: "var(--text-primary)" }}>
-                <Activity className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                <span>Recent Activity</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 pt-0">
-              <div className="space-y-3 max-h-80 overflow-y-auto">
-                {recentActivity.length > 0 ? recentActivity.map((activity: any, index: number) => {
-                  const IconComponent = activity.icon;
-                  const colorClass = activity.color === 'emerald' ? 'from-emerald-400 to-emerald-600' :
-                                   activity.color === 'blue' ? 'from-blue-400 to-blue-600' :
-                                   'from-purple-400 to-purple-600';
-                  return (
-                    <div key={index} className="flex items-start space-x-3">
-                      <div className={`w-8 h-8 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                        <IconComponent className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate" style={{ color: "var(--text-primary)" }}>
-                          {activity.title}
-                        </p>
-                        <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                          {activity.user} • {format(new Date(activity.time), 'MMM d, h:mm a')}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                }) : (
-                  <div className="text-center py-8">
-                    <Activity className="w-12 h-12 mx-auto mb-3" style={{ color: "var(--text-secondary)" }} />
-                    <p style={{ color: "var(--text-secondary)" }}>
-                      No recent activity
-                    </p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Household Members Performance */}
         {memberPerformance.length > 0 && (
           <Card className="glass-card">
@@ -488,6 +395,98 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         )}
+
+        {/* Top Performer & Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Activity */}
+          <Card className="glass-card">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center space-x-2" style={{ color: "var(--text-primary)" }}>
+                <Activity className="w-5 h-5" style={{ color: "var(--primary)" }} />
+                <span>Recent Activity</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 pt-0">
+              <div className="space-y-3 max-h-80 overflow-y-auto">
+                {recentActivity.length > 0 ? recentActivity.map((activity: any, index: number) => {
+                  const IconComponent = activity.icon;
+                  const colorClass = activity.color === 'emerald' ? 'from-emerald-400 to-emerald-600' :
+                                   activity.color === 'blue' ? 'from-blue-400 to-blue-600' :
+                                   'from-purple-400 to-purple-600';
+                  return (
+                    <div key={index} className="flex items-start space-x-3">
+                      <div className={`w-8 h-8 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                        <IconComponent className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate" style={{ color: "var(--text-primary)" }}>
+                          {activity.title}
+                        </p>
+                        <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                          {activity.user} • {format(new Date(activity.time), 'MMM d, h:mm a')}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                }) : (
+                  <div className="text-center py-8">
+                    <Activity className="w-12 h-12 mx-auto mb-3" style={{ color: "var(--text-secondary)" }} />
+                    <p style={{ color: "var(--text-secondary)" }}>
+                      No recent activity
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+          {/* Top Performer */}
+          {topPerformer && (
+            <Card className="glass-card">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center space-x-2" style={{ color: "var(--text-primary)" }}>
+                  <Star className="w-5 h-5 text-yellow-500" />
+                  <span>Top Performer</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 pt-0">
+                <div className="flex items-center space-x-4 p-4 rounded-2xl" style={{ background: "var(--surface-secondary)" }}>
+                  <div className="relative">
+                    <QuickAvatar user={topPerformer.user} size="lg" gradientType="emerald" />
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                      <Star className="w-3 h-3 text-yellow-800" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold" style={{ color: "var(--text-primary)" }}>
+                      {topPerformer.user.firstName || topPerformer.user.email?.split("@")[0]}
+                    </h3>
+                    <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                      Most active this {selectedPeriod}
+                    </p>
+                    <div className="flex items-center space-x-4 mt-2">
+                      <div className="text-center">
+                        <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+                          {topPerformer.activityScore}
+                        </p>
+                        <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                          Activity Score
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-lg font-bold text-emerald-600">
+                          {topPerformer.completionRate.toFixed(0)}%
+                        </p>
+                        <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                          Tasks Done
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
 
         {/* Quick Actions */}
         <Card className="glass-card">
