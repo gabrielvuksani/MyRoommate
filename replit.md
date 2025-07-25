@@ -111,10 +111,24 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 25, 2025 (Latest):**
+- ✓ **CRITICAL FIX: Resolved expense page layout issues**: Fixed absolute positioning bug that caused multiple expense cards to overlap - cards now display properly with sequential layout
+- ✓ **Enhanced chore card legibility**: Increased card transparency from 0.8/0.6 to 0.95/0.85 opacity for significantly better text readability while maintaining premium glass morphism aesthetic
+- ✓ **Creative calendar event card redesign**: 
+  - ✓ Replaced stacked cards with individual event cards featuring gradient time strips
+  - ✓ Added vibrant category-specific gradients (meeting: blue-cyan, appointment: purple-pink, social: orange-rose, personal: emerald-teal)
+  - ✓ Implemented pattern overlays and glow effects for enhanced visual depth
+  - ✓ Time information prominently displayed in colored header strip with icon
+  - ✓ Streamlined expand/collapse with three-dot menu instead of chevron
+  - ✓ Improved information hierarchy with chips for location, attendees, and recurring status
+- ✓ **Simplified event card interactions**: Removed complex stacking animations for better performance and cleaner UX
+- ✓ **Updated calendar rendering**: Switched from fixed-height stacked layout to dynamic space-y-3 list layout for better scalability
+- ✓ **Maintained security and scalability**: All changes preserve PWA functionality, secure authentication, and million-user scalability requirements
+
+**January 25, 2025 (Earlier):**
 - ✓ **PREMIUM REDESIGN: Implemented Apple Wallet-style stacked card interfaces across all core components**:
   - ✓ **ChoreBoard component**: Complete redesign with Apple Wallet-style stacked cards using framer-motion, sophisticated 3D transforms, spring animations, and premium glass morphism
   - ✓ **ExpenseCard component**: Premium redesign with liquid animations, category-specific gradients, settlement progress bars, and Apple-inspired expand/collapse interactions
-  - ✓ **Calendar component**: Full premium overhaul with stacked event cards, enhanced calendar grid with motion animations, and sophisticated date selection effects
+  - ✓ **Calendar component**: Full premium overhaul with enhanced calendar grid with motion animations, and sophisticated date selection effects
 - ✓ **Enhanced visual hierarchy**: All components now feature gradient category icons, sophisticated shadow systems, and liquid glass effects inspired by visionOS and iOS 26
 - ✓ **Improved animations**: Spring-based card stacking, 3D perspective transforms, smooth expand/collapse transitions, and premium interaction feedback
 - ✓ **Consistent design language**: Unified glass morphism effects, backdrop blur, gradient accents, and premium typography across all components

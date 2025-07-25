@@ -44,46 +44,41 @@ const CalendarEventCard = ({
       case 'meeting':
         return {
           icon: '👥',
-          gradient: 'from-blue-500 to-cyan-500',
-          bgLight: 'bg-blue-50',
-          bgDark: 'bg-blue-950/20',
-          textColor: 'text-blue-600 dark:text-blue-400',
+          gradient: 'from-blue-500 via-blue-600 to-cyan-500',
+          glow: 'rgba(59, 130, 246, 0.4)',
+          pattern: 'bg-gradient-to-br from-blue-400/20 via-transparent to-cyan-400/20',
           color: '#3B82F6'
         };
       case 'appointment':
         return {
           icon: '📅',
-          gradient: 'from-purple-500 to-pink-500',
-          bgLight: 'bg-purple-50',
-          bgDark: 'bg-purple-950/20',
-          textColor: 'text-purple-600 dark:text-purple-400',
+          gradient: 'from-purple-500 via-fuchsia-500 to-pink-500',
+          glow: 'rgba(168, 85, 247, 0.4)',
+          pattern: 'bg-gradient-to-br from-purple-400/20 via-transparent to-pink-400/20',
           color: '#8B5CF6'
         };
       case 'social':
         return {
           icon: '🎉',
-          gradient: 'from-orange-500 to-amber-500',
-          bgLight: 'bg-orange-50',
-          bgDark: 'bg-orange-950/20',
-          textColor: 'text-orange-600 dark:text-orange-400',
+          gradient: 'from-orange-500 via-rose-500 to-pink-500',
+          glow: 'rgba(251, 146, 60, 0.4)',
+          pattern: 'bg-gradient-to-br from-orange-400/20 via-transparent to-rose-400/20',
           color: '#F97316'
         };
       case 'personal':
         return {
           icon: '⭐',
-          gradient: 'from-green-500 to-emerald-500',
-          bgLight: 'bg-green-50',
-          bgDark: 'bg-green-950/20',
-          textColor: 'text-green-600 dark:text-green-400',
+          gradient: 'from-emerald-500 via-green-500 to-teal-500',
+          glow: 'rgba(16, 185, 129, 0.4)',
+          pattern: 'bg-gradient-to-br from-emerald-400/20 via-transparent to-teal-400/20',
           color: '#10B981'
         };
       default:
         return {
           icon: '📍',
-          gradient: 'from-gray-500 to-gray-600',
-          bgLight: 'bg-gray-50',
-          bgDark: 'bg-gray-800/20',
-          textColor: 'text-gray-600 dark:text-gray-400',
+          gradient: 'from-gray-500 via-slate-600 to-gray-700',
+          glow: 'rgba(107, 114, 128, 0.4)',
+          pattern: 'bg-gradient-to-br from-gray-400/20 via-transparent to-slate-400/20',
           color: '#6B7280'
         };
     }
@@ -91,11 +86,6 @@ const CalendarEventCard = ({
   
   const typeConfig = getEventTypeConfig(event.type);
   const eventColor = event.color || typeConfig.color;
-  
-  // Calculate card offset for stacking effect
-  const cardOffset = isActive ? 0 : (index - (isActive ? 1 : 0)) * 12;
-  const scale = isActive ? 1 : 1 - (index * 0.02);
-  const zIndex = totalCards - index;
   
   const handleDelete = () => {
     if (onDelete) {
@@ -105,256 +95,170 @@ const CalendarEventCard = ({
 
   return (
     <motion.div
-      className="absolute inset-x-0 top-0 cursor-pointer"
+      className="mb-3 cursor-pointer"
       initial={{ 
-        y: 100, 
+        y: 30, 
         opacity: 0,
         scale: 0.95 
       }}
       animate={{ 
-        y: cardOffset,
-        scale: isActive ? 1.02 : scale,
-        opacity: 1,
-        rotateX: isActive ? 0 : -5
-      }}
-      exit={{ 
-        x: 300,
-        opacity: 0,
-        scale: 0.8,
-        rotate: 15
+        y: 0,
+        scale: 1,
+        opacity: 1
       }}
       transition={{ 
         type: "spring", 
         stiffness: 300, 
-        damping: 30 
+        damping: 30,
+        delay: index * 0.05
       }}
-      style={{ 
-        zIndex,
-        transformStyle: 'preserve-3d',
-        perspective: '1000px'
-      }}
-      onClick={() => !isActive && onActivate && onActivate()}
     >
       <div 
         className={`
-          relative overflow-hidden rounded-3xl mx-6
-          ${isActive ? 'shadow-2xl' : 'shadow-lg'}
-          transition-all duration-500
+          relative overflow-hidden rounded-2xl
+          shadow-md hover:shadow-xl
+          transition-all duration-300 hover:scale-[1.02]
+          ${isActive ? 'ring-2 ring-offset-2' : ''}
         `}
         style={{
-          background: 'var(--glass-card)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid var(--glass-border)',
-          minHeight: '180px',
-          transform: isActive ? 'translateZ(50px)' : 'translateZ(0)',
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+          backdropFilter: 'blur(20px) saturate(1.8)',
+          WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+          border: '1px solid rgba(255, 255, 255, 0.5)',
+          boxShadow: isActive ? `0 10px 40px ${typeConfig.glow}` : undefined,
+          ringColor: eventColor
         }}
+        onClick={onActivate}
       >
-        {/* Event color accent */}
-        <div 
-          className="absolute top-0 left-0 w-1 h-full opacity-80"
-          style={{ backgroundColor: eventColor }}
-        />
+        {/* Pattern overlay */}
+        <div className={`absolute inset-0 opacity-30 ${typeConfig.pattern}`} />
+        
+        {/* Time strip */}
+        <div className={`absolute top-0 left-0 right-0 h-12 bg-gradient-to-r ${typeConfig.gradient} opacity-90`}>
+          <div className="flex items-center justify-between h-full px-4">
+            <div className="flex items-center gap-2">
+              <Clock size={14} className="text-white/80" />
+              <span className="text-sm font-medium text-white">
+                {event.allDay ? 'All Day' : new Date(event.startDate).toLocaleTimeString('en-US', {
+                  hour: 'numeric',
+                  minute: '2-digit'
+                })}
+              </span>
+            </div>
+            <span className="text-2xl">{typeConfig.icon}</span>
+          </div>
+        </div>
         
         {/* Main content */}
-        <div className="p-5 pl-6">
+        <div className="pt-14 p-4">
           <div className="flex items-start justify-between gap-4">
             {/* Left side - event info */}
-            <div className="flex items-start gap-4 flex-1">
-              {/* Type icon */}
-              <div className={`
-                w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0
-                bg-gradient-to-br ${typeConfig.gradient} shadow-lg
-                transform transition-transform duration-300
-                ${isActive ? 'scale-110' : 'scale-100'}
-              `}>
-                <span className="text-white text-xl">{typeConfig.icon}</span>
-              </div>
+            <div className="flex-1">
               
-              {/* Event details */}
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                  {event.title}
-                </h3>
-                
-                {event.description && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                    {event.description}
-                  </p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                {event.title}
+              </h3>
+              
+              {event.description && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
+                  {event.description}
+                </p>
+              )}
+              
+              {/* Info chips */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Location */}
+                {event.location && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-xs">
+                    <MapPin size={12} />
+                    <span className="truncate max-w-[120px]">{event.location}</span>
+                  </div>
                 )}
                 
-                {/* Meta information */}
-                <div className="flex flex-wrap items-center gap-3 text-sm">
-                  {/* Time */}
-                  <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                    <Clock size={14} />
-                    <span>
-                      {event.allDay ? 'All Day' : new Date(event.startDate).toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit'
-                      })}
-                      {event.endDate && !event.allDay && (
-                        <span className="text-gray-500 dark:text-gray-500">
-                          {' - '}
-                          {new Date(event.endDate).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                      )}
-                    </span>
+                {/* Attendees */}
+                {event.attendees && event.attendees.length > 0 && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-xs">
+                    <Users size={12} />
+                    <span>{event.attendees.length}</span>
                   </div>
-                  
-                  {/* Location */}
-                  {event.location && (
-                    <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                      <MapPin size={14} />
-                      <span className="truncate max-w-[150px]">{event.location}</span>
-                    </div>
-                  )}
-                  
-                  {/* Attendees */}
-                  {event.attendees && event.attendees.length > 0 && (
-                    <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                      <Users size={14} />
-                      <span>{event.attendees.length} attendees</span>
-                    </div>
-                  )}
-                </div>
+                )}
                 
-                {/* Tags */}
-                <div className="flex flex-wrap items-center gap-2 mt-3">
-                  {/* Type badge */}
-                  <div className={`
-                    flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
-                    ${typeConfig.bgLight} dark:${typeConfig.bgDark} ${typeConfig.textColor}
-                  `}>
-                    <span className="capitalize">{event.type || 'Event'}</span>
+                {/* Recurring */}
+                {event.isRecurring && event.recurrencePattern && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-xs text-blue-700 dark:text-blue-300">
+                    <Repeat size={12} />
+                    <span className="capitalize">{event.recurrencePattern}</span>
                   </div>
-                  
-                  {/* Recurring badge */}
-                  {event.isRecurring && event.recurrencePattern && (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
-                      <Repeat size={12} />
-                      <span className="capitalize">{event.recurrencePattern}</span>
-                    </div>
-                  )}
-                  
-                  {/* Reminder badge */}
-                  {event.reminderMinutes && (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                      <Bell size={12} />
-                      <span>{event.reminderMinutes}m reminder</span>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             </div>
             
             {/* Right side - actions */}
-            {isActive && (
-              <div className="flex items-start gap-2">
-                <motion.button
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsExpanded(!isExpanded);
-                  }}
-                  className={`
-                    p-2 rounded-xl transition-all duration-200
-                    ${isExpanded ? 'bg-gradient-to-r ' + typeConfig.gradient + ' text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}
-                  `}
-                  style={{
-                    background: isExpanded ? undefined : 'var(--surface-secondary)'
-                  }}
-                >
-                  <ChevronRight 
-                    size={16} 
-                    className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
-                  />
-                </motion.button>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsExpanded(!isExpanded);
+                }}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                <MoreVertical size={16} className="text-gray-600 dark:text-gray-400" />
+              </button>
+            </div>
           </div>
         </div>
         
         {/* Expanded content */}
         <AnimatePresence>
-          {isActive && isExpanded && (
+          {isExpanded && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="px-6 pb-6 space-y-4">
-                {/* Notes */}
-                {event.notes && (
-                  <div className="p-4 rounded-2xl" style={{ background: 'var(--surface-secondary)' }}>
-                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
-                      Notes
-                    </p>
-                    <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
-                      {event.notes}
-                    </p>
-                  </div>
-                )}
-                
-                {/* Full attendees list */}
-                {event.attendees && event.attendees.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Attendees</h4>
-                    <div className="space-y-2">
-                      {event.attendees.map((attendee: string, idx: number) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-xs font-medium text-gray-700 dark:text-gray-300">
-                            {attendee.charAt(0).toUpperCase()}
-                          </div>
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{attendee}</span>
-                        </div>
-                      ))}
-                    </div>
+              <div className="px-4 pb-4 pt-2 space-y-3 border-t border-gray-200 dark:border-gray-700">
+                {/* Reminder info */}
+                {event.reminderMinutes && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <Bell size={14} />
+                    <span>Reminder set for {event.reminderMinutes} minutes before</span>
                   </div>
                 )}
                 
                 {/* Delete button */}
-                <div className="pt-2">
+                <div className="flex justify-end">
                   {!showDeleteConfirm ? (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setShowDeleteConfirm(true);
                       }}
-                      className="w-full p-3 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 flex items-center justify-center gap-2"
+                      className="text-sm text-red-600 hover:text-red-700 transition-colors"
                     >
-                      <Trash2 size={18} />
-                      <span className="text-sm font-medium">Delete Event</span>
+                      Delete Event
                     </button>
                   ) : (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete();
-                        }}
-                        className="flex-1 p-3 rounded-xl bg-red-600 text-white font-medium text-sm hover:bg-red-700 transition-colors"
-                      >
-                        Confirm Delete
-                      </button>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Delete?</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowDeleteConfirm(false);
                         }}
-                        className="flex-1 p-3 rounded-xl text-sm font-medium transition-colors"
-                        style={{ 
-                          background: 'var(--surface-secondary)',
-                          color: 'var(--text-primary)'
-                        }}
+                        className="px-2 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
                       >
                         Cancel
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete();
+                        }}
+                        className="px-2 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
+                      >
+                        Delete
                       </button>
                     </div>
                   )}
@@ -609,20 +513,18 @@ export default function Calendar() {
                 </button>
               </div>
             ) : (
-              <div className="relative" style={{ minHeight: `${Math.max(200, 180 + (getDayEvents(selectedDate.getDate()).length - 1) * 12)}px` }}>
-                <AnimatePresence>
-                  {getDayEvents(selectedDate.getDate()).map((event: any, index: number) => (
-                    <CalendarEventCard 
-                      key={event.id} 
-                      event={event} 
-                      onDelete={handleDeleteEvent} 
-                      index={index}
-                      totalCards={getDayEvents(selectedDate.getDate()).length}
-                      isActive={activeEventIndex === index}
-                      onActivate={() => setActiveEventIndex(index)}
-                    />
-                  ))}
-                </AnimatePresence>
+              <div className="space-y-3">
+                {getDayEvents(selectedDate.getDate()).map((event: any, index: number) => (
+                  <CalendarEventCard 
+                    key={event.id} 
+                    event={event} 
+                    onDelete={handleDeleteEvent} 
+                    index={index}
+                    totalCards={getDayEvents(selectedDate.getDate()).length}
+                    isActive={activeEventIndex === index}
+                    onActivate={() => setActiveEventIndex(index)}
+                  />
+                ))}
               </div>
             )}
           </div>

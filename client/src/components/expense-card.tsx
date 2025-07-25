@@ -155,17 +155,16 @@ export default function ExpenseCard({
 
   return (
     <motion.div
-      className="absolute inset-x-0 top-0 cursor-pointer"
+      className="cursor-pointer"
       initial={{ 
-        y: 100, 
+        y: 50, 
         opacity: 0,
         scale: 0.95 
       }}
       animate={{ 
-        y: cardOffset,
-        scale: isActive ? 1.02 : scale,
-        opacity: 1,
-        rotateX: isActive ? 0 : -5
+        y: 0,
+        scale: 1,
+        opacity: 1
       }}
       exit={{ 
         x: 300,
@@ -176,28 +175,25 @@ export default function ExpenseCard({
       transition={{ 
         type: "spring", 
         stiffness: 300, 
-        damping: 30 
+        damping: 30,
+        delay: index * 0.05
       }}
       style={{ 
-        zIndex,
-        transformStyle: 'preserve-3d',
-        perspective: '1000px'
+        zIndex: 1
       }}
-      onClick={() => !isActive && onActivate && onActivate()}
     >
       <div 
         className={`
-          relative overflow-hidden rounded-3xl mx-6
-          ${isActive ? 'shadow-2xl' : 'shadow-lg'}
+          relative overflow-hidden rounded-2xl
+          shadow-lg hover:shadow-xl
           transition-all duration-500
         `}
         style={{
-          background: 'var(--glass-card)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid var(--glass-border)',
-          minHeight: '220px',
-          transform: isActive ? 'translateZ(50px)' : 'translateZ(0)',
+          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85))',
+          backdropFilter: 'blur(20px) saturate(1.8)',
+          WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+          border: '1px solid rgba(255, 255, 255, 0.5)',
+          minHeight: '160px'
         }}
       >
         {/* Gradient accent bar */}
@@ -207,37 +203,36 @@ export default function ExpenseCard({
         />
         
         {/* Main content */}
-        <div className="p-6">
+        <div className="p-5">
           {/* Header */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-4">
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-3">
               <div 
                 className={`
-                  w-14 h-14 rounded-2xl flex items-center justify-center
+                  w-12 h-12 rounded-xl flex items-center justify-center
                   bg-gradient-to-br ${categoryConfig.gradient}
-                  shadow-lg transform transition-transform duration-300
-                  ${isActive ? 'scale-110' : 'scale-100'}
+                  shadow-md
                 `}
               >
-                <span className="text-2xl">{categoryConfig.emoji}</span>
+                <span className="text-xl">{categoryConfig.emoji}</span>
               </div>
               
               <div>
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                   {expense.title}
                 </h3>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   {expense.creator?.firstName || expense.creator?.email?.split('@')[0]} • {new Date(expense.createdAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
             
             <div className="text-right">
-              <p className="text-2xl font-bold" style={{ color: categoryConfig.color }}>
+              <p className="text-xl font-bold" style={{ color: categoryConfig.color }}>
                 ${expense.amount.toFixed(2)}
               </p>
               {expense.isRecurring && (
-                <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
                   <Repeat size={12} />
                   <span>Monthly</span>
                 </div>
@@ -288,34 +283,30 @@ export default function ExpenseCard({
           </div>
           
           {/* Expand button */}
-          {isActive && (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsExpanded(!isExpanded);
-              }}
-              className={`
-                absolute bottom-4 right-4 p-2 rounded-xl
-                transition-all duration-200
-                ${isExpanded ? 'bg-gradient-to-r ' + categoryConfig.gradient + ' text-white' : ''}
-              `}
-              style={{
-                background: isExpanded ? undefined : 'var(--surface-secondary)'
-              }}
-            >
-              <ChevronRight 
-                size={20} 
-                className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
-              />
-            </motion.button>
-          )}
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
+            className={`
+              absolute bottom-4 right-4 p-2 rounded-xl
+              transition-all duration-200 hover:scale-110
+              ${isExpanded ? 'bg-gradient-to-r ' + categoryConfig.gradient + ' text-white shadow-md' : 'bg-white/50 dark:bg-gray-800/50'}
+            `}
+          >
+            <ChevronRight 
+              size={18} 
+              className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+              style={{ color: isExpanded ? 'white' : 'var(--text-secondary)' }}
+            />
+          </motion.button>
         </div>
         
         {/* Expanded content */}
         <AnimatePresence>
-          {isActive && isExpanded && (
+          {isExpanded && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}

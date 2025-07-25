@@ -143,11 +143,11 @@ export default function ChoreCard({
         style={{
           borderRadius: '24px',
           background: `linear-gradient(135deg, 
-            rgba(255, 255, 255, ${chore.status === 'done' ? '0.4' : '0.8'}) 0%, 
-            rgba(255, 255, 255, ${chore.status === 'done' ? '0.2' : '0.6'}) 100%)`,
-          backdropFilter: 'blur(40px) saturate(1.8)',
-          WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
+            rgba(255, 255, 255, ${chore.status === 'done' ? '0.6' : '0.95'}) 0%, 
+            rgba(255, 255, 255, ${chore.status === 'done' ? '0.4' : '0.85'}) 100%)`,
+          backdropFilter: 'blur(20px) saturate(1.5)',
+          WebkitBackdropFilter: 'blur(20px) saturate(1.5)',
+          border: '1px solid rgba(255, 255, 255, 0.5)',
           transition: 'all 0.3s ease'
         }}
       >

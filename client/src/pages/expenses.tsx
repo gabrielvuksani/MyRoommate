@@ -192,16 +192,13 @@ export default function Expenses() {
             </CardContent>
           </Card>
         ) : (
-          <div className="relative" style={{ minHeight: `${Math.max(250, 220 + (filteredExpenses.length - 1) * 12)}px` }}>
+          <div className="space-y-4">
             <AnimatePresence>
               {filteredExpenses.map((expense: any, index: number) => (
                 <ExpenseCard
                   key={expense.id}
                   expense={expense}
                   index={index}
-                  totalCards={filteredExpenses.length}
-                  isActive={activeExpenseIndex === index}
-                  onActivate={() => setActiveExpenseIndex(index)}
                   onSettleExpense={handleSettleExpense}
                   onDeleteExpense={handleDeleteExpense}
                 />
