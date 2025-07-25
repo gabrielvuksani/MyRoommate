@@ -1020,13 +1020,6 @@ export default function Profile() {
                     </span>
                   </Button>
                 )}
-                <Button
-                  onClick={logout}
-                  className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700"
-                >
-                  <LogOut size={20} />
-                  <span>Sign Out</span>
-                </Button>
               </div>
             </CardContent>
           </Card>
@@ -1079,6 +1072,22 @@ export default function Profile() {
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+        
+        {/* Sign Out - Always visible */}
+        <Card className="glass-card" style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)'
+        }}>
+          <CardContent className="p-6">
+            <Button
+              onClick={logout}
+              className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-red-700"
+            >
+              <LogOut size={20} />
+              <span>Sign Out</span>
+            </Button>
           </CardContent>
         </Card>
       </div>

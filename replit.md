@@ -110,7 +110,15 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 
 ## Recent Changes
 
-**July 25, 2025 (Latest - Household Insights Redesign):**
+**July 25, 2025 (Latest - Sign Out & Real-Time Fixes):**
+- ✓ **Fixed sign out button visibility**: Sign out button now appears in separate card and is always visible regardless of household status
+- ✓ **Enhanced WebSocket real-time messaging**: Verified WebSocket implementation works with both HTTP (ws://) and HTTPS (wss://) protocols
+- ✓ **Production-ready real-time architecture**: WebSocket connects to /ws endpoint on same host for compatibility across all environments
+- ✓ **Dual-mode message delivery**: Messages sent via POST API with WebSocket broadcast for instant updates, API polling as fallback
+- ✓ **Fixed scalability issues**: Removed 15-minute notification refresh interval that was causing unnecessary server load
+- ✓ **Optimized service worker**: Fixed initialization loops and improved refresh mechanism for better performance
+
+**July 25, 2025 (Earlier - Household Insights Redesign):**
 - ✓ **Major household insights redesign**: Streamlined insights section by removing redundant cards (balance, active tasks, expense history) that duplicate information shown elsewhere
 - ✓ **Enhanced analytics layout**: Updated to 2-column grid showing completion rate and top performer with detailed member performance charts
 - ✓ **Improved information hierarchy**: Focused insights on unique analytics not displayed in other sections for cleaner user experience
