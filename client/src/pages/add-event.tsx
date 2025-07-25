@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import BackButton from "@/components/back-button";
+import { useAuth } from "@/hooks/use-auth";
 
 interface NewEvent {
   title: string;
@@ -48,6 +49,7 @@ interface NewEvent {
 export function AddEvent() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const today = new Date().toISOString().split('T')[0];
   const currentTime = new Date().toTimeString().slice(0, 5);
@@ -92,6 +94,16 @@ export function AddEvent() {
   });
 
   const householdMembers = (household as any)?.members || [];
+
+  // Automatically select the current user as an attendee
+  useEffect(() => {
+    if (user && householdMembers.length > 0 && newEvent.attendees.length === 0) {
+      setNewEvent(prev => ({
+        ...prev,
+        attendees: [user.id]
+      }));
+    }
+  }, [user, householdMembers]);
 
   const createEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
