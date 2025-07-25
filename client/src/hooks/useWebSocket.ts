@@ -29,6 +29,9 @@ export function useWebSocket({ onMessage, onConnect, onDisconnect, userId, house
     let isManualClose = false;
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 10;
+    
+    // Initial connection status callback
+    onDisconnect?.();
 
     const connect = () => {
       if (ws.current?.readyState === WebSocket.OPEN) {

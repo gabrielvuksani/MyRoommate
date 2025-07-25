@@ -43,7 +43,7 @@ export default function Messages() {
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  // Connection status - starts optimistic when user and household are available
+  // Connection status
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -61,12 +61,13 @@ export default function Messages() {
     retryDelay: 1000,
   }) as { data: any };
 
-  const { data: serverMessages = [], isLoading } = useQuery({
+  const { data: serverMessages = [], isLoading, error } = useQuery({
     queryKey: ["/api/messages"],
     enabled: !!household && !!user,
-    // No polling needed - push notifications handle real-time updates
+    // No polling - WebSocket handles real-time updates
     refetchInterval: false,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true, // Refresh when tab becomes active
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -85,6 +86,7 @@ export default function Messages() {
     onConnect: () => {
       console.log('WebSocket connected successfully');
       setConnectionStatus('connected');
+      // Sync messages on reconnect
       queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
     },
     onDisconnect: () => {
@@ -178,6 +180,13 @@ export default function Messages() {
     userId: user?.id,
     householdId: household?.id,
   });
+  
+  // Update connection status to 'connecting' when we have user and household
+  useEffect(() => {
+    if (user?.id && household?.id) {
+      setConnectionStatus('connecting');
+    }
+  }, [user?.id, household?.id]);
 
   // Premium scroll system - ensures latest message is always fully visible
   const scrollToBottom = (options: { force?: boolean; smooth?: boolean; keyboardAware?: boolean } = {}) => {
@@ -388,29 +397,27 @@ export default function Messages() {
       return response.json();
     },
     onSuccess: (newMessage: any) => {
-      console.log('Message sent via API fallback:', newMessage.id);
+      console.log('Message sent successfully:', newMessage.id);
       
-      // If WebSocket is not connected, update cache directly for immediate UI feedback
-      if (connectionStatus !== 'connected') {
-        queryClient.setQueryData(["/api/messages"], (old: any) => {
-          const currentMessages = old || [];
-          // Check if message already exists to prevent duplicates
-          const messageExists = currentMessages.some((msg: any) => msg.id === newMessage.id);
-          if (!messageExists) {
-            return [...currentMessages, newMessage];
-          }
-          return currentMessages;
-        });
-      }
-      
-      // Force immediate refresh to show the new message
-      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
-      
-      // Send via WebSocket for other clients
-      sendMessage?.({
-        type: "new_message",
-        message: newMessage,
+      // Update cache immediately for instant UI feedback
+      queryClient.setQueryData(["/api/messages"], (old: any) => {
+        const currentMessages = old || [];
+        // Check if message already exists to prevent duplicates
+        const messageExists = currentMessages.some((msg: any) => msg.id === newMessage.id);
+        if (!messageExists) {
+          return [...currentMessages, newMessage];
+        }
+        return currentMessages;
       });
+      
+      // Invalidate to ensure sync with server
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/messages"],
+        refetchType: 'none' // Don't refetch immediately, rely on WebSocket for real-time updates
+      });
+      
+      // Note: Server will broadcast via WebSocket to all clients including sender
+      // No need to manually send via WebSocket here
       
       // Auto-scroll to new message
       setTimeout(() => {
@@ -445,25 +452,9 @@ export default function Messages() {
     // Clear input immediately for better UX
     setNewMessage("");
 
-    // Try WebSocket first if connected, fallback to API
-    if (connectionStatus === 'connected' && sendMessage) {
-      try {
-        sendMessage({
-          type: "send_message",
-          content: messageContent,
-          householdId: household.id,
-          userId: user.id,
-        });
-        console.log('Message sent via WebSocket');
-      } catch (error) {
-        console.error('WebSocket send failed, falling back to API:', error);
-        sendMessageMutation.mutate(messageContent);
-      }
-    } else {
-      // Use API when WebSocket is not available
-      console.log('Using API fallback for message send');
-      sendMessageMutation.mutate(messageContent);
-    }
+    // For production reliability, always use API as primary method
+    // WebSocket will broadcast for real-time updates
+    sendMessageMutation.mutate(messageContent);
   };
 
   const conversationStarters = [
