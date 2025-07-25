@@ -111,6 +111,13 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 25, 2025 (Latest):**
+- ✓ **PREMIUM REDESIGN: Implemented Apple Wallet-style stacked card interfaces across all core components**:
+  - ✓ **ChoreBoard component**: Complete redesign with Apple Wallet-style stacked cards using framer-motion, sophisticated 3D transforms, spring animations, and premium glass morphism
+  - ✓ **ExpenseCard component**: Premium redesign with liquid animations, category-specific gradients, settlement progress bars, and Apple-inspired expand/collapse interactions
+  - ✓ **Calendar component**: Full premium overhaul with stacked event cards, enhanced calendar grid with motion animations, and sophisticated date selection effects
+- ✓ **Enhanced visual hierarchy**: All components now feature gradient category icons, sophisticated shadow systems, and liquid glass effects inspired by visionOS and iOS 26
+- ✓ **Improved animations**: Spring-based card stacking, 3D perspective transforms, smooth expand/collapse transitions, and premium interaction feedback
+- ✓ **Consistent design language**: Unified glass morphism effects, backdrop blur, gradient accents, and premium typography across all components
 - ✓ **Fixed pinned Create buttons on add pages**: Moved Create buttons from headers to fixed position above bottom navigation on add-chore, add-event, and add-expense pages
 - ✓ **Fixed API call format**: Updated chore and event creation to use correct apiRequest format (method, url, data) matching expense page implementation
 - ✓ **Added bottom spacing**: Added pb-32 padding to all three add pages to ensure content isn't hidden behind pinned Create button
