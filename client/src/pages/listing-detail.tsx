@@ -191,31 +191,40 @@ export default function ListingDetail() {
         {/* Main Details Card */}
         <Card className="glass-card">
           <CardContent className="p-6 space-y-6">
-            {/* Title and Price */}
+            {/* Title */}
             <div>
-              <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+              <h1 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
                 {typedListing.title}
               </h1>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-lg" style={{ color: 'var(--text-secondary)' }}>
-                  <MapPin className="w-5 h-5" />
-                  <span>
-                    {typedListing.location}, {typedListing.city}
-                    {typedListing.state && `, ${typedListing.state}`}
-                    {typedListing.zipCode && ` ${typedListing.zipCode}`}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                    {formatRent(typedListing.rent)}/mo
-                  </div>
-                  {typedListing.utilities && (
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      + ${typedListing.utilities} utilities
-                    </p>
-                  )}
-                </div>
+            </div>
+
+            {/* Location */}
+            <div className="flex items-center gap-2 mb-4">
+              <MapPin className="w-5 h-5" style={{ color: 'var(--primary)' }} />
+              <span className="text-lg" style={{ color: 'var(--text-secondary)' }}>
+                {typedListing.location}, {typedListing.city}
+                {typedListing.state && `, ${typedListing.state}`}
+                {typedListing.zipCode && ` ${typedListing.zipCode}`}
+              </span>
+            </div>
+
+            {/* Price Card */}
+            <div className="p-4 rounded-2xl" style={{ background: 'var(--surface-secondary)' }}>
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="w-5 h-5" style={{ color: 'var(--primary)' }} />
+                <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                  Monthly Rent
+                </span>
               </div>
+              <div className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                {formatRent(typedListing.rent)}
+                <span className="text-lg font-normal" style={{ color: 'var(--text-secondary)' }}>/month</span>
+              </div>
+              {typedListing.utilities && (
+                <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+                  + ${typedListing.utilities} utilities
+                </p>
+              )}
             </div>
 
             {/* Room Details */}
