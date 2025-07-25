@@ -220,55 +220,63 @@ export default function Profile() {
       // Show loading state
       PersistentLoading.show("Refreshing app data...");
       
-      // Clear all caches step by step for PWA compatibility
+      // Clear React Query cache only - preserve authentication
       await queryClient.clear();
       
-      // Clear browser storage
-      try {
-        localStorage.clear();
-      } catch (e) {
-        console.log('localStorage clear failed:', e);
-      }
+      // Selectively clear localStorage while preserving critical data
+      const keysToPreserve = ['theme', 'auth-cache', 'user-settings'];
+      const preservedData: Record<string, string> = {};
       
-      try {
-        sessionStorage.clear();
-      } catch (e) {
-        console.log('sessionStorage clear failed:', e);
-      }
+      // Save critical data
+      keysToPreserve.forEach(key => {
+        const value = localStorage.getItem(key);
+        if (value) preservedData[key] = value;
+      });
       
-      // Clear service worker caches if available
+      // Clear and restore
+      localStorage.clear();
+      Object.entries(preservedData).forEach(([key, value]) => {
+        localStorage.setItem(key, value);
+      });
+      
+      // Clear only myRoommate-specific service worker caches
       if ('serviceWorker' in navigator && 'caches' in window) {
         try {
           const cacheNames = await caches.keys();
           await Promise.all(
-            cacheNames.map(cacheName => caches.delete(cacheName))
+            cacheNames
+              .filter(name => name.includes('myroommate'))
+              .map(cacheName => caches.delete(cacheName))
           );
         } catch (e) {
           console.log('Cache clearing failed:', e);
         }
       }
       
-      // Use a more PWA-friendly navigation approach
+      // Refresh push subscription if needed
+      if (unifiedNotifications.getEnvironmentInfo().permission === 'granted') {
+        // Re-initialize notifications to refresh subscription
+        await unifiedNotifications.requestPermission();
+      }
+      
+      // Smooth navigation without aggressive reload
       setTimeout(() => {
-        // Hide the loading first
         PersistentLoading.hide();
         
-        // For PWA, use location.replace instead of href to avoid navigation issues
+        // Invalidate all queries to refetch fresh data
+        queryClient.invalidateQueries();
+        
+        // Only reload if not on home page
         if (window.location.pathname !== '/') {
           window.location.replace('/');
-        } else {
-          // If already on home, force a reload
-          window.location.reload();
         }
       }, 1000);
       
     } catch (error) {
       console.error('Refresh error:', error);
-      // Fallback: hide loading and try simple reload
       PersistentLoading.hide();
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      // Fallback: just invalidate queries
+      queryClient.invalidateQueries();
     }
   };
 

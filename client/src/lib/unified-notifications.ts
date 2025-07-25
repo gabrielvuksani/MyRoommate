@@ -91,18 +91,18 @@ export class UnifiedNotificationService {
   private async initializePWANotifications(): Promise<void> {
     if ('serviceWorker' in navigator) {
       try {
-        this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js', {
-          updateViaCache: 'none'
-        });
+        // Register service worker without forcing updates
+        this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js');
         
         await navigator.serviceWorker.ready;
         
-        if (!navigator.serviceWorker.controller) {
-          window.location.reload();
-          return;
+        // Don't force reload if no controller - prevents refresh loops
+        if (navigator.serviceWorker.controller) {
+          await this.setupPushSubscription();
+        } else {
+          // Try again after delay without reload
+          setTimeout(() => this.setupPushSubscription(), 3000);
         }
-        
-        await this.setupPushSubscription();
       } catch (error) {
         console.error('Failed to initialize PWA notifications:', error);
       }
@@ -382,11 +382,31 @@ export class UnifiedNotificationService {
     return 'none';
   }
 
-  // Test functionality
+  // Test functionality - sends real push notification through server
   async testNotification(): Promise<boolean> {
     const hasPermission = await this.requestPermission();
     if (!hasPermission) return false;
 
+    // For PWA push notifications, send through server
+    if (this.pushSubscription) {
+      try {
+        const response = await fetch('/api/push/test', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          return true;
+        }
+      } catch (error) {
+        console.error('Failed to send test push notification:', error);
+      }
+    }
+
+    // Fallback to local notification for non-PWA environments
     return this.showNotification({
       title: 'Test Notification',
       body: 'Your notifications are working perfectly!',

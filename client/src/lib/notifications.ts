@@ -46,26 +46,22 @@ export class NotificationService {
   private async registerServiceWorker(): Promise<void> {
     if ('serviceWorker' in navigator) {
       try {
-        // Force service worker update on every load for reliability
-        this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js', {
-          updateViaCache: 'none'
-        });
+        // Register service worker with normal caching behavior
+        this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js');
         
-        // Wait for service worker to be ready and active
+        // Wait for service worker to be ready
         await navigator.serviceWorker.ready;
         
-        // Ensure service worker is controlling the page
-        if (!navigator.serviceWorker.controller) {
-          // Reload to ensure service worker controls the page
-          window.location.reload();
-          return;
+        // Set up push subscription only if controller exists
+        // Don't force reload if no controller - this prevents refresh loops
+        if (navigator.serviceWorker.controller) {
+          await this.setupPushSubscriptionWithRetry();
+        } else {
+          // Try again after a delay without forcing reload
+          setTimeout(() => this.setupPushSubscriptionWithRetry(), 3000);
         }
-        
-        // Set up push subscription with retry mechanism
-        await this.setupPushSubscriptionWithRetry();
       } catch (error) {
-        // Silent fail but retry after delay
-        setTimeout(() => this.registerServiceWorker(), 2000);
+        console.error('Service worker registration failed:', error);
       }
     }
   }
@@ -518,17 +514,3 @@ export class NotificationService {
 
 // Export singleton instance
 export const notificationService = NotificationService.getInstance();
-
-// Initialize periodic subscription refresh for reliability
-if (typeof window !== 'undefined') {
-  // Refresh subscription every 15 minutes to ensure real-time reliability
-  setInterval(async () => {
-    try {
-      if (notificationService.getPermissionStatus() === 'granted') {
-        await notificationService.subscribeToPush();
-      }
-    } catch (error) {
-      // Silent fail for periodic refresh
-    }
-  }, 15 * 60 * 1000); // 15 minutes
-}
