@@ -252,8 +252,8 @@ export default function Dashboard() {
                 <div 
                   className="w-px my-2"
                   style={{ 
-                    background: "var(--border)",
-                    opacity: 0.3
+                    background: "var(--border-strong)",
+                    opacity: 0.8
                   }}
                 />
               )}
