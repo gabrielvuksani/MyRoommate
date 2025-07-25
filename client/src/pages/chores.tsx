@@ -228,57 +228,43 @@ export default function Chores() {
         )}
 
         {/* Quick Stats */}
-        {(() => {
-          // Calculate task counts once for better performance
-          const taskCounts = { todo: 0, doing: 0, done: 0 };
-          if (Array.isArray(chores)) {
-            chores.forEach((chore: any) => {
-              if (chore.status === 'doing') taskCounts.doing++;
-              else if (chore.status === 'done') taskCounts.done++;
-              else taskCounts.todo++; // 'todo' or no status
-            });
-          }
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border-color)'
+          }}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold mb-1" style={{ color: 'var(--primary)' }}>
+                {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'todo' || !c.status).length : 0}
+              </div>
+              <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>To Do</div>
+            </CardContent>
+          </Card>
           
-          return (
-            <div className="grid grid-cols-3 gap-4">
-              <Card className="glass-card" style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border-color)'
-              }}>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold mb-1" style={{ color: 'var(--primary)' }}>
-                    {taskCounts.todo}
-                  </div>
-                  <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>To Do</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="glass-card" style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border-color)'
-              }}>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold mb-1" style={{ color: '#FF9F0A' }}>
-                    {taskCounts.doing}
-                  </div>
-                  <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>In Progress</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="glass-card" style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border-color)'
-              }}>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold mb-1" style={{ color: '#30D158' }}>
-                    {taskCounts.done}
-                  </div>
-                  <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Done</div>
-                </CardContent>
-              </Card>
-            </div>
-          );
-        })()}
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border-color)'
+          }}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold mb-1" style={{ color: '#FF9F0A' }}>
+                {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'doing').length : 0}
+              </div>
+              <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>In Progress</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="glass-card" style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border-color)'
+          }}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold mb-1" style={{ color: '#30D158' }}>
+                {Array.isArray(chores) ? chores.filter((c: any) => c.status === 'done').length : 0}
+              </div>
+              <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Done</div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* All Chores */}
         <Card className="glass-card" style={{

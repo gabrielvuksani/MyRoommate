@@ -111,27 +111,6 @@ myRoommate is a full-stack web application designed to help roommates manage sha
 ## Recent Changes
 
 **January 25, 2025 (Latest):**
-- ✓ **CRITICAL FIX: Resolved expense page layout issues**: Fixed absolute positioning bug that caused multiple expense cards to overlap - cards now display properly with sequential layout using margin-bottom spacing
-- ✓ **Optimized chores page performance**: Reduced task count calculations from 3 separate filter operations to single-pass iteration, improving performance for large chore lists
-- ✓ **Complete calendar event card redesign with clean glass morphism**: 
-  - ✓ Removed complex gradient time strips for cleaner header with icon and time
-  - ✓ Simplified to single glass-card design matching app-wide consistency
-  - ✓ Event type icons now in compact gradient boxes (meeting: blue-cyan, appointment: purple-pink, social: orange-rose, personal: emerald-teal)
-  - ✓ Cleaner information hierarchy with title, description, and info badges
-  - ✓ Streamlined expand/collapse with chevron indicator
-  - ✓ Improved readability with proper CSS variable usage for colors
-- ✓ **Enhanced chore board spacing**: Fixed responsive spacing issues in stacked card view
-- ✓ **Updated calendar rendering**: Events display in clean list layout with proper spacing between cards
-- ✓ **Maintained security and scalability**: All changes preserve PWA functionality, secure authentication, and million-user scalability requirements
-
-**January 25, 2025 (Earlier):**
-- ✓ **PREMIUM REDESIGN: Implemented Apple Wallet-style stacked card interfaces across all core components**:
-  - ✓ **ChoreBoard component**: Complete redesign with Apple Wallet-style stacked cards using framer-motion, sophisticated 3D transforms, spring animations, and premium glass morphism
-  - ✓ **ExpenseCard component**: Premium redesign with liquid animations, category-specific gradients, settlement progress bars, and Apple-inspired expand/collapse interactions
-  - ✓ **Calendar component**: Full premium overhaul with enhanced calendar grid with motion animations, and sophisticated date selection effects
-- ✓ **Enhanced visual hierarchy**: All components now feature gradient category icons, sophisticated shadow systems, and liquid glass effects inspired by visionOS and iOS 26
-- ✓ **Improved animations**: Spring-based card stacking, 3D perspective transforms, smooth expand/collapse transitions, and premium interaction feedback
-- ✓ **Consistent design language**: Unified glass morphism effects, backdrop blur, gradient accents, and premium typography across all components
 - ✓ **Fixed pinned Create buttons on add pages**: Moved Create buttons from headers to fixed position above bottom navigation on add-chore, add-event, and add-expense pages
 - ✓ **Fixed API call format**: Updated chore and event creation to use correct apiRequest format (method, url, data) matching expense page implementation
 - ✓ **Added bottom spacing**: Added pb-32 padding to all three add pages to ensure content isn't hidden behind pinned Create button

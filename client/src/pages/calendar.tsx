@@ -4,296 +4,233 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { notificationService } from "@/lib/notifications";
-import { motion, AnimatePresence } from "framer-motion";
 
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Plus, 
-  Calendar as CalendarIcon, 
-  Clock, 
-  MapPin, 
-  Users, 
-  Repeat, 
-  Trash2, 
-  Bell,
-  MoreVertical 
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Clock, MapPin, Users, Repeat, Trash2, Bell, MoreVertical } from "lucide-react";
 
-// Premium Calendar Event Card Component
-const CalendarEventCard = ({ 
-  event, 
-  onDelete, 
-  index,
-  totalCards,
-  isActive,
-  onActivate
-}: { 
-  event: any; 
-  onDelete: (id: string) => void; 
-  index: number;
-  totalCards: number;
-  isActive: boolean;
-  onActivate: () => void;
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+// Calendar Event Card Component
+const CalendarEventCard = ({ event, onDelete, index }: { event: any; onDelete: (id: string) => void; index: number }) => {
+  const [showDetails, setShowDetails] = useState(false);
   
   const getEventTypeConfig = (type: string) => {
     switch (type?.toLowerCase()) {
       case 'meeting':
         return {
           icon: '👥',
-          gradient: 'from-blue-500 via-blue-600 to-cyan-500',
-          glow: 'rgba(59, 130, 246, 0.4)',
-          pattern: 'bg-gradient-to-br from-blue-400/20 via-transparent to-cyan-400/20',
-          color: '#3B82F6'
+          gradient: 'from-blue-500 to-cyan-500',
+          bgLight: 'bg-blue-50',
+          bgDark: 'bg-blue-950/20',
+          textColor: 'text-blue-600 dark:text-blue-400'
         };
       case 'appointment':
         return {
           icon: '📅',
-          gradient: 'from-purple-500 via-fuchsia-500 to-pink-500',
-          glow: 'rgba(168, 85, 247, 0.4)',
-          pattern: 'bg-gradient-to-br from-purple-400/20 via-transparent to-pink-400/20',
-          color: '#8B5CF6'
+          gradient: 'from-purple-500 to-pink-500',
+          bgLight: 'bg-purple-50',
+          bgDark: 'bg-purple-950/20',
+          textColor: 'text-purple-600 dark:text-purple-400'
         };
       case 'social':
         return {
           icon: '🎉',
-          gradient: 'from-orange-500 via-rose-500 to-pink-500',
-          glow: 'rgba(251, 146, 60, 0.4)',
-          pattern: 'bg-gradient-to-br from-orange-400/20 via-transparent to-rose-400/20',
-          color: '#F97316'
+          gradient: 'from-orange-500 to-amber-500',
+          bgLight: 'bg-orange-50',
+          bgDark: 'bg-orange-950/20',
+          textColor: 'text-orange-600 dark:text-orange-400'
         };
       case 'personal':
         return {
           icon: '⭐',
-          gradient: 'from-emerald-500 via-green-500 to-teal-500',
-          glow: 'rgba(16, 185, 129, 0.4)',
-          pattern: 'bg-gradient-to-br from-emerald-400/20 via-transparent to-teal-400/20',
-          color: '#10B981'
+          gradient: 'from-green-500 to-emerald-500',
+          bgLight: 'bg-green-50',
+          bgDark: 'bg-green-950/20',
+          textColor: 'text-green-600 dark:text-green-400'
         };
       default:
         return {
           icon: '📍',
-          gradient: 'from-gray-500 via-slate-600 to-gray-700',
-          glow: 'rgba(107, 114, 128, 0.4)',
-          pattern: 'bg-gradient-to-br from-gray-400/20 via-transparent to-slate-400/20',
-          color: '#6B7280'
+          gradient: 'from-gray-500 to-gray-600',
+          bgLight: 'bg-gray-50',
+          bgDark: 'bg-gray-800/20',
+          textColor: 'text-gray-600 dark:text-gray-400'
         };
     }
   };
   
   const typeConfig = getEventTypeConfig(event.type);
-  const eventColor = event.color || typeConfig.color;
+  const eventColor = event.color || '#007AFF';
   
-  const handleDelete = () => {
-    if (onDelete) {
-      onDelete(event.id);
-    }
-  };
-
   return (
-    <motion.div
-      className="mb-4"
-      initial={{ 
-        y: 20, 
-        opacity: 0
-      }}
-      animate={{ 
-        y: 0,
-        opacity: 1
-      }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 500, 
-        damping: 30,
-        delay: index * 0.03
+    <div 
+      className={`
+        group relative overflow-hidden transition-all duration-300 animate-fade-in
+        ${showDetails ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
+      `}
+      style={{
+        borderRadius: '20px',
+        background: 'var(--glass-card)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid var(--glass-border)',
+        boxShadow: showDetails 
+          ? '0 20px 40px -10px rgba(0, 0, 0, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)'
+          : '0 4px 24px -2px rgba(0, 0, 0, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
+        animationDelay: `${index * 100}ms`
       }}
     >
+      {/* Event color accent */}
       <div 
-        className="glass-card overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-lg cursor-pointer"
-        style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border-color)'
-        }}
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="p-4">
-          {/* Header with time and type */}
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-3">
-              {/* Type icon with gradient background */}
-              <div 
-                className={`w-10 h-10 rounded-xl bg-gradient-to-r ${typeConfig.gradient} flex items-center justify-center shadow-sm`}
-              >
-                <span className="text-lg">{typeConfig.icon}</span>
-              </div>
+        className="absolute top-0 left-0 w-1 h-full opacity-80"
+        style={{ backgroundColor: eventColor }}
+      />
+      
+      {/* Main content */}
+      <div className="p-5 pl-6">
+        <div className="flex items-start justify-between gap-4">
+          {/* Left side - event info */}
+          <div className="flex items-start gap-4 flex-1">
+            {/* Type icon */}
+            <div className={`
+              w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0
+              bg-gradient-to-br ${typeConfig.gradient} shadow-lg
+            `}>
+              <span className="text-white text-xl">{typeConfig.icon}</span>
+            </div>
+            
+            {/* Event details */}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                {event.title}
+              </h3>
               
-              {/* Time info */}
-              <div>
-                <div className="flex items-center gap-2">
-                  <Clock size={14} style={{ color: typeConfig.color }} />
-                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+              {event.description && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                  {event.description}
+                </p>
+              )}
+              
+              {/* Meta information */}
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                {/* Time */}
+                <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                  <Clock size={14} />
+                  <span>
                     {event.allDay ? 'All Day' : new Date(event.startDate).toLocaleTimeString('en-US', {
                       hour: 'numeric',
                       minute: '2-digit'
                     })}
+                    {event.endDate && !event.allDay && (
+                      <span className="text-gray-500 dark:text-gray-500">
+                        {' - '}
+                        {new Date(event.endDate).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    )}
                   </span>
                 </div>
-                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  {new Date(event.startDate).toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                  })}
-                </span>
+                
+                {/* Location */}
+                {event.location && (
+                  <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                    <MapPin size={14} />
+                    <span className="truncate max-w-[150px]">{event.location}</span>
+                  </div>
+                )}
+                
+                {/* Attendees */}
+                {event.attendees && event.attendees.length > 0 && (
+                  <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                    <Users size={14} />
+                    <span>{event.attendees.length} attendees</span>
+                  </div>
+                )}
+              </div>
+              
+              {/* Tags */}
+              <div className="flex flex-wrap items-center gap-2 mt-3">
+                {/* Type badge */}
+                <div className={`
+                  flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
+                  ${typeConfig.bgLight} dark:${typeConfig.bgDark} ${typeConfig.textColor}
+                `}>
+                  <span className="capitalize">{event.type || 'Event'}</span>
+                </div>
+                
+                {/* Recurring badge */}
+                {event.isRecurring && event.recurrencePattern && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                    <Repeat size={12} />
+                    <span className="capitalize">{event.recurrencePattern}</span>
+                  </div>
+                )}
+                
+                {/* Reminder badge */}
+                {event.reminderMinutes && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                    <Bell size={12} />
+                    <span>{event.reminderMinutes}m reminder</span>
+                  </div>
+                )}
               </div>
             </div>
-            
-            {/* Expand/collapse indicator */}
+          </div>
+          
+          {/* Right side - actions */}
+          <div className="flex items-start gap-2">
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsExpanded(!isExpanded);
-              }}
-              className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              onClick={() => setShowDetails(!showDetails)}
+              className="p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <ChevronDown 
-                size={16} 
-                className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-                style={{ color: 'var(--text-secondary)' }}
-              />
+              <MoreVertical size={16} className="text-gray-500" />
             </button>
-          </div>
-          
-          {/* Title and description */}
-          <div className="mb-3">
-            <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
-              {event.title}
-            </h3>
-            {event.description && (
-              <p className="text-sm line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
-                {event.description}
-              </p>
-            )}
-          </div>
-          
-          {/* Info badges */}
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Location */}
-            {event.location && (
-              <div 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
-                style={{
-                  background: `${typeConfig.color}15`,
-                  color: typeConfig.color
-                }}
-              >
-                <MapPin size={12} />
-                <span className="truncate max-w-[120px]">{event.location}</span>
-              </div>
-            )}
-            
-            {/* Attendees */}
-            {event.attendees && event.attendees.length > 0 && (
-              <div 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
-                style={{
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                <Users size={12} />
-                <span>{event.attendees.length} attending</span>
-              </div>
-            )}
-            
-            {/* Recurring badge */}
-            {event.isRecurring && event.recurrencePattern && (
-              <div 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
-                style={{
-                  background: 'rgba(59, 130, 246, 0.1)',
-                  color: 'var(--primary)'
-                }}
-              >
-                <Repeat size={12} />
-                <span className="capitalize">{event.recurrencePattern}</span>
-              </div>
-            )}
+            <button
+              onClick={() => onDelete(event.id)}
+              className="p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              <Trash2 size={16} className="text-red-600 dark:text-red-400" />
+            </button>
           </div>
         </div>
         
         {/* Expanded content */}
-        <AnimatePresence>
-          {isExpanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
-              <div className="pt-3 mt-3 space-y-3" style={{ borderTop: '1px solid var(--border-color)' }}>
-                {/* Full description if truncated */}
-                {event.description && event.description.length > 80 && (
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                    {event.description}
-                  </p>
-                )}
-                
-                {/* Reminder info */}
-                {event.reminderMinutes && (
-                  <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                    <Bell size={14} />
-                    <span>Reminder {event.reminderMinutes} minutes before</span>
-                  </div>
-                )}
-                
-                {/* Delete action */}
-                <div className="flex justify-end pt-2">
-                  {!showDeleteConfirm ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowDeleteConfirm(true);
-                      }}
-                      className="text-sm text-red-600 hover:text-red-700 transition-colors font-medium"
-                    >
-                      Delete Event
-                    </button>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Delete?</span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowDeleteConfirm(false);
-                        }}
-                        className="px-3 py-1 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        style={{ color: 'var(--text-secondary)' }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete();
-                        }}
-                        className="px-3 py-1 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors font-medium"
-                      >
-                        Delete
-                      </button>
+        {showDetails && (
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/50 animate-fade-in">
+            {/* Notes */}
+            {event.notes && (
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
+                  {event.notes}
+                </p>
+              </div>
+            )}
+            
+            {/* Full attendees list */}
+            {event.attendees && event.attendees.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Attendees</h4>
+                <div className="space-y-2">
+                  {event.attendees.map((attendee: string, idx: number) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-xs font-medium text-gray-700 dark:text-gray-300">
+                        {attendee.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{attendee}</span>
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+            
+            {/* Creator info */}
+            <div className="mt-4 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <span>Created by {event.creator?.firstName || 'Unknown'}</span>
+            </div>
+          </div>
+        )}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -301,7 +238,6 @@ export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [currentDate, setCurrentDate] = useState(new Date());
   const [headerScrolled, setHeaderScrolled] = useState(false);
-  const [activeEventIndex, setActiveEventIndex] = useState(0);
   const [, navigate] = useLocation();
   
   const queryClient = useQueryClient();
@@ -328,7 +264,6 @@ export default function Calendar() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/calendar"] });
-      setActiveEventIndex(0);
     },
     onError: (error) => {
       console.error('Error deleting event:', error);
@@ -375,7 +310,6 @@ export default function Calendar() {
   const handleDayClick = (day: number) => {
     const clickedDate = new Date(currentYear, currentMonth, day);
     setSelectedDate(clickedDate);
-    setActiveEventIndex(0);
   };
 
   const getDayEvents = (day: number) => {
@@ -538,16 +472,13 @@ export default function Calendar() {
                 </button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {getDayEvents(selectedDate.getDate()).map((event: any, index: number) => (
                   <CalendarEventCard 
                     key={event.id} 
                     event={event} 
                     onDelete={handleDeleteEvent} 
-                    index={index}
-                    totalCards={getDayEvents(selectedDate.getDate()).length}
-                    isActive={activeEventIndex === index}
-                    onActivate={() => setActiveEventIndex(index)}
+                    index={index} 
                   />
                 ))}
               </div>
