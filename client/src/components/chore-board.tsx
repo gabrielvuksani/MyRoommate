@@ -337,7 +337,7 @@ export default function ChoreBoard({ chores, onUpdateChore, onDeleteChore }: Cho
           className="px-6 py-3 rounded-xl font-medium btn-animated text-white hover:scale-[1.05] transition-all"
           style={{ background: 'var(--primary)' }}
         >
-          Add First Chore
+          Create a Task
         </button>
       </div>
     );

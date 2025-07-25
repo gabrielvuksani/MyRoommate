@@ -242,7 +242,7 @@ export default function Calendar() {
                   onClick={() => navigate('/add-event')}
                   className="bg-primary text-white px-6 py-3 rounded-xl font-semibold btn-animated"
                 >
-                  Add Event
+                  Create an Event
                 </button>
               </div>
             ) : (
