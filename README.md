@@ -4,7 +4,7 @@
 
 myRoommate is a full-stack web application designed to help roommates list openings and manage shared living responsibilities. The app provides features for listing and renting roommate openings, managing household chores, household expense splitting, calendar events, and real-time messaging. Built with a modern React frontend and Express.js backend, it uses PostgreSQL for data persistence and WebSocket for real-time communication. Supabase is used for DB backend integration.
 
-**Preview Beta Link: https://myroommate.app**
+**Preview Beta Link: <a href="https://myroommate.app" target="_blank">myroommate.app</a>**
 
 ## System Architecture
 
